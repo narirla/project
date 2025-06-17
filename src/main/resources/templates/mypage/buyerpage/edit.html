@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지 수정</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-4">
+  <h2>구매자 마이페이지 수정</h2>
+
+  <form th:action="@{|/mypage/buyer/${form.memberId}|}" th:object="${form}" method="post" enctype="multipart/form-data">
+    <!-- 이미지 업로드 -->
+    <div class="mb-3">
+      <label for="imageFile" class="form-label">프로필 이미지 변경</label>
+      <input type="file" class="form-control" th:field="*{imageFile}" id="imageFile">
+    </div>
+
+    <div class="mb-3">
+      <label for="intro" class="form-label">자기소개</label>
+      <textarea class="form-control" th:field="*{intro}" id="intro" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="recentOrder" class="form-label">최근 주문 상품</label>
+      <input type="text" class="form-control" th:field="*{recentOrder}" id="recentOrder">
+    </div>
+
+    <div class="mb-3">
+      <label for="point" class="form-label">포인트</label>
+      <input type="number" class="form-control" th:field="*{point}" id="point">
+    </div>
+
+    <!-- pageId, memberId는 hidden으로 전달 -->
+    <input type="hidden" th:field="*{pageId}">
+    <input type="hidden" th:field="*{memberId}">
+
+    <button type="submit" class="btn btn-success">수정</button>
+  </form>
+</body>
+</html>
