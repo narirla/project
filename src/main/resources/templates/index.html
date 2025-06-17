@@ -53,8 +53,9 @@
       margin-top: -10px;
     }
     .logo img {
+      width: 32px;
       height: 32px;
-      margin-top: -10px;
+      margin-top: -5px;
       vertical-align: middle;
     }
     .search-box {
@@ -215,28 +216,33 @@
     <div class="container">
       <div class="header-top">
         <div class="user-login">
-          <a href="#">로그인</a>
-          <a href="#">회원가입</a>
+          <th:block th:if="${session.loginUser == null}">
+            <a href="/user/login?redirect=/">로그인</a>
+            <a href="/user/register">회원가입</a>
+          </th:block>
+          <th:block th:if="${session.loginUser != null}">
+            <a href="/user/logout">로그아웃</a>
+          </th:block>
         </div>
         <div class="user-menu">
           <a href="#"><i class="fa fa-heart"></i></a>
-          <a href="#"><i class="fa fa-user"></i></a>
+          <a href="/user/mypage"><i class="fa fa-user"></i></a>
           <a href="#"><i class="fa fa-shopping-bag"></i></a>
         </div>
         <div class="header-main">
-          <span class="logo"><img src="src/main/resources/static/img/Logo.png" width="32"> MO:SI </span>
+          <span class="logo"><img src="Logo.png" width="32"> MO:SI </span>
           <span class="search-box">
-            <input type="text" placeholder="검색어를 입력하세요.">
-            <i class="fa fa-search" style="color:#aaa; margin-left:-30px;"></i>
-          </span>
+              <input type="text" placeholder="검색어를 입력하세요.">
+              <i class="fa fa-search" style="color:#aaa; margin-left:-30px;"></i>
+            </span>
         </div>
       </div>
       <nav class="nav">
-        <a href="#">전체메뉴</a>
-        <a href="#">테마여행</a>
-        <a href="#">커뮤니티</a>
-        <a href="#">항공</a>
-        <a href="#">호텔</a>
+        <a href="/menu.html">전체메뉴</a>
+        <a href="/theme.html">테마여행</a>
+        <a href="/community.html">커뮤니티</a>
+        <a href="/air.html">항공</a>
+        <a href="/hotel.html">호텔</a>
       </nav>
     </div>
   </header>
@@ -351,225 +357,225 @@
             <span class="price">5,000원</span>
             <span class="sale">4,500원</span>
             <span class="tag">MO:SI 인기</span>
-            
+
           </div>
         </div>
       </div>
     </div>
   </div>
-    </div>
-</div>
-<!-- 인기 가이드 섹션 -->
-<div class="container-guide" style="margin-top:40px;">
-  <div style="font-size:18px; font-weight:bold; margin-bottom:16px;">인기 가이드 <a href="#" style="float:right; font-size:14px; color:#888; text-decoration:none;">전체보기 &gt;</a></div>
-  <div style="display:flex; flex-wrap:wrap; gap:16px;">
-    <!-- 가이드 카드 1 -->
-    <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
-      <img src="https://randomuser.me/api/portraits/men/32.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">류제홍</div>
-        <div style="font-size:12px; color:#888;">가이드의 페이커</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">#부산 #핫플길라잡이 #운전가능</div>
+  </div>
+  </div>
+  <!-- 인기 가이드 섹션 -->
+  <div class="container-guide" style="margin-top:40px;">
+    <div style="font-size:18px; font-weight:bold; margin-bottom:16px;">인기 가이드 <a href="#" style="float:right; font-size:14px; color:#888; text-decoration:none;">전체보기 &gt;</a></div>
+    <div style="display:flex; flex-wrap:wrap; gap:16px;">
+      <!-- 가이드 카드 1 -->
+      <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">류제홍</div>
+          <div style="font-size:12px; color:#888;">가이드의 페이커</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">#부산 #핫플길라잡이 #운전가능</div>
+        </div>
+        <div style="text-align:right; min-width:60px;">
+          <i class="fa fa-user" style="color:#bbb;"></i>
+          <span style="font-size:14px; color:#666;">3.65K</span>
+        </div>
       </div>
-      <div style="text-align:right; min-width:60px;">
-        <i class="fa fa-user" style="color:#bbb;"></i>
-        <span style="font-size:14px; color:#666;">3.65K</span>
+      <!-- 가이드 카드 2 -->
+      <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">소련여자</div>
+          <div style="font-size:12px; color:#888;">홍차 마시러 갈 사람?</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">#서울 #디저트 전문 #러시아어 가능</div>
+        </div>
+        <div style="text-align:right; min-width:60px;">
+          <i class="fa fa-user" style="color:#bbb;"></i>
+          <span style="font-size:14px; color:#666;">10.2K</span>
+        </div>
       </div>
-    </div>
-    <!-- 가이드 카드 2 -->
-    <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
-      <img src="https://randomuser.me/api/portraits/women/44.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">소련여자</div>
-        <div style="font-size:12px; color:#888;">홍차 마시러 갈 사람?</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">#서울 #디저트 전문 #러시아어 가능</div>
+      <!-- 가이드 카드 3 -->
+      <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
+        <img src="https://randomuser.me/api/portraits/men/33.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">최준</div>
+          <div style="font-size:12px; color:#888;">이 사람에 대한 정보가 없어요</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">#이 사람에 대한 정보가 없어요</div>
+        </div>
+        <div style="text-align:right; min-width:60px;">
+          <i class="fa fa-user" style="color:#bbb;"></i>
+          <span style="font-size:14px; color:#666;">5.25K</span>
+        </div>
       </div>
-      <div style="text-align:right; min-width:60px;">
-        <i class="fa fa-user" style="color:#bbb;"></i>
-        <span style="font-size:14px; color:#666;">10.2K</span>
+      <!-- 가이드 카드 4 -->
+      <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
+        <img src="https://randomuser.me/api/portraits/men/34.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">김영남</div>
+          <div style="font-size:12px; color:#888;">이 사람에 대한 정보가 없어요</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">#이 사람에 대한 정보가 없어요</div>
+        </div>
+        <div style="text-align:right; min-width:60px;">
+          <i class="fa fa-user" style="color:#bbb;"></i>
+          <span style="font-size:14px; color:#666;">1.12K</span>
+        </div>
       </div>
-    </div>
-    <!-- 가이드 카드 3 -->
-    <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
-      <img src="https://randomuser.me/api/portraits/men/33.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">최준</div>
-        <div style="font-size:12px; color:#888;">이 사람에 대한 정보가 없어요</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">#이 사람에 대한 정보가 없어요</div>
+      <!-- 가이드 카드 5 -->
+      <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
+        <img src="https://randomuser.me/api/portraits/men/35.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">빠니보틀</div>
+          <div style="font-size:12px; color:#888;">이 사람에 대한 정보가 없어요</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">#이 사람에 대한 정보가 없어요</div>
+        </div>
+        <div style="text-align:right; min-width:60px;">
+          <i class="fa fa-user" style="color:#bbb;"></i>
+          <span style="font-size:14px; color:#666;">8.34K</span>
+        </div>
       </div>
-      <div style="text-align:right; min-width:60px;">
-        <i class="fa fa-user" style="color:#bbb;"></i>
-        <span style="font-size:14px; color:#666;">5.25K</span>
+      <!-- 가이드 카드 6 -->
+      <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
+        <img src="https://randomuser.me/api/portraits/men/36.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">잇섭</div>
+          <div style="font-size:12px; color:#888;">새 기계 언박싱마스터</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">#경기도 #여행장비 지원 #신기계 여행</div>
+        </div>
+        <div style="text-align:right; min-width:60px;">
+          <i class="fa fa-user" style="color:#bbb;"></i>
+          <span style="font-size:14px; color:#666;">12.34K</span>
+        </div>
       </div>
-    </div>
-    <!-- 가이드 카드 4 -->
-    <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
-      <img src="https://randomuser.me/api/portraits/men/34.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">김영남</div>
-        <div style="font-size:12px; color:#888;">이 사람에 대한 정보가 없어요</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">#이 사람에 대한 정보가 없어요</div>
+      <!-- 가이드 카드 7 -->
+      <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
+        <img src="https://randomuser.me/api/portraits/men/37.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">곽튜브</div>
+          <div style="font-size:12px; color:#888;">이 사람에 대한 정보가 없어요</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">#이 사람에 대한 정보가 없어요</div>
+        </div>
+        <div style="text-align:right; min-width:60px;">
+          <i class="fa fa-user" style="color:#bbb;"></i>
+          <span style="font-size:14px; color:#666;">3.08K</span>
+        </div>
       </div>
-      <div style="text-align:right; min-width:60px;">
-        <i class="fa fa-user" style="color:#bbb;"></i>
-        <span style="font-size:14px; color:#666;">1.12K</span>
-      </div>
-    </div>
-    <!-- 가이드 카드 5 -->
-    <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
-      <img src="https://randomuser.me/api/portraits/men/35.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">빠니보틀</div>
-        <div style="font-size:12px; color:#888;">이 사람에 대한 정보가 없어요</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">#이 사람에 대한 정보가 없어요</div>
-      </div>
-      <div style="text-align:right; min-width:60px;">
-        <i class="fa fa-user" style="color:#bbb;"></i>
-        <span style="font-size:14px; color:#666;">8.34K</span>
-      </div>
-    </div>
-    <!-- 가이드 카드 6 -->
-    <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
-      <img src="https://randomuser.me/api/portraits/men/36.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">잇섭</div>
-        <div style="font-size:12px; color:#888;">새 기계 언박싱마스터</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">#경기도 #여행장비 지원 #신기계 여행</div>
-      </div>
-      <div style="text-align:right; min-width:60px;">
-        <i class="fa fa-user" style="color:#bbb;"></i>
-        <span style="font-size:14px; color:#666;">12.34K</span>
-      </div>
-    </div>
-    <!-- 가이드 카드 7 -->
-    <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
-      <img src="https://randomuser.me/api/portraits/men/37.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">곽튜브</div>
-        <div style="font-size:12px; color:#888;">이 사람에 대한 정보가 없어요</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">#이 사람에 대한 정보가 없어요</div>
-      </div>
-      <div style="text-align:right; min-width:60px;">
-        <i class="fa fa-user" style="color:#bbb;"></i>
-        <span style="font-size:14px; color:#666;">3.08K</span>
-      </div>
-    </div>
-    <!-- 가이드 카드 8 -->
-    <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
-      <img src="https://randomuser.me/api/portraits/men/38.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">김원훈</div>
-        <div style="font-size:12px; color:#888;">말해 말까? 말해 말까?</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">#충청도 #유우머단체 #크몽이스</div>
-      </div>
-      <div style="text-align:right; min-width:60px;">
-        <i class="fa fa-user" style="color:#bbb;"></i>
-        <span style="font-size:14px; color:#666;">4.13K</span>
+      <!-- 가이드 카드 8 -->
+      <div style="flex:1 1 48%; background:#fff; border-radius:12px; display:flex; align-items:center; padding:16px; min-width:350px;">
+        <img src="https://randomuser.me/api/portraits/men/38.jpg" style="width:56px; height:56px; border-radius:50%; object-fit:cover; margin-right:16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">김원훈</div>
+          <div style="font-size:12px; color:#888;">말해 말까? 말해 말까?</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">#충청도 #유우머단체 #크몽이스</div>
+        </div>
+        <div style="text-align:right; min-width:60px;">
+          <i class="fa fa-user" style="color:#bbb;"></i>
+          <span style="font-size:14px; color:#666;">4.13K</span>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<!-- 커뮤니티 섹션 -->
-<div class="container-community" style="margin-top:40px;">
-  <div style="font-size:18px; font-weight:bold; margin-bottom:16px;">MO:SI 커뮤니티에 놀러오세요 <a href="#" style="float:right; font-size:14px; color:#888; text-decoration:none;">전체보기 &gt;</a></div>
-  <div style="display:flex; flex-direction:column; gap:12px;">
-    <!-- 커뮤니티 게시글 1 -->
-    <div style="background:#fff; border-radius:10px; display:flex; align-items:center; padding:12px 16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">[당첨자 발표] 최대 500만원, 풀코스로 모십니다!</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">소확행 소문을 들을 줄 아는 당신의 무한한 경험을 들려주세요! 많은 분들께서 쓰신 후기 이야기...</div>
+  <!-- 커뮤니티 섹션 -->
+  <div class="container-community" style="margin-top:40px;">
+    <div style="font-size:18px; font-weight:bold; margin-bottom:16px;">MO:SI 커뮤니티에 놀러오세요 <a href="#" style="float:right; font-size:14px; color:#888; text-decoration:none;">전체보기 &gt;</a></div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <!-- 커뮤니티 게시글 1 -->
+      <div style="background:#fff; border-radius:10px; display:flex; align-items:center; padding:12px 16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">[당첨자 발표] 최대 500만원, 풀코스로 모십니다!</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">소확행 소문을 들을 줄 아는 당신의 무한한 경험을 들려주세요! 많은 분들께서 쓰신 후기 이야기...</div>
+          <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 2,074 · 댓글 96</div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80" style="width:56px; height:56px; border-radius:8px; object-fit:cover; margin-left:16px;">
+      </div>
+      <!-- 커뮤니티 게시글 2 -->
+      <div style="background:#fff; border-radius:10px; display:flex; align-items:center; padding:12px 16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">타임지가 정한 2025 부산 여행 트렌드</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">소문난 부산 여행지와 트렌드, 새로운 명소를 소개합니다.</div>
+          <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 1,504 · 댓글 19</div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=80&q=80" style="width:56px; height:56px; border-radius:8px; object-fit:cover; margin-left:16px;">
+      </div>
+      <!-- 커뮤니티 게시글 3 -->
+      <div style="background:#fff; border-radius:10px; display:flex; align-items:center; padding:12px 16px;">
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:500;">무더운 여름을 피하는 부산 로컬맛집 명소</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">부산에서만 맛볼 수 있는 특별한 피서지 추천! 피서지 1순위는?</div>
+          <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 3,234 · 댓글 12</div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=80&q=80" style="width:56px; height:56px; border-radius:8px; object-fit:cover; margin-left:16px;">
+      </div>
+    </div>
+    <!-- 카테고리별 인기글 -->
+    <div style="display:flex; gap:12px; margin-top:16px;">
+      <div style="flex:1; background:#fff; border-radius:10px; padding:12px 16px;">
+        <div style="font-size:14px; font-weight:500; margin-bottom:8px;">실내</div>
+        <div style="font-size:12px; color:#888;">청춘을 60마리 물회 속 노을과 노래와 노하우</div>
         <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 2,074 · 댓글 96</div>
       </div>
-      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80" style="width:56px; height:56px; border-radius:8px; object-fit:cover; margin-left:16px;">
-    </div>
-    <!-- 커뮤니티 게시글 2 -->
-    <div style="background:#fff; border-radius:10px; display:flex; align-items:center; padding:12px 16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">타임지가 정한 2025 부산 여행 트렌드</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">소문난 부산 여행지와 트렌드, 새로운 명소를 소개합니다.</div>
+      <div style="flex:1; background:#fff; border-radius:10px; padding:12px 16px;">
+        <div style="font-size:14px; font-weight:500; margin-bottom:8px;">반려견</div>
+        <div style="font-size:12px; color:#888;">우정의 명가가 가장 사랑하는 여행지</div>
         <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 1,504 · 댓글 19</div>
       </div>
-      <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=80&q=80" style="width:56px; height:56px; border-radius:8px; object-fit:cover; margin-left:16px;">
-    </div>
-    <!-- 커뮤니티 게시글 3 -->
-    <div style="background:#fff; border-radius:10px; display:flex; align-items:center; padding:12px 16px;">
-      <div style="flex:1;">
-        <div style="font-size:15px; font-weight:500;">무더운 여름을 피하는 부산 로컬맛집 명소</div>
-        <div style="font-size:12px; color:#888; margin-top:4px;">부산에서만 맛볼 수 있는 특별한 피서지 추천! 피서지 1순위는?</div>
+      <div style="flex:1; background:#fff; border-radius:10px; padding:12px 16px;">
+        <div style="font-size:14px; font-weight:500; margin-bottom:8px;">맛집</div>
+        <div style="font-size:12px; color:#888;">부산 대표 맛집, 부산 해산물 맛집 BEST 5</div>
         <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 3,234 · 댓글 12</div>
       </div>
-      <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=80&q=80" style="width:56px; height:56px; border-radius:8px; object-fit:cover; margin-left:16px;">
+    </div>
+    <!-- 공지 -->
+    <div style="background:#f5f7fa; border-radius:8px; padding:10px 16px; margin-top:16px; font-size:13px; color:#009688;">
+      <b>공지</b> <span style="color:#888;">•</span> <span style="color:#666;">[~6/1] N년-2%더 더! 적립 • 항공/투어 구매 인증 이벤트 당첨자 안내</span>
+      <a href="#" style="float:right; font-size:13px; color:#0099ad; text-decoration:underline;">+ 더보기</a>
     </div>
   </div>
-  <!-- 카테고리별 인기글 -->
-  <div style="display:flex; gap:12px; margin-top:16px;">
-    <div style="flex:1; background:#fff; border-radius:10px; padding:12px 16px;">
-      <div style="font-size:14px; font-weight:500; margin-bottom:8px;">실내</div>
-      <div style="font-size:12px; color:#888;">청춘을 60마리 물회 속 노을과 노래와 노하우</div>
-      <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 2,074 · 댓글 96</div>
-    </div>
-    <div style="flex:1; background:#fff; border-radius:10px; padding:12px 16px;">
-      <div style="font-size:14px; font-weight:500; margin-bottom:8px;">반려견</div>
-      <div style="font-size:12px; color:#888;">우정의 명가가 가장 사랑하는 여행지</div>
-      <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 1,504 · 댓글 19</div>
-    </div>
-    <div style="flex:1; background:#fff; border-radius:10px; padding:12px 16px;">
-      <div style="font-size:14px; font-weight:500; margin-bottom:8px;">맛집</div>
-      <div style="font-size:12px; color:#888;">부산 대표 맛집, 부산 해산물 맛집 BEST 5</div>
-      <div style="font-size:11px; color:#bbb; margin-top:2px;">조회수 3,234 · 댓글 12</div>
-    </div>
-  </div>
-  <!-- 공지 -->
-  <div style="background:#f5f7fa; border-radius:8px; padding:10px 16px; margin-top:16px; font-size:13px; color:#009688;">
-    <b>공지</b> <span style="color:#888;">•</span> <span style="color:#666;">[~6/1] N년-2%더 더! 적립 • 항공/투어 구매 인증 이벤트 당첨자 안내</span>
-    <a href="#" style="float:right; font-size:13px; color:#0099ad; text-decoration:underline;">+ 더보기</a>
-  </div>
-</div>
   <!-- 푸터 영역 시작 -->
-<footer style="background:#0099ad; color:#fff; padding:40px 0 30px 0;">
-  <div style="width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between;">
-    <!-- 회사 정보 -->
-    <div style="flex:2; padding-left:10px;">
-      <div style="font-size:28px; font-weight:bold; margin-bottom:16px;">MO:SI</div>
-      <div style="font-size:15px; font-weight:500; margin-bottom:8px;">(주) KH정보교육원</div>
-      <div style="font-size:13px; color:#e0f7fa; margin-bottom:4px;">
-        사업자등록번호 : 111-11-1111 | KH정보교육원<br>
-        대표이사 : 허진희 | 통신판매업신고 : 2022-부산해운-1234<br>
-        주소 : 부산광역시 남구 전포대로 133, KH정보교육원
+  <footer style="background:#0099ad; color:#fff; padding:40px 0 30px 0;">
+    <div style="width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between;">
+      <!-- 회사 정보 -->
+      <div style="flex:2; padding-left:10px;">
+        <div style="font-size:28px; font-weight:bold; margin-bottom:16px;">MO:SI</div>
+        <div style="font-size:15px; font-weight:500; margin-bottom:8px;">(주) KH정보교육원</div>
+        <div style="font-size:13px; color:#e0f7fa; margin-bottom:4px;">
+          사업자등록번호 : 111-11-1111 | KH정보교육원<br>
+          대표이사 : 허진희 | 통신판매업신고 : 2022-부산해운-1234<br>
+          주소 : 부산광역시 남구 전포대로 133, KH정보교육원
+        </div>
+        <div style="font-size:13px; color:#ebfcff; margin-bottom:4px;">
+          관광사업자 등록번호 : 제2022-000012호 | 개인정보보호책임자 : 신원석<br>
+          ※ (주)KH정보교육원은 통신판매중개자이며, 상품·거래정보 및 거래에 대해 책임을 지지 않습니다.
+        </div>
+        <div style="font-size:13px; color:#ebfcff;">
+          Copyright ⓒ Shinemusencat Inc. all rights reserved.
+        </div>
       </div>
-      <div style="font-size:13px; color:#ebfcff; margin-bottom:4px;">
-        관광사업자 등록번호 : 제2022-000012호 | 개인정보보호책임자 : 신원석<br>
-        ※ (주)KH정보교육원은 통신판매중개자이며, 상품·거래정보 및 거래에 대해 책임을 지지 않습니다.
-      </div>
-      <div style="font-size:13px; color:#ebfcff;">
-        Copyright ⓒ Shinemusencat Inc. all rights reserved.
+      <!-- 고객센터 및 소셜 -->
+      <div style="flex:1; min-width:260px;">
+        <div style="font-size:15px; font-weight:500; margin-bottom:8px;">고객센터</div>
+        <div style="font-size:13px; color:#ebfcff; margin-bottom:4px;">
+          운영시간 : 평일 09시~18시<br>
+          이메일 : mosi@kh.kr
+        </div>
+        <div style="margin-top:16px;">
+          <span style="font-size:15px; font-weight:500;">Follow us</span>
+          <span style="margin-left:12px;">
+            <a href="#" style="color:#fff; margin-right:8px;"><i class="fab fa-instagram fa-lg"></i></a>
+            <a href="#" style="color:#fff; margin-right:8px;"><i class="fab fa-facebook fa-lg"></i></a>
+            <a href="#" style="color:#fff; margin-right:8px;"><i class="fab fa-youtube fa-lg"></i></a>
+          </span>
+        </div>
       </div>
     </div>
-    <!-- 고객센터 및 소셜 -->
-    <div style="flex:1; min-width:260px;">
-      <div style="font-size:15px; font-weight:500; margin-bottom:8px;">고객센터</div>
-      <div style="font-size:13px; color:#ebfcff; margin-bottom:4px;">
-        운영시간 : 평일 09시~18시<br>
-        이메일 : mosi@kh.kr
-      </div>
-      <div style="margin-top:16px;">
-        <span style="font-size:15px; font-weight:500;">Follow us</span>
-        <span style="margin-left:12px;">
-          <a href="#" style="color:#fff; margin-right:8px;"><i class="fab fa-instagram fa-lg"></i></a>
-          <a href="#" style="color:#fff; margin-right:8px;"><i class="fab fa-facebook fa-lg"></i></a>
-          <a href="#" style="color:#fff; margin-right:8px;"><i class="fab fa-youtube fa-lg"></i></a>
-        </span>
-      </div>
+    <div style="width:1200px; margin:20px auto 0 auto; border-top:1px solid #0099ad; padding-top:16px; font-size:13px; color:#e0f7fa; display:flex; gap:24px; padding-left: 10px;">
+      <a href="#" style="color:#ebfcff; text-decoration:underline;">이용약관</a>
+      <a href="#" style="color:#ebfcff; text-decoration:underline;">개인정보처리방침</a>
+      <a href="#" style="color:#ebfcff; text-decoration:underline;">회원이용약관</a>
+      <a href="#" style="color:#ebfcff; text-decoration:underline;">광고/제휴</a>
+      <a href="#" style="color:#ebfcff; text-decoration:underline;">공지사항</a>
     </div>
-  </div>
-  <div style="width:1200px; margin:20px auto 0 auto; border-top:1px solid #0099ad; padding-top:16px; font-size:13px; color:#e0f7fa; display:flex; gap:24px; padding-left: 10px;">
-    <a href="#" style="color:#ebfcff; text-decoration:underline;">이용약관</a>
-    <a href="#" style="color:#ebfcff; text-decoration:underline;">개인정보처리방침</a>
-    <a href="#" style="color:#ebfcff; text-decoration:underline;">회원이용약관</a>
-    <a href="#" style="color:#ebfcff; text-decoration:underline;">광고/제휴</a>
-    <a href="#" style="color:#ebfcff; text-decoration:underline;">공지사항</a>
-  </div>
-</footer>
-<!-- 푸터 영역 끝 -->
+  </footer>
+  <!-- 푸터 영역 끝 -->
 </body>
 </html>

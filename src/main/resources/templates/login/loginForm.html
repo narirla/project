@@ -1,0 +1,31 @@
+<!-- templates/login/loginForm.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+</head>
+<body>
+  <h1>로그인</h1>
+
+  <form th:action="@{/login}" method="post" th:object="${form}">
+    <div>
+      <label for="email">이메일</label>
+      <input type="email" id="email" th:field="*{email}" required>
+      <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+    </div>
+
+    <div>
+      <label for="passwd">비밀번호</label>
+      <input type="password" id="passwd" th:field="*{passwd}" required>
+      <div th:if="${#fields.hasErrors('passwd')}" th:errors="*{passwd}"></div>
+    </div>
+
+    <div th:if="${#fields.hasGlobalErrors()}" th:each="err : ${#fields.globalErrors()}">
+      <p th:text="${err}">글로벌 오류</p>
+    </div>
+
+    <button type="submit">로그인</button>
+  </form>
+</body>
+</html>
