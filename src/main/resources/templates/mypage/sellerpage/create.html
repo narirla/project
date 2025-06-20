@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>판매자 페이지 생성</title>
+  <style>
+    body {
+      background-color: #e6f0ff; /* 연한 파란 배경 */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #003366; /* 진한 파란 텍스트 */
+      padding: 40px;
+    }
+    h1 {
+      color: #004080;
+      margin-bottom: 30px;
+    }
+    form {
+      background-color: #cce0ff; /* 밝은 파란 폼 배경 */
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 64, 128, 0.3);
+      max-width: 480px;
+    }
+    label {
+      display: block;
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+    input[type="number"],
+    input[type="file"],
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #3399ff;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+    input[type="number"]:focus,
+    input[type="file"]:focus,
+    textarea:focus {
+      border-color: #0066cc;
+      outline: none;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #0073e6;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    /* 글자 수 표시 스타일 */
+    #charCount {
+      color: #004080;
+      font-size: 14px;
+      margin-top: 6px;
+      font-weight: 500;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+<h1>판매자 페이지 생성</h1>
+
+<form action="/seller-page/create" method="post" enctype="multipart/form-data">
+  <div>
+    <label for="memberId">회원 ID:</label>
+    <input type="number" id="memberId" name="memberId" required>
+  </div>
+
+  <div>
+    <label for="intro">소개글:</label>
+    <textarea id="intro" name="intro" rows="4" cols="40" maxlength="500" placeholder="자기소개를 입력하세요. (최대 500자)"></textarea>
+    <div id="charCount">500자 남음</div>
+  </div>
+
+  <div>
+    <label for="image">프로필 이미지:</label>
+    <input type="file" id="image" name="image" accept="image/*">
+  </div>
+
+  <div>
+    <button type="submit">등록</button>
+  </div>
+</form>
+
+<script>
+  const textarea = document.getElementById('intro');
+  const charCount = document.getElementById('charCount');
+  const maxLength = textarea.getAttribute('maxlength');
+
+  textarea.addEventListener('input', () => {
+    const remaining = maxLength - textarea.value.length;
+    charCount.textContent = `${remaining}자 남음`;
+  });
+</script>
+</body>
+</html>
