@@ -19,23 +19,12 @@ import java.util.Optional;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/login")
 public class LoginController {
 
   private final MemberSVC memberSVC;
   private final BCryptPasswordEncoder passwordEncoder;  // ✅ 비밀번호 비교용
 
-<<<<<<< Updated upstream
-  //로그인 폼
-  @GetMapping({"/login", "/user/login"})
-  public String loginForm(Model model){
-    model.addAttribute("form", new LoginForm());
-    return "login/loginForm";  // templates/login/loginForm.html
-  }
-
-  //로그인 처리
-  @PostMapping("/login")
-=======
   // 로그인 폼 요청
   @GetMapping
   public String loginForm(
@@ -48,7 +37,6 @@ public class LoginController {
 
   // 로그인 처리
   @PostMapping
->>>>>>> Stashed changes
   public String login(
       @Valid @ModelAttribute("form") LoginForm loginForm,
       BindingResult bindingResult,
