@@ -41,4 +41,20 @@ public class TermsDAOImpl implements TermsDAO {
 
     return template.update(sql.toString(), param);
   }
+<<<<<<< HEAD
+=======
+
+  @Override
+  public void save(long memberId, long termsId) {
+    String sql = "INSERT INTO member_terms (member_id, terms_id, agreed_at) " +
+        "VALUES (:memberId, :termsId, systimestamp)";
+
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("memberId", memberId)
+        .addValue("termsId", termsId);
+
+    template.update(sql, param);
+  }
+
+>>>>>>> feature/member
 }

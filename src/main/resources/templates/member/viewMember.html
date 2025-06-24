@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>회원 정보</title>
+  <link rel="stylesheet" th:href="@{/css/viewMember.css}">
+</head>
+<body>
+  <div class="container">
+    <h2>회원 정보</h2>
+
+    <div class="profile-img">
+      <img th:if="${member.pic != null}" th:src="@{'/members/' + ${member.memberId} + '/pic'}" alt="프로필 이미지">
+      <img th:if="${member.pic == null}" src="/img/default-profile.png" alt="기본 이미지">
+    </div>
+
+    <div class="member-info">
+      <p><strong>이메일:</strong> <span th:text="${member.email}"></span></p>
+      <p><strong>이름:</strong> <span th:text="${member.name}"></span></p>
+      <p><strong>전화번호:</strong> <span th:text="${member.tel}"></span></p>
+      <p><strong>닉네임:</strong> <span th:text="${member.nickname}"></span></p>
+      <p><strong>성별:</strong> <span th:text="${member.gender}"></span></p>
+      <p><strong>주소:</strong> <span th:text="${member.address}"></span></p>
+      <p><strong>생년월일:</strong> <span th:text="${member.birthDate}"></span></p>
+      <p><strong>가입일:</strong> <span th:text="${#temporals.format(member.createDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+    </div>
+  </div>
+
+  <script src="/js/viewMember.js"></script>
+</body>
+</html>
