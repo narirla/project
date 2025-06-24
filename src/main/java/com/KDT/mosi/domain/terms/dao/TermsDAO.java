@@ -19,4 +19,6 @@ public interface TermsDAO {
    * @return 반영된 행 수
    */
   int agreeTerms(Long memberId, Long termsId);
+
+  void save(long l, long l1);
 }

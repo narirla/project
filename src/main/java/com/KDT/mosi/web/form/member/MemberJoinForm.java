@@ -1,6 +1,9 @@
 package com.KDT.mosi.web.form.member;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +23,8 @@ public class MemberJoinForm {
   @Size(min = 8, max = 12, message = "비밀번호는 8자 이상 12자 이내여야 합니다.")
   private String passwd;
 
+  private String confirmPasswd;
+
   @Pattern(regexp = "^(010-\\d{4}-\\d{4})?$", message = "전화번호 형식은 010-0000-0000입니다.")
   private String tel;
 
@@ -31,11 +36,14 @@ public class MemberJoinForm {
 
   private String address;
 
+  private String birthDate; // yyyy-MM-dd
+
   private MultipartFile picFile;
 
-  // 선택한 역할 목록 (예: ["R01", "R02"])
   private List<String> roles;
 
-  // 동의한 약관 ID 목록 (예: [1, 2])
   private List<Long> agreedTermsIds;
+
+  private String zonecode;
+  private String detailAddress;
 }

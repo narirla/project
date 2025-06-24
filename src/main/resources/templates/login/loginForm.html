@@ -1,31 +1,58 @@
-<!-- templates/login/loginForm.html -->
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>로그인</title>
+  <link rel="stylesheet" th:href="@{/css/member/loginForm.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <h1>로그인</h1>
+<div class="login-container">
+  <h1 class="logo">MO:SI</h1>
 
-  <form th:action="@{/login}" method="post" th:object="${form}">
-    <div>
-      <label for="email">이메일</label>
-      <input type="email" id="email" th:field="*{email}" required>
-      <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+  <form th:action="@{/login}" method="post" class="login-form">
+
+    <!-- ✅ 로그인 실패 시 에러 메시지 출력 -->
+    <div th:if="${param.error}" class="error global-error">
+      이메일 또는 비밀번호가 올바르지 않습니다.
     </div>
 
-    <div>
-      <label for="passwd">비밀번호</label>
-      <input type="password" id="passwd" th:field="*{passwd}" required>
-      <div th:if="${#fields.hasErrors('passwd')}" th:errors="*{passwd}"></div>
+    <!-- ✅ 리다이렉트 경로를 hidden input으로 전달 -->
+    <input type="hidden" name="redirect" th:value="${redirect}">
+
+    <input type="text" name="username" placeholder="이메일" required>
+
+    <!-- ✅ 비밀번호 입력 + 아이콘 버튼 영역 -->
+    <div class="input-item">
+      <input type="password" id="password" name="password" placeholder="비밀번호" required>
+
+      <!-- 👁 비밀번호 보기 토글 버튼 -->
+      <button type="button" class="btn-eye" aria-label="비밀번호 보기">
+        <i class="fa-solid fa-eye"></i>
+      </button>
+
+      <!-- ❌ 입력 삭제 버튼 -->
+      <button type="button" class="btn-clear" aria-label="입력 삭제">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
     </div>
 
-    <div th:if="${#fields.hasGlobalErrors()}" th:each="err : ${#fields.globalErrors()}">
-      <p th:text="${err}">글로벌 오류</p>
+    <p id="caps-warning" class="caps-warning">Caps Lock이 켜져 있습니다.</p>
+
+    <div class="remember">
+      <input type="checkbox" id="remember" name="remember">
+      <label for="remember">이메일 기억하기</label>
     </div>
 
-    <button type="submit">로그인</button>
+    <button type="submit" class="login-btn">로그인</button>
+
+    <div class="links">
+      <a th:href="@{/members/join}">회원가입</a> |
+      <a th:href="@{/find}">아이디/비밀번호 찾기</a>
+    </div>
   </form>
+</div>
+
+<script th:src="@{/js/member/loginForm.js}"></script>
 </body>
 </html>

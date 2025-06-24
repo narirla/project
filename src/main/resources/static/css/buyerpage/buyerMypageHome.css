@@ -1,0 +1,36 @@
+/*buyerMyPageHome.css*/
+body {
+  background-color: #f9f9f9;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+h2 {
+  font-weight: bold;
+  color: #333;
+}
+
+/* 메뉴 그리드 스타일 */
+.menu-grid .col a {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 18px;
+  padding: 20px;
+  transition: all 0.2s ease-in-out;
+  color: #333;
+}
+
+.menu-grid .col a:hover {
+  background-color: #e7f4ff;
+  border-color: #99d1ff;
+  color: #007bff;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 역할 전환 버튼 */
+.btn-outline-secondary {
+  border-radius: 8px;
+  font-size: 14px;
+}

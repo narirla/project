@@ -1,0 +1,47 @@
+/*viewMember.css*/
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #f4f8fb;
+  margin: 0;
+  padding: 40px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: #fff;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #05424A;
+}
+
+.profile-img {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.profile-img img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.member-info p {
+  font-size: 1.1em;
+  color: #222;
+  margin: 8px 0;
+}
+
+.member-info strong {
+  color: #05424A;
+  margin-right: 8px;
+}

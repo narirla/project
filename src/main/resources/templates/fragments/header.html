@@ -1,42 +1,24 @@
-<!-- /templates/fragments/header.html -->
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Header Fragment</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-</head>
-<body>
-  <!-- ✅ fragment 이름은 header -->
-  <div th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
-      <a class="navbar-brand" th:href="@{/}">Mo:Si</a>
-
-      <div class="collapse navbar-collapse justify-content-end">
-        <ul class="navbar-nav">
-          <!-- 로그인 상태 -->
-          <li class="nav-item" th:if="${loginMember != null}">
-            <span class="navbar-text me-2" th:text="'안녕하세요, ' + ${loginMember.nickname} + '님!'"></span>
-          </li>
-          <li class="nav-item" th:if="${loginMember != null}">
-            <a class="nav-link" th:href="@{/mypage/buyer/{id}(id=${loginMember.memberId})}">마이페이지</a>
-          </li>
-          <li class="nav-item" th:if="${loginMember != null}">
-            <form th:action="@{/login/logout}" method="post" class="d-inline">
-              <button type="submit" class="btn btn-outline-danger btn-sm">로그아웃</button>
-            </form>
-          </li>
-
-          <!-- 비로그인 상태 -->
-          <li class="nav-item" th:if="${loginMember == null}">
-            <a class="nav-link" th:href="@{/login}">로그인</a>
-          </li>
-          <li class="nav-item" th:if="${loginMember == null}">
-            <a class="nav-link" th:href="@{/members/join}">회원가입</a>
-          </li>
-        </ul>
+<header>
+  <div class="container">
+    <div class="header-top">
+      <!-- ✅ 로그인 여부에 따른 분기 -->
+      <div class="user-login" th:if="${session.loginMember == null}">
+        <a th:href="@{/login}">로그인</a>
+        <a th:href="@{/members/join}">회원가입</a>
       </div>
-    </nav>
+      <div class="user-login" th:if="${session.loginMember != null}">
+        <span th:text="|${session.loginMember.nickname}님 환영합니다!|"></span>
+        <form th:action="@{/login/logout}" method="post" style="display:inline;">
+          <button type="submit" style="background:none; border:none; color:blue; cursor:pointer;">로그아웃</button>
+        </form>
+      </div>
+
+      <!-- 💡 공통 메뉴 -->
+      <div class="user-menu">
+        <a href="#"><i class="fa fa-heart"></i></a>
+        <a href="#"><i class="fa fa-user"></i></a>
+        <a href="#"><i class="fa fa-shopping-bag"></i></a>
+      </div>
+    </div>
   </div>
-</body>
-</html>
+</header>

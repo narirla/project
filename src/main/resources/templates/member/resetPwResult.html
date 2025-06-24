@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>비밀번호 재설정 결과</title>
+  <link rel="stylesheet" th:href="@{/css/member/resetPwResult.css}">
+</head>
+<body>
+  <div class="result-container">
+    <h2>비밀번호 재설정</h2>
+
+    <div class="message-box">
+      <p th:if="${resetSuccess}" class="success-msg">
+        비밀번호가 성공적으로 변경되었습니다.
+      </p>
+      <p th:unless="${resetSuccess}" class="error-msg">
+        비밀번호 변경에 실패했습니다. 다시 시도해 주세요.
+      </p>
+    </div>
+
+    <div class="btn-box">
+      <a th:href="@{/login}" class="btn">로그인하러 가기</a>
+    </div>
+  </div>
+</body>
+</html>

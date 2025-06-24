@@ -34,4 +34,7 @@ public interface BuyerPageDAO {
    * @return 삭제 건수
    */
   int deleteById(Long pageId);
+
+  Optional<BuyerPage> findById(Long pageId);
+
 }

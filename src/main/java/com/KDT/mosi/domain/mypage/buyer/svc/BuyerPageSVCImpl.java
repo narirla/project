@@ -34,4 +34,10 @@ public class BuyerPageSVCImpl implements BuyerPageSVC{
   public int delete(Long pageId) {
     return buyerPageDAO.deleteById(pageId);
   }
+
+  @Override
+  public Optional<BuyerPage> findById(Long pageId) {
+    return buyerPageDAO.findById(pageId);
+  }
+
 }
