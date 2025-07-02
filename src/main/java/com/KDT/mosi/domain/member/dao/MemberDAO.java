@@ -33,4 +33,20 @@ public interface MemberDAO {
    * @return 존재 여부
    */
   boolean isExistEmail(String email);
+<<<<<<< HEAD
+=======
+
+  /**
+   * 회원 정보 수정
+   * @param member 수정할 회원 정보
+   * @return 수정된 행 수
+   */
+  int update(Member member);
+
+  Optional<String> findEmailByTel(String tel);
+
+
+  int updatePassword(String email, String newPassword);
+
+>>>>>>> feature/member
 }

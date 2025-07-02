@@ -8,13 +8,11 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -25,47 +23,53 @@ import java.util.Optional;
 public class LoginController {
 
   private final MemberSVC memberSVC;
+  private final BCryptPasswordEncoder passwordEncoder;  // ✅ 비밀번호 비교용
 
-  //로그인 폼
+  // 로그인 폼 요청
   @GetMapping
-  public String loginForm(Model model){
+  public String loginForm(
+      @RequestParam(value = "redirect", required = false) String redirect,
+      Model model) {
     model.addAttribute("form", new LoginForm());
+    model.addAttribute("redirect", redirect);
     return "login/loginForm";
   }
 
-  //로그인 처리
+  // 로그인 처리
   @PostMapping
   public String login(
       @Valid @ModelAttribute("form") LoginForm loginForm,
       BindingResult bindingResult,
+      @RequestParam(value = "redirect", required = false) String redirect,
       HttpServletRequest request
-  ){
-    if (bindingResult.hasErrors()){
+  ) {
+    if (bindingResult.hasErrors()) {
       return "login/loginForm";
     }
 
     Optional<Member> optional = memberSVC.findByEmail(loginForm.getEmail());
 
-    if (optional.isEmpty() || !optional.get().getPasswd().equals(loginForm.getPasswd())){
+    // ✅ 비밀번호 비교 로직 수정
+    if (optional.isEmpty() ||
+        !passwordEncoder.matches(loginForm.getPasswd(), optional.get().getPasswd())) {
       bindingResult.reject("loginFail", "이메일 또는 비밀번호가 올바르지 않습니다.");
       return "login/loginForm";
     }
 
-    //로그인 성공 -> 세션 생성
+    // 로그인 성공
     HttpSession session = request.getSession(true);
     session.setAttribute("loginMember", optional.get());
 
-    return "redirect:/";
+    return "redirect:" + (redirect != null ? redirect : "/");
   }
 
-  //로그아웃 처리
+  // 로그아웃
   @PostMapping("/logout")
-  public String logout(HttpServletRequest request){
+  public String logout(HttpServletRequest request) {
     HttpSession session = request.getSession(false);
-    if (session != null){
-      session.invalidate();   //세션 제거
+    if (session != null) {
+      session.invalidate();
     }
     return "redirect:/";
   }
-
 }

@@ -1,0 +1,334 @@
+
+/* 전체 body 스타일 */
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #88E3E3;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 회원가입 폼 컨테이너 */
+.register-container {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 28px;
+  box-shadow: 0 8px 32px rgba(23,41,44,0.10);
+  padding: 56px 40px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 타이틀 */
+h2 {
+  color: #17292C;
+  font-size: 2.2em;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* 서브 타이틀 */
+.subtitle {
+  color: #17292C;
+  font-size: 1.08em;
+  text-align: center;
+  margin-bottom: 32px;
+  font-weight: 400;
+}
+
+/* 공통 폼 그룹 */
+.form-group {
+  margin-bottom: 20px;
+  width: 480px !important;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* 폼 그룹: 이름 + 성별 한 줄 정렬 */
+.form-group.row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.form-group.row > div {
+  flex: 1;
+  max-width: 240px;
+}
+
+/* 입력 요소 공통 */
+.input-mosi, .select-mosi {
+  width: 100% !important;
+  height: 48px !important;
+  padding: 12px 14px;
+  border: 1.5px solid #17292C;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 1em;
+  color: #17292C;
+  outline: none;
+  box-sizing: border-box;
+  transition: border 0.2s;
+  margin: 0 auto;
+  display: block;
+}
+
+/* 포커스 스타일 */
+.input-mosi:focus, .select-mosi:focus {
+  border: 1.5px solid #0099ad;
+}
+
+/* 셀렉트 커스텀 */
+select.input-mosi, .select-mosi {
+  appearance: none;
+  background: #fff url('data:image/svg+xml;utf8,<svg fill="%230099ad" height="24"...') no-repeat right 16px center/18px 18px;
+}
+
+/* 라디오 버튼 그룹 (성별) */
+.gender-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  font-size: 1em;
+  margin-top: 6px;
+}
+.gender-options input[type="radio"] {
+  margin-right: 4px;
+}
+
+/* 주소 행 등 수평 정렬 */
+.address-row,
+.input-row,
+.form-row {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  white-space: nowrap;
+  overflow-x: auto;
+  width: 480px;
+  max-width: 100%;
+}
+
+/* 플렉스 입력 너비 조정 */
+.form-row input,
+.form-row .input-mosi,
+.address-row .input-mosi,
+.input-row .input-mosi,
+.address-row button,
+.input-row button {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+/* 이메일 + 버튼 비율 */
+.form-group input[type="email"] {
+  flex: 5;
+}
+.form-group .btn-small {
+  flex: 0 0 80px;
+  height: 40px;
+  font-size: 10px;
+  padding: 0 8px;
+  border-radius: 12px !important;
+}
+
+/* 버튼 래퍼 */
+.btn-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* 계정 생성 버튼 (큰 버튼) */
+.btn {
+  width: 80% !important;
+  max-width: 400px;
+  height: 48px !important;
+  background: #0099AD !important;   /* ✅ 단일 청록색 */
+  color: #EBFCFF !important;
+  border: none !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 12px rgba(0,153,173,0.10);
+  transition: background 0.2s, color 0.2s;
+  border-radius: 16px !important;
+  font-size: 1.15em !important;
+}
+
+/* 중복확인, 우편번호 버튼 (작은 버튼) */
+.btn-small {
+  background: #0099AD !important;   /* ✅ 동일 색상 적용 */
+  color: #EBFCFF !important;
+  font-size: 0.875em !important;
+  border-radius: 12px !important;
+  height: 40px;
+  font-weight: 700;
+  border: none;
+  transition: background 0.2s, color 0.2s;
+  padding: 0 8px;
+}
+
+/* 호버 공통 */
+.btn:hover,
+.btn-small:hover {
+  background: #007C90 !important;   /* ✅ 진한 청록색 호버 */
+  color: #fff !important;
+}
+
+/* 알림 토스트 메시지 스타일 */
+.toast-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0099AD;
+  color: white;
+  padding: 14px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.95em;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeInOut 2.5s ease-in-out;
+}
+
+/* 애니메이션 정의 */
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  10%, 90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+
+/* 라벨 공통 스타일 */
+.form-group label {
+  font-size: 0.95em;
+  font-weight: 600;
+  margin-bottom: 6px;
+  margin-left: 10px;
+  color: #17292C;
+}
+.required {
+  color: red;
+  margin-left: 4px;
+}
+
+/* 설명 텍스트 */
+.input-desc,
+.address-desc {
+  color: #05424A;
+  font-size: 0.98em;
+  margin: 8px 0 0 2px;
+}
+.address-desc {
+  margin-left: 0;
+}
+
+/* 생년월일 input */
+input[type="date"] {
+  appearance: none;
+  height: 48px;
+  padding: 12px 14px;
+  font-size: 1em;
+  color: #17292C;
+  border: 1.5px solid #17292C;
+  border-radius: 14px;
+  background: #fff;
+}
+
+/* 구분선 */
+.section-divider {
+  width: 100%;
+  border: none;
+  border-top: 1.5px solid #EBFCFF;
+  margin: 32px 0 24px 0;
+}
+
+/* 메시지 */
+.msg {
+  color: #0099ad;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* 에러 메시지 (필드 유효성 검증 실패 시) */
+.error {
+  color: #e53935;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Caps Lock 경고 (비밀번호 입력 시 옵션) */
+.caps-warning {
+  color: red;
+  font-size: 13px;
+  text-align: left;
+  margin: 4px 0 0 4px;
+  display: none;
+}
+
+/* 하단 로그인 안내 */
+.login-link {
+  text-align: center;
+  margin-top: 32px;
+  color: #05424A;
+  font-size: 1.08em;
+}
+.login-link a {
+  color: #0099ad;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+  .register-container,
+  .form-group,
+  .form-group.form-row,
+  .form-row,
+  .address-row,
+  .input-row,
+  .input-mosi,
+  .select-mosi,
+  .btn,
+  .btn-small {
+    width: 100% !important;
+  }
+
+  .register-container {
+    padding: 18px 4vw;
+  }
+}
+
+/* 이메일 중복 확인 메시지 영역 */
+#emailCheckResult, .email-result {
+  font-size: 0.88em;
+  margin-left: 10px;
+  margin-top: 6px;
+  min-height: 1em;
+  color: red;
+}
+
+/* 글로벌 에러 메시지 박스 (예: 회원가입 실패 등 글로벌 오류) */
+.global-error {
+  background-color: #ffeaea;
+  border: 1px solid #d93025;
+  padding: 10px;
+  margin-bottom: 20px;
+  color: #d93025;
+  font-weight: bold;
+  border-radius: 4px;
+}

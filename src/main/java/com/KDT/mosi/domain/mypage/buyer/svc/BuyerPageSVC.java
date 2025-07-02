@@ -34,4 +34,10 @@ public interface BuyerPageSVC {
    * @return 삭제 건수
    */
   int delete(Long pageId);
+<<<<<<< HEAD
+=======
+
+
+  Optional<BuyerPage> findById(Long pageId);
+>>>>>>> feature/member
 }

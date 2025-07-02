@@ -26,8 +26,13 @@ public class MemberDAOImpl implements MemberDAO {
   @Override
   public Long save(Member member) {
     StringBuffer sql = new StringBuffer();
+<<<<<<< HEAD
     sql.append("INSERT INTO member (member_id, email, name, passwd, tel, nickname, gender, address, pic, create_date, update_date) ");
     sql.append("VALUES (member_member_id_seq.nextval, :email, :name, :passwd, :tel, :nickname, :gender, :address, :pic, systimestamp, systimestamp)");
+=======
+    sql.append("INSERT INTO member (member_id, email, name, passwd, tel, nickname, gender, address, birth_date, pic, create_date, update_date) ");
+    sql.append("VALUES (member_member_id_seq.nextval, :email, :name, :passwd, :tel, :nickname, :gender, :address, :birthDate, :pic, systimestamp, systimestamp)");
+>>>>>>> feature/member
 
     SqlParameterSource param = new BeanPropertySqlParameterSource(member);
     KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -88,4 +93,57 @@ public class MemberDAOImpl implements MemberDAO {
     );
     return count != null && count > 0;
   }
+<<<<<<< HEAD
+=======
+
+  @Override
+  public int update(Member member) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("UPDATE member SET ");
+    sql.append("  name = :name, ");
+    sql.append("  passwd = :passwd, ");
+    sql.append("  tel = :tel, ");
+    sql.append("  nickname = :nickname, ");
+    sql.append("  gender = :gender, ");
+    sql.append("  address = :address, ");
+    sql.append("  birth_date = :birthDate, ");
+    sql.append("  pic = :pic, ");
+    sql.append("  update_date = systimestamp ");
+    sql.append("WHERE member_id = :memberId");
+
+    SqlParameterSource param = new BeanPropertySqlParameterSource(member);
+    return template.update(sql.toString(), param);
+  }
+
+  @Override
+  public Optional<String> findEmailByTel(String tel) {
+    String sql = "SELECT email FROM member WHERE tel = :tel";
+
+    try {
+      String email = template.queryForObject(
+          sql,
+          new MapSqlParameterSource("tel", tel),
+          String.class
+      );
+      return Optional.ofNullable(email);
+    } catch (EmptyResultDataAccessException e) {
+      return Optional.empty();
+    }
+  }
+
+
+  @Override
+  public int updatePassword(String email, String newPassword) {
+    String sql = "UPDATE member SET passwd = :passwd, update_date = systimestamp WHERE email = :email";
+
+    MapSqlParameterSource param = new MapSqlParameterSource()
+        .addValue("passwd", newPassword)
+        .addValue("email", email);
+
+    return template.update(sql, param);
+  }
+
+
+
+>>>>>>> feature/member
 }

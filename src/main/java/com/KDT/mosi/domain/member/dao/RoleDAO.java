@@ -19,4 +19,12 @@ public interface RoleDAO {
    * @return 반영된 행 수
    */
   int addRoleToMember(Long memberId, String roleId);
+<<<<<<< HEAD
+=======
+
+  void save(long l, String r01);
+
+  List<Role> findRolesByMemberId(Long memberId);
+
+>>>>>>> feature/member
 }

@@ -1,6 +1,7 @@
 package com.KDT.mosi.web.controller;
 
 import com.KDT.mosi.domain.entity.BuyerPage;
+import com.KDT.mosi.domain.member.svc.MemberSVC;
 import com.KDT.mosi.domain.mypage.buyer.svc.BuyerPageSVC;
 import com.KDT.mosi.web.form.mypage.buyerpage.BuyerPageSaveForm;
 import com.KDT.mosi.web.form.mypage.buyerpage.BuyerPageUpdateForm;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,32 +31,59 @@ import java.util.Optional;
 public class BuyerPageController {
 
   private final BuyerPageSVC buyerPageSVC;
+  private final MemberSVC memberSVC;
+
+  // 🔒 로그인한 회원 ID 가져오기
+  private Long getLoginMemberId() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String loginEmail = auth.getName();
+    return memberSVC.findByEmail(loginEmail).orElseThrow().getMemberId();
+  }
 
   // ✅ 마이페이지 조회
   @GetMapping("/{memberId}")
   public String view(@PathVariable Long memberId, Model model) {
-    Optional<BuyerPage> optional = buyerPageSVC.findByMemberId(memberId);
-    if (optional.isPresent()) {
-      model.addAttribute("buyerPage", optional.get());
-      return "mypage/buyer/view";
-    } else {
-      return "redirect:/mypage/buyer/add";
+    if (!getLoginMemberId().equals(memberId)) {
+      return "error/403";
     }
+
+    return buyerPageSVC.findByMemberId(memberId)
+        .map(page -> {
+          model.addAttribute("buyerPage", page);
+          return "mypage/buyerpage/viewBuyerPage";
+        })
+        .orElse("redirect:/mypage/buyer/add");
   }
 
   // ✅ 등록 폼
   @GetMapping("/add")
   public String addForm(Model model) {
-    model.addAttribute("form", new BuyerPageSaveForm());
-    return "mypage/buyer/add";
+    Long loginMemberId = getLoginMemberId();
+
+    // 이미 등록된 경우, 수정 화면으로 유도
+    if (buyerPageSVC.findByMemberId(loginMemberId).isPresent()) {
+      return "redirect:/mypage/buyer/" + loginMemberId + "/edit";
+    }
+
+    BuyerPageSaveForm form = new BuyerPageSaveForm();
+    form.setMemberId(loginMemberId);
+    model.addAttribute("form", form);
+    return "mypage/buyerpage/addBuyerPage";
   }
+
 
   // ✅ 등록 처리
   @PostMapping("/add")
   public String add(@Valid @ModelAttribute("form") BuyerPageSaveForm form,
                     BindingResult bindingResult) {
+    Long loginMemberId = getLoginMemberId();
+
+    if (!loginMemberId.equals(form.getMemberId())) {
+      return "error/403";
+    }
+
     if (bindingResult.hasErrors()) {
-      return "mypage/buyer/add";
+      return "mypage/buyerpage/addBuyerPage";
     }
 
     BuyerPage buyerPage = new BuyerPage();
@@ -62,7 +92,6 @@ public class BuyerPageController {
     buyerPage.setRecentOrder(form.getRecentOrder());
     buyerPage.setPoint(form.getPoint());
 
-    // 이미지 처리
     if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
       try {
         buyerPage.setImage(form.getImageFile().getBytes());
@@ -75,19 +104,16 @@ public class BuyerPageController {
     return "redirect:/mypage/buyer/" + form.getMemberId();
   }
 
-  //이미지 추가
+  // ✅ 프로필 이미지 조회
   @GetMapping("/{memberId}/image")
   public ResponseEntity<byte[]> image(@PathVariable Long memberId) {
-    // DB에서 BuyerPage 조회
     Optional<BuyerPage> optional = buyerPageSVC.findByMemberId(memberId);
 
-    // 이미지가 존재하는 경우
     if (optional.isPresent() && optional.get().getImage() != null) {
       byte[] image = optional.get().getImage();
-      MediaType mediaType = MediaType.IMAGE_JPEG; // 기본값
+      MediaType mediaType = MediaType.IMAGE_JPEG;
 
       try {
-        // 이미지 MIME 타입 자동 감지
         String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(image));
         if (contentType != null) {
           mediaType = MediaType.parseMediaType(contentType);
@@ -96,39 +122,35 @@ public class BuyerPageController {
         log.warn("이미지 content type 분석 실패, 기본 JPEG 사용");
       }
 
-      // 이미지 데이터와 MIME 타입을 포함하여 응답
       return ResponseEntity.ok()
           .contentType(mediaType)
           .body(image);
     }
 
-    // 이미지가 없을 경우: 기본 이미지로 리디렉션
     return ResponseEntity.status(HttpStatus.FOUND)
         .header(HttpHeaders.LOCATION, "/images/default-profile.png")
         .build();
   }
 
-
   // ✅ 수정 폼
   @GetMapping("/{memberId}/edit")
   public String editForm(@PathVariable Long memberId, Model model) {
-    Optional<BuyerPage> optional = buyerPageSVC.findByMemberId(memberId);
-    if (optional.isPresent()) {
-      BuyerPage entity = optional.get();
-
-      // Entity → UpdateForm 변환
-      BuyerPageUpdateForm form = new BuyerPageUpdateForm();
-      form.setPageId(entity.getPageId());
-      form.setMemberId(entity.getMemberId());
-      form.setIntro(entity.getIntro());
-      form.setRecentOrder(entity.getRecentOrder());
-      form.setPoint(entity.getPoint());
-
-      model.addAttribute("form", form);
-      return "mypage/buyer/edit";
-    } else {
-      return "redirect:/mypage/buyer/add";
+    if (!getLoginMemberId().equals(memberId)) {
+      return "error/403";
     }
+
+    return buyerPageSVC.findByMemberId(memberId)
+        .map(entity -> {
+          BuyerPageUpdateForm form = new BuyerPageUpdateForm();
+          form.setPageId(entity.getPageId());
+          form.setMemberId(entity.getMemberId());
+          form.setNickname(entity.getNickname());
+          form.setIntro(entity.getIntro());
+
+          model.addAttribute("form", form);
+          return "mypage/buyerpage/editBuyerPage";
+        })
+        .orElse("redirect:/mypage/buyer/add");
   }
 
   // ✅ 수정 처리
@@ -136,18 +158,20 @@ public class BuyerPageController {
   public String update(@PathVariable Long memberId,
                        @Valid @ModelAttribute("form") BuyerPageUpdateForm form,
                        BindingResult bindingResult) {
+    if (!getLoginMemberId().equals(memberId)) {
+      return "error/403";
+    }
+
     if (bindingResult.hasErrors()) {
-      return "mypage/buyer/edit";
+      return "mypage/buyerpage/editBuyerPage";
     }
 
     BuyerPage buyerPage = new BuyerPage();
     buyerPage.setPageId(form.getPageId());
     buyerPage.setMemberId(form.getMemberId());
+    buyerPage.setNickname(form.getNickname());
     buyerPage.setIntro(form.getIntro());
-    buyerPage.setRecentOrder(form.getRecentOrder());
-    buyerPage.setPoint(form.getPoint());
 
-    // 이미지 처리
     if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
       try {
         buyerPage.setImage(form.getImageFile().getBytes());
@@ -160,9 +184,17 @@ public class BuyerPageController {
     return "redirect:/mypage/buyer/" + memberId;
   }
 
-  // ✅ 삭제
+  // ✅ 삭제 처리
   @PostMapping("/{pageId}/del")
   public String delete(@PathVariable Long pageId) {
+    Long loginMemberId = getLoginMemberId();
+
+    // 🔒 본인 확인: pageId → memberId 조회 후 비교
+    Optional<BuyerPage> optional = buyerPageSVC.findById(pageId);
+    if (optional.isEmpty() || !optional.get().getMemberId().equals(loginMemberId)) {
+      return "error/403";
+    }
+
     buyerPageSVC.delete(pageId);
     return "redirect:/";
   }

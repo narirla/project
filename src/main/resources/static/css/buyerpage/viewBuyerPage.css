@@ -1,0 +1,24 @@
+/* viewBuyerPage.css */
+
+/* 기본 카드 스타일 */
+.card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.img-thumbnail {
+  border-radius: 50%;
+  border: 1px solid #ccc;
+}
+
+h2 {
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.btn {
+  margin-right: 8px;
+}

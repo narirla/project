@@ -9,6 +9,10 @@ public class BuyerPage {
 
   private Long pageId;                // number(10)       -- 마이페이지 ID
   private Long memberId;              // number(10)       -- 회원 ID (외래키)
+<<<<<<< HEAD
+=======
+  private String nickname;
+>>>>>>> feature/member
   private byte[] image;               // blob             -- 프로필 이미지
   private String intro;               // varchar2(500)    -- 자기소개글
   private String recentOrder;         // varchar2(100)    -- 최근 주문 상품명

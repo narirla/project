@@ -12,7 +12,10 @@ public class Terms {
   private String isRequired; // 'Y' or 'N'
   private String version;
   private Timestamp createdAt;
+<<<<<<< HEAD
 
   public static class inquiry {
   }
+=======
+>>>>>>> feature/member
 }
