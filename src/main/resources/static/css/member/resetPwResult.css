@@ -1,6 +1,10 @@
 /* /css/member/resetPwResult.css */
 body {
+<<<<<<< HEAD
   font-family: 'Pretendard', sans-serif;
+=======
+  font-family: 'Noto Sans KR', sans-serif;
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   background-color: #f5f5f5;
   display: flex;
   justify-content: center;

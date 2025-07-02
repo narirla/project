@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 /* 전체 body 스타일 */
 body {
   font-family: 'Pretendard', sans-serif;
+=======
+
+/* 전체 body 스타일 */
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   background: #88E3E3;
   min-height: 100vh;
   margin: 0;
@@ -69,7 +76,10 @@ h2 {
   width: 100% !important;
   height: 48px !important;
   padding: 12px 14px;
+<<<<<<< HEAD
   padding-right: 40px; /* 👈 눈 아이콘 공간 확보 */
+=======
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   border: 1.5px solid #17292C;
   border-radius: 14px;
   background: #fff;
@@ -155,7 +165,11 @@ select.input-mosi, .select-mosi {
   width: 80% !important;
   max-width: 400px;
   height: 48px !important;
+<<<<<<< HEAD
   background: #0099AD !important;
+=======
+  background: #0099AD !important;   /* ✅ 단일 청록색 */
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   color: #EBFCFF !important;
   border: none !important;
   font-weight: 700 !important;
@@ -168,7 +182,11 @@ select.input-mosi, .select-mosi {
 
 /* 중복확인, 우편번호 버튼 (작은 버튼) */
 .btn-small {
+<<<<<<< HEAD
   background: #0099AD !important;
+=======
+  background: #0099AD !important;   /* ✅ 동일 색상 적용 */
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   color: #EBFCFF !important;
   font-size: 0.875em !important;
   border-radius: 12px !important;
@@ -182,11 +200,19 @@ select.input-mosi, .select-mosi {
 /* 호버 공통 */
 .btn:hover,
 .btn-small:hover {
+<<<<<<< HEAD
   background: #007C90 !important;
   color: #fff !important;
 }
 
 /* 토스트 메시지 */
+=======
+  background: #007C90 !important;   /* ✅ 진한 청록색 호버 */
+  color: #fff !important;
+}
+
+/* 알림 토스트 메시지 스타일 */
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
 .toast-message {
   position: fixed;
   top: 20px;
@@ -203,14 +229,23 @@ select.input-mosi, .select-mosi {
   animation: fadeInOut 2.5s ease-in-out;
 }
 
+<<<<<<< HEAD
 /* 토스트 애니메이션 */
+=======
+/* 애니메이션 정의 */
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
   10%, 90% { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
 }
 
+<<<<<<< HEAD
 /* 라벨 */
+=======
+
+/* 라벨 공통 스타일 */
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
 .form-group label {
   font-size: 0.95em;
   font-weight: 600;
@@ -223,6 +258,7 @@ select.input-mosi, .select-mosi {
   margin-left: 4px;
 }
 
+<<<<<<< HEAD
 /* 에러 메시지 */
 .error {
   color: #e53935;
@@ -261,6 +297,75 @@ select.input-mosi, .select-mosi {
 }
 .toggle-password i {
   font-size: 1.1em;
+=======
+/* 설명 텍스트 */
+.input-desc,
+.address-desc {
+  color: #05424A;
+  font-size: 0.98em;
+  margin: 8px 0 0 2px;
+}
+.address-desc {
+  margin-left: 0;
+}
+
+/* 생년월일 input */
+input[type="date"] {
+  appearance: none;
+  height: 48px;
+  padding: 12px 14px;
+  font-size: 1em;
+  color: #17292C;
+  border: 1.5px solid #17292C;
+  border-radius: 14px;
+  background: #fff;
+}
+
+/* 구분선 */
+.section-divider {
+  width: 100%;
+  border: none;
+  border-top: 1.5px solid #EBFCFF;
+  margin: 32px 0 24px 0;
+}
+
+/* 메시지 */
+.msg {
+  color: #0099ad;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* 에러 메시지 (필드 유효성 검증 실패 시) */
+.error {
+  color: #e53935;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Caps Lock 경고 (비밀번호 입력 시 옵션) */
+.caps-warning {
+  color: red;
+  font-size: 13px;
+  text-align: left;
+  margin: 4px 0 0 4px;
+  display: none;
+}
+
+/* 하단 로그인 안내 */
+.login-link {
+  text-align: center;
+  margin-top: 32px;
+  color: #05424A;
+  font-size: 1.08em;
+}
+.login-link a {
+  color: #0099ad;
+  text-decoration: underline;
+  font-weight: 700;
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
 }
 
 /* 모바일 대응 */
@@ -282,3 +387,26 @@ select.input-mosi, .select-mosi {
     padding: 18px 4vw;
   }
 }
+<<<<<<< HEAD
+=======
+
+/* 이메일 중복 확인 메시지 영역 */
+#emailCheckResult, .email-result {
+  font-size: 0.88em;
+  margin-left: 10px;
+  margin-top: 6px;
+  min-height: 1em;
+  color: red;
+}
+
+/* 글로벌 에러 메시지 박스 (예: 회원가입 실패 등 글로벌 오류) */
+.global-error {
+  background-color: #ffeaea;
+  border: 1px solid #d93025;
+  padding: 10px;
+  margin-bottom: 20px;
+  color: #d93025;
+  font-weight: bold;
+  border-radius: 4px;
+}
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc

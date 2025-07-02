@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8">
@@ -134,5 +135,58 @@
       document.getElementById('passwd').focus();
     }
   </script>
+=======
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지 수정</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/buyerpage/editBuyerPage.css}">
+  <script defer th:src="@{/js/buyerpage/editBuyerPage.js}"></script>
+</head>
+<body class="container mt-4">
+  <!-- ✅ 공통 헤더 -->
+  <div th:replace="fragments/header :: header"></div>
+
+  <h2>구매자 마이페이지 수정</h2>
+
+  <form th:action="@{|/mypage/buyer/${form.memberId}|}" th:object="${form}" method="post" enctype="multipart/form-data">
+
+    <!-- ✅ 현재 이미지 -->
+    <div class="mb-3">
+      <label class="form-label">현재 프로필 이미지</label><br>
+      <img th:src="${form.image != null} ?
+                     @{'/mypage/buyer/' + ${form.memberId} + '/image'} :
+                     @{/img/default-profile.png}"
+           alt="프로필 이미지"
+           style="width: 150px; height: 150px; object-fit: cover; border-radius: 10px; border: 1px solid #ccc;">
+    </div>
+
+    <!-- ✅ 새 이미지 업로드 -->
+    <div class="mb-3">
+      <label for="imageFile" class="form-label">새 프로필 이미지 업로드</label>
+      <input type="file" class="form-control" th:field="*{imageFile}" id="imageFile">
+    </div>
+
+    <!-- ✅ 닉네임 -->
+    <div class="mb-3">
+      <label for="nickname" class="form-label">닉네임</label>
+      <input type="text" class="form-control" th:field="*{nickname}" id="nickname">
+    </div>
+
+    <!-- ✅ 자기소개 -->
+    <div class="mb-3">
+      <label for="intro" class="form-label">자기소개</label>
+      <textarea class="form-control" th:field="*{intro}" id="intro" rows="3"></textarea>
+    </div>
+
+    <!-- 숨겨진 필드 -->
+    <input type="hidden" th:field="*{pageId}">
+    <input type="hidden" th:field="*{memberId}">
+
+    <button type="submit" class="btn btn-success">수정</button>
+  </form>
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
 </body>
 </html>

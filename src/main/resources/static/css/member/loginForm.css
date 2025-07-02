@@ -2,7 +2,11 @@
 body {
   margin: 0;
   padding: 0;
+<<<<<<< HEAD
   font-family: 'Pretendard', sans-serif;
+=======
+  font-family: 'Noto Sans KR', sans-serif;
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   background-color: #88E3E3; /* 배경색: 밝은 청록 */
   display: flex;
   justify-content: center;
@@ -39,8 +43,12 @@ body {
 
 /* ✅ 입력 필드: 이메일, 비밀번호 */
 .login-form input[type="text"],
+<<<<<<< HEAD
 .login-form input[type="password"],
 .login-form input[type="email"]{
+=======
+.login-form input[type="password"] {
+>>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   width: 100%;
   padding: 12px;
   font-size: 16px;
