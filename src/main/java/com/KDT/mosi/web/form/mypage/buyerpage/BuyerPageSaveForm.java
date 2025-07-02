@@ -15,6 +15,10 @@ public class BuyerPageSaveForm {
   // 프로필 이미지 (선택 사항)
   private MultipartFile imageFile;
 
+  /** 닉네임 (2~30자, 중복 확인 대상) */
+  @Size(min = 2, max = 30, message = "닉네임은 최소 2자, 최대 30자까지 입력 가능합니다.")
+  private String nickname;
+
   // 자기소개 (선택 사항, 최대 500자)
   @Size(max = 500, message = "자기소개는 500자 이내로 입력해주세요.")
   private String intro;

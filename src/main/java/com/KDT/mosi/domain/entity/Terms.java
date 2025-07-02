@@ -12,7 +12,4 @@ public class Terms {
   private String isRequired; // 'Y' or 'N'
   private String version;
   private Timestamp createdAt;
-
-  public static class inquiry {
-  }
 }

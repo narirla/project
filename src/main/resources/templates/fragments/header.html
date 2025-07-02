@@ -1,42 +1,61 @@
-<!-- /templates/fragments/header.html -->
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Header Fragment</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-</head>
-<body>
-  <!-- ✅ fragment 이름은 header -->
-  <div th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
-      <a class="navbar-brand" th:href="@{/}">Mo:Si</a>
+<header th:fragment="header">
+  <!-- 최상단 로그인/회원가입 or 사용자 정보 -->
+  <div class="header-top-bar">
+    <div class="user-links">
+      <!-- 비로그인 상태 -->
+      <th:block th:if="${not #authorization.expression('isAuthenticated()')}">
+        <a th:href="@{/login}">로그인</a>
+        <a th:href="@{/members/join}">회원가입</a>
+      </th:block>
 
-      <div class="collapse navbar-collapse justify-content-end">
-        <ul class="navbar-nav">
-          <!-- 로그인 상태 -->
-          <li class="nav-item" th:if="${loginMember != null}">
-            <span class="navbar-text me-2" th:text="'안녕하세요, ' + ${loginMember.nickname} + '님!'"></span>
-          </li>
-          <li class="nav-item" th:if="${loginMember != null}">
-            <a class="nav-link" th:href="@{/mypage/buyer/{id}(id=${loginMember.memberId})}">마이페이지</a>
-          </li>
-          <li class="nav-item" th:if="${loginMember != null}">
-            <form th:action="@{/login/logout}" method="post" class="d-inline">
-              <button type="submit" class="btn btn-outline-danger btn-sm">로그아웃</button>
-            </form>
-          </li>
+      <!-- 로그인 상태 -->
+      <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+        <div class="user-logged-in">
+          <!-- 로그아웃 -->
+          <form th:action="@{/login/logout}" method="post" class="logout-form">
+            <button type="submit" class="logout-button" aria-label="로그아웃">로그아웃</button>
+          </form>
 
-          <!-- 비로그인 상태 -->
-          <li class="nav-item" th:if="${loginMember == null}">
-            <a class="nav-link" th:href="@{/login}">로그인</a>
-          </li>
-          <li class="nav-item" th:if="${loginMember == null}">
-            <a class="nav-link" th:href="@{/members/join}">회원가입</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+          <!-- 알림 -->
+          <a th:href="@{/notifications}" class="notification-link" aria-label="알림">
+            <i class="fa fa-bell" aria-hidden="true"></i> <span>알림</span>
+          </a>
+        </div>
+      </th:block>
+    </div>
   </div>
-</body>
-</html>
+
+  <!-- 로고, 검색창, 사용자 메뉴 -->
+  <div class="header-main">
+    <a th:href="@{/}" class="logo d-flex align-items-center">
+      <img th:src="@{/img/msi.png}" alt="MO:SI 아이콘" style="width:64px; height:64px; margin-left:23px;">
+      <span>MO:SI</span>
+    </a>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="검색어를 입력하세요." aria-label="검색어 입력창">
+      <button type="submit" aria-label="검색"><i class="fa fa-search" aria-hidden="true"></i></button>
+    </div>
+    <div class="user-menu d-flex gap-3">
+      <a th:href="@{/wishlist}" aria-label="관심상품">
+        <i class="fas fa-heart" aria-hidden="true"></i><span>관심상품</span>
+      </a>
+      <a th:href="@{/mypage/buyer}" aria-label="내 정보">
+        <i class="fas fa-user" aria-hidden="true"></i><span>내 정보</span>
+      </a>
+      <a th:href="@{/cart}" aria-label="장바구니">
+        <i class="fas fa-shopping-bag" aria-hidden="true"></i><span>장바구니</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 내비게이션 메뉴 -->
+  <nav class="header-nav">
+    <ul class="d-flex gap-4">
+      <li><a th:href="@{/menu}">전체메뉴</a></li>
+      <li><a th:href="@{/theme}">테마여행</a></li>
+      <li><a th:href="@{/community}">커뮤니티</a></li>
+      <li><a th:href="@{/air}">항공</a></li>
+      <li><a th:href="@{/hotel}">호텔</a></li>
+    </ul>
+  </nav>
+</header>

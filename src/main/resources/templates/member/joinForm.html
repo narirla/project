@@ -1,0 +1,145 @@
+<!-- /templates/member/joinForm.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+
+    <!-- ✅ 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/member/joinForm.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body>
+
+    <!-- ✅ 상단 로고 -->
+    <div style="width:100%;text-align:left;padding:16px 0 0 24px;position:fixed;top:0;left:0;z-index:2000;background:transparent;">
+        <a href="/" style="display:inline-block;text-decoration:none;">
+            <span style="font-size:28px;font-weight:bold;color:#222;letter-spacing:2px;">MO:SI</span>
+        </a>
+    </div>
+
+    <div class="register-container">
+        <h2>MO:SI 계정 생성</h2>
+        <div class="subtitle">
+            <br>
+            이미 계정이 있으신가요?
+            <a th:href="@{/login}" style="color:#0099ad;font-weight:600;">로그인</a>
+        </div>
+
+        <form th:action="@{/members/join}" th:object="${form}" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <div th:if="${#fields.hasGlobalErrors()}" class="error global-error">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err.defaultMessage}"></p>
+            </div>
+
+            <!-- ✅ 이메일 -->
+            <div class="form-group">
+                <label for="email">이메일<span class="required">*</span></label>
+                <div style="display:flex; gap:8px;">
+                    <input type="email" th:field="*{email}" id="email" class="input-mosi" required placeholder="example@domain.com">
+                    <button type="button" class="btn-small" onclick="checkEmail()">중복 확인</button>
+                </div>
+                <div id="emailCheckResult" class="email-result"></div>
+            </div>
+
+            <!-- ✅ 비밀번호 -->
+            <div class="form-group">
+                <label for="passwd">비밀번호<span class="required">*</span></label>
+                <div style="position:relative;">
+                    <input type="password" th:field="*{passwd}" id="passwd" class="input-mosi" placeholder="비밀번호 입력" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('passwd')">
+                        <i class="fa fa-eye-slash"></i> <!-- 초기: 가려짐 -->
+                    </button>
+                </div>
+                <div id="pwHint" class="error"></div>
+                <div id="pwStrength" class="pw-strength"></div>
+                <div th:if="${#fields.hasErrors('passwd')}" th:errors="*{passwd}" class="error"></div>
+            </div>
+
+            <!-- ✅ 비밀번호 확인 -->
+            <div class="form-group">
+                <label for="confirmPasswd">비밀번호 확인<span class="required">*</span></label>
+                <div style="position:relative;">
+                    <input type="password" th:field="*{confirmPasswd}" id="confirmPasswd" class="input-mosi" placeholder="비밀번호 재입력" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('confirmPasswd')">
+                        <i class="fa fa-eye-slash"></i> <!-- 초기: 가려짐 -->
+                    </button>
+                </div>
+                <div th:if="${#fields.hasErrors('confirmPasswd')}" th:errors="*{confirmPasswd}" class="error"></div>
+            </div>
+
+            <!-- ✅ 이름 & 성별 -->
+            <div class="form-group row">
+                <div>
+                    <label for="name">이름<span class="required">*</span></label>
+                    <input type="text" th:field="*{name}" id="name" class="input-mosi" required>
+                    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></div>
+                </div>
+                <div>
+                    <label>성별</label>
+                    <div class="gender-options">
+                        <label for="gender-male"><input type="radio" th:field="*{gender}" id="gender-male" value="남자"> 남</label>
+                        <label for="gender-female"><input type="radio" th:field="*{gender}" id="gender-female" value="여자"> 여</label>
+                    </div>
+                    <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" class="error"></div>
+                </div>
+            </div>
+
+            <!-- ✅ 닉네임 -->
+            <div class="form-group">
+                <label for="nickname">닉네임<span class="required">*</span></label>
+                <input type="text" id="nickname" name="nickname" th:field="*{nickname}" class="input-mosi" required>
+                <div id="nicknameCheckResult" class="check-msg"></div>
+                <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="error"></div>
+            </div>
+
+            <!-- ✅ 전화번호 -->
+            <div class="form-group">
+                <label for="tel">전화번호<span class="required">*</span></label>
+                <input type="tel" th:field="*{tel}" id="tel" class="input-mosi" required placeholder="010-0000-0000">
+                <div th:if="${#fields.hasErrors('tel')}" th:errors="*{tel}" class="error"></div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- ✅ 주소 -->
+            <div class="form-group">
+                <label for="zonecode">우편번호</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" th:field="*{zonecode}" id="zonecode" class="input-mosi" readonly placeholder="우편번호">
+                    <button type="button" class="btn-small" onclick="execDaumPostcode()">주소 검색</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">기본주소</label>
+                <input type="text" th:field="*{address}" id="address" class="input-mosi" readonly placeholder="도로명 주소">
+            </div>
+
+            <div class="form-group">
+                <label for="detailAddress">상세주소</label>
+                <input type="text" th:field="*{detailAddress}" id="detailAddress" class="input-mosi" placeholder="상세주소 입력">
+            </div>
+
+            <!-- ✅ 생년월일 -->
+            <div class="form-group">
+                <label for="birthDate">생년월일</label>
+                <input type="date" th:field="*{birthDate}" id="birthDate" class="input-mosi">
+            </div>
+
+            <!-- ✅ 제출 -->
+            <div class="btn-wrapper">
+                <button type="submit" class="btn">계정 생성</button>
+            </div>
+        </form>
+
+        <!-- ✅ Toast 메시지 -->
+        <div id="toast" class="toast-message" style="display: none;"></div>
+    </div>
+
+    <!-- ✅ JS -->
+    <script th:src="@{/js/member/joinForm.js}"></script>
+</body>
+</html>
