@@ -2,11 +2,12 @@ package com.KDT.mosi.domain.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
 @Data
-public class Member {
+public class Member implements Serializable {
   private Long memberId;
   private String email;
   private String name;

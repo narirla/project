@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>판매자 페이지 생성</title>
+  <link rel="stylesheet" th:href="@{/css/sellerpage/createSellerPage.css}">
+</head>
+<body>
+  <h1>판매자 페이지 생성</h1>
+  <form th:action="@{/mypage/seller/create}" method="post" enctype="multipart/form-data">
+    <input type="hidden" id="memberId" name="memberId" th:value="${memberId}">
+
+    <div>
+      <label for="intro">소개글:</label>
+      <textarea id="intro" name="intro" rows="4" cols="40" maxlength="500"></textarea>
+      <div id="charCount">500자 남음</div>
+    </div>
+
+    <div>
+      <label for="image">프로필 이미지:</label>
+      <input type="file" id="image" name="image" accept="image/*">
+    </div>
+
+    <div>
+      <button type="submit">등록</button>
+    </div>
+  </form>
+
+  <script th:src="@{/js/sellerpage/createSellerPage.js}"></script>
+</body>
+</html>

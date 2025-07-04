@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
 <html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8">
@@ -25,168 +24,115 @@
 </head>
 
 <body>
-  <div class="wrapper">
-    <main class="page-container" role="main">
-      <div th:replace="~{fragments/header :: header}"></div>
+<div class="wrapper">
+  <main class="page-container" role="main">
+    <div th:replace="~{fragments/header :: header}"></div>
 
-      <h2>구매자 마이페이지 수정</h2>
+    <h2>구매자 마이페이지 수정</h2>
 
-      <form th:action="@{'/mypage/buyer/' + ${form.memberId}}" th:object="${form}" method="post" enctype="multipart/form-data">
+    <form th:action="@{'/mypage/buyer/' + ${form.memberId}}" th:object="${form}" method="post" enctype="multipart/form-data">
 
-        <!-- 이름 -->
-        <div class="mb-3">
-          <label for="name" class="form-label">이름</label>
-          <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="이름" autocomplete="name">
+      <!-- 이름 -->
+      <div class="mb-3">
+        <label for="name" class="form-label">이름</label>
+        <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="이름" autocomplete="name">
+      </div>
+
+      <!-- 닉네임 -->
+      <div class="form-group d-flex align-items-center gap-2 mb-1">
+        <label for="nickname" class="form-label me-2" style="min-width: 60px;">닉네임</label>
+        <input type="text" id="nickname" th:field="*{nickname}" class="form-control" style="max-width: 300px;" readonly autocomplete="off">
+        <button type="button" id="nicknameToggleBtn" class="btn btn-outline-secondary" aria-label="닉네임 변경 버튼">변경하기</button>
+      </div>
+      <span id="nicknameCheckMsg" class="form-text ms-2"></span>
+
+      <!-- 비밀번호 -->
+      <div class="form-group mb-3">
+        <label for="passwd">비밀번호</label>
+        <div id="passwdDisplay">
+          <div class="form-control w-auto d-inline-block bg-light text-muted" aria-hidden="true" tabindex="-1">********</div>
+          <button type="button" onclick="enablePasswordEdit()" class="btn btn-outline-secondary btn-sm ms-2" aria-label="비밀번호 수정 버튼">비밀번호 수정</button>
         </div>
-
-        <!-- 닉네임 -->
-        <div class="form-group d-flex align-items-center gap-2 mb-1">
-          <label for="nickname" class="form-label me-2" style="min-width: 60px;">닉네임</label>
-          <input type="text" id="nickname" th:field="*{nickname}" class="form-control" style="max-width: 300px;" readonly autocomplete="off">
-          <button type="button" id="nicknameToggleBtn" class="btn btn-outline-secondary" aria-label="닉네임 변경 버튼">변경하기</button>
+        <div id="passwdEdit" style="display:none;">
+          <input type="password" id="passwd" name="passwd" th:field="*{passwd}" class="form-control" placeholder="새 비밀번호 (8~12자)" autocomplete="new-password">
         </div>
-        <span id="nicknameCheckMsg" class="form-text ms-2"></span>
+      </div>
 
-        <!-- 비밀번호 -->
-        <div class="form-group mb-3">
-          <label for="passwd">비밀번호</label>
-          <div id="passwdDisplay">
-            <div class="form-control w-auto d-inline-block bg-light text-muted" aria-hidden="true" tabindex="-1">********</div>
-            <button type="button" onclick="enablePasswordEdit()" class="btn btn-outline-secondary btn-sm ms-2" aria-label="비밀번호 수정 버튼">비밀번호 수정</button>
-          </div>
-          <div id="passwdEdit" style="display:none;">
-            <input type="password" id="passwd" name="passwd" th:field="*{passwd}" class="form-control" placeholder="새 비밀번호 (8~12자)" autocomplete="new-password">
-          </div>
+      <!-- 전화번호 -->
+      <div class="mb-3">
+        <label for="tel" class="form-label">전화번호</label>
+        <input type="text" class="form-control" th:field="*{tel}" id="tel" placeholder="010-0000-0000" autocomplete="tel">
+        <div th:if="${#fields.hasErrors('tel')}" th:errors="*{tel}" class="form-text text-danger"></div>
+      </div>
+
+      <!-- 자기소개 -->
+      <div class="mb-3">
+        <label for="intro" class="form-label">자기소개</label>
+        <textarea class="form-control" th:field="*{intro}" id="intro" rows="3" autocomplete="off"></textarea>
+        <div th:if="${#fields.hasErrors('intro')}" th:errors="*{intro}" class="form-text text-danger"></div>
+      </div>
+
+      <!-- 주소 -->
+      <div class="mb-3">
+        <label for="zonecode" class="form-label">우편번호</label>
+        <div class="input-group mb-2">
+          <input type="text" class="form-control" id="zonecode" th:field="*{zonecode}" placeholder="우편번호" readonly autocomplete="postal-code">
+          <button type="button" class="btn btn-outline-secondary" onclick="execDaumPostcode()" aria-label="주소 검색 버튼">주소 검색</button>
         </div>
+        <label for="address" class="form-label">기본주소</label>
+        <input type="text" class="form-control mb-2" id="address" th:field="*{address}" placeholder="기본주소" readonly autocomplete="street-address">
+        <label for="detailAddress" class="form-label">상세주소</label>
+        <input type="text" class="form-control" id="detailAddress" th:field="*{detailAddress}" placeholder="상세주소" autocomplete="address-line2">
+      </div>
 
-        <!-- 전화번호 -->
-        <div class="mb-3">
-          <label for="tel" class="form-label">전화번호</label>
-          <input type="text" class="form-control" th:field="*{tel}" id="tel" placeholder="010-0000-0000" autocomplete="tel">
-          <div th:if="${#fields.hasErrors('tel')}" th:errors="*{tel}" class="form-text text-danger"></div>
-        </div>
+      <!-- 알림 설정 -->
+      <div class="form-group mb-3 form-check">
+        <!-- checkbox 미체크 시에도 "N"이 서버로 전달되도록 -->
+        <input type="hidden" name="notification" value="N">
+        <input type="checkbox" id="notification" name="notification" value="Y"
+               class="form-check-input"
+               th:checked="${form.notification == 'Y'}"
+               aria-label="알림 수신 동의 체크박스">
+        <label for="notification" class="form-check-label">할인쿠폰/이벤트/뉴스레터 수신 동의</label>
+      </div>
 
-        <!-- 자기소개 -->
-        <div class="mb-3">
-          <label for="intro" class="form-label">자기소개</label>
-          <textarea class="form-control" th:field="*{intro}" id="intro" rows="3" autocomplete="off"></textarea>
-          <div th:if="${#fields.hasErrors('intro')}" th:errors="*{intro}" class="form-text text-danger"></div>
-        </div>
+      <!-- 프로필 이미지 -->
+      <div class="mb-3">
+        <figure>
+          <img th:src="@{'/mypage/buyer/' + ${form.memberId} + '/image'}" alt="현재 프로필 이미지" class="profile-image">
+          <figcaption class="form-text">현재 프로필 이미지</figcaption>
+        </figure>
+      </div>
 
-        <!-- 주소 -->
-        <div class="mb-3">
-          <label for="zonecode" class="form-label">우편번호</label>
-          <div class="input-group mb-2">
-            <input type="text" class="form-control" id="zonecode" th:field="*{zonecode}" placeholder="우편번호" readonly autocomplete="postal-code">
-            <button type="button" class="btn btn-outline-secondary" onclick="execDaumPostcode()" aria-label="주소 검색 버튼">주소 검색</button>
-          </div>
-          <label for="address" class="form-label">기본주소</label>
-          <input type="text" class="form-control mb-2" id="address" th:field="*{address}" placeholder="기본주소" readonly autocomplete="street-address">
-          <label for="detailAddress" class="form-label">상세주소</label>
-          <input type="text" class="form-control" id="detailAddress" th:field="*{detailAddress}" placeholder="상세주소" autocomplete="address-line2">
-        </div>
+      <!-- 새 이미지 업로드 -->
+      <div class="mb-3">
+        <label for="imageFile" class="form-label">새 프로필 이미지</label>
+        <input type="file" class="form-control" th:field="*{imageFile}" id="imageFile" aria-label="새 프로필 이미지 업로드">
+      </div>
 
-        <!-- 알림 설정 -->
-        <div class="form-group mb-3 form-check">
-          <!-- checkbox 미체크 시에도 "N"이 서버로 전달되도록 -->
-          <input type="hidden" name="notification" value="N">
-          <input type="checkbox" id="notification" name="notification" value="Y"
-                 class="form-check-input"
-                 th:checked="${form.notification == 'Y'}"
-                 aria-label="알림 수신 동의 체크박스">
-          <label for="notification" class="form-check-label">할인쿠폰/이벤트/뉴스레터 수신 동의</label>
-        </div>
+      <!-- 숨겨진 필드 -->
+      <input type="hidden" th:field="*{pageId}" id="pageId">
+      <input type="hidden" th:field="*{memberId}" id="memberId">
 
-        <!-- 프로필 이미지 -->
-        <div class="mb-3">
-          <figure>
-            <img th:src="@{'/mypage/buyer/' + ${form.memberId} + '/image'}" alt="현재 프로필 이미지" class="profile-image">
-            <figcaption class="form-text">현재 프로필 이미지</figcaption>
-          </figure>
-        </div>
+      <!-- 버튼 -->
+      <div class="d-flex gap-2 mt-3">
+        <button type="submit" id="saveBtn" class="btn" aria-label="저장 버튼">저장</button>
+        <a th:href="@{'/mypage/buyer/' + ${form.memberId}}" class="btn btn-outline-secondary" aria-label="수정 취소 버튼">취소</a>
+      </div>
+    </form>
+  </main>
 
-        <!-- 새 이미지 업로드 -->
-        <div class="mb-3">
-          <label for="imageFile" class="form-label">새 프로필 이미지</label>
-          <input type="file" class="form-control" th:field="*{imageFile}" id="imageFile" aria-label="새 프로필 이미지 업로드">
-        </div>
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
 
-        <!-- 숨겨진 필드 -->
-        <input type="hidden" th:field="*{pageId}" id="pageId">
-        <input type="hidden" th:field="*{memberId}" id="memberId">
-
-        <!-- 버튼 -->
-        <div class="d-flex gap-2 mt-3">
-          <button type="submit" id="saveBtn" class="btn" aria-label="저장 버튼">저장</button>
-          <a th:href="@{'/mypage/buyer/' + ${form.memberId}}" class="btn btn-outline-secondary" aria-label="수정 취소 버튼">취소</a>
-        </div>
-      </form>
-    </main>
-
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
-  </div>
-
-  <!-- JS 파일 + 추가 함수 -->
-  <script th:src="@{/js/buyerpage/editBuyerPage.js}" defer></script>
-  <script>
-    function enablePasswordEdit() {
-      document.getElementById('passwdDisplay').style.display = 'none';
-      document.getElementById('passwdEdit').style.display = 'block';
-      document.getElementById('passwd').focus();
-    }
-  </script>
-=======
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>마이페이지 수정</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" th:href="@{/css/common.css}">
-  <link rel="stylesheet" th:href="@{/css/buyerpage/editBuyerPage.css}">
-  <script defer th:src="@{/js/buyerpage/editBuyerPage.js}"></script>
-</head>
-<body class="container mt-4">
-  <!-- ✅ 공통 헤더 -->
-  <div th:replace="fragments/header :: header"></div>
-
-  <h2>구매자 마이페이지 수정</h2>
-
-  <form th:action="@{|/mypage/buyer/${form.memberId}|}" th:object="${form}" method="post" enctype="multipart/form-data">
-
-    <!-- ✅ 현재 이미지 -->
-    <div class="mb-3">
-      <label class="form-label">현재 프로필 이미지</label><br>
-      <img th:src="${form.image != null} ?
-                     @{'/mypage/buyer/' + ${form.memberId} + '/image'} :
-                     @{/img/default-profile.png}"
-           alt="프로필 이미지"
-           style="width: 150px; height: 150px; object-fit: cover; border-radius: 10px; border: 1px solid #ccc;">
-    </div>
-
-    <!-- ✅ 새 이미지 업로드 -->
-    <div class="mb-3">
-      <label for="imageFile" class="form-label">새 프로필 이미지 업로드</label>
-      <input type="file" class="form-control" th:field="*{imageFile}" id="imageFile">
-    </div>
-
-    <!-- ✅ 닉네임 -->
-    <div class="mb-3">
-      <label for="nickname" class="form-label">닉네임</label>
-      <input type="text" class="form-control" th:field="*{nickname}" id="nickname">
-    </div>
-
-    <!-- ✅ 자기소개 -->
-    <div class="mb-3">
-      <label for="intro" class="form-label">자기소개</label>
-      <textarea class="form-control" th:field="*{intro}" id="intro" rows="3"></textarea>
-    </div>
-
-    <!-- 숨겨진 필드 -->
-    <input type="hidden" th:field="*{pageId}">
-    <input type="hidden" th:field="*{memberId}">
-
-    <button type="submit" class="btn btn-success">수정</button>
-  </form>
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
+<!-- JS 파일 + 추가 함수 -->
+<script th:src="@{/js/buyerpage/editBuyerPage.js}" defer></script>
+<script>
+  function enablePasswordEdit() {
+    document.getElementById('passwdDisplay').style.display = 'none';
+    document.getElementById('passwdEdit').style.display = 'block';
+    document.getElementById('passwd').focus();
+  }
+</script>
 </body>
 </html>

@@ -24,6 +24,7 @@ public class WebSecurityConfig {
             .loginProcessingUrl("/login")             // 로그인 처리 경로
             .successHandler(loginSuccessHandler)      // ✅ 로그인 성공 핸들러 등록
             .permitAll()
+
         )
         .logout(logout -> logout
             .logoutUrl("/login/logout")               // 로그아웃 처리 경로
@@ -33,13 +34,13 @@ public class WebSecurityConfig {
             .requestMatchers(
                 "/", "/login/**",
                 "/members/join", "/members/join/**",
-                "/members/emailCheck", "/members/nicknameCheck",  // ✅ 추가
+                "/members/emailCheck", "/members/nicknameCheck",
                 "/find/**", "/css/**", "/js/**", "/img/**"
             ).permitAll()
             .requestMatchers("/members/*/delete").authenticated()
+            .requestMatchers("/mypage/role/**").authenticated() // ✅ 명시적으로 인증 필요
             .anyRequest().authenticated()
         )
-
         .exceptionHandling(ex -> ex
             .accessDeniedPage("/error/403")           // 권한 오류 시 이동 페이지
         )

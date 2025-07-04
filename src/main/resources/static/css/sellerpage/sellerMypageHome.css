@@ -1,0 +1,173 @@
+/*sellerMypageHome.css*/
+/* sellerMypageHome.css */
+
+/* ✅ 공통 레이아웃 설정 */
+.page-container {
+  width: 1200px;
+  margin: 0 auto;
+  padding: 167px 40px 60px 40px;
+  background-color: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ✅ 판매자 요약 카드 */
+.info-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  background-color: #f9f9f9;
+}
+
+.info-grid,
+.info-grid-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.info-item {
+  flex: 1;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.04);
+  text-align: center;
+}
+
+.info-item .title {
+  display: block;
+  font-size: 0.875rem;
+  color: #888;
+}
+
+.info-item .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ✅ 주문 현황 테이블 */
+.section-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.section-card th,
+.section-card td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.875rem;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-item-image {
+  width: 40px;
+  height: 40px;
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+/* ✅ 내 상품 목록 */
+.card-list {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.tour-card {
+  width: 250px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+}
+
+.card-image {
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.heart-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #f66;
+}
+
+.card-content {
+  padding: 12px;
+}
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.card-price {
+  font-size: 0.875rem;
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.card-discount {
+  font-size: 1rem;
+  color: #0099AD;
+  font-weight: 700;
+}
+
+.discount-badge {
+  background: #EBFCFF;
+  color: #0099AD;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+/* ✅ 광고 배너 */
+.ad-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eaeaea;
+  height: 60px;
+  margin: 40px 0;
+  border-radius: 8px;
+}
+
+.ad-arrow {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  margin: 0 12px;
+  cursor: pointer;
+}
+
+/* ✅ 공지 */
+.notice-bar {
+  background: #F8F8F8;
+  padding: 10px 20px;
+  margin-top: 40px;
+  border-top: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.notice-label {
+  font-weight: 700;
+  color: #0099AD;
+  margin-right: 12px;
+}

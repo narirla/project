@@ -1,66 +1,191 @@
 package com.KDT.mosi.web.controller;
 
+import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.SellerPage;
-import com.KDT.mosi.domain.mypage.seller.svc.SellerSVC;
+import com.KDT.mosi.domain.mypage.seller.dao.SellerPageDAO;
+import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-@RestController
-@RequestMapping("/seller-page")
+@Slf4j
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/mypage/seller")
 public class SellerPageController {
 
-  private final SellerSVC sellerPageService;
+  private final SellerPageSVC sellerPageSVC;
+  private final SellerPageDAO sellerPageDAO;
 
-  public SellerPageController(SellerSVC sellerSVC) {
-    this.sellerPageService = sellerSVC;
+  /**
+   * /mypage/seller → sellerMypageHome.html 렌더링
+   */
+  @GetMapping
+  public String sellerMypageHome(HttpSession session, Model model) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
+      return "redirect:/login";
+    }
+
+    SellerPage sellerPage = sellerPageDAO.findByMemberId(loginMember.getMemberId())
+        .orElseGet(SellerPage::new);
+
+    model.addAttribute("member", loginMember);
+    model.addAttribute("sellerPage", sellerPage);
+    model.addAttribute("orders", mockOrders());
+    model.addAttribute("products", mockProducts());
+
+    return "mypage/sellerpage/sellerMypageHome";
   }
 
+  /**
+   * /mypage/seller/home → /mypage/seller 리다이렉트 처리
+   */
+  @GetMapping("/home")
+  public String redirectToSellerMypage() {
+    return "redirect:/mypage/seller";
+  }
+
+  /**
+   * 판매자 마이페이지 생성 폼
+   */
+  @GetMapping("/create")
+  public String createForm(HttpSession session, Model model) {
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      return "redirect:/login";
+    }
+
+    if (sellerPageSVC.existByMemberId(memberId)) {
+      throw new AccessDeniedException("이미 판매자 페이지가 존재합니다.");
+    }
+
+    model.addAttribute("memberId", memberId);
+    return "mypage/sellerpage/createSellerPage";
+  }
+
+  /**
+   * 판매자 마이페이지 생성 처리
+   */
   @PostMapping("/create")
-  public ResponseEntity<String> createPage(
-      @RequestParam Long memberId,
-      @RequestParam(required = false) MultipartFile image,
-      @RequestParam(required = false) String intro
-  ) throws IOException {
-    SellerPage page = new SellerPage();
-    page.setMemberId(memberId);
-    page.setIntro(intro);
-    page.setImage(image != null ? image.getBytes() : null);
-    sellerPageService.createSellerPage(page);
-    return ResponseEntity.ok("판매자 페이지 생성 완료");
+  public String create(@RequestParam("memberId") Long memberId,
+                       @RequestParam("intro") String intro,
+                       @RequestParam("image") MultipartFile image,
+                       RedirectAttributes redirectAttributes) {
+
+    SellerPage sellerPage = new SellerPage();
+    sellerPage.setMemberId(memberId);
+    sellerPage.setIntro(intro);
+
+    try {
+      if (image != null && !image.isEmpty()) {
+        sellerPage.setImage(image.getBytes());
+      }
+    } catch (Exception e) {
+      log.error("이미지 업로드 실패", e);
+    }
+
+    sellerPageSVC.save(sellerPage);
+    redirectAttributes.addFlashAttribute("msg", "판매자 마이페이지가 생성되었습니다.");
+    return "redirect:/mypage/seller";
   }
 
-  @GetMapping("/{memberId}")
-  public ResponseEntity<SellerPage> getPage(@PathVariable Long memberId) {
-    return sellerPageService.getSellerPageByMemberId(memberId)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+  /**
+   * 판매자 마이페이지 수정 폼
+   */
+  @GetMapping("/edit")
+  public String editForm(HttpSession session, Model model) {
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      return "redirect:/login";
+    }
+
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
+    model.addAttribute("sellerpage", optional.orElseGet(SellerPage::new));
+
+    return "mypage/sellerpage/editSellerPage";
   }
 
-  @PostMapping("/update/{pageId}")
-  public ResponseEntity<String> updatePage(
-      @PathVariable Long pageId,
-      @RequestParam(required = false) MultipartFile image,
-      @RequestParam(required = false) String intro,
-      @RequestParam int salesCount,
-      @RequestParam double reviewAvg
-  ) throws IOException {
-    SellerPage page = new SellerPage();
-    page.setPageId(pageId);
-    page.setImage(image != null ? image.getBytes() : null);
-    page.setIntro(intro);
-    page.setSalesCount(salesCount);
-    page.setReviewAvg(reviewAvg);
+  /**
+   * 판매자 마이페이지 수정 처리
+   */
+  @PostMapping("/edit")
+  public String edit(@ModelAttribute SellerPage sellerpage,
+                     @RequestParam("image") MultipartFile image,
+                     HttpSession session,
+                     RedirectAttributes redirectAttributes) {
 
-    sellerPageService.updateSellerPage(page);
-    return ResponseEntity.ok("판매자 페이지 수정 완료");
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      return "redirect:/login";
+    }
+
+    try {
+      if (image != null && !image.isEmpty()) {
+        sellerpage.setImage(image.getBytes());
+      }
+    } catch (Exception e) {
+      log.error("프로필 이미지 처리 중 오류", e);
+    }
+
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
+
+    if (optional.isPresent()) {
+      Long pageId = optional.get().getPageId();
+      sellerPageSVC.updateById(pageId, sellerpage);
+    } else {
+      sellerpage.setMemberId(memberId);
+      sellerPageSVC.save(sellerpage);
+    }
+
+    redirectAttributes.addFlashAttribute("msg", "마이페이지 정보가 수정되었습니다.");
+    return "redirect:/mypage/seller";
   }
 
-  @DeleteMapping("/delete/{pageId}")
-  public ResponseEntity<String> deletePage(@PathVariable Long pageId) {
-    sellerPageService.deleteSellerPage(pageId);
-    return ResponseEntity.ok("삭제 완료");
+  /**
+   * 판매자 프로필 이미지 조회
+   */
+  @GetMapping("/images/profile/{id}")
+  @ResponseBody
+  public ResponseEntity<byte[]> getProfileImage(@PathVariable("id") Long pageId) {
+    Optional<SellerPage> optional = sellerPageSVC.findById(pageId);
+
+    if (optional.isPresent() && optional.get().getImage() != null) {
+      return ResponseEntity
+          .ok()
+          .header("Content-Type", "image/jpeg")
+          .body(optional.get().getImage());
+    }
+
+    return ResponseEntity.notFound().build();
+  }
+
+  /**
+   * 모의 주문 데이터
+   */
+  private List<Map<String, Object>> mockOrders() {
+    return List.of(
+        Map.of("date", "2025.07.01", "title", "[MO:SI Pick] 황령산 투어", "orderNo", "ORD20250701-1234567", "amount", 5000)
+    );
+  }
+
+  /**
+   * 모의 상품 데이터
+   */
+  private List<Map<String, Object>> mockProducts() {
+    return List.of(
+        Map.of("name", "[MO:SI Pick] 황령산 투어", "price", 5000, "discountPrice", 4500, "imageUrl", "/img/sample-product.png")
+    );
   }
 }
