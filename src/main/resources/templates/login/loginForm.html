@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>로그인</title>
-<<<<<<< HEAD
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
   <link rel="stylesheet" th:href="@{/css/member/loginForm.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -18,68 +17,35 @@
     <form th:action="@{/login}" method="post" class="login-form">
 
       <!-- ✅ 로그인 실패 시 에러 메시지 -->
-=======
-  <link rel="stylesheet" th:href="@{/css/member/loginForm.css}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body>
-  <div class="login-container">
-    <h1 class="logo">MO:SI</h1>
-
-    <form th:action="@{/login}" method="post" class="login-form">
-
-      <!-- ✅ 로그인 실패 시 에러 메시지 출력 -->
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
       <div th:if="${param.error}" class="error global-error">
         이메일 또는 비밀번호가 올바르지 않습니다.
       </div>
 
-<<<<<<< HEAD
       <!-- ✅ 리다이렉트 경로 (선택사항) -->
       <input type="hidden" name="redirect" th:value="${redirect}">
 
       <!-- ✅ 이메일 (username) 입력 -->
       <input type="email" name="username" placeholder="이메일"
-             th:value="${param.username}" required class="input-item">
+             th:value="${param.username}" required class="input-item"
+             autocomplete="email">
 
       <!-- ✅ 비밀번호 입력 + 보기/삭제 버튼 -->
       <div class="input-item">
-        <input type="password" id="password" name="password" placeholder="비밀번호" required>
+        <input type="password" id="password" name="password" placeholder="비밀번호" required autocomplete="current-password">
 
-=======
-      <!-- ✅ 리다이렉트 경로를 hidden input으로 전달 -->
-      <input type="hidden" name="redirect" th:value="${redirect}">
-
-      <input type="text" name="username" placeholder="이메일" required>
-
-      <!-- ✅ 비밀번호 입력 + 아이콘 버튼 영역 -->
-      <div class="input-item">
-        <input type="password" id="password" name="password" placeholder="비밀번호" required>
-
-        <!-- 👁 비밀번호 보기 토글 버튼 -->
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
         <button type="button" class="btn-eye" aria-label="비밀번호 보기">
           <i class="fa-solid fa-eye"></i>
         </button>
 
-<<<<<<< HEAD
-=======
-        <!-- ❌ 입력 삭제 버튼 -->
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
         <button type="button" class="btn-clear" aria-label="입력 삭제">
           <i class="fa-solid fa-circle-xmark"></i>
         </button>
       </div>
 
-<<<<<<< HEAD
       <!-- ✅ Caps Lock 감지 메시지 -->
       <p id="caps-warning" class="caps-warning">Caps Lock이 켜져 있습니다.</p>
 
       <!-- ✅ remember-me (기능 미연동 상태) -->
-=======
-      <p id="caps-warning" class="caps-warning">Caps Lock이 켜져 있습니다.</p>
-
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
       <div class="remember">
         <input type="checkbox" id="remember" name="remember">
         <label for="remember">이메일 기억하기</label>
@@ -94,6 +60,6 @@
     </form>
   </div>
 
-  <script th:src="@{/js/member/loginForm.js}"></script>
+<script th:src="@{/js/member/loginForm.js}"></script>
 </body>
 </html>

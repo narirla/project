@@ -1,51 +1,50 @@
-/*viewMember.css*/
-
+/* /css/member/resetPwResult.css */
 body {
-<<<<<<< HEAD
   font-family: 'Pretendard', sans-serif;
-=======
-  font-family: 'Noto Sans KR', sans-serif;
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
-  background-color: #f4f8fb;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   margin: 0;
+}
+
+.result-container {
+  background: white;
   padding: 40px;
-}
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  background: #fff;
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.05);
-}
-
-h2 {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   text-align: center;
+  width: 360px;
+}
+
+.result-container h2 {
   margin-bottom: 24px;
-  color: #05424A;
+  color: #333;
 }
 
-.profile-img {
-  text-align: center;
-  margin-bottom: 24px;
+.message-box {
+  margin-bottom: 32px;
 }
 
-.profile-img img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ccc;
+.success-msg {
+  color: #0099AD;
+  font-weight: bold;
+  font-size: 16px;
 }
 
-.member-info p {
-  font-size: 1.1em;
-  color: #222;
-  margin: 8px 0;
+.error-msg {
+  color: red;
+  font-weight: bold;
+  font-size: 16px;
 }
 
-.member-info strong {
-  color: #05424A;
-  margin-right: 8px;
+.btn-box .btn {
+  padding: 10px 20px;
+  background-color: #0099AD;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
 }

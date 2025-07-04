@@ -27,16 +27,17 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
       HttpServletResponse response,
       Authentication authentication
   ) throws IOException, ServletException {
-    // 1. 이메일로 사용자 정보 조회
-    String email = authentication.getName();  // 로그인에 사용된 이메일
+    String email = authentication.getName();
     Member member = memberSVC.findByEmail(email).orElseThrow();
 
-    // 2. 세션에 사용자 정보 저장
+    // ✅ 세션에 로그인 정보 저장
     HttpSession session = request.getSession(true);
     session.setAttribute("loginMember", member);
+    session.setAttribute("loginMemberId", member.getMemberId());  // 🔧 추가
+
     log.info("✅ 로그인 성공: 세션에 loginMember 저장 - {}", member.getEmail());
 
-    // 3. 홈으로 리디렉션 (필요 시 redirect 파라미터 처리 가능)
     response.sendRedirect("/");
   }
+
 }

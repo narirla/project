@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>판매자 마이페이지 수정</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/sellerpage/editSellerPage.css}">
+</head>
+<body>
+
+  <header th:replace="~{fragments/header :: header}"></header>
+
+  <div class="page-container">
+    <main class="mypage-container">
+      <h2>판매자 마이페이지 수정</h2>
+
+      <form th:action="@{/mypage/seller/edit}" th:object="${form}" method="post" enctype="multipart/form-data">
+
+        <div class="mb-3">
+          <label for="nickname" class="form-label">닉네임</label>
+          <div class="d-flex align-items-center">
+            <input type="text" id="nickname" th:field="*{nickname}" class="form-control" readonly>
+            <button type="button" id="nicknameToggleBtn" class="btn btn-outline-secondary ms-2">변경하기</button>
+          </div>
+          <span id="nicknameCheckMsg" class="form-text ms-2"></span>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="passwd">비밀번호</label>
+          <a th:href="@{/member/changePw}" class="btn btn-outline-secondary">비밀번호 수정</a>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="tel">전화번호</label>
+          <input type="text" id="tel" th:field="*{tel}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="intro">자기소개</label>
+          <textarea id="intro" th:field="*{intro}" class="form-control" rows="5"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="zonecode">우편번호</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="zonecode" th:field="*{zonecode}" class="form-control">
+            <button type="button" id="searchAddress" class="btn btn-outline-secondary">주소 검색</button>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="address">기본주소</label>
+          <input type="text" id="address" th:field="*{address}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="detailAddress">상세주소</label>
+          <input type="text" id="detailAddress" th:field="*{detailAddress}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label>
+            <input type="checkbox" th:field="*{notification}">
+            할인쿠폰/이벤트/뉴스레터 수신 동의
+          </label>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">현재 프로필 이미지</label>
+          <div class="profile-image">
+            <img th:if="*{image != null}" th:src="@{/images/profile/{id}(id=*{pageId})}" alt="프로필 이미지">
+            <img th:if="*{image == null}" src="/images/default-profile.png" alt="기본 이미지">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="imageFile">새 프로필 이미지</label>
+          <input type="file" id="imageFile" th:field="*{imageFile}" class="form-control">
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" id="saveBtn" class="btn">저장</button>
+          <a th:href="@{/mypage/seller}" class="btn btn-outline-secondary">취소</a>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script th:src="@{/js/sellerpage/editSellerPage.js}" defer></script>
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

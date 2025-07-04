@@ -7,6 +7,7 @@
   width: 1200px;
   height: 1501px;
   margin: 0 auto;
+  padding-top: 167px;  /* ✅ 고정 헤더 높이 고려 */
   background-color: #fff;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
   overflow-y: auto;     /* 수직 스크롤 필요 시만 표시 */

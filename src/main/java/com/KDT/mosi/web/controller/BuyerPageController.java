@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,7 +29,7 @@ import java.util.Optional;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/mypage/buyer")
-public class BuyerPageController {
+public class  BuyerPageController {
 
   private final BuyerPageSVC buyerPageSVC;
   private final MemberSVC memberSVC;
@@ -178,7 +179,8 @@ public class BuyerPageController {
   public String update(
       @PathVariable Long memberId,
       @Valid @ModelAttribute("form") BuyerPageUpdateForm form,
-      BindingResult bindingResult
+      BindingResult bindingResult,
+      RedirectAttributes redirectAttributes
   ) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     log.info("🔐 Authentication: {}", auth);
@@ -258,10 +260,11 @@ public class BuyerPageController {
     memberSVC.modify(memberId, member);
     log.info("✅ Member 정보 수정 완료: {}", member);
 
+    // 🔽 수정 성공 메시지 전달
+    redirectAttributes.addFlashAttribute("msg", "마이페이지 정보가 성공적으로 수정되었습니다.");
+
     return "redirect:/mypage/buyer/" + memberId;
   }
-
-
 
   // ✅ 기본 진입 시 로그인한 회원의 마이페이지로 리다이렉트
   @GetMapping

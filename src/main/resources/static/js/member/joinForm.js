@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // ✅ joinForm.js 최종 전체 코드
 
 // 이메일 중복 확인 상태 저장 객체
@@ -33,17 +32,6 @@ async function checkEmail() {
   if (!isValidEmail(email)) {
     resultBox.textContent = "올바른 이메일 형식이 아닙니다.";
     resultBox.style.color = "red";
-=======
-/*joinForm.js*/
-// ✅ 이메일 중복 확인
-async function checkEmail() {
-  const email = document.getElementById("email").value.trim();
-  const emailCheckResult = document.getElementById("emailCheckResult");
-
-  if (!email) {
-    emailCheckResult.textContent = "이메일을 입력해주세요.";
-    emailCheckResult.style.color = "red";
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
     return;
   }
 
@@ -51,7 +39,6 @@ async function checkEmail() {
     const response = await fetch(`/members/emailCheck?email=${encodeURIComponent(email)}`);
     const result = await response.json();
 
-<<<<<<< HEAD
     if (result.exists === true) {
       resultBox.textContent = "이미 사용 중인 이메일입니다.";
       resultBox.style.color = "red";
@@ -98,17 +85,6 @@ async function checkNickname() {
     }
   } catch (error) {
     console.error("닉네임 중복 확인 실패:", error);
-=======
-    if (result === true) {
-      emailCheckResult.textContent = "이미 사용 중인 이메일입니다.";
-      emailCheckResult.style.color = "red";
-    } else {
-      emailCheckResult.textContent = "";
-      showToast("사용 가능한 이메일입니다."); // ✅ 토스트 메시지 출력
-    }
-  } catch (error) {
-    console.error("이메일 중복 확인 실패:", error);
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   }
 }
 
@@ -118,24 +94,15 @@ function showToast(message) {
   toast.textContent = message;
   toast.style.display = "block";
 
-<<<<<<< HEAD
-=======
-  // 애니메이션 리셋을 위한 강제 리플로우
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   toast.classList.remove("toast-message");
   void toast.offsetWidth;
   toast.classList.add("toast-message");
 
-<<<<<<< HEAD
-=======
-  // 자동 숨김
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   setTimeout(() => {
     toast.style.display = "none";
   }, 2500);
 }
 
-<<<<<<< HEAD
 // ✅ 다음 우편번호 API 실행 함수
 function execDaumPostcode() {
   new daum.Postcode({
@@ -143,18 +110,10 @@ function execDaumPostcode() {
       document.getElementById("zonecode").value = data.zonecode;
       document.getElementById("address").value = data.roadAddress;
       document.getElementById("detailAddress").focus();
-=======
-// ✅ 다음 우편번호 API 실행 함수 (주소 연동 시 사용)
-function execDaumPostcode() {
-  new daum.Postcode({
-    oncomplete: function(data) {
-      document.getElementById("address").value = data.roadAddress;
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
     }
   }).open();
 }
 
-<<<<<<< HEAD
 // ✅ 비밀번호 보기 토글
 function togglePassword(id) {
   const pwInput = document.getElementById(id);
@@ -235,9 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ✅ 회원가입 폼 유효성 검사 함수
-=======
-// ✅ 회원가입 폼 유효성 검사
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
 function validateForm() {
   const requiredFields = [
     { id: "email", name: "이메일" },
@@ -245,11 +201,7 @@ function validateForm() {
     { id: "confirmPasswd", name: "비밀번호 확인" },
     { id: "nickname", name: "닉네임" },
     { id: "name", name: "이름" },
-<<<<<<< HEAD
     { id: "tel", name: "전화번호" },
-=======
-    { id: "tel", name: "전화번호" }
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   ];
 
   for (const field of requiredFields) {
@@ -261,11 +213,7 @@ function validateForm() {
     }
   }
 
-<<<<<<< HEAD
   // 전화번호 형식 검사
-=======
-  // ✅ 전화번호 형식 검사
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   const tel = document.getElementById("tel").value.trim();
   const telPattern = /^01[016789]-\d{3,4}-\d{4}$/;
   if (!telPattern.test(tel)) {
@@ -274,11 +222,7 @@ function validateForm() {
     return false;
   }
 
-<<<<<<< HEAD
   // 비밀번호 일치 검사
-=======
-  // ✅ 비밀번호 일치 여부 검사
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
   const pw = document.getElementById("passwd").value.trim();
   const pwCheck = document.getElementById("confirmPasswd").value.trim();
   if (pw !== pwCheck) {
@@ -287,7 +231,6 @@ function validateForm() {
     return false;
   }
 
-<<<<<<< HEAD
   // 이메일 중복 확인 여부 검사
   const currentEmail = document.getElementById("email").value.trim();
   if (!emailCheckStatus.checked || emailCheckStatus.value !== currentEmail) {
@@ -305,7 +248,4 @@ function validateForm() {
   }
 
   return true;
-=======
-  return true; // 모든 검증 통과
->>>>>>> 5bcd794f81594c91efbbdea27f041d883c9f36cc
 }
