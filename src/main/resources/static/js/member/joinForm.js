@@ -191,6 +191,24 @@ document.addEventListener("DOMContentLoaded", () => {
       checkEmail();
     }
   });
+
+  // 비밀번호 확인 입력 시 실시간 일치 검사
+  const confirmPwInput = document.getElementById("confirmPasswd");
+  confirmPwInput.addEventListener("input", () => {
+    const pw = document.getElementById("passwd").value.trim();
+    const pwCheck = confirmPwInput.value.trim();
+    const confirmPwErrorBox = document.getElementById("confirmPwError");
+
+      if (pw && pwCheck && pw !== pwCheck) {
+        confirmPwErrorBox.textContent = "비밀번호가 일치하지 않습니다.";
+        confirmPwErrorBox.style.color = "red";
+      } else if (pw && pwCheck && pw === pwCheck) {
+        confirmPwErrorBox.textContent = "비밀번호가 일치합니다.";
+        confirmPwErrorBox.style.color = "green";
+      } else {
+        confirmPwErrorBox.textContent = "";
+      }
+  });
 });
 
 // ✅ 회원가입 폼 유효성 검사 함수
@@ -225,10 +243,15 @@ function validateForm() {
   // 비밀번호 일치 검사
   const pw = document.getElementById("passwd").value.trim();
   const pwCheck = document.getElementById("confirmPasswd").value.trim();
+  const confirmPwErrorBox = document.getElementById("confirmPwError");
+
   if (pw !== pwCheck) {
-    alert("비밀번호가 일치하지 않습니다.");
+    confirmPwErrorBox.textContent = "비밀번호가 일치하지 않습니다.";
+    confirmPwErrorBox.style.color = "red";
     document.getElementById("confirmPasswd").focus();
     return false;
+  } else {
+    confirmPwErrorBox.textContent = ""; // 일치하면 메시지 제거
   }
 
   // 이메일 중복 확인 여부 검사

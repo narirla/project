@@ -23,7 +23,7 @@ ul {
 }
 
 .page-container {
-    width: 1280px;
+    width: 1200px;
     margin: 0 auto 40px auto;
     background-color: #fff;
 }
@@ -378,4 +378,11 @@ ul {
 .more-link {
     font-size: 13px;
     color: #666;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }

@@ -1,37 +1,49 @@
 /* layout.css */
 
 /* ============================= */
-/* ✅ 1. 기본 레이아웃 및 공통 */
+/* ✅ 0. 레이아웃 전체 구조 보완 */
 /* ============================= */
 
-/* 전체 body에 기본 폰트와 배경색 설정 */
-body {
+/* 전체 페이지 높이 100%, 기본 마진/패딩 제거, 기본 폰트 설정 */
+html, body {
+  height: 100%;
   margin: 0;
+  padding: 0;
   font-family: 'Pretendard', sans-serif;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
 }
 
-/* 페이지 중앙 정렬 및 상단 여백, 그림자 효과 설정 */
-.page-container {
+/* 메인 컨텐츠를 감싸는 중앙 정렬된 레이아웃 */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   width: 1200px;
   margin: 0 auto;
-  padding: 0px 40px 60px 40px; /* ⬆️ header 높이 고려 */
+}
+
+/* 페이지 내 컨텐츠 박스: 여백, 배경, 그림자 설정 */
+.page-container {
+  flex: 1;
+  width: 100%;
+  padding: 0px 40px 60px 40px;
   background-color: #fff;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
   overflow-y: auto;
-  overflow-x: hidden; /* 수평 스크롤 방지 */
+  overflow-x: hidden;
 }
 
 /* ============================= */
-/* ✅ 2. Header 영역 */
+/* ✅ 1. Header 영역 (1200*167 고정) */
 /* ============================= */
 
-/* 상단 고정 헤더 설정 */
+/* 상단 고정 헤더 전체 틀 */
 header {
   position: fixed;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1200px;
   height: 167px;
   background: #fff;
   z-index: 1000;
@@ -41,10 +53,9 @@ header {
   overflow: hidden;
 }
 
-/* 로그인/회원가입 또는 사용자 상태 영역 */
+/* 로그인/회원가입 or 사용자 정보 표시 영역 */
 .header-top-bar {
   width: 100%;
-  max-width: 1200px;
   height: 30px;
   display: flex;
   justify-content: flex-end;
@@ -54,7 +65,7 @@ header {
   background-color: #EFEFEF;
 }
 
-/* 사용자 링크 그룹 */
+/* 로그인/알림 메뉴 공통 스타일 */
 .user-links,
 .user-logged-in {
   display: flex;
@@ -62,7 +73,6 @@ header {
   gap: 15px;
 }
 
-/* 사용자 링크 및 버튼 스타일 */
 .user-links a,
 .logout-button,
 .notification-link {
@@ -71,7 +81,7 @@ header {
   text-decoration: none;
 }
 
-/* 로그아웃 버튼 스타일 */
+/* 로그아웃 form (inline) */
 .logout-form {
   margin: 0;
   display: flex;
@@ -84,31 +94,36 @@ header {
   padding: 0;
 }
 
-/* 알림 링크 아이콘 포함 정렬 */
+/* 알림 링크 아이콘+텍스트 정렬 */
 .notification-link {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-/* 메인 헤더 영역 (로고, 검색창, 메뉴) */
+/* 로고, 검색창, 사용자 메뉴 포함하는 메인 헤더 */
 .header-main {
   width: 100%;
   max-width: 1200px;
+  height: 90px;
+  position: relative; /* 위치 기준 */
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0;
+  justify-content: center;
+  padding: 0 16px;
 }
 
 /* 로고 영역 */
 .logo {
+  position: absolute;
+  left: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
   color: inherit;
 }
+
 .logo img {
   height: 48px;
 }
@@ -125,9 +140,11 @@ header {
   border: 1px solid #0099ad;
   border-radius: 10px;
   padding: 2px;
+  width: 440px;
+  background-color: #fff;
 }
 .search-box input {
-  width: 400px;
+  width: 100%;
   padding: 8px 12px;
   border: none;
   outline: none;
@@ -142,8 +159,10 @@ header {
   font-size: 18px;
 }
 
-/* 사용자 메뉴 */
+/* 사용자 메뉴 (관심상품, 마이페이지, 장바구니) */
 .user-menu {
+  position: absolute;
+  right: 16px;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -160,10 +179,9 @@ header {
   font-size: 22px;
 }
 
-/* 내비게이션 바 */
+/* 내비게이션 메뉴 (전체메뉴 ~ 호텔) */
 .header-nav {
   width: 100%;
-  max-width: 1200px;
   display: flex;
   justify-content: center;
   border-top: 1px solid #eee;
@@ -191,25 +209,26 @@ header {
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  white-space: nowrap; /* ✅ 줄바꿈 방지 */
+  white-space: nowrap;
 }
 .header-nav ul li:hover {
-  border-bottom: 1px solid red;
+  border-bottom: 1px solid #0099AD;
 }
 
 /* ============================= */
-/* ✅ 3. Footer 영역 */
+/* ✅ 2. Footer 영역 */
 /* ============================= */
 
-/* 전체 푸터 영역 */
+/* footer 틀 */
 footer {
   width: 100%;
   background: #0099AD;
   color: #fff;
-  padding: 40px 0;
+  padding: 40px;
+  box-sizing: border-box; /* 패딩 포함한 전체 너비 유지 */
 }
 
-/* 푸터 내부 정렬 */
+/* 메인 footer 컨텐츠 */
 .footer-container {
   width: 1200px;
   margin: 0 auto;
@@ -241,7 +260,7 @@ footer {
   color: #ebfcff;
 }
 
-/* 고객센터 및 SNS */
+/* 고객센터/소셜링크 영역 */
 .csns {
   flex: 1;
   min-width: 240px;
@@ -262,7 +281,7 @@ footer {
   text-decoration: none;
 }
 
-/* 하단 링크 영역 */
+/* 하단 링크 목록 */
 .footer-links {
   width: 1200px;
   margin: 0 auto;
@@ -279,22 +298,22 @@ footer {
 }
 
 /* ============================= */
-/* ✅ 4. 공통 UI 요소 */
+/* ✅ 3. 공통 UI 요소 */
 /* ============================= */
 
-/* 입력 필드 라벨 */
+/* 폼 라벨 */
 .form-label {
   font-weight: bold;
   margin-bottom: 6px;
 }
 
-/* 검증 에러 메시지 */
+/* 에러 메시지 */
 .text-danger {
   font-size: 0.875rem;
   margin-top: 4px;
 }
 
-/* 프로필 이미지 미리보기 */
+/* 프로필 이미지 스타일 */
 .profile-image {
   width: 150px;
   height: 150px;
@@ -303,7 +322,7 @@ footer {
   border: 1px solid #ccc;
 }
 
-/* 닉네임 중복 확인 버튼 */
+/* 닉네임 중복확인 버튼 */
 #nicknameCheckBtn {
   margin-left: 8px;
   height: 38px;
@@ -311,7 +330,7 @@ footer {
   font-size: 14px;
 }
 
-/* 기본 버튼 스타일 */
+/* 기본 버튼 */
 .btn {
   background-color: #0099AD !important;
   color: #EBFCFF !important;
@@ -326,7 +345,7 @@ footer {
   color: #fff !important;
 }
 
-/* 외곽선 버튼 스타일 */
+/* 아웃라인 버튼 */
 .btn-outline-secondary {
   background-color: transparent !important;
   color: #0099AD !important;

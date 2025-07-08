@@ -29,25 +29,29 @@ public class SellerPageController {
   private final SellerPageDAO sellerPageDAO;
 
   /**
-   * /mypage/seller → sellerMypageHome.html 렌더링
+   * /mypage/seller, /mypage/seller/view → 판매자 상세 페이지 보기 (viewSellerPage.html)
    */
-  @GetMapping
-  public String sellerMypageHome(HttpSession session, Model model) {
+  @GetMapping({"", "/", "/view"})
+  public String viewSellerPage(HttpSession session, Model model) {
+    log.info("판매자 마이페이지 진입 확인");
+
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       return "redirect:/login";
     }
 
-    SellerPage sellerPage = sellerPageDAO.findByMemberId(loginMember.getMemberId())
-        .orElseGet(SellerPage::new);
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(loginMember.getMemberId());
+    if (optional.isEmpty()) {
+      return "redirect:/mypage/seller/create";
+    }
 
     model.addAttribute("member", loginMember);
-    model.addAttribute("sellerPage", sellerPage);
-    model.addAttribute("orders", mockOrders());
-    model.addAttribute("products", mockProducts());
+    model.addAttribute("sellerPage", optional.get());
 
-    return "mypage/sellerpage/sellerMypageHome";
+    return "mypage/sellerpage/viewSellerPage";
   }
+
+
 
   /**
    * /mypage/seller/home → /mypage/seller 리다이렉트 처리
@@ -112,7 +116,10 @@ public class SellerPageController {
     }
 
     Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
-    model.addAttribute("sellerpage", optional.orElseGet(SellerPage::new));
+    Member loginMember = (Member) session.getAttribute("loginMember");
+
+    model.addAttribute("sellerPage", optional.orElseGet(SellerPage::new));
+    model.addAttribute("member", loginMember);
 
     return "mypage/sellerpage/editSellerPage";
   }
@@ -121,7 +128,7 @@ public class SellerPageController {
    * 판매자 마이페이지 수정 처리
    */
   @PostMapping("/edit")
-  public String edit(@ModelAttribute SellerPage sellerpage,
+  public String edit(@ModelAttribute SellerPage sellerPage,
                      @RequestParam("image") MultipartFile image,
                      HttpSession session,
                      RedirectAttributes redirectAttributes) {
@@ -133,7 +140,7 @@ public class SellerPageController {
 
     try {
       if (image != null && !image.isEmpty()) {
-        sellerpage.setImage(image.getBytes());
+        sellerPage.setImage(image.getBytes());
       }
     } catch (Exception e) {
       log.error("프로필 이미지 처리 중 오류", e);
@@ -143,10 +150,10 @@ public class SellerPageController {
 
     if (optional.isPresent()) {
       Long pageId = optional.get().getPageId();
-      sellerPageSVC.updateById(pageId, sellerpage);
+      sellerPageSVC.updateById(pageId, sellerPage);
     } else {
-      sellerpage.setMemberId(memberId);
-      sellerPageSVC.save(sellerpage);
+      sellerPage.setMemberId(memberId);
+      sellerPageSVC.save(sellerPage);
     }
 
     redirectAttributes.addFlashAttribute("msg", "마이페이지 정보가 수정되었습니다.");
