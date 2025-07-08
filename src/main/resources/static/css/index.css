@@ -1,62 +1,83 @@
+/* index.css */
+
+/* ✅ Pretendard 웹폰트 적용 */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+/* ================== ✅ 기본 설정 ================== */
 body {
-  margin: 0;
+  margin-top: 167px;                   /* 헤더 높이만큼 상단 여백 */
+  padding-top: 170px;                 /* 추가 패딩: 레이아웃 정렬 안정화 */
+  background: #FFFFFF;                /* 배경색 */
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-  background: #f7f7f7;
-  padding-top: 150px; /* 헤더 높이에 맞게 조정 */
+  display: flex;
+  justify-content: center;
+}
+
+.layout-wrapper {
+  width: 1200px;                      /* 전체 콘텐츠 최대 너비 제한 */
 }
 
 a {
   text-decoration: none;
-  color: inherit;
+  color: inherit;                     /* 링크 텍스트 기본 컬러 상속 */
 }
 
-/* ================== 메인 배너 ================== */
+/* ================== ✅ 메인 배너 ================== */
 .main-banner {
   position: relative;
   width: 1200px;
   height: 500px;
-  background: #222;
+  background: #ddd;                   /* 로딩 전 배경 대비용 */
   margin: 0 auto;
   overflow: hidden;
 }
 
-.main-banner img,
-.main-banner iframe {
+.main-banner img {
   width: 100%;
-  height: 100%;
+  height: 500px;
   object-fit: cover;
+  display: block;
 }
+
 
 .main-banner-text {
   position: absolute;
-  left: 120px;
-  top: 100px;
-  color: #fff;
-  z-index: 1;
+  left: 80px;
+  top: 140px;
+  color: white;
+  z-index: 2;
 }
 
 .main-banner-text h2 {
-  font-size: 36px;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.4;
   margin-bottom: 12px;
 }
 
 .main-banner-text p {
   font-size: 18px;
+  font-weight: 400;
+  color: #e0e0e0;
 }
 
-/* ================== 투어 섹션 ================== */
+/* ================== ✅ 이달의 인기 투어 ================== */
 .tour-section {
   width: 1200px;
+  height:832px;
   margin: 40px auto 0 auto;
+  overflow: hidden;
 }
 
 .tour-title {
-  font-size: 20px;
+  font-size: 22px;      /* 원하는 크기로 증가 */
   font-weight: bold;
+  height: 48px;         /* 예: 제목 영역을 48px로 고정 */
+  line-height: 48px;    /* 수직 가운데 정렬 효과 */
   margin-bottom: 20px;
+  padding-left: 8px;    /* 좌측 여백 (선택) */
 }
+
 
 .tour-list {
   display: flex;
@@ -67,16 +88,16 @@ a {
 }
 
 .tour-card {
+  width: 280px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  width: 280px;
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
 }
 
 .tour-card img {
-  width: 100%;
+  width: 290px;
   height: 180px;
   object-fit: cover;
 }
@@ -107,22 +128,22 @@ a {
 }
 
 .tour-card .desc .sale {
-  color: #00bfae;
   font-size: 14px;
+  color: #00bfae;
   margin-left: 8px;
 }
 
 .tour-card .desc .tag {
   display: inline-block;
+  font-size: 12px;
   background: #e0f7f4;
   color: #00bfae;
-  font-size: 12px;
   border-radius: 8px;
   padding: 2px 8px;
   margin-top: 8px;
 }
 
-/* ================== 가이드 섹션 ================== */
+/* ================== ✅ 인기 가이드 ================== */
 .container-guide {
   width: 1200px;
   margin: 40px auto 0 auto;
@@ -146,11 +167,9 @@ a {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   padding: 16px;
   box-sizing: border-box;
-  background-size: cover;
-  background-position: center;
-  color: #fff;
-  position: relative;
   overflow: hidden;
+  position: relative;
+
 }
 
 .guide-card img {
@@ -159,58 +178,137 @@ a {
   border-radius: 50%;
   object-fit: cover;
   margin-right: 16px;
-  z-index: 1;
 }
 
 .guide-info {
   flex: 1;
-  z-index: 1;
 }
 
 .guide-info .name {
-  font-weight: bold;
   font-size: 15px;
+  font-weight: bold;
   margin-bottom: 4px;
-  color: #000; /* 수정 */
-  text-shadow: none; /* 그림자 제거 */
 }
 
 .guide-info .desc {
   font-size: 13px;
-  color: #555; /* 기존과 동일 유지 가능 */
+  color: #555;
   margin-bottom: 4px;
-  text-shadow: none;
 }
 
 .guide-info .tags {
   font-size: 12px;
   color: #00bfae;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
 
 .guide-follow {
-  text-align: right;
   min-width: 70px;
+  text-align: right;
   font-size: 14px;
   color: #000;
-  z-index: 1;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
 .guide-follow i {
   margin-right: 4px;
-  color: #000;
 }
 
-/* ================== 커뮤니티 섹션 ================== */
+/* ================== ✅ 커뮤니티 ================== */
 .container-community {
   width: 1200px;
   margin: 40px auto 0 auto;
   padding-top: 40px;
 }
 
-/* ================== 푸터 ================== */
-footer {
-  width: 1200px;
-  margin: 0 auto;
+/* 게시글 카드 */
+.community-card {
+  background: #fff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+}
+
+.community-card .text {
+  flex: 1;
+}
+
+.community-card .text .title {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.community-card .text .summary {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.community-card .text .meta {
+  font-size: 11px;
+  color: #bbb;
+  margin-top: 2px;
+}
+
+.community-card img.thumb {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  margin-left: 16px;
+  border-radius: 10px;
+}
+
+/* 게시글/카테고리 반반 정렬 */
+.community-flex-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.community-half {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ================== ✅ 카테고리 카드 ================== */
+.category-card {
+  display: flex;
+  align-items: center;
+  background-color: #f8f8f8;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  transition: box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.category-thumb {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 21px;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.category-text .title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.category-text .summary {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.category-text .meta {
+  font-size: 13px;
+  color: #999;
 }
