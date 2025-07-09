@@ -2,51 +2,49 @@ package com.KDT.mosi.domain.product.svc;
 
 import com.KDT.mosi.domain.entity.ProductImage;
 import com.KDT.mosi.domain.product.dao.ProductImageDAO;
-import com.KDT.mosi.domain.product.svc.ProductImageSVC;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 public class ProductImageSVCImpl implements ProductImageSVC {
 
   private final ProductImageDAO productImageDAO;
 
   @Override
-  public ProductImage save(ProductImage productImage) {
-    return productImageDAO.save(productImage);
+  public void saveAll(List<ProductImage> images) {
+    for (ProductImage image : images) {
+      productImageDAO.insert(image);
+    }
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public List<ProductImage> getImagesByProductId(Long productId) {
+  public List<ProductImage> findByProductId(Long productId) {
     return productImageDAO.findByProductId(productId);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public Optional<ProductImage> getImageById(Long imageId) {
-    return productImageDAO.findById(imageId);
-  }
-
-  @Override
-  public ProductImage update(ProductImage productImage) {
-    productImageDAO.update(productImage);
-    return productImage;
-  }
-
-  @Override
-  public void deleteById(Long imageId) {
-    productImageDAO.deleteById(imageId);
   }
 
   @Override
   public void deleteByProductId(Long productId) {
     productImageDAO.deleteByProductId(productId);
+  }
+
+  // getImagesByProductId 와 기능 중복, 필요 시 삭제 가능
+  @Override
+  public List<ProductImage> getImagesByProductId(Long productId) {
+    return findByProductId(productId);
+  }
+
+  @Override
+  public boolean addProductImage(ProductImage productImage) {
+    return productImageDAO.insert(productImage) > 0;
+  }
+
+  @Override
+  public boolean deleteProductImage(Long imageId) {
+    return productImageDAO.delete(imageId) > 0;
   }
 }

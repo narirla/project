@@ -22,6 +22,7 @@ public class MemberEditForm {
   @Size(max = 50, message = "이름은 최대 50자까지 입력 가능합니다.")
   private String name;
 
+
   /** 새 비밀번호 (영문 대소문자, 숫자, 특수문자 포함, 동일 문자 3회 이상 반복 불가) */
   @ValidPassword(message = "비밀번호는 8~12자이며, 영문 대소문자, 숫자, 특수문자를 포함해야 하며 동일 문자 3회 이상 반복은 불가합니다.")
   private String passwd;

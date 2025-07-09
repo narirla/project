@@ -1,13 +1,20 @@
 package com.KDT.mosi.domain.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
+
 
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "member")
 @Data
 public class Member implements Serializable {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long memberId;
   private String email;
   private String name;
@@ -23,5 +30,4 @@ public class Member implements Serializable {
   private String zonecode;
   private String detailAddress;
   private String notification;   // 알림 설정 (Y: 수신, N: 수신 안 함)
-
 }

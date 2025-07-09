@@ -1,4 +1,4 @@
-package com.KDT.mosi.web.form.product;
+package com.KDT.mosi.web.form.product.old;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -56,14 +56,14 @@ public class UpdateForm {
   @Size(max = 10)
   private String storeInfo;
 
-  @Pattern(regexp = "[YN]")
-  private String promoYn;
+  @Size(max = 150)
+  private String promotion;
 
   @Size(max = 100)
   private String transportInfo;
 
   // 추가: 이미지 리스트
-  private List<ImageForm> images;
+  private List<ImageForm> productImages;
 
   // 추가: 코스포인트 리스트
   private List<CoursePointForm> coursePoints;

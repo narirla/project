@@ -1,4 +1,4 @@
-package com.KDT.mosi.web.form.product;
+package com.KDT.mosi.web.form.product.old;
 
 import lombok.*;
 

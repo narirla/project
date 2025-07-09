@@ -1,211 +1,233 @@
 package com.KDT.mosi.domain.product.dao;
 
+import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.Product;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.*;
-import org.springframework.stereotype.Repository;
 
-import java.sql.Blob;
-import java.sql.Timestamp;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Slf4j
-@RequiredArgsConstructor
 @Repository
+@Transactional
 public class ProductDAOImpl implements ProductDAO {
 
-  private final NamedParameterJdbcTemplate template;
+  private static final Logger logger = LoggerFactory.getLogger(ProductDAOImpl.class);
+  private final NamedParameterJdbcTemplate jdbcTemplate;
 
-  // 수동매핑: PRODUCT 테이블 전체 컬럼 매핑
-  private RowMapper<Product> productRowMapper = (rs, rowNum) -> {
-    Product product = new Product();
-
-    product.setProductId(rs.getLong("product_id"));
-    product.setMemberId(rs.getLong("member_id"));
-    product.setName(rs.getString("name"));
-    product.setCategory(rs.getString("category"));
-    product.setPrice(rs.getInt("price"));
-    product.setStatus(rs.getString("status"));
-    product.setDescription(rs.getString("description"));
-    product.setDetail(rs.getString("detail"));
-    product.setGuideYn(rs.getString("guide_yn"));
-    product.setReqMoney(rs.getInt("req_money"));
-    product.setReqPeople(rs.getInt("req_people"));
-    product.setAge(rs.getInt("age"));
-
-    product.setFoodInfo(rs.getString("food_info"));
-    product.setSleepInfo(rs.getString("sleep_info"));
-    product.setStoreInfo(rs.getString("store_info"));
-    product.setPromoYn(rs.getString("promo_yn"));
-    product.setTransportInfo(rs.getString("transport_info"));
-
-    Timestamp createDate = rs.getTimestamp("create_date");
-    product.setCreateDate(createDate != null ? createDate.toLocalDateTime() : null);
-
-    Timestamp updateDate = rs.getTimestamp("update_date");
-    product.setUpdateDate(updateDate != null ? updateDate.toLocalDateTime() : null);
-
-    return product;
-  };
-
-  // 저장
-  @Override
-  public Product save(Product product) {
-    String sql = "INSERT INTO product (" +
-        "product_id, member_id, name, category, price, status, description, detail, " +
-        "guide_yn, req_money, req_people, age, food_info, sleep_info, store_info, " +
-        "promo_yn, transport_info, create_date, update_date) " +
-        "VALUES (PRODUCT_PRODUCT_ID_SEQ.nextval, :memberId, :name, :category, :price, :status, :description, :detail, " +
-        ":guideYn, :reqMoney, :reqPeople, :age, :foodInfo, :sleepInfo, :storeInfo, " +
-        ":promoYn, :transportInfo, :createDate, :updateDate)";
-
-    SqlParameterSource param = new BeanPropertySqlParameterSource(product);
-    template.update(sql, param);
-
-    // Oracle 시퀀스 연동 시 발생하는 PK 반환은 별도 쿼리 필요 (생략)
-
-    return product;
+  // 생성자 주입
+  public ProductDAOImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    this.jdbcTemplate = jdbcTemplate;
   }
 
-// 페이징 조회
-  @Override
-  public List<Product> findAll(int pageNo, int numOfRows) {
-    String sql = "SELECT * FROM product " +
-        "ORDER BY product_id DESC " +
-        "OFFSET (:offset) ROWS FETCH NEXT :limit ROWS ONLY";
-
-    int offset = (pageNo - 1) * numOfRows;
-
-    MapSqlParameterSource param = new MapSqlParameterSource()
-        .addValue("offset", offset)
-        .addValue("limit", numOfRows);
-
-    return template.query(sql, param, productRowMapper);
+  // 시퀀스 값 가져오기
+  public Long getNextProductId() {
+    String sql = "SELECT PRODUCT_PRODUCT_ID_SEQ.NEXTVAL FROM DUAL";
+    return jdbcTemplate.getJdbcOperations().queryForObject(sql, Long.class);
   }
 
-  // 결제 전 상세 조회 (food_info, sleep_info, store_info, promo_yn, transport_info 제외)
-  @Override
-  public Optional<Product> findById(Long id) {
-    String sql = "SELECT product_id, member_id, name, category, price, status, description, detail, guide_yn, " +
-        "req_money, req_people, age, create_date, update_date " +
-        "FROM product WHERE product_id = :id";
-
-    SqlParameterSource param = new MapSqlParameterSource("id", id);
-
-    RowMapper<Product> mapperExcludingInfo = (rs, rowNum) -> {
-      Product product = new Product();
-
-      product.setProductId(rs.getLong("product_id"));
-      product.setMemberId(rs.getLong("member_id"));
-      product.setName(rs.getString("name"));
-      product.setCategory(rs.getString("category"));
-      product.setPrice(rs.getInt("price"));
-      product.setStatus(rs.getString("status"));
-      product.setDescription(rs.getString("description"));
-      product.setDetail(rs.getString("detail"));
-      product.setGuideYn(rs.getString("guide_yn"));
-      product.setReqMoney(rs.getInt("req_money"));
-      product.setReqPeople(rs.getInt("req_people"));
-      product.setAge(rs.getInt("age"));
-
-      // foodInfo, sleepInfo, storeInfo, promoYn, transportInfo 필드는 제외
-
-      Timestamp createDate = rs.getTimestamp("create_date");
-      product.setCreateDate(createDate != null ? createDate.toLocalDateTime() : null);
-
-      Timestamp updateDate = rs.getTimestamp("update_date");
-      product.setUpdateDate(updateDate != null ? updateDate.toLocalDateTime() : null);
-
-      return product;
-    };
-
-    try {
-      Product product = template.queryForObject(sql, param, mapperExcludingInfo);
-      return Optional.of(product);
-    } catch (EmptyResultDataAccessException e) {
-      return Optional.empty();
+  // RowMapper 구현 - 수동 매핑
+  private static final class ProductRowMapper implements RowMapper<Product> {
+    @Override
+    public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
+      Product p = new Product();
+      p.setProductId(rs.getLong("product_id"));
+      Member member = new Member();
+      member.setMemberId(rs.getLong("member_id"));
+      p.setMember(member);
+      p.setCategory(rs.getString("category"));
+      p.setTitle(rs.getString("title"));
+      p.setGuideYn(rs.getString("guide_yn"));
+      p.setNormalPrice(rs.getInt("normal_price"));
+      p.setGuidePrice(rs.getInt("guide_price"));
+      p.setSalesPrice(rs.getInt("sales_price"));
+      p.setSalesGuidePrice(rs.getInt("sales_guide_price"));
+      p.setTotalDay(rs.getInt("total_day"));
+      p.setTotalTime(rs.getInt("total_time"));
+      p.setReqMoney(rs.getInt("req_money"));
+      p.setSleepInfo(rs.getString("sleep_info"));
+      p.setTransportInfo(rs.getString("transport_info"));
+      p.setFoodInfo(rs.getString("food_info"));
+      p.setReqPeople(rs.getString("req_people"));
+      p.setTarget(rs.getString("target"));
+      p.setStucks(rs.getString("stucks"));
+      p.setDescription(rs.getString("description"));
+      p.setDetail(rs.getString("detail"));
+      p.setFileName(rs.getString("file_name"));
+      p.setFileType(rs.getString("file_type"));
+      p.setFileSize(rs.getLong("file_size"));
+      p.setFileData(rs.getBytes("file_data"));
+      p.setPriceDetail(rs.getString("price_detail"));
+      p.setGpriceDetail(rs.getString("gprice_detail"));
+      p.setStatus(rs.getString("status"));
+      p.setCreateDate(rs.getDate("create_date"));
+      p.setUpdateDate(rs.getDate("update_date"));
+      // productImages는 별도 로직 필요 (생략)
+      return p;
     }
   }
 
-  // 결제 후 상세 조회 (food_info, sleep_info, store_info, promo_yn, transport_info 포함)
+  // insert
   @Override
-  public Optional<Product> findByIdAfterPay(Long id) {
-    String sql = "SELECT product_id, member_id, name, category, price, status, description, detail, guide_yn, " +
-        "req_money, req_people, age, food_info, sleep_info, store_info, promo_yn, transport_info, create_date, update_date " +
-        "FROM product WHERE product_id = :id AND status = 'Y'";
+  public Product insert(Product product) {
 
-    SqlParameterSource param = new MapSqlParameterSource("id", id);
+    Long nextId = getNextProductId();
+    product.setProductId(nextId);
 
-    // 기존 productRowMapper 그대로 사용 가능
-    try {
-      Product product = template.queryForObject(sql, param, productRowMapper);
-      return Optional.of(product);
-    } catch (EmptyResultDataAccessException e) {
-      return Optional.empty();
-    }
-  }
+    StringBuffer sql = new StringBuffer();
+    sql.append("INSERT INTO product (")
+        .append("product_id, member_id, category, title, guide_yn, normal_price, guide_price, sales_price, sales_guide_price, ")
+        .append("total_day, total_time, req_money, sleep_info, transport_info, food_info, req_people, target, stucks, ")
+        .append("description, detail, file_name, file_type, file_size, file_data, price_detail, gprice_detail, status, ")
+        .append("create_date, update_date) ")
+        .append("VALUES (")
+        .append(":productId, :memberId, :category, :title, :guideYn, :normalPrice, :guidePrice, :salesPrice, :salesGuidePrice, ")
+        .append(":totalDay, :totalTime, :reqMoney, :sleepInfo, :transportInfo, :foodInfo, :reqPeople, :target, :stucks, ")
+        .append(":description, :detail, :fileName, :fileType, :fileSize, :fileData, :priceDetail, :gpriceDetail, :status, ")
+        .append(":createDate, :updateDate)");
 
-  // 수정
-  @Override
-  public Product updateById(Long productId, Product product) {
-    String sql = "UPDATE product SET " +
-        "name = :name, category = :category, price = :price, status = :status, description = :description, " +
-        "detail = :detail, guide_yn = :guideYn, req_money = :reqMoney, req_people = :reqPeople, age = :age, " +
-        "food_info = :foodInfo, sleep_info = :sleepInfo, store_info = :storeInfo, promo_yn = :promoYn, " +
-        "transport_info = :transportInfo, update_date = :updateDate " +
-        "WHERE product_id = :productId";
-
-    SqlParameterSource param = new MapSqlParameterSource()
-        .addValue("name", product.getName())
+    MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("productId", product.getProductId())
+        .addValue("memberId", product.getMember() != null ? product.getMember().getMemberId() : null)
         .addValue("category", product.getCategory())
-        .addValue("price", product.getPrice())
-        .addValue("status", product.getStatus())
+        .addValue("title", product.getTitle())
+        .addValue("guideYn", product.getGuideYn())
+        .addValue("normalPrice", product.getNormalPrice())
+        .addValue("guidePrice", product.getGuidePrice())
+        .addValue("salesPrice", product.getSalesPrice())
+        .addValue("salesGuidePrice", product.getSalesGuidePrice())
+        .addValue("totalDay", product.getTotalDay())
+        .addValue("totalTime", product.getTotalTime())
+        .addValue("reqMoney", product.getReqMoney())
+        .addValue("sleepInfo", product.getSleepInfo())
+        .addValue("transportInfo", product.getTransportInfo())
+        .addValue("foodInfo", product.getFoodInfo())
+        .addValue("reqPeople", product.getReqPeople())
+        .addValue("target", product.getTarget())
+        .addValue("stucks", product.getStucks())
         .addValue("description", product.getDescription())
         .addValue("detail", product.getDetail())
-        .addValue("guideYn", product.getGuideYn())
-        .addValue("reqMoney", product.getReqMoney())
-        .addValue("reqPeople", product.getReqPeople())
-        .addValue("age", product.getAge())
-        .addValue("foodInfo", product.getFoodInfo())
-        .addValue("sleepInfo", product.getSleepInfo())
-        .addValue("storeInfo", product.getStoreInfo())
-        .addValue("promoYn", product.getPromoYn())
-        .addValue("transportInfo", product.getTransportInfo())
-        .addValue("updateDate", product.getUpdateDate())
-        .addValue("productId", productId);
+        .addValue("fileName", product.getFileName())
+        .addValue("fileType", product.getFileType())
+        .addValue("fileSize", product.getFileSize())
+        .addValue("fileData", product.getFileData())
+        .addValue("priceDetail", product.getPriceDetail())
+        .addValue("gpriceDetail", product.getGpriceDetail())
+        .addValue("status", product.getStatus())
+        .addValue("createDate", product.getCreateDate())
+        .addValue("updateDate", product.getUpdateDate());
 
-    template.update(sql, param);
+    jdbcTemplate.update(sql.toString(), params);
+
     return product;
   }
 
-  // 단건 삭제
+  // update
   @Override
-  public void deleteById(Long id) {
-    String sql = "DELETE FROM product WHERE product_id = :id";
-    template.update(sql, Map.of("id", id));
+  public Product update(Product product) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("UPDATE product SET ")
+        .append("member_id=:memberId, category=:category, title=:title, guide_yn=:guideYn, normal_price=:normalPrice, guide_price=:guidePrice, ")
+        .append("sales_price=:salesPrice, sales_guide_price=:salesGuidePrice, total_day=:totalDay, total_time=:totalTime, req_money=:reqMoney, ")
+        .append("sleep_info=:sleepInfo, transport_info=:transportInfo, food_info=:foodInfo, req_people=:reqPeople, target=:target, stucks=:stucks, ")
+        .append("description=:description, detail=:detail, file_name=:fileName, file_type=:fileType, file_size=:fileSize, file_data=:fileData, ")
+        .append("price_detail=:priceDetail, gprice_detail=:gpriceDetail, status=:status, create_date=:createDate, update_date=:updateDate ")
+        .append("WHERE product_id=:productId");
+
+    MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("productId", product.getProductId())
+        .addValue("memberId", product.getMember().getMemberId())
+        .addValue("category", product.getCategory())
+        .addValue("title", product.getTitle())
+        .addValue("guideYn", product.getGuideYn())
+        .addValue("normalPrice", product.getNormalPrice())
+        .addValue("guidePrice", product.getGuidePrice())
+        .addValue("salesPrice", product.getSalesPrice())
+        .addValue("salesGuidePrice", product.getSalesGuidePrice())
+        .addValue("totalDay", product.getTotalDay())
+        .addValue("totalTime", product.getTotalTime())
+        .addValue("reqMoney", product.getReqMoney())
+        .addValue("sleepInfo", product.getSleepInfo())
+        .addValue("transportInfo", product.getTransportInfo())
+        .addValue("foodInfo", product.getFoodInfo())
+        .addValue("reqPeople", product.getReqPeople())
+        .addValue("target", product.getTarget())
+        .addValue("stucks", product.getStucks())
+        .addValue("description", product.getDescription())
+        .addValue("detail", product.getDetail())
+        .addValue("fileName", product.getFileName())
+        .addValue("fileType", product.getFileType())
+        .addValue("fileSize", product.getFileSize())
+        .addValue("fileData", product.getFileData())
+        .addValue("priceDetail", product.getPriceDetail())
+        .addValue("gpriceDetail", product.getGpriceDetail())
+        .addValue("status", product.getStatus())
+        .addValue("createDate", product.getCreateDate())
+        .addValue("updateDate", product.getUpdateDate());
+
+    jdbcTemplate.update(sql.toString(), params);
+    return product;
   }
 
-  // 다중 삭제
+  // delete
   @Override
-  public void deleteByIds(List<Long> ids) {
-    if (ids == null || ids.isEmpty()) return;
+  public void delete(Long productId) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("DELETE FROM product WHERE product_id = :productId");
 
-    String sql = "DELETE FROM product WHERE product_id IN (:ids)";
-    template.update(sql, Map.of("ids", ids));
+    Map<String, Object> params = new HashMap<>();
+    params.put("productId", productId);
+
+    jdbcTemplate.update(sql.toString(), params);
   }
 
-  // 총 건수 조회
-  @Override
-  public long getTotalCount() {
-    String sql = "SELECT COUNT(*) FROM product";
-    Long count = template.queryForObject(sql, new MapSqlParameterSource(), Long.class);
-    return count != null ? count : 0L;
+  // findById
+  public Optional<Product> findById(Long productId) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT * FROM product WHERE product_id = :productId");
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("productId", productId);
+
+    List<Product> list = jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
+
+    if (list.isEmpty()) {
+      return Optional.empty();
+    } else {
+      return Optional.of(list.get(0));
+    }
   }
 
+  // findAllByPage (Oracle 기준 페이징 처리)
+  @Override
+  public List<Product> findAllByPage(int pageNumber, int pageSize) {
+    int offset = (pageNumber - 1) * pageSize;
+
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT * FROM product ORDER BY product_id DESC OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY");
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("offset", offset);
+    params.put("limit", pageSize);
+
+    return jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
+  }
+
+  // countAll
+  @Override
+  public long countAll() {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT COUNT(*) FROM product");
+
+    return jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
+  }
 }

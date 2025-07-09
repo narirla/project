@@ -1,33 +1,30 @@
 package com.KDT.mosi.domain.product.dao;
 
 import com.KDT.mosi.domain.entity.Product;
-
 import java.util.List;
 import java.util.Optional;
 
 public interface ProductDAO {
+  // 상품 생성
+  Product insert(Product product);
 
-  // 상품 등록 또는 저장
-  Product save(Product product);
+  // 상품 수정
+  Product update(Product product);
 
-  // 전체 목록 조회(페이징 포함)
-  List<Product> findAll(int pageNo, int numOfRows);
+  // 상품 삭제
+  void delete(Long productId);
 
-  // 상세페이지 조회
-  Optional<Product> findById(Long id);
+  // 상품 개별 조회
+  Optional<Product> findById(Long productId);
 
-  // 결제 후 상세페이지 (상세페이지와 다르게 결제상태 반영 등 추가 조건 가능)
-  Optional<Product> findByIdAfterPay(Long id);
+  // 페이징 처리된 상품 리스트 조회 (pageNumber: 1부터 시작, pageSize: 한 페이지에 보여줄 상품 갯수)
+  List<Product> findAllByPage(int pageNumber, int pageSize);
 
-  // 수정 (ID 기준)
-  Product updateById(Long productId, Product product);
+  // 전체 상품 갯수 조회
+  long countAll();
 
-  // 단건 삭제
-  void deleteById(Long id);
-
-  // 여러건 삭제
-  void deleteByIds(List<Long> ids);
-
-  // 상품 총 건수 조회 (페이징용)
-  long getTotalCount();
+  // 멤버 존재 여부 확인
+  public interface MemberDAO {
+    boolean existsById(Long memberId);
+  }
 }

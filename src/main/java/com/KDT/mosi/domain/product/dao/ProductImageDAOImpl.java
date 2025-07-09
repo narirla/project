@@ -1,82 +1,85 @@
 package com.KDT.mosi.domain.product.dao;
 
+import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.entity.ProductImage;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
 public class ProductImageDAOImpl implements ProductImageDAO {
 
-  private final NamedParameterJdbcTemplate template;
+  private final NamedParameterJdbcTemplate jdbcTemplate;
 
-  private RowMapper<ProductImage> imageMapper = (rs, rowNum) -> {
-    ProductImage image = new ProductImage();
-    image.setImageId(rs.getLong("image_id"));
-    image.setProductId(rs.getLong("product_id"));
-    image.setImageData(rs.getBytes("image_data"));
-    image.setImageOrder(rs.getInt("image_order"));
-    image.setFileName(rs.getString("file_name"));
-    image.setFileSize(rs.getLong("file_size"));
-    image.setMimeType(rs.getString("mime_type"));
-    Timestamp uploadTime = rs.getTimestamp("upload_time");
-    image.setUploadTime(uploadTime != null ? uploadTime : null);
-    return image;
+  public ProductImageDAOImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    this.jdbcTemplate = jdbcTemplate;
+  }
+
+  private final RowMapper<ProductImage> rowMapper = (rs, rowNum) -> {
+    ProductImage pi = new ProductImage();
+    pi.setImageId(rs.getLong("IMAGE_ID"));
+
+    // productId 가져와 Product 객체 세팅
+    Long productId = rs.getLong("PRODUCT_ID");
+    Product product = new Product();
+    product.setProductId(productId);
+    pi.setProduct(product);
+
+    pi.setImageData(rs.getBytes("IMAGE_DATA"));
+    pi.setImageOrder(rs.getInt("IMAGE_ORDER"));
+    pi.setFileName(rs.getString("FILE_NAME"));
+    pi.setFileSize(rs.getLong("FILE_SIZE"));
+    pi.setMimeType(rs.getString("MIME_TYPE"));
+    pi.setUploadTime(rs.getDate("UPLOAD_TIME"));
+    return pi;
   };
 
   @Override
-  public ProductImage save(ProductImage productImage) {
-    String sql = "INSERT INTO product_image (" +
-        "image_id, product_id, image_data, image_order, file_name, file_size, mime_type, upload_time) " +
-        "VALUES (PRODUCT_IMAGE_ID_SEQ.nextval, :productId, :imageData, :imageOrder, :fileName, :fileSize, :mimeType, :uploadTime)";
-    SqlParameterSource param = new BeanPropertySqlParameterSource(productImage);
-    template.update(sql, param);
-    return productImage;
-  }
-
-  @Override
   public List<ProductImage> findByProductId(Long productId) {
-    String sql = "SELECT * FROM product_image WHERE product_id = :productId ORDER BY image_order";
-    return template.query(sql, Map.of("productId", productId), imageMapper);
+    String sql = "SELECT * FROM PRODUCT_IMAGE WHERE PRODUCT_ID = :productId ORDER BY IMAGE_ORDER";
+    Map<String, Object> params = new HashMap<>();
+    params.put("productId", productId);
+    return jdbcTemplate.query(sql, params, rowMapper);
   }
 
   @Override
-  public Optional<ProductImage> findById(Long imageId) {
-    String sql = "SELECT * FROM product_image WHERE image_id = :imageId";
-    try {
-      ProductImage image = template.queryForObject(sql, Map.of("imageId", imageId), imageMapper);
-      return Optional.of(image);
-    } catch (EmptyResultDataAccessException e) {
-      return Optional.empty();
+  public int insert(ProductImage productImage) {
+    String sql = "INSERT INTO PRODUCT_IMAGE " +
+        "(IMAGE_ID, PRODUCT_ID, IMAGE_DATA, IMAGE_ORDER, FILE_NAME, FILE_SIZE, MIME_TYPE, UPLOAD_TIME) VALUES " +
+        "(IMAGE_IMAGE_ID_SEQ.NEXTVAL, :productId, :imageData, :imageOrder, :fileName, :fileSize, :mimeType, SYSDATE)";
+    Map<String, Object> params = new HashMap<>();
+
+    // productId를 Product 객체에서 얻어야 함
+    if (productImage.getProduct() == null || productImage.getProduct().getProductId() == null) {
+      throw new IllegalArgumentException("Product object or productId is null in ProductImage");
     }
+    params.put("productId", productImage.getProduct().getProductId());
+
+    params.put("imageData", productImage.getImageData());
+    params.put("imageOrder", productImage.getImageOrder());
+    params.put("fileName", productImage.getFileName());
+    params.put("fileSize", productImage.getFileSize());
+    params.put("mimeType", productImage.getMimeType());
+    return jdbcTemplate.update(sql, params);
   }
 
   @Override
-  public int update(ProductImage productImage) {
-    String sql = "UPDATE product_image SET " +
-        "product_id = :productId, image_data = :imageData, image_order = :imageOrder, file_name = :fileName, " +
-        "file_size = :fileSize, mime_type = :mimeType, upload_time = :uploadTime WHERE image_id = :imageId";
-    SqlParameterSource param = new BeanPropertySqlParameterSource(productImage);
-    return template.update(sql, param);
+  public int delete(Long imageId) {
+    String sql = "DELETE FROM PRODUCT_IMAGE WHERE IMAGE_ID = :imageId";
+    Map<String, Object> params = new HashMap<>();
+    params.put("imageId", imageId);
+    return jdbcTemplate.update(sql, params);
   }
 
   @Override
-  public void deleteById(Long imageId) {
-    String sql = "DELETE FROM product_image WHERE image_id = :imageId";
-    template.update(sql, Map.of("imageId", imageId));
-  }
-
-  @Override
-  public void deleteByProductId(Long productId) {
-    String sql = "DELETE FROM product_image WHERE product_id = :productId";
-    template.update(sql, Map.of("productId", productId));
+  public int deleteByProductId(Long productId) {
+    String sql = "DELETE FROM PRODUCT_IMAGE WHERE PRODUCT_ID = :productId";
+    Map<String, Object> params = new HashMap<>();
+    params.put("productId", productId);
+    return jdbcTemplate.update(sql, params);
   }
 }

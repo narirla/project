@@ -2,51 +2,55 @@ package com.KDT.mosi.domain.product.svc;
 
 import com.KDT.mosi.domain.entity.ProductCoursePoint;
 import com.KDT.mosi.domain.product.dao.ProductCoursePointDAO;
-import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 public class ProductCoursePointSVCImpl implements ProductCoursePointSVC {
 
-  private final ProductCoursePointDAO coursePointDAO;
+  private final ProductCoursePointDAO productCoursePointDAO;
 
   @Override
-  public ProductCoursePoint save(ProductCoursePoint coursePoint) {
-    return coursePointDAO.save(coursePoint);
+  public void saveAll(List<ProductCoursePoint> points) {
+    for (ProductCoursePoint point : points) {
+      if (point.getProduct() == null || point.getProduct().getProductId() == null) {
+        throw new IllegalArgumentException("Product or productId is null in ProductCoursePoint");
+      }
+      productCoursePointDAO.insert(point);
+    }
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public List<ProductCoursePoint> getCoursePointsByProductId(Long productId) {
-    return coursePointDAO.findByProductId(productId);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public Optional<ProductCoursePoint> getCoursePointById(Long coursePointId) {
-    return coursePointDAO.findById(coursePointId);
-  }
-
-  @Override
-  public ProductCoursePoint update(ProductCoursePoint coursePoint) {
-    coursePointDAO.update(coursePoint);
-    return coursePoint;
-  }
-
-  @Override
-  public void deleteById(Long coursePointId) {
-    coursePointDAO.deleteById(coursePointId);
+  public List<ProductCoursePoint> findByProductId(Long productId) {
+    return productCoursePointDAO.findByProductId(productId);
   }
 
   @Override
   public void deleteByProductId(Long productId) {
-    coursePointDAO.deleteByProductId(productId);
+    productCoursePointDAO.deleteByProductId(productId);
+  }
+
+  // 필요에 따라 getPointsByProductId 메서드 삭제 가능 (중복)
+  @Override
+  public List<ProductCoursePoint> getPointsByProductId(Long productId) {
+    return productCoursePointDAO.findByProductId(productId);
+  }
+
+  @Override
+  public boolean addCoursePoint(ProductCoursePoint point) {
+    if (point.getProduct() == null || point.getProduct().getProductId() == null) {
+      throw new IllegalArgumentException("Product or productId is null in ProductCoursePoint");
+    }
+    return productCoursePointDAO.insert(point) > 0;
+  }
+
+  @Override
+  public boolean deleteCoursePoint(Long coursePointId) {
+    return productCoursePointDAO.delete(coursePointId) > 0;
   }
 }

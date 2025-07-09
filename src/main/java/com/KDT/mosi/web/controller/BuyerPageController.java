@@ -265,7 +265,6 @@ public class  BuyerPageController {
 
     return "redirect:/mypage/buyer/" + memberId;
   }
-
   // ✅ 기본 진입 시 로그인한 회원의 마이페이지로 리다이렉트
   @GetMapping
   public String buyerMypageHome(Model model) {
