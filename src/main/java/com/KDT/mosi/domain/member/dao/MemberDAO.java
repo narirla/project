@@ -15,7 +15,6 @@ public interface MemberDAO {
    */
   Long save(Member member);
 
-
   /**
    * 이메일로 회원 조회
    * - 이메일을 기준으로 회원 정보를 조회한다.
@@ -91,4 +90,13 @@ public interface MemberDAO {
    */
   int deleteById(Long memberId);
 
+  Optional<Long> findMemberIdByEmail(String email);
+
+  /**
+   * 회원 ID 존재 여부 확인
+   *
+   * @param memberId 확인할 회원 ID
+   * @return true: 존재함, false: 없음
+   */
+  boolean isExistMemberId(Long memberId);
 }

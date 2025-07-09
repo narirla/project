@@ -13,6 +13,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -199,4 +200,21 @@ public class MemberDAOImpl implements MemberDAO {
     return template.update(sql, param);
   }
 
+  @Override
+  public Optional<Long> findMemberIdByEmail(String email) {
+    String sql = "SELECT member_id FROM member WHERE email = :email";
+    Map<String, Object> params = Map.of("email", email);
+
+    try {
+      Long memberId = template.queryForObject(sql, params, Long.class);
+      return Optional.ofNullable(memberId);
+    } catch (EmptyResultDataAccessException e) {
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public boolean isExistMemberId(Long memberId) {
+    return findById(memberId).isPresent();
+  }
 }

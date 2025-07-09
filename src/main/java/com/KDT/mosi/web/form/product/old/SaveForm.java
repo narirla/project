@@ -1,4 +1,4 @@
-package com.KDT.mosi.web.form.product;
+package com.KDT.mosi.web.form.product.old;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -56,7 +56,7 @@ public class SaveForm {
   @Size(max = 10)
   private String storeInfo;
 
-  @Pattern(regexp = "[YN]")
+  @Size(max = 150)
   private String promoYn;
 
   @Size(max = 100)

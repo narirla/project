@@ -22,5 +22,4 @@ public class BuyerPage {
   private String zonecode;
   private String detailAddress;
   private String notification;
-
 }

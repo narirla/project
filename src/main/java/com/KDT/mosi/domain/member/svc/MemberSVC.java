@@ -117,10 +117,9 @@ public interface MemberSVC {
    * - 회원 ID 기준으로 삭제
    *
    * @param memberId 삭제할 회원 ID
-   * @return
    */
   int deleteById(Long memberId);
 
-
+  Optional<Long> findMemberIdByEmail(String email);
 
 }

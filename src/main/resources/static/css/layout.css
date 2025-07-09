@@ -1,10 +1,7 @@
-/* layout.css */
-
 /* ============================= */
-/* ✅ 0. 레이아웃 전체 구조 보완 */
+/* ✅ 0. 레이아웃 전체 구조 */
 /* ============================= */
 
-/* 전체 페이지 높이 100%, 기본 마진/패딩 제거, 기본 폰트 설정 */
 html, body {
   height: 100%;
   margin: 0;
@@ -13,75 +10,64 @@ html, body {
   background-color: #ffffff;
 }
 
-/* 메인 컨텐츠를 감싸는 중앙 정렬된 레이아웃 */
 .layout-wrapper {
-  display: flex;
-  flex-direction: column;
+  width: 1200px;
+  margin: 0 auto;
   min-height: 100vh;
+  display: block;
+}
+
+/* ============================= */
+/* ✅ 1. Header 영역 (정중앙 고정) */
+/* ============================= */
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;                  /* ✅ 전체 너비로 수정 */
+  height: 167px;
+  background-color: #fff;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;      /* ✅ 가운데 정렬 */
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* header 내부 콘텐츠 영역 (중앙 고정) */
+.header-inner {
   width: 1200px;
   margin: 0 auto;
 }
 
-/* 페이지 내 컨텐츠 박스: 여백, 배경, 그림자 설정 */
-.page-container {
-  flex: 1;
-  width: 100%;
-  padding: 0px 40px 60px 40px;
-  background-color: #fff;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* ============================= */
-/* ✅ 1. Header 영역 (1200*167 고정) */
-/* ============================= */
-
-/* 상단 고정 헤더 전체 틀 */
-header {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1200px;
-  height: 167px;
-  background: #fff;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-}
-
-/* 로그인/회원가입 or 사용자 정보 표시 영역 */
+/* 상단 로그인/회원가입 바 */
 .header-top-bar {
   width: 100%;
   height: 30px;
+  line-height: 30px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   padding: 0 16px;
-  border-bottom: 1px solid #eee;
   background-color: #EFEFEF;
+  border-bottom: 1px solid #eee;
+  box-sizing: border-box;
 }
 
-/* 로그인/알림 메뉴 공통 스타일 */
-.user-links,
-.user-logged-in {
+/* 로그인/알림 영역 */
+.user-links, .user-logged-in {
   display: flex;
   align-items: center;
   gap: 15px;
 }
-
-.user-links a,
-.logout-button,
-.notification-link {
+.user-links a, .logout-button, .notification-link {
   font-size: 14px;
   color: #555;
   text-decoration: none;
 }
-
-/* 로그아웃 form (inline) */
 .logout-form {
   margin: 0;
   display: flex;
@@ -90,30 +76,27 @@ header {
 .logout-button {
   background: none;
   border: none;
-  cursor: pointer;
   padding: 0;
+  cursor: pointer;
 }
-
-/* 알림 링크 아이콘+텍스트 정렬 */
 .notification-link {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-/* 로고, 검색창, 사용자 메뉴 포함하는 메인 헤더 */
+/* 메인 헤더 영역 */
 .header-main {
   width: 100%;
-  max-width: 1200px;
   height: 90px;
-  position: relative; /* 위치 기준 */
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 16px;
+  box-sizing: border-box;
 }
 
-/* 로고 영역 */
+/* 로고 */
 .logo {
   position: absolute;
   left: 16px;
@@ -121,26 +104,24 @@ header {
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  color: inherit;
+  color: #000;
 }
-
 .logo img {
   height: 48px;
 }
 .logo span {
   font-size: 40px;
   font-weight: 800;
-  color: #000;
 }
 
-/* 검색창 스타일 */
+/* 검색창 */
 .search-box {
   display: flex;
   align-items: center;
+  width: 440px;
   border: 1px solid #0099ad;
   border-radius: 10px;
   padding: 2px;
-  width: 440px;
   background-color: #fff;
 }
 .search-box input {
@@ -153,13 +134,13 @@ header {
 .search-box button {
   background: none;
   border: none;
-  cursor: pointer;
   padding: 0 12px 0 4px;
-  color: #0099ad;
   font-size: 18px;
+  color: #0099ad;
+  cursor: pointer;
 }
 
-/* 사용자 메뉴 (관심상품, 마이페이지, 장바구니) */
+/* 사용자 메뉴 */
 .user-menu {
   position: absolute;
   right: 16px;
@@ -179,39 +160,42 @@ header {
   font-size: 22px;
 }
 
-/* 내비게이션 메뉴 (전체메뉴 ~ 호텔) */
+/* 내비게이션 */
 .header-nav {
   width: 100%;
+  height: 47px;
   display: flex;
   justify-content: center;
   border-top: 1px solid #eee;
+  box-sizing: border-box;
 }
 .header-nav ul {
   display: flex;
   gap: 48px;
-  padding: 0;
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
-.header-nav ul li {
-  height: 48px;
+.header-nav li {
   width: 111px;
+  height: 47px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
-.header-nav ul li a {
+.header-nav a {
   font-size: 16px;
   font-weight: 500;
+  text-decoration: none;
   color: #000;
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
-  text-decoration: none;
+  justify-content: center;
   white-space: nowrap;
 }
-.header-nav ul li:hover {
+.header-nav li:hover {
   border-bottom: 1px solid #0099AD;
 }
 
@@ -219,24 +203,19 @@ header {
 /* ✅ 2. Footer 영역 */
 /* ============================= */
 
-/* footer 틀 */
 footer {
   width: 100%;
   background: #0099AD;
   color: #fff;
   padding: 40px;
-  box-sizing: border-box; /* 패딩 포함한 전체 너비 유지 */
+  box-sizing: border-box;
 }
-
-/* 메인 footer 컨텐츠 */
 .footer-container {
   width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
 }
-
-/* 회사 정보 영역 */
 .company-info {
   flex: 2;
 }
@@ -259,8 +238,6 @@ footer {
   font-size: 13px;
   color: #ebfcff;
 }
-
-/* 고객센터/소셜링크 영역 */
 .csns {
   flex: 1;
   min-width: 240px;
@@ -280,8 +257,6 @@ footer {
   margin-right: 8px;
   text-decoration: none;
 }
-
-/* 하단 링크 목록 */
 .footer-links {
   width: 1200px;
   margin: 0 auto;
@@ -298,22 +273,17 @@ footer {
 }
 
 /* ============================= */
-/* ✅ 3. 공통 UI 요소 */
+/* ✅ 3. 공통 UI */
 /* ============================= */
 
-/* 폼 라벨 */
 .form-label {
   font-weight: bold;
   margin-bottom: 6px;
 }
-
-/* 에러 메시지 */
 .text-danger {
   font-size: 0.875rem;
   margin-top: 4px;
 }
-
-/* 프로필 이미지 스타일 */
 .profile-image {
   width: 150px;
   height: 150px;
@@ -321,16 +291,12 @@ footer {
   border-radius: 10px;
   border: 1px solid #ccc;
 }
-
-/* 닉네임 중복확인 버튼 */
 #nicknameCheckBtn {
   margin-left: 8px;
   height: 38px;
   padding: 0 12px;
   font-size: 14px;
 }
-
-/* 기본 버튼 */
 .btn {
   background-color: #0099AD !important;
   color: #EBFCFF !important;
@@ -344,8 +310,6 @@ footer {
   background-color: #007C90 !important;
   color: #fff !important;
 }
-
-/* 아웃라인 버튼 */
 .btn-outline-secondary {
   background-color: transparent !important;
   color: #0099AD !important;

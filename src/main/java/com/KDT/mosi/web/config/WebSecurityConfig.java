@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
   private final UserDetailsService userDetailsService;
-  private final LoginSuccessHandler loginSuccessHandler;
+  private final LoginSuccessHandler loginSuccessHandler; // ✅ 커스텀 로그인 성공 핸들러 주입
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

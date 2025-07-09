@@ -37,7 +37,6 @@ public class BuyerPageUpdateForm {
   @NotBlank(message = "이름은 필수 항목입니다.")
   private String name;
 
-
   @Override
   public String toString() {
     return "BuyerPageUpdateForm{" +
@@ -54,6 +53,5 @@ public class BuyerPageUpdateForm {
         ", name='" + name + '\'' +
         '}';
   }
-
 }
 
