@@ -147,7 +147,7 @@ function evaluatePasswordStrength(password) {
   if (password.length < 8 || hasRepeat) {
     strengthBox.textContent = "약함";
     strengthBox.className = "pw-strength weak";
-    hintBox.textContent = "8자 이상, 반복 문자 피해주세요.";
+    hintBox.textContent = "비밀번호는 8자 ~ 12자\n,대소문자, 숫자, 특수문자를 포함 \n 동일 문자를 3회 이상 반복할 수 없습니다.";
     return;
   }
 
