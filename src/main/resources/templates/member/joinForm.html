@@ -64,6 +64,8 @@
             <i class="fa fa-eye-slash"></i>
           </button>
         </div>
+        <div id="confirmPwError" class="error"></div>
+
         <div th:if="${#fields.hasErrors('confirmPasswd')}" th:errors="*{confirmPasswd}" class="error"></div>
       </div>
 
@@ -87,7 +89,10 @@
       <!-- ✅ 닉네임 -->
       <div class="form-group">
         <label for="nickname">닉네임<span class="required">*</span></label>
-        <input type="text" id="nickname" name="nickname" th:field="*{nickname}" class="input-mosi" required autocomplete="nickname">
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="nickname" name="nickname" th:field="*{nickname}" class="input-mosi" required autocomplete="nickname">
+          <button type="button" class="btn-small" onclick="checkNickname()">중복 확인</button>
+        </div>
         <div id="nicknameCheckResult" class="check-msg"></div>
         <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="error"></div>
       </div>

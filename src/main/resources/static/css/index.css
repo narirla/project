@@ -1,10 +1,19 @@
+/* index.css */
+
+/* index.css */
+
+/* ✅ Pretendard 웹폰트 적용 */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+/* ================== ✅ 기본 설정 ================== */
 body {
   margin: 0;
+  background: #FFFFFF;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-  background: #f7f7f7;
-  padding-top: 150px; /* 헤더 높이에 맞게 조정 */
+}
+
+.layout-wrapper {
+  width: 1200px;
 }
 
 a {
@@ -12,73 +21,103 @@ a {
   color: inherit;
 }
 
-/* ================== 메인 배너 ================== */
+/* ================== ✅ 메인 배너 ================== */
 .main-banner {
-  position: relative;
   width: 1200px;
   height: 500px;
-  background: #222;
-  margin: 0 auto;
   overflow: hidden;
+  position: relative;
 }
 
-.main-banner img,
-.main-banner iframe {
+.main-banner img {
   width: 100%;
-  height: 100%;
+  height: 500px;
   object-fit: cover;
+  display: block;
 }
 
 .main-banner-text {
   position: absolute;
-  left: 120px;
-  top: 100px;
-  color: #fff;
-  z-index: 1;
+  left: 80px;
+  bottom: 80px;
+  color: white;
+  z-index: 2;
 }
 
 .main-banner-text h2 {
-  font-size: 36px;
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1.4;
   margin-bottom: 12px;
 }
 
 .main-banner-text p {
-  font-size: 18px;
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-/* ================== 투어 섹션 ================== */
+/* ================== ✅ 이달의 인기 투어 ================== */
 .tour-section {
   width: 1200px;
-  margin: 40px auto 0 auto;
+  margin: 40px auto;
+  height: auto;
+  overflow: visible;
+}
+
+/* ✅ 타이틀 + 전체보기 정렬 */
+.tour-header {
+  width: 1200px;
+  padding-top: 40px;            /* ✅ 상단 여백 */
+  margin-bottom: 16px;          /* ✅ 하단 여백 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .tour-title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  height: 29px;
+  line-height: 29px;
+  padding-left: 4px;
+  width: fit-content;
+}
+
+.tour-header .see-all {
+  font-size: 16px;
+  font-weight: 400;
+  color: #141414;
+  text-decoration: none;
 }
 
 .tour-list {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 290px);
+  grid-template-rows: repeat(2, 398px);
+  gap: 10px;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-bottom: 40px;
 }
 
 .tour-card {
+  width: 290px;
+  height: 398px;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  width: 280px;
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .tour-card img {
   width: 100%;
-  height: 180px;
+  height: 290px;
   object-fit: cover;
+  display: block;
 }
 
 .tour-card .heart {
@@ -91,7 +130,9 @@ a {
 }
 
 .tour-card .desc {
+  height: 108px;
   padding: 16px;
+  box-sizing: border-box;
 }
 
 .tour-card .desc .title {
@@ -107,110 +148,287 @@ a {
 }
 
 .tour-card .desc .sale {
-  color: #00bfae;
   font-size: 14px;
+  color: #00bfae;
   margin-left: 8px;
 }
 
 .tour-card .desc .tag {
   display: inline-block;
+  font-size: 12px;
   background: #e0f7f4;
   color: #00bfae;
-  font-size: 12px;
   border-radius: 8px;
   padding: 2px 8px;
   margin-top: 8px;
 }
 
-/* ================== 가이드 섹션 ================== */
+/* ================== ✅ 인기 가이드 ================== */
 .container-guide {
   width: 1200px;
   margin: 40px auto 0 auto;
   padding-top: 40px;
 }
 
-.guide-list {
+.guide-header {
+  width: 1200px;
+  margin: 0 auto 20px auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
   justify-content: space-between;
+  align-items: center;
+}
+
+.tour-title {
+  font-size: 22px;
+  font-weight: 600;
+  height: 29px;
+  line-height: 29px;
+}
+
+.guide-more {
+  font-size: 16px;
+  font-weight: 400;
+  color: #141414;
+  text-decoration: none;
+}
+
+.guide-list {
+  display: grid;
+  grid-template-columns: repeat(2, 593px);
+  grid-template-rows: repeat(4, 160px);
+  gap: 20px 14px;
+  justify-content: center;
 }
 
 .guide-card {
-  width: 580px;
-  height: 140px;
+  width: 593px;
+  height: 160px;
   display: flex;
   align-items: center;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background-color: #f9f9f9;
+  border-radius: 8px;
   padding: 16px;
-  box-sizing: border-box;
-  background-size: cover;
-  background-position: center;
-  color: #fff;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .guide-card img {
-  width: 64px;
-  height: 64px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 16px;
-  z-index: 1;
+  margin-right: 20px;
 }
 
 .guide-info {
   flex: 1;
-  z-index: 1;
 }
 
 .guide-info .name {
-  font-weight: bold;
-  font-size: 15px;
-  margin-bottom: 4px;
-  color: #000; /* 수정 */
-  text-shadow: none; /* 그림자 제거 */
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
 .guide-info .desc {
-  font-size: 13px;
-  color: #555; /* 기존과 동일 유지 가능 */
-  margin-bottom: 4px;
-  text-shadow: none;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 6px;
 }
 
 .guide-info .tags {
-  font-size: 12px;
-  color: #00bfae;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  font-size: 20px;
+  color: #5e5e5e;
 }
 
 .guide-follow {
-  text-align: right;
   min-width: 70px;
+  text-align: right;
   font-size: 14px;
   color: #000;
-  z-index: 1;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
 .guide-follow i {
   margin-right: 4px;
+}
+
+/* ================== ✅ 커뮤니티 섹션 ================== */
+.container-community {
+  width: 1200px;
+  height: 427px;
+  margin: 40px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* ✅ 커뮤니티 타이틀 영역 */
+.community-header {
+  width: 1200px;
+  padding: 40px 0 40px 10px;       /* ✅ top 40px, bottom 40px, left 10px */
+  margin-bottom: 0px;             /* ✅ 아래 여백 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+
+.community-header .title {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 29px;
+}
+
+.community-header .guide-more {
+  font-size: 16px;
+  font-weight: 400;
+  color: #141414;
+  text-decoration: none;
+  line-height: 29px;
+}
+
+/* 게시글/카테고리 영역 */
+.community-flex-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.community-half {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.community-card {
+  width: 600px;
+  height: 106px;
+  background-color: #F9F9F9;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.community-card .text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.community-card .title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.community-card .summary {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.community-card .meta {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.community-card .thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-left: 16px;
+}
+
+.category-card {
+  width: 581px;
+  height: 106px;
+  background-color: #F2F2F2;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 16px;
+}
+
+.category-thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.category-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.category-text .title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.category-text .summary {
+  font-size: 14px;
+  font-weight: 600;
   color: #000;
 }
 
-/* ================== 커뮤니티 섹션 ================== */
-.container-community {
-  width: 1200px;
-  margin: 40px auto 0 auto;
-  padding-top: 40px;
+.category-text .meta {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.3);
 }
 
-/* ================== 푸터 ================== */
-footer {
+/* 공지 */
+.notice-box {
   width: 1200px;
-  margin: 0 auto;
+  height: 54px;
+  background: #FAFAFA;                          /* 배경색 100% */
+  border: 1px solid rgba(194, 194, 194, 0.5);    /* 외곽선 50% 투명도 */
+  border-radius: 8px;
+  padding: 10px 16px;                            /* ✅ 유지 */
+  margin-top: 90px;                              /* ✅ 유지 */
+  margin-bottom: 40px;                           /* ✅ 유지 */
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  font-size: 14px;
+  position: relative;
 }
+
+/* 공지 텍스트: 세미볼드 16px #0099AD */
+.notice-box b {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0099AD;
+  margin-right: 8px;
+}
+
+/* 설명 텍스트: 레귤러 14px #000000 */
+.notice-box .text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  flex: 1;
+}
+
+/* 더보기 링크: 세미볼드 14px #0099AD */
+.notice-box .notice-more {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0099AD;
+  text-decoration: none;
+}
+
+

@@ -1,173 +1,386 @@
 /*sellerMypageHome.css*/
-/* sellerMypageHome.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* ✅ 공통 레이아웃 설정 */
+body {
+    font-family: 'Pretendard', sans-serif;
+    color: #fff;
+    background-color: #fff;
+    padding-top: 150px;}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
 .page-container {
-  width: 1200px;
-  margin: 0 auto;
-  padding: 167px 40px 60px 40px;
-  background-color: #fff;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+    width: 1280px;
+    margin: 0 auto 40px auto;
+    background-color: #fff;
 }
 
-/* ✅ 판매자 요약 카드 */
+.mypage-container {
+    display: flex;
+    gap: 30px;
+    padding: 40px 20px;
+    background-color: #fff;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.sidebar-card {
+    border: 1px solid #82d8d8;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    overflow: hidden;
+}
+
+.profile-box {
+    padding: 20px 15px;
+    text-align: center;
+    border-bottom: 1px solid #E0E0E0;
+    background-color: #ffffff;
+}
+
+.profile-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 10px;
+    border: 1px solid #ddd;
+}
+
+.profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-badge {
+    display: inline-block;
+    color: #666;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.profile-name {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.profile-discount {
+    background-color: #20c997;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.mypage-nav .nav-title {
+    background-color: #1EC4CC;
+    color: #fff;
+    font-weight: bold;
+    padding: 15px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.mypage-nav ul {
+    background-color: #fff;
+    padding: 10px 0;
+}
+
+.mypage-nav > ul > li > a {
+    font-weight: bold;
+    display: block;
+    padding: 10px 15px;
+    font-size: 14px;
+}
+
+.mypage-nav > ul > li > ul {
+    padding-left: 0;
+    margin-bottom: 10px;
+}
+
+.mypage-nav > ul > li > ul a {
+    display: block;
+    padding: 6px 15px 6px 25px;
+    font-size: 13px;
+    color: #555;
+}
+
+.mypage-nav > ul > li > ul a:hover {
+    color: #00c7e2;
+}
+
+
+
+/* Content */
+.content {
+    flex-grow: 1;
+    width: calc(100% - 230px);
+}
+
+.content-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* Info Summary */
 .info-summary-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  margin-bottom: 32px;
-  background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    margin-bottom: 30px;
 }
 
-.info-grid,
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
 .info-grid-bottom {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #fafafa;
+    border-top: 1px solid #e0e0e0;
 }
 
 .info-item {
-  flex: 1;
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 4px rgba(0,0,0,0.04);
-  text-align: center;
+    text-align: center;
+    position: relative;
+    padding: 20px 0;
+}
+
+.info-item:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 40px;
+    background-color: #e0e0e0;
+}
+
+.info-main .title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.info-main .value {
+    font-size: 36px;
+    font-weight: 700;
 }
 
 .info-item .title {
-  display: block;
-  font-size: 0.875rem;
-  color: #888;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 8px;
 }
 
 .info-item .value {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
+    font-size: 24px;
+    font-weight: bold;
 }
 
-/* ✅ 주문 현황 테이블 */
-.section-card table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 12px;
+/* Recent Orders */
+.recent-orders table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
 }
 
-.section-card th,
-.section-card td {
-  padding: 12px 10px;
-  border-bottom: 1px solid #eee;
-  font-size: 0.875rem;
+.recent-orders th, .recent-orders td {
+    padding: 15px 10px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.recent-orders thead {
+    background-color: #fafafa;
+    border-top: 1px solid #e0e0e0;
 }
 
 .order-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
 }
 
 .order-item-image {
-  width: 40px;
-  height: 40px;
-  background-color: #ccc;
-  border-radius: 4px;
+    width: 50px;
+    height: 50px;
+    background-color: #ececec;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
 }
 
-/* ✅ 내 상품 목록 */
-.card-list {
-  display: flex;
-  gap: 16px;
-  margin-top: 16px;
+.price {
+    font-weight: bold;
 }
 
-.tour-card {
-  width: 250px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 6px rgba(0,0,0,0.05);
-  background-color: #fff;
-}
-
-.card-image {
-  height: 160px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
-
-.heart-icon {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  color: #f66;
-}
-
-.card-content {
-  padding: 12px;
-}
-
-.card-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.card-price {
-  font-size: 0.875rem;
-  text-decoration: line-through;
-  color: #aaa;
-}
-
-.card-discount {
-  font-size: 1rem;
-  color: #0099AD;
-  font-weight: 700;
-}
-
-.discount-badge {
-  background: #EBFCFF;
-  color: #0099AD;
-  font-size: 0.75rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-left: 6px;
-}
-
-/* ✅ 광고 배너 */
+/* Ad Banner */
 .ad-banner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #eaeaea;
-  height: 60px;
-  margin: 40px 0;
-  border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f7f7f7;
+    padding: 15px 20px;
+    border-radius: 4px;
+    margin-bottom: 30px;
+    gap: 40px;
 }
 
 .ad-arrow {
-  background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  margin: 0 12px;
-  cursor: pointer;
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    line-height: 22px;
+    text-align: center;
+    cursor: pointer;
 }
 
-/* ✅ 공지 */
+/* Tour Card */
+.card-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.tour-card {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e1e4e8;
+}
+
+.card-image {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.heart-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: white;
+    text-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+.card-content {
+    padding: 15px;
+}
+
+.card-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.card-price {
+    text-decoration: line-through;
+    font-size: 14px;
+    color: #888;
+}
+
+.card-discount {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.discount-badge {
+    background-color: #e5f8fb;
+    color: #00a0b6;
+    font-size: 12px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* Guide List */
+.guide-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.guide-card .guide-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    background-size: cover;
+    background-position: center;
+}
+
+.guide-card .guide-name {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 6px;
+}
+
+/* Recent Courses */
+.recent-courses .card-list {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.recent-courses .card-image {
+    height: 140px;
+}
+
+/* Notice Bar */
 .notice-bar {
-  background: #F8F8F8;
-  padding: 10px 20px;
-  margin-top: 40px;
-  border-top: 1px solid #ccc;
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    margin-top: 20px;
 }
 
 .notice-label {
-  font-weight: 700;
-  color: #0099AD;
-  margin-right: 12px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.notice-text {
+    flex-grow: 1;
+}
+
+.more-link {
+    font-size: 13px;
+    color: #666;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }

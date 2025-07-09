@@ -19,17 +19,17 @@
         <div class="sidebar-card">
           <div class="profile-box">
             <div class="profile-image">
-              <img th:if="${member != null and member.pic != null}"
-                   th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}" alt="프로필 이미지">
-              <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}" alt="기본 이미지">
+              <img th:src="${sellerPage.image != null}
+                  ? @{/mypage/seller/images/profile/{id}(id=${sellerPage.pageId})}
+                  : @{/img/default-profile.png}"
+                   alt="프로필 이미지">
             </div>
             <div class="profile-info">
               <a href="#" class="profile-badge">🧭 프로가이드 ></a>
-              <div class="profile-name" th:text="${member.name}">김도시</div>
+              <div class="profile-name" th:text="${member.name}">김모시</div>
               <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
                 <button type="submit" class="btn btn-outline-secondary w-100">구매자 전환</button>
               </form>
-
             </div>
           </div>
 
@@ -96,41 +96,43 @@
 
           <table class="member-info-table">
             <tr>
-              <th>닉네임</th>
+              <th><label for="nickname">닉네임</label></th>
               <td>
-                <input type="text" th:value="${member.nickname}" class="form-control" readonly>
+                <input type="text" id="nickname" name="nickname" th:value="${member.nickname}"
+                       class="form-control" readonly autocomplete="nickname">
               </td>
             </tr>
             <tr>
-              <th>자기소개</th>
+              <th><label for="intro">자기소개</label></th>
               <td>
-                <textarea class="form-control" rows="3" readonly
+                <textarea id="intro" name="intro" class="form-control" rows="3" readonly
                           th:text="${sellerPage != null and sellerPage.intro != null ? sellerPage.intro : '등록된 자기소개가 없습니다.'}"></textarea>
               </td>
             </tr>
             <tr>
               <th>전화</th>
               <td>
-                <span th:text="${member.tel}">010-0000-0000</span>
-                <button type="button" class="btn btn-secondary">변경하기</button>
+                <span th:text="${member.tel}" id="tel">010-0000-0000</span>
+                <a th:href="@{/mypage/seller/edit}" class="btn btn-secondary" style="float:right;">변경하기</a>
               </td>
             </tr>
             <tr>
-              <th>알림설정</th>
+              <th><label for="notification">알림설정</label></th>
               <td>
                 <label>
-                  <input type="checkbox" disabled th:checked="${member.notification == 'Y'}"> 알림 수신 동의
+                  <input type="checkbox" id="notification" name="notification"
+                         disabled th:checked="${member.notification == 'Y'}"> 알림 수신 동의
                 </label>
                 <div style="margin-top: 8px;">판매 관련 알림을 수신하시겠습니까?</div>
               </td>
             </tr>
           </table>
 
-          <div class="btn-group mt-4">
-            <a th:href="@{/mypage/seller/edit}" class="btn btn-primary">정보 수정</a>
-            <form th:action="@{/members/{id}/delete(id=${member.memberId})}" method="post"
-                  onsubmit="return confirm('정말 탈퇴하시겠습니까?');" style="display: inline;">
-              <button type="submit" class="btn btn-danger">회원탈퇴</button>
+          <div class="btn-group mt-4" style="text-align: right;">
+            <a th:href="@{/mypage/seller/edit}" class="btn btn-primary">회원 정보 수정</a>
+            <form th:action="@{/members/delete}" method="post" style="display: inline;">
+              <input type="hidden" id="memberId" name="memberId" th:value="${member.memberId}">
+              <button type="submit" class="btn btn-danger" onclick="return confirm('정말 탈퇴하시겠습니까?');">회원탈퇴</button>
             </form>
           </div>
         </div>

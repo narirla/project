@@ -29,7 +29,8 @@ public class MemberJoinForm {
   /** 비밀번호 (필수, 8~12자) */
   @NotBlank(message = "비밀번호는 필수 입력값입니다.")
   @Size(min = 8, max = 12, message = "비밀번호는 8자 이상 12자 이내여야 합니다.")
-  @ValidPassword(message = "비밀번호는 영어 대/소문자, 숫자, 특수문자를 포함해야 하며, 반복 문자는 3회 이상 불가합니다.")
+
+  @ValidPassword(message = "비밀번호는 영문 대소문자, 숫자, 특수문자를 모두 포함해야 하며 동일 문자를 3회 이상 반복할 수 없습니다.")
   private String passwd;
 
   /** 비밀번호 확인 */

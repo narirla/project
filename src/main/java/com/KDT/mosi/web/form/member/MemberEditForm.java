@@ -1,5 +1,6 @@
 package com.KDT.mosi.web.form.member;
 
+import com.KDT.mosi.web.validation.ValidPassword;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -21,8 +22,9 @@ public class MemberEditForm {
   @Size(max = 50, message = "이름은 최대 50자까지 입력 가능합니다.")
   private String name;
 
-  /** 새 비밀번호 (선택 입력) */
-  @Size(min = 8, max = 12, message = "비밀번호는 8자 이상 12자 이내여야 합니다.")
+
+  /** 새 비밀번호 (영문 대소문자, 숫자, 특수문자 포함, 동일 문자 3회 이상 반복 불가) */
+  @ValidPassword(message = "비밀번호는 8~12자이며, 영문 대소문자, 숫자, 특수문자를 포함해야 하며 동일 문자 3회 이상 반복은 불가합니다.")
   private String passwd;
 
   /** 비밀번호 확인 */
@@ -32,7 +34,7 @@ public class MemberEditForm {
   @Pattern(regexp = "^(010-\\d{4}-\\d{4})?$", message = "전화번호 형식은 010-0000-0000입니다.")
   private String tel;
 
-  /** 닉네임 (최대 30자) */
+  /** 닉네임 (2~30자) */
   @Size(min = 2, max = 30, message = "닉네임은 최소 2자, 최대 30자까지 입력 가능합니다.")
   private String nickname;
 

@@ -34,8 +34,8 @@ public class ProductController {
 
     @GetMapping("/list")
     public String list(Model model,
-                       @RequestParam(defaultValue = "1") int page,
-                       @RequestParam(defaultValue = "12") int size) {
+                       @RequestParam(name = "page", defaultValue = "1") int page,
+                       @RequestParam(name = "size", defaultValue = "12") int size) {
         List<Product> products = productSVC.getProductsByPage(page, size);
         model.addAttribute("products", products);
         model.addAttribute("currentPage", page);
@@ -119,7 +119,7 @@ public class ProductController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, Model model, HttpSession session, RedirectAttributes redirectAttrs) {
+    public String editForm(@PathVariable("id") Long id, Model model, HttpSession session, RedirectAttributes redirectAttrs) {
         Member loginMember = (Member) session.getAttribute("loginMember");
         if (loginMember == null) {
             redirectAttrs.addFlashAttribute("redirectAfterLogin", "/product/edit/" + id);

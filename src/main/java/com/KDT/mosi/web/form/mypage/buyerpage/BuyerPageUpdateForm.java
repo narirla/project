@@ -18,7 +18,9 @@ public class BuyerPageUpdateForm {
   @Size(min = 2, max = 30, message = "닉네임은 2~30자 이내여야 합니다.")
   private String nickname;
 
-  @Size(min = 8, max = 12, message = "비밀번호는 8~12자 이내여야 합니다.")
+  @Pattern(
+      regexp = "^$|^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,12}$",
+      message = "비밀번호는 8~12자이며, 영문/숫자/특수문자를 포함해야 합니다.")
   private String passwd;
 
   @Pattern(regexp = "^(010-\\d{4}-\\d{4})?$", message = "전화번호 형식은 010-0000-0000입니다.")
