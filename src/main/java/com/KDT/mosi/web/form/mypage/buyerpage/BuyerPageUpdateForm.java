@@ -1,5 +1,7 @@
 package com.KDT.mosi.web.form.mypage.buyerpage;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -7,24 +9,47 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 public class BuyerPageUpdateForm {
 
-  // 마이페이지 고유 ID (hidden으로 전달)
   private Long pageId;
 
-  // 회원 ID (수정 불가, hidden)
   private Long memberId;
 
-  // 새 프로필 이미지 파일 (선택 시 덮어씀)
   private MultipartFile imageFile;
 
-  // 자기소개 (최대 500자)
+  @Size(min = 2, max = 30, message = "닉네임은 2~30자 이내여야 합니다.")
+  private String nickname;
+
+  @Size(min = 8, max = 12, message = "비밀번호는 8~12자 이내여야 합니다.")
+  private String passwd;
+
+  @Pattern(regexp = "^(010-\\d{4}-\\d{4})?$", message = "전화번호 형식은 010-0000-0000입니다.")
+  private String tel;
+
+  private String zonecode;
+  private String address;
+  private String detailAddress;
+  private String notification;
+
   @Size(max = 500, message = "자기소개는 500자 이내로 입력해주세요.")
   private String intro;
 
-  // 최근 주문한 상품명 (최대 100자)
-  @Size(max = 100, message = "최근 주문 상품명은 100자 이내로 입력해주세요.")
-  private String recentOrder;
+  @NotBlank(message = "이름은 필수 항목입니다.")
+  private String name;
 
-  // 적립 포인트
-  private Integer point;
+  @Override
+  public String toString() {
+    return "BuyerPageUpdateForm{" +
+        "pageId=" + pageId +
+        ", memberId=" + memberId +
+        ", nickname='" + nickname + '\'' +
+        ", passwd='" + passwd + '\'' +
+        ", tel='" + tel + '\'' +
+        ", zonecode='" + zonecode + '\'' +
+        ", address='" + address + '\'' +
+        ", detailAddress='" + detailAddress + '\'' +
+        ", notification='" + notification + '\'' +
+        ", intro='" + intro + '\'' +
+        ", name='" + name + '\'' +
+        '}';
+  }
 }
 

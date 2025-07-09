@@ -1,9 +1,11 @@
 package com.KDT.mosi.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 
 @Entity
@@ -11,30 +13,30 @@ import java.sql.Timestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ProductCoursePoint {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_course_point_seq")
-  @SequenceGenerator(name = "product_course_point_seq", sequenceName = "product_course_point_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "course_point_seq_generator")
+  @SequenceGenerator(name = "course_point_seq_generator", sequenceName = "PRODUCT_COURSE_POINT_COURSE_POINT_ID_SEQ", allocationSize = 1)
   @Column(name = "COURSE_POINT_ID")
   private Long coursePointId;
 
-  @Column(name = "PRODUCT_ID", nullable = false)
-  private Long productId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "product_id")  // 외래키 컬럼명 맞추기
+  private Product product;
 
-  @Column(name = "POINT_ORDER", nullable = false)
+  @Column(name = "POINT_ORDER")
   private Integer pointOrder;
 
-  @Column(name = "LATITUDE", precision = 9, scale = 6, nullable = false)
-  private BigDecimal latitude;
+  @Column(name = "LATITUDE")
+  private Double latitude;
 
-  @Column(name = "LONGITUDE", precision = 9, scale = 6, nullable = false)
-  private BigDecimal longitude;
+  @Column(name = "LONGITUDE")
+  private Double longitude;
 
   @Column(name = "DESCRIPTION", length = 500)
   private String description;
 
   @Column(name = "CREATED_AT")
-  private Timestamp createdAt;
+  private Date createdAt;
 }

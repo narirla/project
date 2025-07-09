@@ -29,9 +29,17 @@ public interface BuyerPageDAO {
   int updateById(Long pageId, BuyerPage buyerPage);
 
   /**
-   * 마이페이지 삭제
-   * @param pageId 마이페이지 ID
-   * @return 삭제 건수
+   * 회원 ID로 마이페이지 삭제
+   * - 회원 탈퇴 시 사용
+   * @param memberId 회원 ID
+   * @return 삭제된 행 수
    */
-  int deleteById(Long pageId);
+  int deleteByMemberId(Long memberId);
+
+  /**
+   * 마이페이지 ID로 조회
+   * @param pageId 마이페이지 ID
+   * @return Optional<BuyerPage>
+   */
+  Optional<BuyerPage> findById(Long pageId);
 }

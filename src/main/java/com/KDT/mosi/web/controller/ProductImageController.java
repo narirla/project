@@ -1,64 +1,44 @@
-package com.KDT.mosi.web;
+package com.KDT.mosi.web.controller;
 
+import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.entity.ProductImage;
 import com.KDT.mosi.domain.product.svc.ProductImageSVC;
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpStatus;
+import com.KDT.mosi.domain.product.svc.ProductSVC;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/product-images")
-@RequiredArgsConstructor
+@RequestMapping("/product-images")
 public class ProductImageController {
 
+  private final ProductSVC productSVC;
   private final ProductImageSVC productImageSVC;
 
-  // 이미지 등록
-  @PostMapping
-  public ResponseEntity<ProductImage> createImage(@RequestBody ProductImage productImage) {
-    ProductImage saved = productImageSVC.save(productImage);
-    return new ResponseEntity<>(saved, HttpStatus.CREATED);
+  public ProductImageController(ProductImageSVC productImageService, ProductSVC productSVC) {
+    this.productSVC = productSVC;
+    this.productImageSVC = productImageService;
   }
 
-  // 상품 이미지 목록 조회
   @GetMapping("/product/{productId}")
-  public ResponseEntity<List<ProductImage>> getImagesByProductId(@PathVariable Long productId) {
+  public ResponseEntity<List<ProductImage>> getImagesByProduct(@PathVariable Long productId) {
     List<ProductImage> images = productImageSVC.getImagesByProductId(productId);
     return ResponseEntity.ok(images);
   }
 
-  // 이미지 단건 조회
-  @GetMapping("/{imageId}")
-  public ResponseEntity<ProductImage> getImageById(@PathVariable Long imageId) {
-    Optional<ProductImage> image = productImageSVC.getImageById(imageId);
-    return image.map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+  @PostMapping
+  public ResponseEntity<String> addImage(@RequestBody ProductImage productImage) {
+    boolean success = productImageSVC.addProductImage(productImage);
+    if (success) return ResponseEntity.ok("이미지 등록 성공");
+    else return ResponseEntity.status(500).body("이미지 등록 실패");
   }
 
-  // 이미지 수정
-  @PutMapping("/{imageId}")
-  public ResponseEntity<ProductImage> updateImage(@PathVariable Long imageId, @RequestBody ProductImage productImage) {
-    productImage.setImageId(imageId);
-    ProductImage updated = productImageSVC.update(productImage);
-    return ResponseEntity.ok(updated);
-  }
-
-  // 이미지 삭제
   @DeleteMapping("/{imageId}")
-  public ResponseEntity<Void> deleteImage(@PathVariable Long imageId) {
-    productImageSVC.deleteById(imageId);
-    return ResponseEntity.noContent().build();
-  }
-
-  // 특정 상품 이미지 전체 삭제
-  @DeleteMapping("/product/{productId}")
-  public ResponseEntity<Void> deleteImagesByProduct(@PathVariable Long productId) {
-    productImageSVC.deleteByProductId(productId);
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<String> deleteImage(@PathVariable Long imageId) {
+    boolean success = productImageSVC.deleteProductImage(imageId);
+    if (success) return ResponseEntity.ok("이미지 삭제 성공");
+    else return ResponseEntity.status(500).body("이미지 삭제 실패");
   }
 }

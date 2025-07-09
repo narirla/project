@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MO:SI 구매자 마이페이지</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/buyerpage/buyerMypageHome.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+  <header th:replace="~{fragments/header :: header}"></header>
+
+  <div class="page-container">
+    <main class="mypage-container">
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <div class="profile-box">
+            <div class="profile-image">
+              <img th:if="${member != null and member.pic != null}"
+                   th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
+              <!-- member가 null이거나 pic이 null이면 기본 이미지 출력 -->
+              <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}"
+                   alt="기본 프로필 이미지">
+            </div>
+            <div class="profile-info">
+              <a href="#" class="profile-badge">프로여행러 ></a>
+              <div class="profile-name" th:text="${member.name}"></div>
+              <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-outline-secondary w-100">판매자 전환</button>
+              </form>
+
+            </div>
+          </div>
+          <nav class="mypage-nav">
+            <div class="nav-title active">MY PAGE</div>
+            <ul>
+              <li><a href="#">주문 배송</a>
+                <ul>
+                  <li><a href="#">주문/배송 내역</a></li>
+                </ul>
+              </li>
+              <li><a href="#">알림 및 메시지</a>
+                <ul>
+                  <li><a href="#">알림</a></li>
+                  <li><a href="#">메시지</a></li>
+                </ul>
+              </li>
+              <li><a href="#">나의 활동</a>
+                <ul>
+                  <li><a href="#">후기</a></li>
+                  <li><a href="#">게시글</a></li>
+                </ul>
+              </li>
+              <li><a href="#">관심</a>
+                <ul>
+                  <li><a href="#">찜한 상품</a></li>
+                  <li><a href="#">팔로잉 가이드</a></li>
+                  <li><a href="#">최근 본 상품</a></li>
+                </ul>
+              </li>
+              <li><a href="#">내 정보</a>
+                <ul>
+                  <li><a href="#">회원 등급</a></li>
+                  <li><a th:href="@{'/mypage/buyer/' + ${member.memberId}}">회원 정보 관리</a></li>
+                  <li><a href="#">신용 카드 및 환불계좌 관리</a></li>
+                  <li><a href="#">배송지 관리</a></li>
+                  <li><a href="#">본인 인증</a></li>
+                </ul>
+              </li>
+              <li><a href="#">고객센터</a>
+                <ul>
+                  <li><a href="#">1:1 문의</a></li>
+                  <li><a href="#">상품 Q&A 내역</a></li>
+                  <li><a href="#">공지사항</a></li>
+                  <li><a href="#">FAQ</a></li>
+                  <li><a href="#">고객의 소리</a></li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <section class="content">
+        <!-- 내 정보 -->
+        <div class="info-summary-card">
+          <div class="info-grid">
+            <div class="info-item info-main">
+              <span class="title">마일리지</span>
+              <span class="value">16,800</span>
+            </div>
+            <div class="info-item info-main">
+              <span class="title">포인트</span>
+              <span class="value">3000P</span>
+            </div>
+          </div>
+          <div class="info-grid-bottom">
+            <div class="info-item"><span class="title">작성 가능 리뷰</span><span class="value">2</span></div>
+            <div class="info-item"><span class="title">작성한 리뷰</span><span class="value">11</span></div>
+            <div class="info-item"><span class="title">쿠폰</span><span class="value">5</span></div>
+          </div>
+        </div>
+
+        <!-- 최근 주문 -->
+        <div class="section-card recent-orders">
+          <div class="section-header">
+            <h3>최근 주문</h3>
+            <a href="#" class="view-all">전체보기 ></a>
+          </div>
+          <table>
+            <thead>
+            <tr>
+              <th>주문일</th>
+              <th>주문내역</th>
+              <th>주문번호</th>
+              <th>결제금액</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Sample Order Row -->
+            <tr>
+              <td>2025.06.18</td>
+              <td class="order-item">
+                <div class="order-item-image"></div>
+                <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
+              </td>
+              <td>ORD20250525-9018706</td>
+              <td class="price">5,000원</td>
+            </tr>
+            <tr>
+              <td>2025.06.18</td>
+              <td class="order-item">
+                <div class="order-item-image"></div>
+                <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
+              </td>
+              <td>ORD20250525-9018706</td>
+              <td class="price">5,000원</td>
+            </tr>
+            <tr>
+              <td>2025.06.18</td>
+              <td class="order-item">
+                <div class="order-item-image"></div>
+                <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
+              </td>
+              <td>ORD20250525-9018706</td>
+              <td class="price">5,000원</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+        <!-- 광고 슬라이드 -->
+        <div class="ad-banner">
+          <button class="ad-arrow prev">&lt;</button>
+          <span>광고 슬라이드</span>
+          <button class="ad-arrow next">&gt;</button>
+        </div>
+
+        <!-- 찜한 코스 -->
+        <div class="section-card">
+          <div class="section-header">
+            <h3>찜한 코스</h3>
+            <a href="#" class="view-all">전체보기 ></a>
+          </div>
+          <div class="card-list">
+            <div class="tour-card">
+              <div class="card-image"
+                   style="background-image: url('https://search.pstatic.net/sunny/?src=https%3A%2F%2Fyt3.googleusercontent.com%2Fl_a-5VnKw9T_pvm_25JMukfk11GxVpCH99QmLLHN5KDAfavx4YKVyDtZJ92m2VrmRVKi3yECAw%3Ds900-c-k-c0x00ffffff-no-rj&type=sc960_832');">
+                <i class="fa-solid fa-heart heart-icon"></i>
+              </div>
+              <div class="card-content">
+                <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                <p class="card-price">5,000 원</p>
+                <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
+              </div>
+            </div>
+            <div class="tour-card">
+              <div class="card-image"
+                   style="background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjA1MThfNiAg%2FMDAxNjUyODg1MzU2MzMx.ls6p0EDMuN8jrsuwtfuFSnf187fMXDpMeJKikfZhZ7sg.wPGHrpe0EyihwqhzW5wVQtlpGCs61pLgRBJsSDmOY1kg.JPEG.polkl11%2FScreenshot%25A3%25DF20220518%25A3%25AD234244%25A3%25DFNAVER.jpg&type=sc960_832');">
+                <i class="fa-solid fa-heart heart-icon"></i>
+              </div>
+              <div class="card-content">
+                <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                <p class="card-price">5,000 원</p>
+                <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
+              </div>
+            </div>
+            <div class="tour-card">
+              <div class="card-image"
+                   style="background-image: url('https://search.pstatic.net/sunny/?src=https%3A%2F%2Fi.pinimg.com%2F736x%2F29%2F96%2F76%2F299676d83007b0d2e7eb081647761b85.jpg&type=sc960_832');">
+                <i class="fa-solid fa-heart heart-icon"></i>
+              </div>
+              <div class="card-content">
+                <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                <p class="card-price">5,000 원</p>
+                <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 팔로우 하는 가이드 -->
+        <div class="section-card">
+          <div class="section-header">
+            <h3>팔로우 하는 가이드</h3>
+            <a href="#" class="view-all">전체보기 ></a>
+          </div>
+          <div class="guide-list">
+            <div class="guide-card">
+              <div class="guide-image"
+                   style="background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA2MTVfMTAx%2FMDAxNjg2ODI5MTEzOTQ4.ChgTzCGcVfCtvQr62VXbn-TxvKY5_8oc8ghi1b22_o8g.oqGQIP7JuvKCp56NsYAnohUSijzo0O5KzDPRFU0PMBMg.JPEG.seoa3000%2FKakaoTalk_20230615_203440336_03.jpg&type=sc960_832');">
+              </div>
+              <p class="guide-name">루퐁이네</p>
+            </div>
+            <div class="guide-card">
+              <div class="guide-image"
+                   style="background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjEyMTZfNDkg%2FMDAxNjcxMTkxMzA5Njc2.fy_FqJfsJTuVXnNWXihHZMWZDAreJ3tqOthhXfVQkskg.mmvvubdzKcP-2NirYEMWexRpu0mffYVxw274AN1A4KQg.JPEG.kimym0410%2FScreenshot%25A3%25DF20221212%25A3%25AD233858%25A3%25DFInstagram.jpg&type=sc960_832');">
+              </div>
+            </div>
+            <div class="guide-card">
+              <div class="guide-image"
+                   style="background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjExMDlfMjM4%2FMDAxNjY3OTg4NjM4MzU3.ReMJjhHksLG18Kz8Pt2ejWaNR22GkABee6BcfvZofO0g.jSji9ns8ILWsG4BuF4HHzvvl_ZWUYmH3DQsXANWQnUog.JPEG.kimym0410%2FScreenshot%25A3%25DF20221109%25A3%25AD184608%25A3%25DFYouTube.jpg&type=sc960_832');">
+              </div>
+            </div>
+            <div class="guide-card">
+              <div class="guide-image"
+                   style="background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDAyMDdfMTYy%2FMDAxNzA3MzE2MjU0ODA2.24KNZr-xjTrT3e1XMEDrms6CvMpmMDNTb1galx3j3DMg.hqL7fBQCDC8nyqvsWuy-7Do1fkfA6licj05L0wDerNsg.JPEG.kimym0410%2FScreenshot%25A3%25DF20240207%25A3%25DF203641%25A3%25DFInstagram.jpg&type=sc960_832');">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 최근 본 코스 -->
+        <div class="section-card">
+          <div class="section-header">
+            <h3>최근 본 코스</h3>
+          </div>
+          <div class="card-list">
+            <div class="tour-card">
+              <div class="card-image"
+                   style="background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxOTExMjFfNDgg%2FMDAxNTc0MzM2MTI0NjYx.xWScUNzpLYIWtfZk8vZ7rm09Pz6i9uclZ0exG-r6fLMg.bvErsvLsy5NHLBxW4rPjgwLD-t0Qm77MYM-Eq1rbM5Ig.PNG.ehdream69%2F2019-11-11_21%253B52%253B41.PNG&type=sc960_832');">
+              </div>
+            </div>
+            <div class="tour-card">
+              <div class="card-image"
+                   style="background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMDEwMTRfMjg0%2FMDAxNjAyNjY4ODU0MDg3.h6H_9cw_IPPWISbXZbeL0g_y37L0cVnFDLgQdVKKpcUg.-q7kHtrcF_-RCO8hhggJZ0isWBlS4Ede9rLrxGW5cD4g.JPEG.thesoycandle%2F1602668993553.jpg&type=sc960_832');">
+              </div>
+            </div>
+            <div class="tour-card">
+              <div class="card-image"
+                   style="background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA1MTNfNDkg%2FMDAxNjgzOTc5NTgzMDM0.J7fMj1gQf53FA_-FA4PRSSRKrTmQCk4MMTVF9ns6Fiog.GWlqbzJtwNdwfyFeUdhymUx2MSZRVNVx0tGTVC4jAI0g.JPEG.kimym0410%2FScreenshot%25A3%25DF20230513%25A3%25DF190952%25A3%25DFYouTube.jpg&type=sc960_832');">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 공지 -->
+        <div class="notice-bar">
+          <span class="notice-label">공지</span>
+          <span class="notice-text"><a href="#">&lt;하나LIVE&gt;25년 6월 1일 방송 - 동유럽 구매 인증 이벤트 당첨자 안내</a></span>
+          <a href="#" class="more-link">+ 더보기</a>
+        </div>
+
+      </section>
+    </main>
+  </div>
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>

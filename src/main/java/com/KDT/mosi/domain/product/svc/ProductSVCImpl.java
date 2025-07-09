@@ -1,73 +1,73 @@
 package com.KDT.mosi.domain.product.svc;
 
 import com.KDT.mosi.domain.entity.Product;
+import com.KDT.mosi.domain.member.dao.MemberDAO;
 import com.KDT.mosi.domain.product.dao.ProductDAO;
-import com.KDT.mosi.domain.product.svc.ProductSVC;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @Transactional
 public class ProductSVCImpl implements ProductSVC {
 
   private final ProductDAO productDAO;
+  private final MemberDAO memberDAO;
 
-  @Override
-  public Product save(Product product) {
-    log.info("Saving product: {}", product);
-    return productDAO.save(product);
+  public ProductSVCImpl(ProductDAO productDAO, MemberDAO memberDAO) {
+    this.productDAO = productDAO;
+    this.memberDAO = memberDAO;
   }
 
   @Override
-  public List<Product> findAll(int pageNo, int numOfRows) {
-    log.info("Fetching product list: pageNo={}, numOfRows={}", pageNo, numOfRows);
-    return productDAO.findAll(pageNo, numOfRows);
+  public Product registerProduct(Product product) {
+    Long memberId = extractMemberId(product);
+    validateMemberId(memberId);
+    return productDAO.insert(product);
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public Optional<Product> findById(Long id) {
-    log.info("Fetching product by ID (before pay): {}", id);
-    return productDAO.findById(id);
+  public Product updateProduct(Product product) {
+    Long memberId = extractMemberId(product);
+    validateMemberId(memberId);
+    // 기존 상품 존재 여부 체크 추가 가능
+    return productDAO.update(product);
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public Optional<Product> findByIdAfterPay(Long id) {
-    log.info("Fetching product by ID (after pay): {}", id);
-    return productDAO.findByIdAfterPay(id);
+  public void removeProduct(Long productId) {
+    productDAO.delete(productId);
   }
 
   @Override
-  public Product updateById(Long productId, Product product) {
-    log.info("Updating product with ID {}: {}", productId, product);
-    return productDAO.updateById(productId, product);
+  public Optional<Product> getProduct(Long productId) {
+    return productDAO.findById(productId);
   }
 
   @Override
-  public void deleteById(Long id) {
-    log.info("Deleting product by id: {}", id);
-    productDAO.deleteById(id);
+  public List<Product> getProductsByPage(int pageNumber, int pageSize) {
+    return productDAO.findAllByPage(pageNumber, pageSize);
   }
 
   @Override
-  public void deleteByIds(List<Long> ids) {
-    log.info("Deleting products by ids: {}", ids);
-    productDAO.deleteByIds(ids);
+  public long countAllProducts() {
+    return productDAO.countAll();
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public long getTotalCount() {
-    log.info("Getting total count of products.");
-    return productDAO.getTotalCount();
+  // Member 객체에서 ID 안전하게 추출
+  private Long extractMemberId(Product product) {
+    if (product == null || product.getMember() == null) {
+      return null;
+    }
+    return product.getMember().getMemberId();
+  }
+
+  // memberId 유효성 검사
+  private void validateMemberId(Long memberId) {
+    if (memberId == null || !memberDAO.isExistMemberId(memberId)) {
+      throw new IllegalArgumentException("존재하지 않는 회원 ID입니다: " + memberId);
+    }
   }
 }

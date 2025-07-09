@@ -1,21 +1,22 @@
 package com.KDT.mosi.domain.product.svc;
 
 import com.KDT.mosi.domain.entity.ProductCoursePoint;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
+@Service
 public interface ProductCoursePointSVC {
 
-  ProductCoursePoint save(ProductCoursePoint coursePoint);
+  void saveAll(List<ProductCoursePoint> points);
 
-  List<ProductCoursePoint> getCoursePointsByProductId(Long productId);
-
-  Optional<ProductCoursePoint> getCoursePointById(Long coursePointId);
-
-  ProductCoursePoint update(ProductCoursePoint coursePoint);
-
-  void deleteById(Long coursePointId);
+  List<ProductCoursePoint> findByProductId(Long productId);  // 추가
 
   void deleteByProductId(Long productId);
+
+  List<ProductCoursePoint> getPointsByProductId(Long productId);
+
+  boolean addCoursePoint(ProductCoursePoint point);
+
+  boolean deleteCoursePoint(Long coursePointId);
 }

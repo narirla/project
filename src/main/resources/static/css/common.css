@@ -1,0 +1,122 @@
+/*common.css*/
+/* ======================== */
+/*           basic          */
+/* ======================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Pretendard', sans-serif;
+  overflow-x: hidden;       /* ✅ 수평 스크롤 제거 */
+  height: 100%;
+}
+
+/* ======================== */
+/* ✅ 바디 레이아웃 구조 (footer 하단 고정 등) */
+/* ======================== */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;        /* 전체 높이 설정 */
+}
+
+/* ======================== */
+/* ✅ 공통 페이지 컨테이너 (본문 중앙 정렬) */
+/* ======================== */
+.page-container {
+  flex: 1;                  /* 남은 공간 채움 */
+  width: 1200px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding-top: 200px;       /* header 높이 고려 */
+}
+
+/* ======================== */
+/* ✅ HTML 요소 기본 스타일 초기화 */
+/* ======================== */
+button {
+  background: none;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+  outline: inherit;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* ======================== */
+/* ✅ 카테고리 메뉴 (작성 예정 시 공간 확보) */
+/* ======================== */
+/* (필요 시 별도 정의) */
+
+/* ======================== */
+/* ✅ 메인 영역 전용 스타일 (홈페이지 등) */
+/* ======================== */
+/* (필요 시 별도 정의) */
+
+/* ======================== */
+/* ✅ 공통 버튼 스타일 */
+/* ======================== */
+
+/* 전체 버튼 기본값 */
+.btn,
+.btn-small {
+  background: #0099AD;
+  color: #EBFCFF;
+  font-size: 0.875em;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  height: 40px;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+/* 일반 버튼 */
+.btn {
+  padding: 0 16px;
+}
+
+/* 작은 버튼 (중복확인, 주소검색 등) */
+.btn-small {
+  padding: 0 8px;
+}
+
+/* 공통 hover 효과 */
+.btn:hover,
+.btn-small:hover {
+  background: #007C90;
+  color: #fff;
+}
+
+/* Bootstrap outline-secondary 대체 스타일 */
+.btn-outline-secondary {
+  background-color: transparent !important;
+  color: #0099AD !important;
+  border: 1px solid #0099AD !important;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #0099AD !important;
+  color: #fff !important;
+}
