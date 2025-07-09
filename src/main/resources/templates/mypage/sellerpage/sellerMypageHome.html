@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MO:SI 판매자 마이페이지</title>
+  <title>MO:SI 판매자 마이페이지 홈</title>
   <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/sellerpage/sellerMypageHome.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -39,7 +39,7 @@
               <li><a href="#">상품</a>
                 <ul>
                   <li><a href="#">내 상품 목록</a></li>
-                  <li><a href="#">상품 등록</a></li>
+                  <li><a th:href="@{/product/upload}">상품 등록</a></li>
                 </ul>
               </li>
               <li><a href="#">판매 현황</a>
@@ -58,14 +58,14 @@
               <li><a href="#">알림 / 공지</a>
                 <ul>
                   <li><a href="#">공지사항</a></li>
-                  <li><a href="#">쿠폰오퍼</a></li>
+                  <li><a href="#">프로모션</a></li>
                 </ul>
               </li>
               <li><a href="#">내 정보</a>
                 <ul>
                   <li><a th:href="@{/mypage/seller/view}">프로필</a></li>
                   <li><a href="#">정산 정보 관리</a></li>
-                  <li><a href="#">주소지 관리</a></li>
+                  <li><a href="#">구독자 관리</a></li>
                 </ul>
               </li>
               <li><a href="#">고객센터</a>
@@ -87,17 +87,17 @@
           <div class="info-grid">
             <div class="info-item info-main">
               <span class="title">누적 매출액</span>
-              <span class="value" th:text="|${sellerPage.totalSales} 원|">980,000 원</span>
+              <span class="value" th:text="|${sellerPage.totalSales} 원|"> 980,000 원</span>
             </div>
             <div class="info-item info-main">
               <span class="title">팔로워</span>
-              <span class="value" th:text="|${sellerPage.followerCount}명|">250명</span>
+              <span class="value" th:text="|${sellerPage.followerCount}명|"> 250명</span>
             </div>
           </div>
           <div class="info-grid-bottom">
-            <div class="info-item"><span class="title">신규 주문</span><span class="value" th:text="${#lists.size(orders)}">9</span></div>
-            <div class="info-item"><span class="title">신규 문의글</span><span class="value" th:text="${sellerPage.recentQnaCnt}">2</span></div>
-            <div class="info-item"><span class="title">상품 리뷰</span><span class="value" th:text="${sellerPage.reviewCount}">25</span></div>
+            <div class="info-item"><span class="title">신규 주문</span><span class="value" th:text="${#lists.size(orders)}"> 9</span></div>
+            <div class="info-item"><span class="title">신규 문의글</span><span class="value" th:text="${sellerPage.recentQnaCnt}"> 2</span></div>
+            <div class="info-item"><span class="title">상품 리뷰</span><span class="value" th:text="${sellerPage.reviewCount}"> 25</span></div>
           </div>
         </div>
 
@@ -154,10 +154,11 @@
           </div>
         </div>
 
-        <div class="notice-bar">
-          <span class="notice-label">공지</span>
-          <span class="notice-text"><a href="#">하나LIVE 방송 - 이벤트 당첨자 안내</a></span>
-          <a href="#" class="more-link">+ 더보기</a>
+        <!-- 공지 -->
+        <div class="notice-box">
+          <b>공지</b>
+          <span class="text">< MO:SI > MO:SI 신규 코스 등록 이벤트 당첨자 안내</span>
+          <a href="#" class="notice-more">+ 더보기</a>
         </div>
       </section>
     </main>

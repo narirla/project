@@ -67,6 +67,7 @@ CREATE TABLE member (
 ALTER TABLE member ADD CONSTRAINT member_member_id_pk PRIMARY KEY (member_id);
 ALTER TABLE member ADD CONSTRAINT member_email_uk UNIQUE(email);
 ALTER TABLE member ADD CONSTRAINT member_gender_ck CHECK (gender IN ('남자','여자'));
+ALTER TABLE member ADD CONSTRAINT member_nickname_uk UNIQUE(nickname);
 
 -- 시퀀스 생성
 CREATE SEQUENCE member_member_id_seq;
