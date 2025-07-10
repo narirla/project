@@ -31,6 +31,7 @@ public class SellerPageDAOImpl implements SellerPageDAO {
       SellerPage sellerpage = new SellerPage();
       sellerpage.setPageId(rs.getLong("page_id"));
       sellerpage.setMemberId(rs.getLong("member_id"));
+      sellerpage.setNickname(rs.getString("nickname"));
       sellerpage.setImage(rs.getBytes("image"));
       sellerpage.setIntro(rs.getString("intro"));
       sellerpage.setSalesCount(rs.getInt("sales_count"));
@@ -55,8 +56,8 @@ public class SellerPageDAOImpl implements SellerPageDAO {
   public Long save(SellerPage sellerpage) {
     StringBuffer sql = new StringBuffer();
     sql.append("INSERT INTO SELLER_PAGE ");
-    sql.append("(PAGE_ID, MEMBER_ID, IMAGE, INTRO, SALES_COUNT, REVIEW_AVG, CREATE_DATE, UPDATE_DATE) ");
-    sql.append("VALUES (SELLER_PAGE_SEQ.NEXTVAL, :memberId, :image, :intro, :salesCount, :reviewAvg, systimestamp, systimestamp) ");
+    sql.append("(PAGE_ID, MEMBER_ID, IMAGE, INTRO, NICKNAME, SALES_COUNT, REVIEW_AVG, CREATE_DATE, UPDATE_DATE) ");
+    sql.append("VALUES (SELLER_PAGE_SEQ.NEXTVAL, :memberId, :image, :intro, :nickname, :salesCount, :reviewAvg, systimestamp, systimestamp) ");
 
     SqlParameterSource param = new BeanPropertySqlParameterSource(sellerpage);
     KeyHolder keyHolder = new GeneratedKeyHolder();

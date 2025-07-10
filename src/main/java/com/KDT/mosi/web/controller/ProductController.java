@@ -4,6 +4,7 @@ import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.entity.ProductCoursePoint;
 import com.KDT.mosi.domain.entity.ProductImage;
+import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
 import com.KDT.mosi.domain.product.svc.ProductImageSVC;
 import com.KDT.mosi.domain.product.svc.ProductSVC;
@@ -11,6 +12,7 @@ import com.KDT.mosi.web.form.product.ProductCoursePointForm;
 import com.KDT.mosi.web.form.product.ProductUploadForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -23,6 +25,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/product")
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class ProductController {
     private final ProductSVC productSVC;
     private final ProductImageSVC productImageSVC;
     private final ProductCoursePointSVC productCoursePointSVC;
+    private final SellerPageSVC sellerPageSVC;
 
     @GetMapping("/list")
     public String list(Model model,
@@ -46,13 +50,17 @@ public class ProductController {
     public String uploadForm(Model model, HttpSession session, RedirectAttributes redirectAttrs) {
 
         Member loginMember = (Member) session.getAttribute("loginMember");
+
         if (loginMember == null) {
             redirectAttrs.addFlashAttribute("redirectAfterLogin", "/product/upload");
             return "redirect:/login";
         }
+        System.out.println(loginMember.getNickname());
+
+        model.addAttribute("nickname", loginMember.getNickname());
 
         model.addAttribute("productUploadForm", new ProductUploadForm());
-        return "product/enroll(without_map)";
+        return "product/product_enroll";
     }
 
     @PostMapping("/upload")
@@ -63,8 +71,14 @@ public class ProductController {
             return "redirect:/login";
         }
 
+
+
+
         // 로그인한 회원 ID를 form에 세팅
         form.setMemberId(loginMember.getMemberId());
+        form.setNickname(loginMember.getNickname());
+
+
 
         if (form.getProductImages() != null && form.getProductImages().size() > 10) {
             model.addAttribute("errorMessage", "이미지는 최대 10장까지 업로드 가능합니다.");

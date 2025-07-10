@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class ProductUploadForm {
     private Long memberId;
+    private String nickname;
 
     private String category;
     private String title;
