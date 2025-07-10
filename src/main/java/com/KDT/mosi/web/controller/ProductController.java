@@ -1,5 +1,6 @@
 package com.KDT.mosi.web.controller;
 
+
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.entity.ProductCoursePoint;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -58,7 +60,6 @@ public class ProductController {
         System.out.println(loginMember.getNickname());
 
         model.addAttribute("nickname", loginMember.getNickname());
-
         model.addAttribute("productUploadForm", new ProductUploadForm());
         return "product/product_enroll";
     }
@@ -150,6 +151,7 @@ public class ProductController {
 
         ProductUploadForm form = toForm(product);
 
+        model.addAttribute("nickname", loginMember.getNickname());
         model.addAttribute("product", form);
         model.addAttribute("images", images);
         model.addAttribute("coursePoints", coursePoints);
@@ -212,17 +214,33 @@ public class ProductController {
     }
 
     @GetMapping("/view/{id}")
-    public String view(@PathVariable Long id, Model model) {
+    public String view(@PathVariable("id") Long id, Model model, HttpSession session) {
         Product product = productSVC.getProduct(id)
             .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
         List<ProductImage> images = productImageSVC.findByProductId(id);
         List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
+        Member loginMember = (Member) session.getAttribute("loginMember");
+        Long memberId = loginMember.getMemberId();
+        Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
+        if (optional.isEmpty()) {
+            return "redirect:/mypage/seller/create";
+        }
+        SellerPage sellerPage = optional.get();
+        product.setProductImages(images);
+        log.info("sellerId= {}", sellerPage.getMemberId());
+        log.info("loginSeller = {}", sellerPage.getIntro());
+        log.info("nickname = {}", sellerPage.getNickname());
+        log.info("id = {}", memberId);
 
+        model.addAttribute("nickname", sellerPage.getNickname());
+        model.addAttribute("intro", sellerPage.getIntro());
+        model.addAttribute("sellerImage", sellerPage.getImage());
+        model.addAttribute("countProduct", productSVC.countByMemberId(memberId));
         model.addAttribute("product", product);
         model.addAttribute("images", images);
         model.addAttribute("coursePoints", coursePoints);
 
-        return "product/product_detail";
+        return "product/productDetails";
     }
 
     // DTO -> Entity 변환 메서드

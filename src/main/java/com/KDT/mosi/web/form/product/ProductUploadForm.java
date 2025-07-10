@@ -13,6 +13,7 @@ public class ProductUploadForm {
     private String category;
     private String title;
     private String guideYn;
+
     private Integer normalPrice;
     private Integer guidePrice;
     private Integer salesPrice;
@@ -20,6 +21,7 @@ public class ProductUploadForm {
     private Integer totalDay;
     private Integer totalTime;
     private Integer reqMoney;
+
     private String sleepInfo;
     private String transportInfo;
     private String foodInfo;
@@ -28,7 +30,6 @@ public class ProductUploadForm {
     private String stucks;
     private String description;
     private String detail;
-
     private String priceDetail;
     private String gpriceDetail;
     private String status;

@@ -70,4 +70,6 @@ public class ProductSVCImpl implements ProductSVC {
       throw new IllegalArgumentException("존재하지 않는 회원 ID입니다: " + memberId);
     }
   }
+
+  public long countByMemberId(Long memberId){ return productDAO.countByMemberId(memberId); }
 }

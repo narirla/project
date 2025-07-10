@@ -10,6 +10,10 @@ public class ProductDetailForm {
   private Long productId;
   private Long memberId;
 
+  private String nickname;
+  private String intro;
+  private byte[] sellerImage;
+
   private String category;
   private String title;
   private String guideYn;
