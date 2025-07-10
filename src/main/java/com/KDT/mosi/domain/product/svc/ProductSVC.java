@@ -25,4 +25,7 @@ public interface ProductSVC {
 
   // 전체 상품 수 조회
   long countAllProducts();
+
+  // 판매자별 상품 수 조회
+  long countByMemberId(Long memberId);
 }

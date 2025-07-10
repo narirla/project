@@ -1,5 +1,6 @@
 package com.KDT.mosi.web.form.mypage.sellerpage;
 
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -17,6 +18,9 @@ public class SellerPageDetailForm {
 
   // 자기소개
   private String intro;
+
+  // 별명
+  private String nickname;
 
   // 판매 상품명 (최근 판매 상품 등)
   private String recentProduct;
