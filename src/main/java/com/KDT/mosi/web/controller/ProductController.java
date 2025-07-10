@@ -1,10 +1,7 @@
 package com.KDT.mosi.web.controller;
 
 
-import com.KDT.mosi.domain.entity.Member;
-import com.KDT.mosi.domain.entity.Product;
-import com.KDT.mosi.domain.entity.ProductCoursePoint;
-import com.KDT.mosi.domain.entity.ProductImage;
+import com.KDT.mosi.domain.entity.*;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
 import com.KDT.mosi.domain.product.svc.ProductImageSVC;

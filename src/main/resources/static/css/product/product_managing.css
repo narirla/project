@@ -142,7 +142,8 @@ input[type='radio']:checked {
     height: 300px;
 }
 
-.form-group.img div .image-upload-single{
+.form-group.img div .image-upload-single,
+.form-group.img div .image-upload-single label{
     border: 1px dashed #D9D9D9;
     border-radius: 5px; 
     padding: 20px; 
