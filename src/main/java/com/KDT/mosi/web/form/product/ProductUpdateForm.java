@@ -16,6 +16,9 @@ public class ProductUpdateForm {
   @NotNull
   private Long memberId;
 
+  @NotNull
+  private String nickname;
+
   @Size(max = 30)
   private String category;
 

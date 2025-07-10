@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class ProductImageDAOImpl implements ProductImageDAO {
@@ -81,5 +82,15 @@ public class ProductImageDAOImpl implements ProductImageDAO {
     Map<String, Object> params = new HashMap<>();
     params.put("productId", productId);
     return jdbcTemplate.update(sql, params);
+  }
+
+  @Override
+  public Optional<ProductImage> findById(Long imageId) {
+    String sql = "SELECT * FROM PRODUCT_IMAGE WHERE IMAGE_ID = :imageId";
+    Map<String, Object> params = new HashMap<>();
+    params.put("imageId", imageId);
+
+    List<ProductImage> results = jdbcTemplate.query(sql, params, rowMapper);
+    return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
   }
 }

@@ -27,4 +27,6 @@ public interface ProductDAO {
   public interface MemberDAO {
     boolean existsById(Long memberId);
   }
+  // 판매자별 상품 등록 갯수 확인
+  long countByMemberId(Long memberId);
 }

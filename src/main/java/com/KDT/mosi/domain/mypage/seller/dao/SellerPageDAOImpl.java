@@ -34,6 +34,7 @@ public class SellerPageDAOImpl implements SellerPageDAO {
       sellerpage.setNickname(rs.getString("nickname"));
       sellerpage.setImage(rs.getBytes("image"));
       sellerpage.setIntro(rs.getString("intro"));
+      sellerpage.setNickname(rs.getString("nickname"));
       sellerpage.setSalesCount(rs.getInt("sales_count"));
       sellerpage.setReviewAvg(rs.getDouble("review_avg"));
 
@@ -123,6 +124,7 @@ public class SellerPageDAOImpl implements SellerPageDAO {
     sql.append("UPDATE SELLER_PAGE ");
     sql.append("SET IMAGE = :image, ");
     sql.append("    INTRO = :intro, ");
+    sql.append("    NICKNAME = :nickname, ");
     sql.append("    SALES_COUNT = :salesCount, ");
     sql.append("    REVIEW_AVG = :reviewAvg, ");
     sql.append("    UPDATE_DATE = systimestamp ");
@@ -131,6 +133,7 @@ public class SellerPageDAOImpl implements SellerPageDAO {
     SqlParameterSource param = new MapSqlParameterSource()
         .addValue("image", sellerpage.getImage())
         .addValue("intro", sellerpage.getIntro())
+        .addValue("nickname", sellerpage.getNickname())
         .addValue("salesCount", sellerpage.getSalesCount())
         .addValue("reviewAvg", sellerpage.getReviewAvg())
         .addValue("pageId", pageId);

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,5 +47,10 @@ public class ProductImageSVCImpl implements ProductImageSVC {
   @Override
   public boolean deleteProductImage(Long imageId) {
     return productImageDAO.delete(imageId) > 0;
+  }
+
+  @Override
+  public Optional<ProductImage> findById(Long imageId) {
+    return productImageDAO.findById(imageId);
   }
 }
