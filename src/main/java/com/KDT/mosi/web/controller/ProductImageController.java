@@ -4,6 +4,9 @@ import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.entity.ProductImage;
 import com.KDT.mosi.domain.product.svc.ProductImageSVC;
 import com.KDT.mosi.domain.product.svc.ProductSVC;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,5 +43,17 @@ public class ProductImageController {
     boolean success = productImageSVC.deleteProductImage(imageId);
     if (success) return ResponseEntity.ok("이미지 삭제 성공");
     else return ResponseEntity.status(500).body("이미지 삭제 실패");
+  }
+
+  @GetMapping("/{imageId}/data")
+  public ResponseEntity<byte[]> getImageData(@PathVariable Long imageId) {
+    return productImageSVC.findById(imageId)
+        .map(img -> {
+          HttpHeaders headers = new HttpHeaders();
+          headers.setContentType(MediaType.parseMediaType(img.getMimeType()));
+          headers.setContentLength(img.getFileSize());
+          return new ResponseEntity<>(img.getImageData(), headers, HttpStatus.OK);
+        })
+        .orElse(ResponseEntity.notFound().build());
   }
 }

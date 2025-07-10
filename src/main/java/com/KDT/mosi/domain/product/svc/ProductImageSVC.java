@@ -4,6 +4,7 @@ import com.KDT.mosi.domain.entity.ProductImage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public interface ProductImageSVC {
@@ -17,4 +18,6 @@ public interface ProductImageSVC {
   List<ProductImage> getImagesByProductId(Long productId);
   boolean addProductImage(ProductImage productImage);
   boolean deleteProductImage(Long imageId);
+
+  Optional<ProductImage> findById(Long imageId);
 }

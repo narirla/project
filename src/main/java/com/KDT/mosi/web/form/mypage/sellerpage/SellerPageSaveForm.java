@@ -19,6 +19,10 @@ public class SellerPageSaveForm {
   @Size(max = 500, message = "자기소개는 500자 이내로 입력해주세요.")
   private String intro;
 
+  // 별명
+  @Size(max = 10)
+  private String nickname;
+
   // 최근 판매 상품명 (선택 사항, 최대 100자)
   @Size(max = 100, message = "최근 판매 상품명은 100자 이내로 입력해주세요.")
   private String recentProduct;

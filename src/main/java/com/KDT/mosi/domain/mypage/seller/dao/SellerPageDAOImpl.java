@@ -33,6 +33,7 @@ public class SellerPageDAOImpl implements SellerPageDAO {
       sellerpage.setMemberId(rs.getLong("member_id"));
       sellerpage.setImage(rs.getBytes("image"));
       sellerpage.setIntro(rs.getString("intro"));
+      sellerpage.setNickname(rs.getString("nickname"));
       sellerpage.setSalesCount(rs.getInt("sales_count"));
       sellerpage.setReviewAvg(rs.getDouble("review_avg"));
 
@@ -55,8 +56,8 @@ public class SellerPageDAOImpl implements SellerPageDAO {
   public Long save(SellerPage sellerpage) {
     StringBuffer sql = new StringBuffer();
     sql.append("INSERT INTO SELLER_PAGE ");
-    sql.append("(PAGE_ID, MEMBER_ID, IMAGE, INTRO, SALES_COUNT, REVIEW_AVG, CREATE_DATE, UPDATE_DATE) ");
-    sql.append("VALUES (SELLER_PAGE_SEQ.NEXTVAL, :memberId, :image, :intro, :salesCount, :reviewAvg, systimestamp, systimestamp) ");
+    sql.append("(PAGE_ID, MEMBER_ID, IMAGE, INTRO, NICKNAME, SALES_COUNT, REVIEW_AVG, CREATE_DATE, UPDATE_DATE) ");
+    sql.append("VALUES (SELLER_PAGE_SEQ.NEXTVAL, :memberId, :image, :intro, :nickname, :salesCount, :reviewAvg, systimestamp, systimestamp) ");
 
     SqlParameterSource param = new BeanPropertySqlParameterSource(sellerpage);
     KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -122,6 +123,7 @@ public class SellerPageDAOImpl implements SellerPageDAO {
     sql.append("UPDATE SELLER_PAGE ");
     sql.append("SET IMAGE = :image, ");
     sql.append("    INTRO = :intro, ");
+    sql.append("    NICKNAME = :nickname, ");
     sql.append("    SALES_COUNT = :salesCount, ");
     sql.append("    REVIEW_AVG = :reviewAvg, ");
     sql.append("    UPDATE_DATE = systimestamp ");
@@ -130,6 +132,7 @@ public class SellerPageDAOImpl implements SellerPageDAO {
     SqlParameterSource param = new MapSqlParameterSource()
         .addValue("image", sellerpage.getImage())
         .addValue("intro", sellerpage.getIntro())
+        .addValue("nickname", sellerpage.getNickname())
         .addValue("salesCount", sellerpage.getSalesCount())
         .addValue("reviewAvg", sellerpage.getReviewAvg())
         .addValue("pageId", pageId);

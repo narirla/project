@@ -230,4 +230,15 @@ public class ProductDAOImpl implements ProductDAO {
 
     return jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
   }
+  // 특정 판매자의 판매등록 글 갯수
+  @Override
+  public long countByMemberId(Long memberId) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT COUNT(*) FROM product  ");
+    sql.append(" WHERE member_id = :memberId");
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("memberId", memberId);
+
+    return jdbcTemplate.queryForObject(sql.toString(), paramMap, Long.class);
+  }
 }

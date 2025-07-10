@@ -1,0 +1,146 @@
+ul, ol {
+    list-style: none;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.product-detail-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+/* --------------------- */
+/* ----- 상품 타이틀 ---- */
+/* --------------------- */
+.product-header-container{
+    background-color: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-header{
+    display: flex;
+    background-color: lightgray;
+    width: 1200px;
+}
+
+.product-header-left{
+    width: 70%;
+    background-color: aliceblue;
+}
+
+.product-seller{
+    display: flex;
+    background-color: lightseagreen;
+}
+
+.product-seller .seller-info{
+    background-color: antiquewhite;
+}
+
+
+/* --------------------- */
+/* ------ 상품 바디 ----- */
+/* --------------------- */
+.product-body {
+    display: flex;
+    width: 1200px;
+}
+/* ------ 왼쪽 (이미지, 리뷰, 상품탭 등) ----- */
+.product-body-left{
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+}
+
+/* ------ 이미지 슬라이드 ----- */
+.slider-container {
+width: 600px;
+position: relative;
+margin: 20px auto;
+}
+
+.slider-wrapper {
+overflow: hidden;
+width: 100%;
+height: 400px;
+position: relative;
+}
+
+.slide {
+display: none;
+position: absolute;
+width: 100%;
+height: 100%;
+}
+
+.slide.active {
+display: block;
+position: relative;
+}
+
+.slide img {
+width: 100%;
+height: 100%;
+object-fit: contain;
+}
+
+#prevBtn, #nextBtn {
+position: absolute;
+top: 50%;
+transform: translateY(-50%);
+background-color: rgba(0,0,0,0.5);
+border: none;
+color: white;
+font-size: 24px;
+padding: 10px;
+cursor: pointer;
+user-select: none;
+}
+
+#prevBtn {
+left: 5px;
+}
+
+#nextBtn {
+right: 5px;
+}
+
+/* ------ 최근 리뷰 ----- */
+.product-recent-reviews{
+    background-color: lightpink;
+}
+
+/* ------ 기본 정보 ----- */
+.product-basic-info{
+    background-color: lightblue;
+}
+
+
+
+
+
+
+/* ------ 오른쪽 (구매박스) ----- */
+
+
+
