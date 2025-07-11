@@ -1,7 +1,7 @@
 package com.KDT.mosi.web.controller.board;
 
 import com.KDT.mosi.domain.board.bbs.svc.BbsSVC;
-import com.KDT.mosi.web.form.login.LoginMember;
+import com.KDT.mosi.domain.entity.Member;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -36,7 +36,7 @@ public class CsrBbsController {
   public String bbsAdd(
       HttpSession session
       ,Model model) {
-    LoginMember loginMember = (LoginMember) session.getAttribute("loginMember");
+    Member loginMember = (Member) session.getAttribute("loginMember");
     model.addAttribute("user", loginMember);
     return "postBoards/write_quill";
   }
