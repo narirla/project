@@ -9,7 +9,6 @@ import com.KDT.mosi.web.api.ApiResponse;
 import com.KDT.mosi.web.api.ApiResponseCode;
 import com.KDT.mosi.web.form.board.bbs.SaveApi;
 import com.KDT.mosi.web.form.board.bbs.UpdateApi;
-import com.KDT.mosi.web.form.login.LoginMember;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
