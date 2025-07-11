@@ -37,9 +37,7 @@ public class ApiBbsController {
       @RequestBody @Valid SaveApi saveApi,
       HttpSession session
   ) {
-    log.info("saveApi={}", saveApi);
-
-    Long memberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long memberId = (Long) session.getAttribute("loginMemberId");
     saveApi.setMemberId(memberId);
     Bbs bbs = new Bbs();
     BeanUtils.copyProperties(saveApi, bbs);
@@ -62,7 +60,7 @@ public class ApiBbsController {
       @RequestParam(name = "pbbsId", required = false) Long pbbsId,
       HttpSession session
   ) {
-    Long memberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long memberId = (Long) session.getAttribute("loginMemberId");
     boolean exists = bbsSVC.findTemporaryStorageById(memberId, pbbsId).isPresent();
     return ResponseEntity.ok(ApiResponse.of(ApiResponseCode.SUCCESS, exists));
   }
@@ -76,7 +74,7 @@ public class ApiBbsController {
       @RequestParam(name = "pbbsId", required = false) Long pbbsId,
       HttpSession session
   ) {
-    Long memberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long memberId = (Long) session.getAttribute("loginMemberId");
     Optional<Bbs> tempOpt = bbsSVC.findTemporaryStorageById(memberId, pbbsId);
     Bbs temp = tempOpt.get();
 
@@ -96,7 +94,7 @@ public class ApiBbsController {
       @RequestParam(name = "pbbsId", required = false) Long pbbsId,
       HttpSession session
   ) {
-    Long memberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long memberId = (Long) session.getAttribute("loginMemberId");
     bbsSVC.deleteTemporaryStorage(memberId, pbbsId);
     return ResponseEntity.ok(ApiResponse.of(ApiResponseCode.SUCCESS, null));
   }
@@ -144,7 +142,7 @@ public class ApiBbsController {
     );  // 찾고자하는 게시글이 없으면 NoSuchElementException 예외발생
 
     // 2) 로그인 정보 꺼내기
-    Long loginMemberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long loginMemberId = (Long) session.getAttribute("loginMemberId");
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
@@ -189,7 +187,7 @@ public class ApiBbsController {
     );  // 찾고자하는 게시글이 없으면 NoSuchElementException 예외발생
 
     // 2) 로그인 정보 꺼내기
-    Long loginMemberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long loginMemberId = (Long) session.getAttribute("loginMemberId");
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
