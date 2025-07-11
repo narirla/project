@@ -1,11 +1,11 @@
 package com.KDT.mosi.web.controller.board;
 
 import com.KDT.mosi.domain.board.rbbsReport.svc.RBbsReportSVC;
+import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.board.RbbsReport;
 import com.KDT.mosi.web.api.ApiResponse;
 import com.KDT.mosi.web.api.ApiResponseCode;
 import com.KDT.mosi.web.form.board.rbbsReport.RBbsReport;
-import com.KDT.mosi.web.form.login.LoginMember;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class ApiRBbsReportController {
       @RequestBody RBbsReport reportForm,
       HttpSession session
   ) {
-    LoginMember loginMember = (LoginMember) session.getAttribute("loginMember");
+    Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
     }

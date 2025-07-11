@@ -294,7 +294,7 @@ CREATE TABLE bbs_upload (
   file_path   VARCHAR2(2000)   NOT NULL,
   original_name VARCHAR2(255),
   saved_name    VARCHAR2(255),
-  uploaded_at TIMESTAMP        DEFAULT SYSTIMESTAMP,
+  uploaded_at TIMESTAMP        DEFAULT SYSTIMESTAMP
 );
 
 ALTER TABLE bbs_upload

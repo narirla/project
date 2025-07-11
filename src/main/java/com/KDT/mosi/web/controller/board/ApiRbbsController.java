@@ -1,12 +1,12 @@
 package com.KDT.mosi.web.controller.board;
 
 import com.KDT.mosi.domain.board.rbbs.svc.RbbsSVC;
+import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.board.Rbbs;
 import com.KDT.mosi.web.api.ApiResponse;
 import com.KDT.mosi.web.api.ApiResponseCode;
 import com.KDT.mosi.web.form.board.rbbs.SaveApi;
 import com.KDT.mosi.web.form.board.rbbs.UpdateApi;
-import com.KDT.mosi.web.form.login.LoginMember;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,15 +35,15 @@ public class ApiRbbsController {
       HttpSession session
   ) {
     // 로그인 체크
-    LoginMember login = (LoginMember) session.getAttribute("loginMember");
-    if (login == null) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
     }
 
     Rbbs rbbs = new Rbbs();
     BeanUtils.copyProperties(form, rbbs);
     rbbs.setBbsId(bbsId);
-    rbbs.setMemberId(login.getMemberId());
+    rbbs.setMemberId(loginMember.getMemberId());
 
     Long id = rbbsSVC.save(rbbs);
     Rbbs saved = rbbsSVC.findById(id).orElseThrow();
@@ -109,11 +109,11 @@ public class ApiRbbsController {
         .orElseThrow(() -> new NoSuchElementException("댓글을 찾을 수 없습니다. id=" + id));
 
     // 2) 로그인 & 작성자 확인
-    LoginMember login = (LoginMember) session.getAttribute("loginMember");
-    if (login == null) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
     }
-    if (!orig.getMemberId().equals(login.getMemberId())) {
+    if (!orig.getMemberId().equals(loginMember.getMemberId())) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "작성자만 수정할 수 있습니다.");
     }
 
@@ -141,11 +141,11 @@ public class ApiRbbsController {
         .orElseThrow(() -> new NoSuchElementException("댓글을 찾을 수 없습니다. id=" + id));
 
     // 2) 로그인 & 작성자 확인
-    LoginMember login = (LoginMember) session.getAttribute("loginMember");
-    if (login == null) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
     }
-    if (!orig.getMemberId().equals(login.getMemberId())) {
+    if (!orig.getMemberId().equals(loginMember.getMemberId())) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "작성자만 삭제할 수 있습니다.");
     }
 
