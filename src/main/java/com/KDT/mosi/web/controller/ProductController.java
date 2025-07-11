@@ -37,12 +37,29 @@ public class ProductController {
 
     @GetMapping("/list")
     public String list(Model model,
+                       HttpSession session,
                        @RequestParam(name = "page", defaultValue = "1") int page,
                        @RequestParam(name = "size", defaultValue = "12") int size) {
-        List<Product> products = productSVC.getProductsByPage(page, size);
-        model.addAttribute("products", products);
-        model.addAttribute("currentPage", page);
-        return "product/product_list";
+
+        Member loginMember = (Member) session.getAttribute("loginMember");
+
+        if (loginMember != null) {
+            Optional<SellerPage> optionalSellerPage = sellerPageSVC.findByMemberId(loginMember.getMemberId());
+
+            if (optionalSellerPage.isPresent()) {
+                model.addAttribute("sellerPage", optionalSellerPage.get());
+            } else {
+                model.addAttribute("sellerPage", null);
+            }
+
+            List<Product> products = productSVC.getProductsByPage(page, size);
+            model.addAttribute("productList", products);
+            model.addAttribute("currentPage", page);
+
+            return "product/product_managing";
+        }
+
+        return "redirect:/login";  // 비로그인 상태 예외 처리 추가 (보안/UX 개선)
     }
 
     @GetMapping("/upload")
