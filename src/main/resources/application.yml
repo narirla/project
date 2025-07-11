@@ -27,3 +27,7 @@ server:
 logging:
   level:
     root: info
+
+# 게시판 업로드 위치
+upload:
+  path: uploads/bbs
