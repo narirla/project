@@ -10,6 +10,7 @@ public class Rbbs {
   private Long bbsId;
   private String status;
   private Long memberId;
+  private String nickname;
   private String bcontent;
   private Long prbbsId;
   private Long bgroup;

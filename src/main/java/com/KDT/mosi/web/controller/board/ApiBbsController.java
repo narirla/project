@@ -1,6 +1,7 @@
 package com.KDT.mosi.web.controller.board;
 
 import com.KDT.mosi.domain.board.bbs.svc.BbsSVC;
+import com.KDT.mosi.domain.board.bbsUpload.svc.BbsUploadSVC;
 import com.KDT.mosi.domain.common.CodeId;
 import com.KDT.mosi.domain.common.svc.CodeSVC;
 import com.KDT.mosi.domain.dto.CodeDTO;
@@ -31,20 +32,21 @@ import java.util.Optional;
 public class ApiBbsController {
   private final BbsSVC bbsSVC;
   private final CodeSVC codeSVC;
+  private final BbsUploadSVC bbsUploadSVC;
   //게시글 추가
   @PostMapping
   public ResponseEntity<ApiResponse<Bbs>> add(
       @RequestBody @Valid SaveApi saveApi,
       HttpSession session
   ) {
-    log.info("saveApi={}", saveApi);
-
-    Long memberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long memberId = (Long) session.getAttribute("loginMemberId");
     saveApi.setMemberId(memberId);
     Bbs bbs = new Bbs();
     BeanUtils.copyProperties(saveApi, bbs);
-
     Long id = bbsSVC.save(bbs);
+    if (saveApi.getUploadGroup() != null) {
+      bbsUploadSVC.bindGroupToBbs(id,saveApi.getUploadGroup());
+    }
     Optional<Bbs> optionalBbs = bbsSVC.findById(id);
     Bbs findedBbs = optionalBbs.orElseThrow();
 
@@ -62,7 +64,7 @@ public class ApiBbsController {
       @RequestParam(name = "pbbsId", required = false) Long pbbsId,
       HttpSession session
   ) {
-    Long memberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long memberId = (Long) session.getAttribute("loginMemberId");
     boolean exists = bbsSVC.findTemporaryStorageById(memberId, pbbsId).isPresent();
     return ResponseEntity.ok(ApiResponse.of(ApiResponseCode.SUCCESS, exists));
   }
@@ -76,12 +78,12 @@ public class ApiBbsController {
       @RequestParam(name = "pbbsId", required = false) Long pbbsId,
       HttpSession session
   ) {
-    Long memberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long memberId = (Long) session.getAttribute("loginMemberId");
     Optional<Bbs> tempOpt = bbsSVC.findTemporaryStorageById(memberId, pbbsId);
     Bbs temp = tempOpt.get();
 
     // 2) 불러온 뒤 곧바로 삭제
-    bbsSVC.deleteTemporaryStorage(memberId, pbbsId);
+//    bbsSVC.deleteTemporaryStorage(memberId, pbbsId);
 
     // 3) 로드된 내용 반환
     return ResponseEntity.ok(ApiResponse.of(ApiResponseCode.SUCCESS, temp));
@@ -96,7 +98,7 @@ public class ApiBbsController {
       @RequestParam(name = "pbbsId", required = false) Long pbbsId,
       HttpSession session
   ) {
-    Long memberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long memberId = (Long) session.getAttribute("loginMemberId");
     bbsSVC.deleteTemporaryStorage(memberId, pbbsId);
     return ResponseEntity.ok(ApiResponse.of(ApiResponseCode.SUCCESS, null));
   }
@@ -144,7 +146,7 @@ public class ApiBbsController {
     );  // 찾고자하는 게시글이 없으면 NoSuchElementException 예외발생
 
     // 2) 로그인 정보 꺼내기
-    Long loginMemberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long loginMemberId = (Long) session.getAttribute("loginMemberId");
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
@@ -189,7 +191,7 @@ public class ApiBbsController {
     );  // 찾고자하는 게시글이 없으면 NoSuchElementException 예외발생
 
     // 2) 로그인 정보 꺼내기
-    Long loginMemberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long loginMemberId = (Long) session.getAttribute("loginMemberId");
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");

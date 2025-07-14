@@ -254,7 +254,7 @@ public class ProductController {
         model.addAttribute("images", images);
         model.addAttribute("coursePoints", coursePoints);
 
-        return "product/productDetails";
+        return "product/product_detail";
     }
 
     // DTO -> Entity 변환 메서드

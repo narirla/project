@@ -98,6 +98,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("ELSE b.title ");
     sql.append("END AS title, ");
     sql.append("NVL(m.member_id, 0) AS member_id, ");
+    sql.append("m.nickname as nickname, ");
     sql.append("b.create_date AS create_date, ");
     sql.append("b.update_date as update_date, ");
     sql.append("b.bindent as bindent ");
@@ -133,6 +134,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("ELSE b.title ");
     sql.append("END AS title, ");
     sql.append("NVL(m.member_id, 0) AS member_id, ");
+    sql.append("m.nickname as nickname, ");
     sql.append("b.hit AS hit, ");
     sql.append("b.bindent AS bindent, ");
     sql.append("b.create_date AS create_date, ");
@@ -183,6 +185,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("ELSE b.title ");
     sql.append("END AS title, ");
     sql.append("NVL(m.member_id, 0) AS member_id, ");
+    sql.append("m.nickname as nickname, ");
     sql.append("b.hit AS hit, ");
     sql.append("b.create_date AS create_date, ");
     sql.append("b.update_date as update_date, ");
@@ -220,6 +223,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("ELSE b.title ");
     sql.append("END AS title, ");
     sql.append("NVL(m.member_id, 0) AS member_id, ");
+    sql.append("m.nickname as nickname, ");
     sql.append("b.hit AS hit, ");
     sql.append("b.create_date AS create_date, ");
     sql.append("b.update_date as update_date, ");
@@ -272,6 +276,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("ELSE b.title ");
     sql.append("END AS title, ");
     sql.append("NVL(m.member_id, 0) AS member_id, ");
+    sql.append("m.nickname as nickname, ");
     sql.append("b.hit AS hit, ");
     sql.append("CASE ");
     sql.append("WHEN b.status = 'B0202' THEN to_clob('삭제된 게시글입니다.') ");
@@ -457,6 +462,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("b.status as status, ");
     sql.append("b.title as title, ");
     sql.append("NVL(m.member_id, 0) AS member_id, ");
+    sql.append("m.nickname as nickname, ");
     sql.append("b.hit AS hit, ");
     sql.append("b.bcontent as bcontent, ");
     sql.append("b.pbbs_id AS pbbs_id, ");

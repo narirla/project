@@ -37,4 +37,7 @@ public interface BbsUploadSVC {
 
   // 업로드 찾기
   Optional<BbsUpload> findById(Long uploadId);
+
+  // 게시글 저장시 bbsId 업데이트
+  int bindGroupToBbs(Long bbsId, Long uploadGroup);
 }
