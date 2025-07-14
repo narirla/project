@@ -1,5 +1,7 @@
+/*layout.css(“뼈대” 전용)*/
+
 /* ============================= */
-/* ✅ 0. 레이아웃 전체 구조 */
+/* ✅ 0. 레이아웃 전체 구조      */
 /* ============================= */
 
 html, body {
@@ -14,36 +16,33 @@ html, body {
   width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
-  display: block;
 }
 
 /* ============================= */
-/* ✅ 1. Header 영역 (정중앙 고정) */
+/* ✅ 1. Header 영역            */
 /* ============================= */
 
 header {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;                  /* ✅ 전체 너비로 수정 */
+  width: 100%;
   height: 167px;
   background-color: #fff;
   z-index: 1000;
   display: flex;
-  justify-content: center;      /* ✅ 가운데 정렬 */
   flex-direction: column;
+  justify-content: center;
   overflow: hidden;
   box-sizing: border-box;
-  padding: 0;
 }
 
-/* header 내부 콘텐츠 영역 (중앙 고정) */
 .header-inner {
   width: 1200px;
   margin: 0 auto;
 }
 
-/* 상단 로그인/회원가입 바 */
+/* ── 상단 로그인/회원가입 바 ── */
 .header-top-bar {
   width: 100%;
   height: 30px;
@@ -56,14 +55,15 @@ header {
   border-bottom: 1px solid #eee;
   box-sizing: border-box;
 }
-
-/* 로그인/알림 영역 */
-.user-links, .user-logged-in {
+.user-links,
+.user-logged-in {
   display: flex;
   align-items: center;
   gap: 15px;
 }
-.user-links a, .logout-button, .notification-link {
+.user-links a,
+.logout-button,
+.notification-link {
   font-size: 14px;
   color: #555;
   text-decoration: none;
@@ -85,7 +85,7 @@ header {
   gap: 6px;
 }
 
-/* 메인 헤더 영역 */
+/* ── 메인 헤더 ── */
 .header-main {
   width: 100%;
   height: 90px;
@@ -96,7 +96,6 @@ header {
   box-sizing: border-box;
 }
 
-/* 로고 */
 .logo {
   position: absolute;
   left: 16px;
@@ -106,15 +105,13 @@ header {
   text-decoration: none;
   color: #000;
 }
-.logo img {
-  height: 48px;
-}
+.logo img { height: 48px; }
 .logo span {
   font-size: 40px;
   font-weight: 800;
 }
 
-/* 검색창 */
+/* ── 검색창 ── */
 .search-box {
   display: flex;
   align-items: center;
@@ -125,7 +122,7 @@ header {
   background-color: #fff;
 }
 .search-box input {
-  width: 100%;
+  flex: 1 1 0;
   padding: 8px 12px;
   border: none;
   outline: none;
@@ -140,7 +137,7 @@ header {
   cursor: pointer;
 }
 
-/* 사용자 메뉴 */
+/* ── 우측 메뉴 ── */
 .user-menu {
   position: absolute;
   right: 16px;
@@ -156,11 +153,9 @@ header {
   color: #000;
   text-decoration: none;
 }
-.user-menu .fas {
-  font-size: 22px;
-}
+.user-menu .fas { font-size: 22px; }
 
-/* 내비게이션 */
+/* ── 내비게이션 바 ── */
 .header-nav {
   width: 100%;
   height: 47px;
@@ -184,15 +179,15 @@ header {
   justify-content: center;
 }
 .header-nav a {
-  font-size: 16px;
-  font-weight: 500;
-  text-decoration: none;
-  color: #000;
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #000;
   white-space: nowrap;
 }
 .header-nav li:hover {
@@ -200,7 +195,7 @@ header {
 }
 
 /* ============================= */
-/* ✅ 2. Footer 영역 */
+/* ✅ 2. Footer 영역            */
 /* ============================= */
 
 footer {
@@ -208,17 +203,23 @@ footer {
   background: #0099AD;
   color: #fff;
   padding: 40px;
+  min-height: 300px;          /* 300px 보장, 넘치면 확장 */
   box-sizing: border-box;
 }
+
 .footer-container {
   width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
 }
 .company-info {
-  flex: 2;
+    flex: 2;
 }
+
+
 .footer-title {
   font-size: 28px;
   font-weight: bold;
@@ -238,10 +239,12 @@ footer {
   font-size: 13px;
   color: #ebfcff;
 }
+
 .csns {
-  flex: 1;
-  min-width: 240px;
+    flex: 1;
+    min-width: 240px;
 }
+
 .section-title {
   font-size: 15px;
   font-weight: 500;
@@ -257,6 +260,7 @@ footer {
   margin-right: 8px;
   text-decoration: none;
 }
+
 .footer-links {
   width: 1200px;
   margin: 0 auto;
@@ -270,56 +274,4 @@ footer {
 .footer-links a {
   color: #ebfcff;
   text-decoration: underline;
-}
-
-/* ============================= */
-/* ✅ 3. 공통 UI */
-/* ============================= */
-
-.form-label {
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-.text-danger {
-  font-size: 0.875rem;
-  margin-top: 4px;
-}
-.profile-image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-#nicknameCheckBtn {
-  margin-left: 8px;
-  height: 38px;
-  padding: 0 12px;
-  font-size: 14px;
-}
-.btn {
-  background-color: #0099AD !important;
-  color: #EBFCFF !important;
-  font-weight: 700;
-  border-radius: 12px;
-  border: none;
-  padding: 8px 16px;
-  transition: background 0.2s, color 0.2s;
-}
-.btn:hover {
-  background-color: #007C90 !important;
-  color: #fff !important;
-}
-.btn-outline-secondary {
-  background-color: transparent !important;
-  color: #0099AD !important;
-  border: 1px solid #0099AD !important;
-  font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 12px;
-  transition: background 0.2s, color 0.2s;
-}
-.btn-outline-secondary:hover {
-  background-color: #0099AD !important;
-  color: #fff !important;
 }

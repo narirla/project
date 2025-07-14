@@ -5,7 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MO:SI 구매자 마이페이지</title>
+  <!-- 레이아웃(헤더·푸터) -->
   <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <!-- 공통 컴포넌트(UI, 사이드바 등) -->
+  <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/buyerpage/buyerMypageHome.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -259,15 +262,14 @@
             </div>
           </div>
 
-          <!-- 공지 -->
-          <div class="notice-box">
-            <b>공지</b>
-            <span class="text">< MO:SI > MO:SI 신규 코스 등록 이벤트 당첨자 안내</span>
-            <a href="#" class="notice-more">+ 더보기</a>
-          </div>
-
         </section>
       </main>
+      <!-- 공지 -->
+      <div class="notice-bar">
+        <div class="notice-label">공지</div>
+        <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+        <a href="#" class="more-link">+ 더보기</a>
+      </div>
     </div>
     <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>

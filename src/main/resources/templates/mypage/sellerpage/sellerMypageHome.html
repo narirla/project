@@ -6,12 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MO:SI 판매자 마이페이지 홈</title>
   <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/sellerpage/sellerMypageHome.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
-  <header th:replace="~{fragments/header :: header}"></header>
+<div class="layout-wrapper">
+  <header th:replace="~{fragments/sellerHeader :: sellerHeader}"></header>
+  
   <div class="page-container">
     <main class="mypage-container">
       <aside class="sidebar">
@@ -26,13 +29,13 @@
             </div>
             <div class="profile-info">
               <a href="#" class="profile-badge"> 프로가이드 ></a>
-              <div class="profile-name" th:text="${member.name}">이름</div>
+              <div class="profile-name" th:text="${sellerPage.nickname}">닉네임</div>
               <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
                 <button type="submit" class="btn btn-outline-secondary w-100">구매자 전환</button>
               </form>
             </div>
           </div>
-
+  
           <nav class="mypage-nav">
             <div class="nav-title active">MY PAGE</div>
             <ul>
@@ -81,7 +84,7 @@
           </nav>
         </div>
       </aside>
-
+  
       <section class="content">
         <div class="info-summary-card">
           <div class="info-grid">
@@ -100,7 +103,7 @@
             <div class="info-item"><span class="title">상품 리뷰</span><span class="value" th:text="${sellerPage.reviewCount}"> 25</span></div>
           </div>
         </div>
-
+  
         <div class="section-card recent-orders">
           <div class="section-header">
             <h3>주문 현황(최근 1주일 이내)</h3>
@@ -125,13 +128,13 @@
             </tbody>
           </table>
         </div>
-
+  
         <div class="ad-banner">
           <button class="ad-arrow prev">&lt;</button>
           <span>광고 슬라이드</span>
           <button class="ad-arrow next">&gt;</button>
         </div>
-
+  
         <div class="section-card">
           <div class="section-header">
             <h3>내 상품 목록</h3>
@@ -143,7 +146,7 @@
                 <i class="fa-solid fa-heart heart-icon"></i>
               </div>
               <div class="card-content">
-                <p class="card-title" th:text="${product.name}">황령산 투어</p>
+                <p class="card-title" th:text="${product.name}">[MO:SI Pick]황령산 투어</p>
                 <p class="card-price" th:text="|${product.price} 원|">5,000 원</p>
                 <p class="card-discount">
                   <span th:text="|${product.discountPrice} 원|"></span>
@@ -153,17 +156,19 @@
             </div>
           </div>
         </div>
-
-        <!-- 공지 -->
-        <div class="notice-box">
-          <b>공지</b>
-          <span class="text">< MO:SI > MO:SI 신규 코스 등록 이벤트 당첨자 안내</span>
-          <a href="#" class="notice-more">+ 더보기</a>
-        </div>
       </section>
     </main>
+    <!-- 공지 -->
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
+    </div>
+  
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
-  <footer th:replace="~{fragments/footer :: footer}"></footer>
+  
   <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
+</div>
 </body>
 </html>

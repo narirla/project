@@ -11,7 +11,7 @@ body {
     font-family: 'Pretendard', sans-serif;
     color: #333;
     background-color: #FFFFFF;
-    padding-top: 150px;}
+}
 
 a {
     text-decoration: none;
@@ -35,104 +35,6 @@ ul {
     background-color: #fff;
 }
 
-/* Sidebar */
-.sidebar {
-    width: 200px;
-    flex-shrink: 0;
-}
-
-.sidebar-card {
-    border: 1px solid #82d8d8;
-    border-radius: 4px;
-    background-color: #f8f9fa;
-    overflow: hidden;
-}
-
-.profile-box {
-    padding: 20px 15px;
-    text-align: center;
-    border-bottom: 1px solid #E0E0E0;
-    background-color: #ffffff;
-}
-
-.profile-image {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin: 0 auto 10px;
-    border: 1px solid #ddd;
-}
-
-.profile-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.profile-badge {
-    display: inline-block;
-    color: #666;
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 12px;
-    margin-bottom: 8px;
-}
-
-.profile-name {
-    font-size: 15px;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.profile-discount {
-    background-color: #20c997;
-    color: #fff;
-    font-size: 11px;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 4px;
-    display: inline-block;
-}
-
-.mypage-nav .nav-title {
-    background-color: #1EC4CC;
-    color: #fff;
-    font-weight: bold;
-    padding: 15px;
-    text-align: center;
-    font-size: 16px;
-}
-
-.mypage-nav ul {
-    background-color: #fff;
-    padding: 10px 0;
-}
-
-.mypage-nav > ul > li > a {
-    font-weight: bold;
-    display: block;
-    padding: 10px 15px;
-    font-size: 14px;
-}
-
-.mypage-nav > ul > li > ul {
-    padding-left: 0;
-    margin-bottom: 10px;
-}
-
-.mypage-nav > ul > li > ul a {
-    display: block;
-    padding: 6px 15px 6px 25px;
-    font-size: 13px;
-    color: #555;
-}
-
-.mypage-nav > ul > li > ul a:hover {
-    color: #00c7e2;
-}
-
-
 
 /* Content */
 .content {
@@ -146,63 +48,109 @@ ul {
     margin-bottom: 20px;
 }
 
-/* Info Summary */
-.info-summary-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    margin-bottom: 30px;
+/* ============================= */
+/* ✅ Info Summary 카드 영역     */
+/* ============================= */
+
+/* 전체 카드 */
+.info-summary-card{
+  width:948px;
+  height:196px;
+  border:1px solid #E0E0E0;
+  border-radius:8px;
+  background:#FFFFFF;
+  padding:0;
+  box-sizing:border-box;
 }
 
-.info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+/* ────────── 상단 2칸(마일리지·포인트) ────────── */
+.info-grid{
+  display:flex;
+  width:100%;
+  height:124px;
 }
 
-.info-grid-bottom {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    background-color: #fafafa;
-    border-top: 1px solid #e0e0e0;
+/* 각 칸 레이아웃 : 세로 중앙 정렬(제목 위, 값 아래) */
+.info-item.info-main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center; /* 수직 중앙 */
+  align-items:center;     /* 수평 중앙 */
+  gap:12px;               /* 제목↔값 간격 */
+  position:relative;      /* 구분선 기준 */
+  padding:24px 0;         /* 좌우 여백 제거 */
 }
 
-.info-item {
-    text-align: center;
-    position: relative;
-    padding: 20px 0;
+/* ① 제목(마일리지, 포인트) */
+.info-item.info-main .title{
+  font-size: 20px;
+  font-weight:700;
+  color:rgba(65,65,65,0.6); /* #414141 60% */
 }
 
-.info-item:not(:first-child)::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 1px;
-    height: 40px;
-    background-color: #e0e0e0;
+/* ② 값(숫자) */
+.info-item.info-main .value{
+  font-size:36px;
+  font-weight:700;
+  color:#414141;
+  border-bottom:1px solid #DEDEDE; /* 하단 얇은 언더라인 */
 }
 
-.info-main .title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 10px;
+/* ③ 두 칸 사이 세로 구분선 */
+.info-grid .info-item.info-main:not(:first-child)::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:15%;
+  width:1px;
+  height:70%;
+  background:#DEDEDE;
 }
 
-.info-main .value {
-    font-size: 36px;
-    font-weight: 700;
+/* ────────── 하단 3칸(작성 가능 리뷰 등) ────────── */
+.info-grid-bottom{
+  display:flex;
+  width:100%;
+  height:71px;
+  border-top:1px solid #E0E0E0;
 }
 
-.info-item .title {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 8px;
+.info-grid-bottom .info-item{
+  flex:1;
+  position:relative;
+  padding:16px 24px;
+  text-align:center;
 }
 
-.info-item .value {
-    font-size: 24px;
-    font-weight: bold;
+/* 하단 타이틀 */
+.info-grid-bottom .title{
+  font-size:20px;
+  font-weight:500;          /* Medium */
+  color:rgba(65,65,65,0.6);
 }
+
+/* 하단 값 */
+.info-grid-bottom .value{
+  font-size:24px;
+  font-weight:700;          /* Bold */
+  color:rgba(65,65,65,0.6);
+  margin-left:4px;
+}
+
+/* 하단 3칸 사이 구분선 */
+.info-grid-bottom .info-item:not(:first-child)::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  width:1px;
+  height:40px;
+  background:#DEDEDE;
+}
+
+
 
 /* Recent Orders */
 .recent-orders table {
@@ -354,35 +302,4 @@ ul {
     height: 140px;
 }
 
-/* Notice Bar */
-.notice-bar {
-    display: flex;
-    align-items: center;
-    padding: 16px 24px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-    margin-top: 20px;
-}
 
-.notice-label {
-    font-weight: bold;
-    margin-right: 20px;
-}
-
-.notice-text {
-    flex-grow: 1;
-}
-
-.more-link {
-    font-size: 13px;
-    color: #666;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}

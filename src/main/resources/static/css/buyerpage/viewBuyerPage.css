@@ -1,4 +1,5 @@
-/*viewBuyerPage.css*/
+/* viewBuyerPage.css */
+/* ✅ 기본 설정 및 초기화 */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
 * {
@@ -10,7 +11,7 @@
 body {
   font-family: 'Pretendard', sans-serif;
   color: #333;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
 }
 
 a {
@@ -22,224 +23,171 @@ ul {
   list-style: none;
 }
 
-/* 전체 레이아웃 */
+/* ✅ 페이지 전체 컨테이너 설정 */
 .page-container {
   width: 1200px;
-  height: 1980px;
+  height: 1570px;
   margin: 0 auto 40px auto;
   background-color: #fff;
-  padding-top: 167px;
+  padding-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* ✅ 마이페이지 전체 레이아웃 (사이드바 + 콘텐츠) */
 .mypage-container {
   display: flex;
+  justify-content: center;
   gap: 30px;
   padding: 40px 20px;
   background-color: #fff;
 }
 
-/* 사이드바 */
-.sidebar {
-  width: 200px;
-  flex-shrink: 0;
-}
 
-.sidebar-card {
-  border: 1px solid #82d8d8;
-  border-radius: 4px;
-  background-color: #f8f9fa;
-  overflow: hidden;
-}
-
-.profile-box {
-  padding: 20px 15px;
-  text-align: center;
-  border-bottom: 1px solid #E0E0E0;
-}
-
-.profile-image {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin: 0 auto 10px;
-  border: 1px solid #ddd;
-}
-
-.profile-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profile-badge {
-  display: inline-block;
-  color: #666;
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 12px;
-  margin-bottom: 8px;
-}
-
-.profile-name {
-  font-size: 15px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.profile-discount {
-  background-color: #20c997;
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
-.mypage-nav .nav-title {
-  background-color: #20c997;
-  color: #fff;
-  font-weight: bold;
-  padding: 15px;
-  text-align: center;
-  font-size: 16px;
-}
-
-.mypage-nav ul {
-  background-color: #fff;
-  padding: 10px 0;
-}
-
-.mypage-nav > ul > li > a {
-  font-weight: bold;
-  display: block;
-  padding: 10px 15px;
-  font-size: 14px;
-}
-
-.mypage-nav > ul > li > ul a {
-  display: block;
-  padding: 6px 15px 6px 25px;
-  font-size: 13px;
-  color: #555;
-}
-
-.mypage-nav > ul > li > ul a:hover {
-  color: #00c7e2;
-}
-
-/* 메인 콘텐츠 */
+/* ✅ 본문 콘텐츠 영역 */
 .content {
   flex-grow: 1;
-  width: calc(100% - 230px);
+  width: calc(100% - 230px); /* 사이드바 여백 포함 */
 }
 
+/* ✅ 회원 정보 카드 박스 */
 .info-summary-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
-  padding: 30px;
+  width: 938px;               /* ✅ 고정 너비 */
+  height: 463px;              /* ✅ 고정 높이 */
+  margin: 0 auto;
+  font-family: 'Pretendard', sans-serif;
+  color: #333;
+  border: none;               /* ✅ 외곽선 제거 */
   background-color: #fff;
 }
 
+/* ✅ 회원 정보 제목 */
 .info-summary-card h2 {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 30px;
+  margin-top: 30px;
+  text-align: left;
 }
 
-.info-row {
-  margin-bottom: 16px;
-}
-
-.info-row label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.readonly-field {
-  padding: 10px;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-/* 버튼 그룹 */
-.mt-3 {
-  margin-top: 24px;
-}
-
-.d-flex {
+/* ✅ 기본 form-row 스타일 */
+.form-row {
   display: flex;
+  align-items: center;
+  padding: 16px 0;
+  /* 선은 조건별로 따로 지정함 */
 }
 
-.gap-2 {
-  gap: 12px;
+/* ① 아이디 행 위쪽 라인 (첫 행) */
+.form-row:first-of-type {
+  border-top: 1px solid #1EC4CC;   /* ← 신규 추가 */
 }
 
-/* 버튼 공통 */
-.btn {
-  padding: 8px 16px;
+/* ✅ 위쪽 선: 일반 항목용 (#BFBFBF) */
+.form-row.divider-top {
+  border-top: 1px solid #BFBFBF;
+}
+
+/* ✅ 아래쪽 선: 알림 설정 항목 전용 (#1EC4CC) */
+.form-row.divider-bottom {
+  border-bottom: 1px solid #1EC4CC;
+}
+
+/* ✅ 항목 이름 (왼쪽 라벨) */
+.form-row label {
+  width: 150px;
+  font-weight: 600;     /* 세미볼드 */
+  font-size: 18px;       /* 글자 크기 18px */
+  color: #6B6B6B;        /* 글자색 #6B6B6B */
+  flex-shrink: 0;
+}
+
+/* ✅ 항목 값 (오른쪽 텍스트) */
+.form-row span,
+.form-row .intro-text {
+  font-size: 18px;       /* label과 동일 */
+  font-weight: 600;      /* 세미볼드 */
+  color: #6B6B6B;        /* 동일 색상 */
+}
+
+/* ✅ 자기소개 없는 경우의 텍스트 */
+.form-row .intro-text {
+  color: #999;
+  font-style: italic;
+}
+
+/* ✅ 전화번호 인증 완료 라벨 */
+.label-certify {
+  background-color: #f0f0f0;
+  color: #999;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+/* ✅ 알림 설정 영역 */
+.notification-setting {
+  display: flex;
+  flex-direction: column;
   font-size: 14px;
+  color: #444;
+}
+
+.notification-setting input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.notification-setting p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #777;
+}
+
+/* ✅ 수정 / 탈퇴 버튼 그룹 */
+.form-button-group {
+  position: relative;            /* 기준점 설정 */
+  display: flex;
+  justify-content: center;       /* 수정 버튼 중앙 정렬 */
+  align-items: center;
+  width: 100%;
+  margin-top: 32px;
+  height: 40px;                  /* 버튼 높이 맞춤 */
+}
+
+/* ✅ 공통 버튼 스타일 */
+.btn {
+  padding: 10px 24px;
+  font-size: 18px;
+  font-weight: 600;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   text-align: center;
   text-decoration: none;
+  transition: background-color 0.3s ease;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: white;
+/* ✅ 회원정보 수정하기 버튼 */
+.btn.btn-primary {
+  background-color: #1EC4CC !important;
+  color: #FFFFFF !important;
 }
 
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
+/* ✅ hover 효과 (색상 유지 원하면 제거 가능) */
+.btn-primary:hover {
+  background-color: #00b4cc;
 }
 
-.member-info-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+/* ✅ 모시 탈퇴: 오른쪽 고정 */
+.withdraw-text {
+  position: absolute;
+  right: 0;                      /* 오른쪽 끝 정렬 */
+  font-size: 15px;
+  font-weight: 500;              /* 미디엄 */
+  color: #414141;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
-.member-info-table th,
-.member-info-table td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.member-info-table th {
-  background-color: #f9f9f9;
-  width: 150px;
-}
-
-.member-info-table input[type="text"] {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.member-info-table label {
-  margin-right: 12px;
-}
-
-.btn-group {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 24px;
-}
-.form-control {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-  font-size: 14px;
-}
