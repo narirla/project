@@ -11,7 +11,7 @@ public class Bbs {
   private String status;
   private String title;
   private Long memberId;
-//  private String nickname;
+  private String nickname;
   private Long hit;
   private String bcontent;
   private Long pbbsId;

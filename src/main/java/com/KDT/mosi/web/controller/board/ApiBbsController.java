@@ -1,6 +1,7 @@
 package com.KDT.mosi.web.controller.board;
 
 import com.KDT.mosi.domain.board.bbs.svc.BbsSVC;
+import com.KDT.mosi.domain.board.bbsUpload.svc.BbsUploadSVC;
 import com.KDT.mosi.domain.common.CodeId;
 import com.KDT.mosi.domain.common.svc.CodeSVC;
 import com.KDT.mosi.domain.dto.CodeDTO;
@@ -31,6 +32,7 @@ import java.util.Optional;
 public class ApiBbsController {
   private final BbsSVC bbsSVC;
   private final CodeSVC codeSVC;
+  private final BbsUploadSVC bbsUploadSVC;
   //게시글 추가
   @PostMapping
   public ResponseEntity<ApiResponse<Bbs>> add(
@@ -41,8 +43,10 @@ public class ApiBbsController {
     saveApi.setMemberId(memberId);
     Bbs bbs = new Bbs();
     BeanUtils.copyProperties(saveApi, bbs);
-
     Long id = bbsSVC.save(bbs);
+    if (saveApi.getUploadGroup() != null) {
+      bbsUploadSVC.bindGroupToBbs(id,saveApi.getUploadGroup());
+    }
     Optional<Bbs> optionalBbs = bbsSVC.findById(id);
     Bbs findedBbs = optionalBbs.orElseThrow();
 
@@ -79,7 +83,7 @@ public class ApiBbsController {
     Bbs temp = tempOpt.get();
 
     // 2) 불러온 뒤 곧바로 삭제
-    bbsSVC.deleteTemporaryStorage(memberId, pbbsId);
+//    bbsSVC.deleteTemporaryStorage(memberId, pbbsId);
 
     // 3) 로드된 내용 반환
     return ResponseEntity.ok(ApiResponse.of(ApiResponseCode.SUCCESS, temp));
