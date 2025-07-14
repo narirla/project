@@ -11,6 +11,9 @@ header {
   flex-direction: column;
   align-items: center;
 }
+.header-inner{
+  width: 1200px;
+}
 
 /* ✅ 상단 사용자 상태 바 */
 .header-top-bar {
