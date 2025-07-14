@@ -1,92 +1,163 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="UTF-8">
   <title>판매자 마이페이지 수정</title>
   <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/sellerpage/editSellerPage.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
-  <header th:replace="~{fragments/header :: header}"></header>
-
+<div class="layout-wrapper">
   <div class="page-container">
-    <main class="mypage-container">
-      <h2>판매자 마이페이지 수정</h2>
-
-      <form th:action="@{/mypage/seller/edit}" th:object="${form}" method="post" enctype="multipart/form-data">
-
-        <div class="mb-3">
-          <label for="nickname" class="form-label">닉네임</label>
-          <div class="d-flex align-items-center">
-            <input type="text" id="nickname" th:field="*{nickname}" class="form-control" readonly>
-            <button type="button" id="nicknameToggleBtn" class="btn btn-outline-secondary ms-2">변경하기</button>
+    <div class="seller-page-layout">
+      <!-- ✅ 왼쪽: 사이드바 직접 삽입 -->
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <div class="profile-box">
+            <div class="profile-image">
+              <img th:if="${sellerPage != null and sellerPage.image != null}"
+                   th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}"
+                   alt="프로필 이미지">
+              <img th:if="${sellerPage == null or sellerPage.image == null}"
+                   th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
+            </div>
+            <div class="profile-info">
+              <a href="#" class="profile-badge"> 프로가이드 ></a>
+              <div class="profile-name" th:text="${sellerPage.nickname}">닉네임</div>
+              <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-outline-secondary w-100">구매자 전환</button>
+              </form>
+            </div>
           </div>
-          <span id="nicknameCheckMsg" class="form-text ms-2"></span>
+  
+          <nav class="mypage-nav">
+            <div class="nav-title active">MY PAGE</div>
+            <ul>
+              <li><a href="#">상품</a>
+                <ul>
+                  <li><a th:href="@{/seller/products}">내 상품 목록</a></li>
+                  <li><a th:href="@{/product/upload}">상품 등록</a></li>
+                </ul>
+              </li>
+              <li><a href="#">판매 현황</a>
+                <ul>
+                  <li><a href="#">주문 현황</a></li>
+                  <li><a href="#">총 판매수 / 매출액</a></li>
+                  <li><a href="#">판매 통계</a></li>
+                </ul>
+              </li>
+              <li><a href="#">문의 / 리뷰</a>
+                <ul>
+                  <li><a href="#">상품 문의</a></li>
+                  <li><a href="#">나의 답글</a></li>
+                </ul>
+              </li>
+              <li><a href="#">알림 / 공지</a>
+                <ul>
+                  <li><a href="#">공지사항</a></li>
+                  <li><a href="#">프로모션</a></li>
+                </ul>
+              </li>
+              <li><a href="#">내 정보</a>
+                <ul>
+                  <li><a th:href="@{/mypage/seller/view}">프로필</a></li>
+                  <li><a href="#">정산 정보 관리</a></li>
+                  <li><a href="#">구독자 관리</a></li>
+                </ul>
+              </li>
+              <li><a href="#">고객센터</a>
+                <ul>
+                  <li><a href="#">1:1 문의</a></li>
+                  <li><a href="#">판매 Q&A 내역</a></li>
+                  <li><a href="#">공지사항</a></li>
+                  <li><a href="#">FAQ</a></li>
+                  <li><a href="#">고객의 소리</a></li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
         </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="passwd">비밀번호</label>
-          <a th:href="@{/member/changePw}" class="btn btn-outline-secondary">비밀번호 수정</a>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="tel">전화번호</label>
-          <input type="text" id="tel" th:field="*{tel}" class="form-control">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="intro">자기소개</label>
-          <textarea id="intro" th:field="*{intro}" class="form-control" rows="5"></textarea>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="zonecode">우편번호</label>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="zonecode" th:field="*{zonecode}" class="form-control">
-            <button type="button" id="searchAddress" class="btn btn-outline-secondary">주소 검색</button>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="address">기본주소</label>
-          <input type="text" id="address" th:field="*{address}" class="form-control">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="detailAddress">상세주소</label>
-          <input type="text" id="detailAddress" th:field="*{detailAddress}" class="form-control">
-        </div>
-
-        <div class="mb-3">
-          <label>
-            <input type="checkbox" th:field="*{notification}">
-            할인쿠폰/이벤트/뉴스레터 수신 동의
-          </label>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">현재 프로필 이미지</label>
-          <div class="profile-image">
-            <img th:if="*{image != null}" th:src="@{/images/profile/{id}(id=*{pageId})}" alt="프로필 이미지">
-            <img th:if="*{image == null}" src="/images/default-profile.png" alt="기본 이미지">
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="imageFile">새 프로필 이미지</label>
-          <input type="file" id="imageFile" th:field="*{imageFile}" class="form-control">
-        </div>
-
-        <div class="form-buttons">
-          <button type="button" id="saveBtn" class="btn">저장</button>
-          <a th:href="@{/mypage/seller}" class="btn btn-outline-secondary">취소</a>
-        </div>
-      </form>
-    </main>
+      </aside>
+  
+      <section class="content">
+  
+        <!-- ✅ 오른쪽: 본문 영역 -->
+        <main class="mypage-container">
+          <h2>나의 프로필 수정</h2>
+  
+          <form th:action="@{/mypage/seller/edit}" th:object="${sellerPage}" method="post" enctype="multipart/form-data">
+  
+            <!-- ✅ 현재 프로필 이미지 -->
+            <div class="mb-3">
+              <label class="form-label">현재 프로필 이미지</label>
+              <div class="profile-image">
+                <img th:if="${sellerPage.image != null}" th:src="@{/mypage/seller/images/profile/{id}(id=${sellerPage.pageId})}" alt="프로필 이미지">
+                <img th:if="${sellerPage.image == null}" src="/img/default-profile.png" alt="기본 이미지">
+              </div>
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label" for="imageFile">새 프로필 이미지</label>
+              <input type="file" id="imageFile" name="imageFile" class="form-control">
+            </div>
+  
+            <div class="mb-3">
+              <label for="nickname" class="form-label">닉네임</label>
+              <div class="d-flex align-items-center">
+                <input type="text" id="nickname" th:field="*{nickname}" class="form-control" maxlength="30" required>
+                <button type="button" id="nicknameToggleBtn" class="btn btn-outline-secondary ms-2">변경하기</button>
+              </div>
+              <span id="nicknameCheckMsg" class="form-text ms-2"></span>
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label" for="tel">전화번호</label>
+              <input type="text" id="tel" th:field="*{tel}" class="form-control">
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label" for="passwd">비밀번호</label>
+              <a th:href="@{/member/changePw}" class="btn btn-outline-secondary">비밀번호 수정</a>
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label" for="intro">자기소개</label>
+              <textarea id="intro" th:field="*{intro}" class="form-control" rows="5"></textarea>
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label" for="zonecode">우편번호</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="zonecode" th:field="*{zonecode}" class="form-control">
+                <button type="button" id="searchAddress" class="btn btn-outline-secondary">주소 검색</button>
+              </div>
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label" for="address">기본주소</label>
+              <input type="text" id="address" th:field="*{address}" class="form-control">
+            </div>
+  
+            <div class="mb-3">
+              <label class="form-label" for="detailAddress">상세주소</label>
+              <input type="text" id="detailAddress" th:field="*{detailAddress}" class="form-control">
+            </div>
+  
+            <div class="form-buttons">
+              <button type="submit" class="btn">저장</button>
+              <a th:href="@{/mypage/seller}" class="btn btn-outline-secondary">취소</a>
+            </div>
+          </form>
+        </main>
+      </section>
+    </div>
   </div>
-
+  
   <script th:src="@{/js/sellerpage/editSellerPage.js}" defer></script>
   <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
 </body>
 </html>

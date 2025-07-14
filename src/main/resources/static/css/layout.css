@@ -16,7 +16,6 @@ html, body {
   width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
-  padding-top: 167px;      /* 고정 헤더 높이 보상 */
 }
 
 /* ============================= */
@@ -216,7 +215,11 @@ footer {
   align-items: flex-start;
   gap: 40px;
 }
-.company-info { flex: 2; }
+.company-info {
+    flex: 2;
+}
+
+
 .footer-title {
   font-size: 28px;
   font-weight: bold;
@@ -237,7 +240,11 @@ footer {
   color: #ebfcff;
 }
 
-.csns { flex: 1; min-width: 240px; }
+.csns {
+    flex: 1;
+    min-width: 240px;
+}
+
 .section-title {
   font-size: 15px;
   font-weight: 500;

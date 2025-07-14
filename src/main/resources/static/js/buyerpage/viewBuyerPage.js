@@ -1,27 +1,31 @@
-// /static/js/buyerpage/viewBuyerPage.js
-
-document.addEventListener('DOMContentLoaded', function () {
-  // ✅ 수정 성공 메시지 자동 숨김 처리
+document.addEventListener('DOMContentLoaded', () => {
+  /* ================================
+   * 1. 3초 뒤 알림 박스 자동 숨김
+   * ================================ */
   const alertBox = document.querySelector('.alert');
   if (alertBox) {
-    setTimeout(() => {
-      alertBox.style.display = 'none';
-    }, 3000); // 3초 후 사라짐
+    setTimeout(() => alertBox.style.display = 'none', 3000);
   }
 
-  // ✅ 역할 전환 버튼 중복 클릭 방지
+  /* ==========================================
+   * 2. 역할 전환 버튼 중복 클릭 방지
+   *    - 존재 여부 먼저 확인
+   *    - disable + 텍스트 변경
+   * ========================================== */
   const roleChangeForm = document.querySelector('form[action="/mypage/role/to-seller"]');
-  if (roleChangeForm) {
-    roleChangeForm.addEventListener('submit', function (e) {
-      const btn = roleChangeForm.querySelector('button[type="submit"]');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = '처리 중...';
-      }
-    });
-  }
+  roleChangeForm?.addEventListener('submit', (e) => {
+    const submitBtn = roleChangeForm.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '처리 중...';
+    }
+  });
 
-  // ✳️ 향후 기능 추가 영역
-  // 예) 알림 설정, 프로필 클릭 등
+  /* ==========================================
+   * 3. (TODO) 향후 기능 추가 지점
+   *    - 여기서 DOM을 사용할 때는 항상
+   *      const el = document.querySelector(...);
+   *      el && el.addEventListener(...);
+   *      형태로 null-check 후 사용
+   * ========================================== */
 });
-

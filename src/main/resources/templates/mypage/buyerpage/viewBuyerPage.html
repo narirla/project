@@ -5,114 +5,137 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MO:SI 구매자 마이페이지</title>
+  <!-- 레이아웃(헤더·푸터) -->
   <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <!-- 공통 컴포넌트(UI, 사이드바 등) -->
+  <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/buyerpage/viewBuyerPage.css}">
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
-<header th:replace="~{fragments/header :: header}"></header>
-<div class="page-container">
-  <main class="mypage-container">
-    <aside class="sidebar">
-      <div class="sidebar-card">
-        <div class="profile-box">
-          <div class="profile-image">
-            <img th:if="${member != null and member.pic != null}"
-                 th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
-            <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
-          </div>
-          <div class="profile-info">
-            <a href="#" class="profile-badge">프로여행러 ></a>
-            <div class="profile-name" th:text="${member.name}"></div>
-            <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top: 10px;">
-              <button type="submit" class="btn btn-outline-secondary w-100">판매자 전환</button>
-            </form>
 
-          </div>
-        </div>
-        <nav class="mypage-nav">
-          <div class="nav-title active">MY PAGE</div>
-          <ul>
-            <li><a href="#">내 정보</a>
+  <div class="layout-wrapper">
+    <header th:replace="~{fragments/header :: header}"></header>
+
+    <div class="page-container">
+      <main class="mypage-container">
+        <aside class="sidebar">
+          <div class="sidebar-card">
+            <div class="profile-box">
+              <div class="profile-image">
+                <img th:if="${member != null and member.pic != null}"
+                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="초지형 이미지">
+                <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}"
+                     alt="기본 프로필 이미지">
+              </div>
+              <div class="profile-info">
+                <a href="#" class="profile-badge">프로에행러 ></a>
+                <div class="profile-name" th:text="${member.name}"></div>
+                <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top: 10px;">
+                  <button type="submit" class="btn btn-outline-secondary w-100">판매자 전환</button>
+                </form>
+              </div>
+            </div>
+            <nav class="mypage-nav">
+              <div class="nav-title active">MY PAGE</div>
               <ul>
-                <li><a th:href="@{'/mypage/buyer/' + ${member.memberId}}">회원 정보 관리</a></li>
+                <li><a href="#">주문 배송</a>
+                  <ul>
+                    <li><a href="#">주문/배송 내역</a></li>
+                  </ul>
+                </li>
+                <li><a href="#">알림 및 메시지</a>
+                  <ul>
+                    <li><a href="#">알림</a></li>
+                    <li><a href="#">메시지</a></li>
+                  </ul>
+                </li>
+                <li><a href="#">나의 활동</a>
+                  <ul>
+                    <li><a href="#">후기</a></li>
+                    <li><a href="#">게시글</a></li>
+                  </ul>
+                </li>
+                <li><a href="#">관심</a>
+                  <ul>
+                    <li><a href="#">찜한 상품</a></li>
+                    <li><a href="#">팔로잉 가이드</a></li>
+                    <li><a href="#">최근 본 상품</a></li>
+                  </ul>
+                </li>
+                <li><a href="#">내 정보</a>
+                  <ul>
+                    <li><a href="#">회원 등급</a></li>
+                    <li><a th:href="@{'/mypage/buyer/' + ${member.memberId}}">회원 정보 관리</a></li>
+                    <li><a href="#">신용 카드 및 환불계좌 관리</a></li>
+                    <li><a href="#">배송지 관리</a></li>
+                    <li><a href="#">본인 인증</a></li>
+                  </ul>
+                </li>
+                <li><a href="#">고객센터</a>
+                  <ul>
+                    <li><a href="#">1:1 문의</a></li>
+                    <li><a href="#">상품 Q&A 내역</a></li>
+                    <li><a href="#">공지사항</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">고객의 소리</a></li>
+                  </ul>
+                </li>
               </ul>
-            </li>
-            <li><a href="#">고객센터</a>
-              <ul>
-                <li><a href="#">1:1 문의</a></li>
-                <li><a href="#">상품 Q&A 내역</a></li>
-                <li><a href="#">공지사항</a></li>
-                <li><a href="#">FAQ</a></li>
-                <li><a href="#">고객의 소리</a></li>
-              </ul>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </aside>
+            </nav>
+          </div>
+        </aside>
 
-    <section class="content">
-      <!-- ✅ 수정 성공 메시지 출력 -->
-      <div th:if="${msg != null}"
-           style="padding: 10px 20px; background-color: #e3f7f9; color: #027384; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">
-        <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
-        <span th:text="${msg}">수정되었습니다.</span>
-      </div>
+        <section class="content">
+          <div class="info-summary-card">
+            <h2>회원 정보 관리</h2>
 
-      <div class="info-summary-card">
-        <h2>회원 정보 관리</h2>
+            <div class="form-row">
+              <label>아이디</label>
+              <span th:text="${member.email}">mosimosi@mosi.com</span>
+            </div>
 
-        <table class="member-info-table">
-          <tr>
-            <th>닉네임</th>
-            <td>
-              <input type="text" th:value="${member.nickname}" class="form-control" readonly>
-            </td>
-          </tr>
-          <tr>
-            <th>자기소개</th>
-            <td>
-                <textarea class="form-control" rows="3" readonly
-                          th:text="${buyerPage.intro != null ? buyerPage.intro : '등록된 자기소개가 없습니다.'}"></textarea>
-            </td>
-          </tr>
+            <div class="form-row divider-top">
+              <label>닉네임</label>
+              <span th:text="${member.nickname}">김모시</span>
+            </div>
 
-          <tr>
-            <th>전화</th>
-            <td>
-              <span th:text="${member.tel}">010-0000-0000</span>
-              <button type="button" class="btn btn-secondary">변경하기</button>
-            </td>
-          </tr>
-          <tr>
-            <th>알림설정</th>
-            <td>
-              <label>
-                <input type="checkbox" disabled
-                       th:checked="${member.notification == 'Y'}"> 알림 수신 동의
-              </label>
-              <div style="margin-top: 8px;">할인쿠폰/이벤트, 뉴스레터를 받아보시겠습니까?</div>
-            </td>
-          </tr>
-        </table>
+            <div class="form-row divider-top">
+              <label>전화번호</label>
+              <span th:text="${member.tel}">010-1234-5678</span>
+              <span class="label-certify">인증완료</span>
+            </div>
 
-        <div class="btn-group mt-4">
-          <a th:href="@{/mypage/buyer/{memberId}/edit(memberId=${member.memberId})}" class="btn btn-primary">회원정보 수정하기</a>
-          <form th:action="@{/members/{id}/delete(id=${member.memberId})}" method="post"
-                onsubmit="return confirm('정말 탈퇴하시겠습니까?');" style="display: inline;">
-            <button type="submit" class="btn btn-danger">회원탈퇴</button>
-          </form>
-        </div>
-      </div>
-    </section>
-  </main>
-</div>
-<script th:src="@{/js/buyerpage/viewBuyerPage.js}" defer></script>
+            <div class="form-row divider-top">
+              <label>자기소개</label>
+              <span class="intro-text" th:text="${buyerPage.intro != null ? buyerPage.intro : '등록된 자기 소개가 없습니다.'}"></span>
+            </div>
 
-<footer th:replace="~{fragments/footer :: footer}"></footer>
+            <div class="form-row divider-top divider-bottom">
+              <label>알림설정</label>
+              <div class="notification-setting">
+                <input type="checkbox" disabled th:checked="${member.notification == 'Y'}"> 알림 수신 동의
+                <p>할인쿠폰/이벤트, 뉴스레터를 받아보시겠습니까?</p>
+              </div>
+            </div>
 
+            <div class="form-button-group">
+              <a th:href="@{/mypage/buyer/{memberId}/edit(memberId=${member.memberId})}" class="btn btn-primary">회원정보 수정하기</a>
+              <a th:href="@{/members/{id}/delete(id=${member.memberId})}" class="withdraw-text" onclick="return confirm('정말 탈퇴하시겠습니까?');">모시 탈퇴</a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <!-- 공지 -->
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
+    </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
 </body>
+
 </html>
