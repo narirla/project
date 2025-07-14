@@ -24,4 +24,6 @@ public class SaveApi {
   private Long step;
   @Max(value = 2, message = "들여쓰기 단계는 최대 2까지만 가능합니다.")
   private Long bindent;
+
+  private Long uploadGroup;
 }

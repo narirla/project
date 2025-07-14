@@ -29,13 +29,13 @@ public class ApiBbsLikeController {
       @PathVariable("bbsId") Long bbsId,
       HttpSession session
   ) {
-    Long loginMemberId = ((Member) session.getAttribute("loginMember")).getMemberId();
+    Long loginMemberId = (Long) session.getAttribute("loginMemberId");
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
     }
 
-    String result = bbsLikeSVC.toggleLike(loginMember.getMemberId(), bbsId);
+    String result = bbsLikeSVC.toggleLike(loginMemberId, bbsId);
     // "CREATED" 또는 "DELETED" 반환
     return ResponseEntity.ok(ApiResponse.of(ApiResponseCode.SUCCESS, result));
   }

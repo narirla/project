@@ -2,6 +2,8 @@ package com.KDT.mosi.web.controller.board;
 
 import com.KDT.mosi.domain.board.bbsUpload.svc.BbsUploadSVC;
 import com.KDT.mosi.domain.entity.board.UploadResult;
+import com.KDT.mosi.web.api.ApiResponse;
+import com.KDT.mosi.web.api.ApiResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -63,14 +65,16 @@ public class ApiBbsUploadController {
    * 첨부파일 업로드
    */
   @PostMapping(value = "/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<List<UploadResult>> uploadAttachments(
+  public ResponseEntity<ApiResponse<List<UploadResult>>> uploadAttachments(
       @RequestParam(value="uploadGroup", required=false) Long uploadGroup,
       @RequestParam("files") List<MultipartFile> files
   ) {
     if (files == null || files.isEmpty()) return ResponseEntity.badRequest().build();
     List<UploadResult> results = bbsUploadSVC.saveAll(uploadGroup, "ATTACHMENT", files);
-    return ResponseEntity.status(HttpStatus.CREATED).body(results);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ApiResponse.of(ApiResponseCode.SUCCESS, results));
   }
+
 
   /**
    * 개별 업로드 아이템 삭제

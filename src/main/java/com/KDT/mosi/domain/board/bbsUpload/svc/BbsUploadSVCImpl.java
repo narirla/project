@@ -191,4 +191,9 @@ public class BbsUploadSVCImpl implements BbsUploadSVC{
   public Optional<BbsUpload> findById(Long uploadId) {
     return bbsUploadDAO.findById(uploadId);
   }
+
+  @Override
+  public int bindGroupToBbs(Long bbsId, Long uploadGroup) {
+    return bbsUploadDAO.bindGroupToBbs(bbsId, uploadGroup);
+  }
 }
