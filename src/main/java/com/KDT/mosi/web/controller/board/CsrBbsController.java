@@ -18,7 +18,7 @@ public class CsrBbsController {
 
   @GetMapping
   public String bbs() {
-    return "csr/bbs/allForm";
+    return "csr/bbs/allForm_v2";
   }
 
   //게시글조회
