@@ -21,6 +21,11 @@ public class CsrBbsController {
     return "csr/bbs/allForm_v2";
   }
 
+  @GetMapping("/community")
+  public String community() {
+    return "csr/bbs/bbs_list";
+  }
+
   //게시글조회
   @GetMapping("/{id}")
   public String findById(

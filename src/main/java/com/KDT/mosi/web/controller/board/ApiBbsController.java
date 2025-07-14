@@ -33,6 +33,8 @@ public class ApiBbsController {
   private final BbsSVC bbsSVC;
   private final CodeSVC codeSVC;
   private final BbsUploadSVC bbsUploadSVC;
+
+
   //게시글 추가
   @PostMapping
   public ResponseEntity<ApiResponse<Bbs>> add(
