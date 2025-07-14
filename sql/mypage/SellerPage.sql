@@ -80,6 +80,12 @@ INSERT INTO SELLER_PAGE (
   '로컬 체험', '신한 123-456-7890', 'https://instagram.com/sin_guide', 'Y',
   DEFAULT, DEFAULT
 );
-/
+
+
+-- 전화번호, 우편번호, 주소, 상세주소 추가
+ALTER TABLE SELLER_PAGE ADD TEL VARCHAR2(20);             -- 전화번호
+ALTER TABLE SELLER_PAGE ADD ZONECODE VARCHAR2(10);        -- 우편번호
+ALTER TABLE SELLER_PAGE ADD ADDRESS VARCHAR2(200);        -- 기본 주소
+ALTER TABLE SELLER_PAGE ADD DETAIL_ADDRESS VARCHAR2(200); -- 상세 주소
 
 COMMIT;
