@@ -31,6 +31,7 @@ public class SellerPageDAOImpl implements SellerPageDAO {
       SellerPage sellerpage = new SellerPage();
       sellerpage.setPageId(rs.getLong("page_id"));
       sellerpage.setMemberId(rs.getLong("member_id"));
+      sellerpage.setNickname(rs.getString("nickname"));
       sellerpage.setImage(rs.getBytes("image"));
       sellerpage.setIntro(rs.getString("intro"));
       sellerpage.setNickname(rs.getString("nickname"));

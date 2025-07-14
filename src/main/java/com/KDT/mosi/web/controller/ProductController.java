@@ -1,5 +1,6 @@
 package com.KDT.mosi.web.controller;
 
+
 import com.KDT.mosi.domain.entity.*;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
@@ -36,25 +37,45 @@ public class ProductController {
 
     @GetMapping("/list")
     public String list(Model model,
+                       HttpSession session,
                        @RequestParam(name = "page", defaultValue = "1") int page,
                        @RequestParam(name = "size", defaultValue = "12") int size) {
-        List<Product> products = productSVC.getProductsByPage(page, size);
-        model.addAttribute("products", products);
-        model.addAttribute("currentPage", page);
-        return "product/product_list";
+
+        Member loginMember = (Member) session.getAttribute("loginMember");
+
+        if (loginMember != null) {
+            Optional<SellerPage> optionalSellerPage = sellerPageSVC.findByMemberId(loginMember.getMemberId());
+
+            if (optionalSellerPage.isPresent()) {
+                model.addAttribute("sellerPage", optionalSellerPage.get());
+            } else {
+                model.addAttribute("sellerPage", null);
+            }
+
+            List<Product> products = productSVC.getProductsByPage(page, size);
+            model.addAttribute("productList", products);
+            model.addAttribute("currentPage", page);
+
+            return "product/product_managing";
+        }
+
+        return "redirect:/login";  // 비로그인 상태 예외 처리 추가 (보안/UX 개선)
     }
 
     @GetMapping("/upload")
     public String uploadForm(Model model, HttpSession session, RedirectAttributes redirectAttrs) {
 
         Member loginMember = (Member) session.getAttribute("loginMember");
+
         if (loginMember == null) {
             redirectAttrs.addFlashAttribute("redirectAfterLogin", "/product/upload");
             return "redirect:/login";
         }
+        System.out.println(loginMember.getNickname());
+
         model.addAttribute("nickname", loginMember.getNickname());
         model.addAttribute("productUploadForm", new ProductUploadForm());
-        return "product/enroll(without_map)";
+        return "product/product_enroll";
     }
 
     @PostMapping("/upload")
@@ -65,8 +86,14 @@ public class ProductController {
             return "redirect:/login";
         }
 
+
+
+
         // 로그인한 회원 ID를 form에 세팅
         form.setMemberId(loginMember.getMemberId());
+        form.setNickname(loginMember.getNickname());
+
+
 
         if (form.getProductImages() != null && form.getProductImages().size() > 10) {
             model.addAttribute("errorMessage", "이미지는 최대 10장까지 업로드 가능합니다.");
