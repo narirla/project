@@ -49,25 +49,40 @@ const ajax = {
       console.error(err.message);
     }
   },
-  post: async (url, payload) => {
-    const option = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(payload), // jsobject => json포맷의 문자열
+  post: async (url, payload, opt = {}) => {
+  const isFormData = typeof FormData !== 'undefined' && payload instanceof FormData;
+    // 2) 기본 + 추가 헤더 병합
+    const headers = {
+      Accept: 'application/json',      // JSON 응답 기대
+      ...(opt.headers || {})           // 호출 측에서 넘긴 헤더
     };
-    try {
-      const res = await fetch(url, option);
-      if(!res.ok) {
-        throw new Error(`응답오류! : ${res.status}`)
-      }
-      const json = await res.json();
-      return json;
-    } catch (err) {
-      console.error(err.message);
+
+    let body = payload;
+
+    if (isFormData) {
+      // ---- [FormData 분기] ------------------------------------------
+      //   ↳ 브라우저가 boundary 포함 Content-Type 을 자동으로 붙임
+      delete headers['Content-Type'];
+      delete headers['content-type'];  // (소문자 키도 제거)
+      // body 는 그대로 FormData 객체
+    } else {
+      // ---- [JSON 분기] ---------------------------------------------
+      headers['Content-Type'] ??= 'application/json;charset=UTF-8';
+      body = JSON.stringify(payload);  // JS 객체 → JSON 문자열
     }
+
+    // 3) fetch 호출
+    const res = await fetch(url, {
+      method: 'POST',
+      headers,
+      body,
+      ...opt                           // timeout 등 추가 옵션
+    });
+
+    if (!res.ok) {
+      throw new Error(`응답오류! : ${res.status}`);   // 상위로 throw
+    }
+    return res.json();                 // { header, body, paging } 형식
   },
   put: async (url, payload) => {
     const option = {
