@@ -4,206 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="|MO:SI 커뮤니티 게시글 작성|">MO:SI 커뮤니티 게시글 작성</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/community/write_quill.css}">
-
+    <link rel="stylesheet" th:href="@{/css/community/addStyles.css}">
+    <style>
+        .file-list {
+          display: inline-block;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+        .file-list li {
+          display: inline;
+          margin-left: 8px;
+        }
+    </style>
 </head>
 <body th:attr="data-parent-id=${bbsId}">
 <div class="container-wrapper">
 
-    <div class="container-wrapper">
-        <div class="logout-bar">
-            <div th:if="${session.loginMember != null}">
-                <a href="/logout" class="logout-link">로그아웃</a>
-                <a href="/notifications" class="notification-link">알림</a>
-            </div>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <nav class="main-nav">
+        <div>전체메뉴</div>
+        <div>테마여행</div>
+        <div>커뮤니티</div>
+        <div>항공</div>
+        <div>호텔</div>
+    </nav>
 
-            <div th:if="${session.loginMember == null}">
-                <a href="/login" class="logout-link">로그인</a>
-                <a href="/register" class="notification-link">회원가입</a>
-            </div>
-        </div>
-        <div class="container-wrapper">
-            <header class="header">
-                <div class="logo-with-text">
-                    <a href="#"><img src="/src/main/resources/static/img/msi.png" alt="MO:SI 로고" class="logo"></a>
-                    <span class="logo-text" style="font-family: 'Pretendard', sans-serif; font-weight: 800;">MO:SI</span>
+    <main class="main-content">
+        <aside class="left-sidebar">
+            <ul>
+                <li class="menu-title">커뮤니티</li>
+                <li><a th:href="@{/bbs}">자유 게시판</a></li>
+            </ul>
+        </aside>
+
+        <section class="content-area">
+            <h1>게시글 작성</h1>
+            <form class="write-form" id="write-form">
+                <label for="bcategory" class="form-label">카테고리</label>
+                <div class="select-group">
+                    <select id="bcategory" name="bcategory">
+                        <option value="">--선택--</option>
+                    </select>
                 </div>
-                <div class="search-bar">
-                    <input type="text" placeholder="검색어를 입력해 주세요">
-                    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
-                    </svg></a>
+                <label for="title" class="form-label">제목</label>
+                <input type="text" id="title" name="title" class="form-input" placeholder="제목을 입력하세요">
+
+                <label for="editor" class="form-label">내용</label>
+                <div class="content-editor-wrapper">
+                    <div id="toolbar">
+                        <select class="ql-font"></select>
+                        <select class="ql-size">
+                            <option value="small"></option>
+                            <option selected></option>
+                            <option value="large"></option>
+                            <option value="huge"></option>
+                        </select>
+
+                        <button class="ql-bold"></button>
+                        <button class="ql-italic"></button>
+                        <button class="ql-underline"></button>
+                        <button class="ql-strike"></button>
+
+                        <select class="ql-color"></select>
+                        <select class="ql-background"></select>
+
+                        <button class="ql-script" value="sub"></button>
+                        <button class="ql-script" value="super"></button>
+
+                        <select class="ql-header">
+                            <option value="1"></option>
+                            <option value="2"></option>
+                            <option selected></option>
+                        </select>
+
+                        <button class="ql-align" value=""></button>
+                        <button class="ql-align" value="center"></button>
+                        <button class="ql-align" value="right"></button>
+                        <button class="ql-align" value="justify"></button>
+
+                        <button class="ql-list" value="ordered"></button>
+                        <button class="ql-list" value="bullet"></button>
+
+                        <button class="ql-indent" value="-1"></button>
+                        <button class="ql-indent" value="+1"></button>
+
+                        <button class="ql-link"></button>
+                        <button class="ql-image"></button>
+
+                        <button class="ql-clean"></button>
+                    </div>
+                    <div id="editor" style="height: 300px;"></div>
+                    <input type="hidden" name="bcontent" id="editorContent">
                 </div>
-                <div class="user-icons">
-                    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/>
-                    </svg></a>
-                    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
-                    </svg></a>
-                    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/>
-                    </svg></a>
-                    <div class="user-profile">
-                        <img src="/src/main/resources/static/img/default-profile.png" alt="Profile Image" class="profile-img">
-                        <span class="username" th:text="${user != null ? user.memberNickname : '회원님'}">회원님</span>
+
+                <div class="file-upload-section">
+                    <input type="hidden" id="upload-group" name="uploadGroup">
+                    <span class="upload-label">파일 첨부</span>
+                    <div class="file-upload-buttons">
+                        <input type="file" id="file-input" name="files" multiple style="display: none;">
+                        <button type="button" onclick="document.getElementById('file-input').click();">파일 선택</button>
+                        <span id="file-name-display">선택된 파일 없음</span>
+                        <ul id="file-list" class="file-list"></ul>
                     </div>
                 </div>
-            </header>
-
-            <nav class="main-nav">
-                <div><a th:href="@{/menu/all}">전체메뉴</a></div>
-                <div><a th:href="@{/theme}">테마여행</a></div>
-                <div><a th:href="@{/community}">커뮤니티</a></div>
-                <div><a th:href="@{/flight}">항공</a></div>
-                <div><a th:href="@{/hotel}">호텔</a></div>
-            </nav>
-
-            <main class="main-content">
-                <aside class="left-sidebar">
-                    <ul>
-                        <div class="menu-title">커뮤니티</div>
-                        <li><a th:href="@{/review}">리뷰</a></li>
-                        <li><a th:href="@{/bbs}">자유 게시판</a></li>
-                    </ul>
-                </aside>
-                <section class="content-area">
-                    <div class="header-with-temp-save">
-                        <h1>게시글 작성</h1>
-                        <div id="tempSaveControls">
-                            <button id="tempSaveButton">임시저장글 (<span id="tempSaveCount">0</span>)</button>
-                            <div id="tempSaveList" style="display: none;">
-                                <h4>임시저장된 글 목록</h4>
-                                <ul id="tempSaveListItems">
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <form class="write-form" id="write-form" th:action="@{/community/write}" method="post">
-                        <label for="bcategory" class="form-label">카테고리</label>
-                        <div class="select-group">
-                            <select id="bcategory" name="bcategory">
-                                <option value="category0">==선택==</option>
-                                <option value="category1">지역</option>
-                                <option value="category2">반려동물</option>
-                                <option value="category3">맛집</option>
-                                <option value="category4">문화/역사</option>
-                                <option value="category5">계절/자연</option>
-                                <option value="category6">실버/교통약자</option>
-                            </select>
-                        </div>
-
-                        <label for="title" class="form-label">제목</label>
-                        <input type="text" id="title" name="title" class="form-input" placeholder="제목을 입력하세요">
-
-                        <label for="editor" class="form-label">내용</label>
-                        <div class="content-editor-wrapper">
-                            <div id="toolbar">
-                                <select class="ql-font"></select>
-                                <select class="ql-size">
-                                    <option value="small"></option>
-                                    <option selected></option>
-                                    <option value="large"></option>
-                                    <option value="huge"></option>
-                                </select>
-
-                                <button class="ql-bold"></button>
-                                <button class="ql-italic"></button>
-                                <button class="ql-underline"></button>
-                                <button class="ql-strike"></button>
-
-                                <select class="ql-color"></select>
-                                <select class="ql-background"></select>
-
-                                <button class="ql-script" value="sub"></button>
-                                <button class="ql-script" value="super"></button>
-
-                                <select class="ql-header">
-                                    <option value="1"></option>
-                                    <option value="2"></option>
-                                    <option selected></option>
-                                </select>
-
-                                <button class="ql-align" value=""></button>
-                                <button class="ql-align" value="center"></button>
-                                <button class="ql-align" value="right"></button>
-                                <button class="ql-align" value="justify"></button>
-
-                                <button class="ql-list" value="ordered"></button>
-                                <button class="ql-list" value="bullet"></button>
-
-                                <button class="ql-indent" value="-1"></button>
-                                <button class="ql-indent" value="+1"></button>
-
-                                <button class="ql-link"></button>
-                                <button class="ql-image"></button>
-
-                                <button class="ql-clean"></button>
-                            </div>
-                            <div id="editor" style="height: 300px;"></div>
-                            <input type="hidden" name="bcontent" id="editorContent">
-                        </div>
-
-                        <div class="file-upload-section">
-                            <span class="upload-label">사진 첨부</span>
-                            <div class="file-upload-buttons">
-                                <input type="file" id="file-input" name="files" multiple style="display: none;">
-                                <button type="button" onclick="document.getElementById('file-input').click();">파일 선택</button>
-                                <span id="file-name-display">선택된 사진 파일 없음</span>
-                            </div>
-                        </div>
-
-                        <div class="button-group">
-                            <button type="submit" class="submit-btn">작성완료</button>
-                            <button type="button" class="temp-save-btn" id="submit-temp-save-btn">임시저장</button> </div>
-                    </form>
-                </section>
-            </main>
-
-            <footer class="footer">
-                <div class="footer-top">
-                    <div class="footer-logo">
-                        <span class="footer-logo-text">MO:SI</span>
-                    </div>
-                    <div class="footer-info">
-                        <div class="footer-column">
-                            <div class="title">(주) 샤인머스캣</div>
-                            <div class="item">
-                                사업자 등록번호: 338-88-00632 | 대표: 이수영<br>
-                                소재지: (06159) 서울시 강남구 테헤란로 208<br>
-                                이메일: mosi@subsmsm.co.kr<br>
-                                대표번호: 1666-9807
-                            </div>
-                        </div>
-                        <div class="footer-column">
-                            <div class="title">고객센터</div>
-                            <div class="item">
-                                <a href="#" style="color: white; text-decoration: none;">1:1 문의</a><br>
-                                <a href="#" style="color: white; text-decoration: none;">FAQ</a><br>
-                                <a href="#" style="color: white; text-decoration: none;">공지사항</a>
-                            </div>
-                        </div>
-                        <div class="footer-column footer-social">
-                            <div class="title">Follow us</div>
-                            <a href="#"><img src="https://via.placeholder.com/24x24?text=FB" alt="Facebook"></a>
-                            <a href="#"><img src="https://via.placeholder.com/24x24?text=IG" alt="Instagram"></a>
-                            <a href="#"><img src="https://via.placeholder.com/24x24?text=YT" alt="YouTube"></a>
-                        </div>
-                    </div>
+                <div class="button-group">
+                    <button type="submit" class="submit-btn" id="submit-btn">작성하기</button>
+                    <button type="button" class="temp-save-btn" id="temp-save-btn">임시저장</button>
                 </div>
-                <div class="footer-bottom">
-                    <div class="policy-links">
-                        <span>이용약관</span> |
-                        <span>개인정보처리방침</span> |
-                        <span>전자금융거래 이용약관</span>
-                    </div>
-                    <div>&copy; Copyright ©subsmsm.co.ltd Inc. All rights reserved.</div>
-                </div>
-            </footer>
-        </div>
-    </div>
+            </form>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
-
-            <!-- 1) Quill UMD (로컬) -->
+<!-- 1) Quill UMD (로컬) -->
 <script th:src="@{/js/community/vendor/quill.min.js}"></script>
 
 <!-- 2) ImageDrop UMD (로컬, 파일명은 image-drop.min.js) -->
@@ -213,6 +128,5 @@
 <script th:src="@{/js/community/vendor/image-resize.min.js}"></script>
 
 <script  type="module" th:src="@{/js/community/bbs/csr/writeForm_quill.js}"></script>
-
 </body>
 </html>

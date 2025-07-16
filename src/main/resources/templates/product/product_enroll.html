@@ -211,15 +211,15 @@
                   <!-- 이미지 업로드 영역 -->
                   <div class="form-group img">
                     <label>&nbsp&nbsp&nbsp상품 이미지 등록</label>
-                    <div>
+                    <div class="image-upload-container">
                       <div class="image-upload-single">
-                        <label for="productImage">
+                        <div class="upload-box">
                           <input id="productImage" type="file" th:field="*{productImages}" multiple style="display:none;">
                           <i class="fa fa-cloud-upload-alt" style=""></i>
                           <p style="text-align:center; color:#717171; font-size:14px;">클릭하거나 파일을 드래그하여 <br>이미지 업로드</p>
                           <img class="image-preview" src="" alt="미리보기 이미지"
-                            style="display:none; max-width: 100%; border-radius: 8px; margin-top: 10px;" />
-                        </label>
+                               style="display:none; max-width: 100%; border-radius: 8px; margin-top: 10px;" />
+                        </div>
                       </div>
                       <!-- 파일명 리스트 영역 -->
                       <div id="imageNameList" class="image-name-list">
@@ -264,12 +264,12 @@
               </div>
             </div>
           </div>
-          <script src="/static/js/product/enroll.js"></script>
         </section>
       </main>
     </div>
     <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
+  <script th:src="@{/js/product/enroll.js}"></script>
   <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
 </body>
 

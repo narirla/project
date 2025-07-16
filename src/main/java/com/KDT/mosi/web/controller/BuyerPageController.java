@@ -50,8 +50,10 @@ public class  BuyerPageController {
 
   // ✅ 마이페이지 조회
   @GetMapping("/{memberId}")
+
   public String view(@PathVariable Long memberId, Model model) {
     if (!getLoginMemberId().equals(memberId)) return "error/403";
+
 
     Optional<Member>  om = memberSVC.findById(memberId);
     Optional<BuyerPage> ob = buyerPageSVC.findByMemberId(memberId);
@@ -82,7 +84,7 @@ public class  BuyerPageController {
 
   // ✅ 프로필 이미지 조회
   @GetMapping("/{memberId}/image")
-  public ResponseEntity<byte[]> image(@PathVariable Long memberId) {
+  public ResponseEntity<byte[]> image(@PathVariable("memberId") Long memberId) {
     Optional<BuyerPage> optional = buyerPageSVC.findByMemberId(memberId);
 
     if (optional.isPresent() && optional.get().getImage() != null) {
@@ -110,7 +112,7 @@ public class  BuyerPageController {
 
   // ✅ 수정 폼
   @GetMapping("/{memberId}/edit")
-  public String editForm(@PathVariable Long memberId, Model model) {
+  public String editForm(@PathVariable("memberId") Long memberId, Model model) {
     if (!getLoginMemberId().equals(memberId)) {
       return "error/403";
     }

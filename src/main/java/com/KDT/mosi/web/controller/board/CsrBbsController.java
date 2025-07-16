@@ -18,7 +18,12 @@ public class CsrBbsController {
 
   @GetMapping
   public String bbs() {
-    return "csr/bbs/allForm_v2";
+    return "/postBoards/allForm_v2";
+  }
+
+  @GetMapping("/community")
+  public String community() {
+    return "/postBoards/bbs_list";
   }
 
   //게시글조회
@@ -29,7 +34,7 @@ public class CsrBbsController {
   ){
     model.addAttribute("bbsId", id);
 
-    return "csr/bbs/detailForm";
+    return "/postBoards/detailForm";
   }
 
   @GetMapping("/add")
