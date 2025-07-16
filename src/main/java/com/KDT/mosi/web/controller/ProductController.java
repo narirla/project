@@ -7,6 +7,7 @@ import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
 import com.KDT.mosi.domain.product.svc.ProductImageSVC;
 import com.KDT.mosi.domain.product.svc.ProductSVC;
 import com.KDT.mosi.web.form.product.ProductCoursePointForm;
+import com.KDT.mosi.web.form.product.ProductDetailForm;
 import com.KDT.mosi.web.form.product.ProductUploadForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,8 +55,12 @@ public class ProductController {
             }
 
             List<Product> products = productSVC.getProductsByPage(page, size);
+            Long memberId = loginMember.getMemberId();
+
+
             model.addAttribute("productList", products);
             model.addAttribute("currentPage", page);
+            model.addAttribute("countProduct", productSVC.countByMemberId(memberId));
 
             return "product/product_managing";
         }
@@ -229,30 +235,55 @@ public class ProductController {
 
     @GetMapping("/view/{id}")
     public String view(@PathVariable("id") Long id, Model model, HttpSession session) {
+
+        // 3) 로그인 회원 정보 조회
+        Member loginMember = (Member) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            // 필요 시 로그인 페이지로 리다이렉트 또는 예외 처리
+            throw new IllegalStateException("로그인한 회원이 아닙니다.");
+        }
+        Long memberId = loginMember.getMemberId();
+
+        // 1) 상품 조회, 없으면 예외 처리
         Product product = productSVC.getProduct(id)
             .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
+
+        // 2) 상품 이미지, 코스 포인트 리스트 조회
         List<ProductImage> images = productImageSVC.findByProductId(id);
         List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
-        Member loginMember = (Member) session.getAttribute("loginMember");
-        Long memberId = loginMember.getMemberId();
+
+        // 4) 판매자 페이지 정보 조회
         Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
         if (optional.isEmpty()) {
             return "redirect:/mypage/seller/create";
         }
         SellerPage sellerPage = optional.get();
-        product.setProductImages(images);
-        log.info("sellerId= {}", sellerPage.getMemberId());
-        log.info("loginSeller = {}", sellerPage.getIntro());
-        log.info("nickname = {}", sellerPage.getNickname());
-        log.info("id = {}", memberId);
 
-        model.addAttribute("nickname", sellerPage.getNickname());
-        model.addAttribute("intro", sellerPage.getIntro());
-        model.addAttribute("sellerImage", sellerPage.getImage());
-        model.addAttribute("countProduct", productSVC.countByMemberId(memberId));
-        model.addAttribute("product", product);
-        model.addAttribute("images", images);
-        model.addAttribute("coursePoints", coursePoints);
+        // 5) DTO에 데이터 세팅
+        product.setMember(loginMember);
+        product.setProductImages(images); // 엔티티에 이미지 세팅
+
+        ProductDetailForm productDetailForm = new ProductDetailForm();
+        productDetailForm.setProduct(product);
+        productDetailForm.setImages(images);
+        productDetailForm.setCoursePoints(coursePoints);
+        productDetailForm.setNickname(sellerPage.getNickname());
+        productDetailForm.setIntro(sellerPage.getIntro());
+
+        // 이미지 byte[] -> base64로 인코딩(Null 체크 필수)
+        byte[] imageBytes = sellerPage.getImage();
+        if (imageBytes != null && imageBytes.length > 0) {
+            String base64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
+            productDetailForm.setSellerImage(base64Image);
+        } else {
+            productDetailForm.setSellerImage(null);
+        }
+
+        // 판매자 상품 수
+        productDetailForm.setCountProduct(productSVC.countByMemberId(memberId));
+
+        // 6) model에 DTO 등록
+        model.addAttribute("productDetailForm", productDetailForm);
 
         return "product/product_detail";
     }

@@ -191,6 +191,7 @@ public class ProductDAOImpl implements ProductDAO {
   }
 
   // findById
+  @Override
   public Optional<Product> findById(Long productId) {
     StringBuffer sql = new StringBuffer();
     sql.append("SELECT * FROM product WHERE product_id = :productId");
@@ -200,11 +201,7 @@ public class ProductDAOImpl implements ProductDAO {
 
     List<Product> list = jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
 
-    if (list.isEmpty()) {
-      return Optional.empty();
-    } else {
-      return Optional.of(list.get(0));
-    }
+    return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
   }
 
   // findAllByPage (Oracle 기준 페이징 처리)
