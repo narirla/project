@@ -8,14 +8,30 @@
     box-sizing: border-box;
 }
 
+/* body{
+    height: 3500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+
 .product-registration {
     font-family: 'Noto Sans KR', sans-serif;
-    width: 1010px;
+    width: 941px;
     color: #414141;
     line-height: 1.6;
     margin-bottom: 100px;
+    
 }
 
+.page-container{
+    height: 2600px;
+}
+
+
+.page-container section{
+    width: 941px;
+}
 
 /* ======================= */
 /* ======= 등록내용 ======= */
