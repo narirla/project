@@ -4,39 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MO:SI 구매자 마이페이지</title>
-  <!-- 레이아웃(헤더·푸터) -->
-  <link rel="stylesheet" th:href="@{/css/layout.css}">
-  <!-- 공통 컴포넌트(UI, 사이드바 등) -->
   <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/buyerpage/editBuyerPage.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
   <div class="layout-wrapper">
     <header th:replace="~{fragments/header :: header}"></header>
-
     <div class="page-container">
       <main class="mypage-container">
-        <!-- ✅ 왼쪽 사이드바 -->
         <aside class="sidebar">
           <div class="sidebar-card">
             <div class="profile-box">
               <div class="profile-image">
-                <!-- 프로필 이미지 -->
-                <img th:if="*{image != null}" th:src="@{'/mypage/buyer/' + *{memberId} + '/image'}" alt="프로필 이미지">
-                <img th:if="*{image == null}" th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
+                <img id="asideProfileImage" th:if="${member != null and member.pic != null}"
+                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
+                <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
               </div>
               <div class="profile-info">
                 <a href="#" class="profile-badge">프로여행러 ></a>
-                <div class="profile-name" th:text="*{name}">이름</div>
-                <!-- 판매자 전환 버튼 -->
+                <div class="profile-name" th:text="${member.name}"></div>
                 <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top: 10px;">
                   <button type="submit" class="btn btn-outline-secondary w-100">판매자 전환</button>
                 </form>
               </div>
             </div>
-
-            <!-- 사이드바 네비게이션 -->
             <nav class="mypage-nav">
               <div class="nav-title active">MY PAGE</div>
               <ul>
@@ -67,7 +60,7 @@
                 <li><a href="#">내 정보</a>
                   <ul>
                     <li><a href="#">회원 등급</a></li>
-                    <li><a th:href="@{'/mypage/buyer/' + *{memberId}}">회원 정보 관리</a></li>
+                    <li><a th:href="@{'/mypage/buyer/' + ${member.memberId}}">회원 정보 관리</a></li>
                     <li><a href="#">신용 카드 및 환불계좌 관리</a></li>
                     <li><a href="#">배송지 관리</a></li>
                     <li><a href="#">본인 인증</a></li>
@@ -87,113 +80,102 @@
           </div>
         </aside>
 
-        <!-- ✅ 본문 영역 -->
         <section class="content">
           <h2 class="form-title">회원 정보 수정</h2>
 
-          <!-- 🔽 form 기반 렌더링 -->
-          <form class="edit-form" th:object="${form}"
-                th:action="@{'/mypage/buyer/' + *{memberId}}" method="post" enctype="multipart/form-data">
+          <form id="buyerUpdateForm" class="edit-form" th:object="${form}" th:action="@{'/mypage/buyer/' + *{memberId}}"
+                method="post" enctype="multipart/form-data">
 
-            <input type="hidden" sec:csrf />
-
-            <!-- 🔽 필수 hidden 값 -->
+            <input type="hidden" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}">
             <input type="hidden" th:field="*{memberId}">
             <input type="hidden" th:field="*{pageId}">
 
-            <!-- 프로필 이미지 -->
             <div class="profile-section">
-              <!-- 서버에서 기본 이미지 fallback 처리 -->
-              <img th:src="@{'/mypage/buyer/' + *{memberId} + '/image'}" alt="프로필 이미지" class="profile-preview">
-              <label class="btn-upload">
-                사진변경 <input type="file" th:field="*{imageFile}" hidden id="imageFile">
-              </label>
+              <img class="profile-preview" id="sectionProfilePreview" th:src="@{'/mypage/buyer/' + *{memberId} + '/image'}" alt="프로필 이미지">
+              <input type="file" id="imageFile" name="imageFile" th:field="*{imageFile}" hidden accept="image/*">
+              <label for="imageFile" class="btn-upload">사진변경</label>
             </div>
 
-            <!-- 아이디 (readonly) -->
+<!--            <div class="form-row">-->
+<!--              <label for="name">이름</label>-->
+              <input type="hidden" th:field="*{name}" id="name" autocomplete="name">
+<!--            </div>-->
+
             <div class="form-row">
-              <label>아이디</label>
-              <input type="text" th:value="${member.email}" readonly>
+              <label for="userEmail">아이디</label>
+              <input type="text" th:value="${member.email}" id="userEmail" readonly autocomplete="email">
             </div>
 
-            <!-- 닉네임 -->
             <div class="form-row">
-              <label>닉네임</label>
+              <label for="nickname">닉네임</label>
               <div class="nickname-box">
-                <input type="text" th:field="*{nickname}" id="nickname">
+                <input type="text" th:field="*{nickname}" id="nickname" name="nickname" autocomplete="off">
                 <button type="button" class="btn-small" id="nicknameToggleBtn">중복확인</button>
               </div>
-
-              <!-- ✅ 중복 확인 결과 메시지 -->
               <span id="nicknameCheckMsg" class="form-text ms-2"></span>
-
               <p class="error-msg" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">닉네임 오류</p>
             </div>
 
-            <!-- 전화번호 (disabled) -->
             <div class="form-row">
-              <label>전화번호</label>
-              <input type="tel" th:field="*{tel}" disabled>
+              <label for="tel">전화번호</label>
+              <input type="tel" th:field="*{tel}" id="tel" name="tel" autocomplete="tel">
             </div>
 
-            <!-- 비밀번호 -->
             <div class="form-row">
-              <label>비밀번호</label>
-              <input type="password" th:field="*{passwd}">
+              <label for="passwd">비밀번호</label>
+              <input type="password" th:field="*{passwd}" id="passwd" name="passwd" autocomplete="new-password">
             </div>
 
-            <!-- 비밀번호 확인 -->
             <div class="form-row">
-              <label>비밀번호 확인</label>
-              <input type="password" th:field="*{confirmPasswd}">
+              <label for="confirmPasswd">비밀번호 확인</label>
+              <input type="password" th:field="*{confirmPasswd}" id="confirmPasswd" name="confirmPasswd" autocomplete="new-password">
               <p class="error-msg" th:if="${#fields.hasErrors('confirmPasswd')}" th:errors="*{confirmPasswd}">비밀번호 확인 오류</p>
             </div>
 
-            <!-- 자기소개 -->
             <div class="form-row">
-              <label>자기소개</label>
-              <textarea th:field="*{intro}" maxlength="60" id="intro"></textarea>
+              <label for="intro">자기소개</label>
+              <textarea id="intro" th:field="*{intro}" name="intro" maxlength="60"></textarea>
               <div class="char-count" th:text="${#strings.length(form.intro)} + '자 / 60자'"></div>
             </div>
 
-            <!-- 알림 수신 여부 -->
             <div class="form-row">
-              <label>알림 설정</label>
-              <label><input type="checkbox" th:field="*{notification}" value="Y"> 알림 수신 동의</label>
+              <label for="notification">알림 설정</label>
+              <label class="inline-label">
+                <input type="checkbox" id="notification" name="notification" th:field="*{notification}" value="Y">
+                알림 수신 동의
+              </label>
             </div>
 
-            <!-- 주소 입력 -->
             <h3 class="section-subtitle">추가 정보</h3>
+
             <div class="form-row address-row">
-              <label>우편번호</label>
+              <label for="zonecode">우편번호</label>
               <div>
-                <input type="text" th:field="*{zonecode}" readonly>
+                <input type="text" id="zonecode" th:field="*{zonecode}" name="zonecode" autocomplete="postal-code" readonly>
                 <button type="button" class="btn-small" id="btnSearchAddr">주소 검색</button>
               </div>
             </div>
 
             <div class="form-row">
-              <label>기본주소</label>
-              <input type="text" th:field="*{address}" readonly>
+              <label for="address">기본주소</label>
+              <input type="text" id="address" th:field="*{address}" name="address" autocomplete="address-line1" readonly>
             </div>
 
             <div class="form-row">
-              <label>상세주소</label>
-              <input type="text" th:field="*{detailAddress}">
+              <label for="detailAddress">상세주소</label>
+              <input type="text" id="detailAddress" th:field="*{detailAddress}" name="detailAddress" autocomplete="address-line2">
             </div>
 
-            <!-- 버튼 -->
             <div class="form-button-group">
-              <button type="button" class="btn btn-primary" id="saveBtn">회원정보 수정하기</button>
+              <button id="saveBtn" type="submit" class="btn btn-primary">회원 정보 수정하기</button>
             </div>
           </form>
         </section>
       </main>
 
-      <!-- 공지 바 -->
       <div class="notice-bar">
-        <div class="notice-label">공지</div>
-        <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+        <strong class="notice-label">공지</strong>
+        <span class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</span>
         <a href="#" class="more-link">+ 더보기</a>
       </div>
     </div>
@@ -201,7 +183,6 @@
     <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
 
-  <!-- ✅ 주소검색 스크립트 (카카오) -->
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <script th:src="@{/js/buyerpage/editBuyerPage.js}" defer></script>
 </body>
