@@ -1,4 +1,4 @@
-import { ajax, PaginationUI } from '/js/common.js';
+import { ajax, PaginationUI } from '/js/community/common.js';
 const $list = document.getElementById('post-tbody')
 let currentPage = 1;
 const recordsPerPage = 10;
