@@ -1,25 +1,21 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // 업로드 영역, input[type=file], 미리보기 이미지, 아이콘, 텍스트, 파일명 리스트 요소 선택
-  const uploadBox = document.querySelector('.image-upload-single');
-  const input = uploadBox.querySelector('input[type="file"]');
+  const uploadBox = document.querySelector('.upload-box');
+  const input = document.querySelector('#productImage');   // id로 직접 선택하여 명확성 증가
   const preview = uploadBox.querySelector('.image-preview');
   const icon = uploadBox.querySelector('i');
   const text = uploadBox.querySelector('p');
   const nameList = document.getElementById('imageNameList');
 
-  const maxCount = 10; // 최대 업로드 가능한 이미지 수 제한
-  let filesArr = []; // 현재 업로드된 파일 배열
+  const maxCount = 10;
+  let filesArr = [];
 
-  // 업로드 박스 클릭하면 파일 선택창 열림 (단, input 직접 클릭은 무시)
   uploadBox.addEventListener('click', function (e) {
-    if (e.target === input) return;
+    if(e.target === input) return;
     input.click();
   });
 
-  // 파일 선택시 처리
   input.addEventListener('change', function (e) {
     const newFiles = Array.from(input.files);
-    // 기존에 없는 새 파일만 추가
     filesArr = filesArr.concat(newFiles.filter(newFile =>
       !filesArr.some(f => f.name === newFile.name && f.size === newFile.size)
     ));
@@ -31,25 +27,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     updateInputFiles();
     renderNameList();
-    if (filesArr.length > 0) showPreview(filesArr[0]);
-    else hidePreview();
+
+    if (filesArr.length > 0) {
+        showPreview(filesArr[0]);
+        renderNameList(filesArr[0]); // 활성화 파일명 표시
+      } else {
+        hidePreview();
+        renderNameList(null);
+      }
   });
 
-  // 드래그 오버 시 스타일 변경 및 기본 동작 방지
   uploadBox.addEventListener('dragover', function (e) {
     e.preventDefault();
     this.style.borderColor = '#3498db';
     this.style.background = '#f0f7ff';
   });
 
-  // 드래그 떠날 때 스타일 원상복귀
   uploadBox.addEventListener('dragleave', function (e) {
     e.preventDefault();
     this.style.borderColor = '#e0e0e0';
     this.style.background = '#f8f9fa';
   });
 
-  // 드랍 시 파일 추가 처리
   uploadBox.addEventListener('drop', function (e) {
     e.preventDefault();
     this.style.borderColor = '#e0e0e0';
@@ -67,40 +66,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
       updateInputFiles();
       renderNameList();
-      if (filesArr.length > 0) showPreview(filesArr[0]);
-      else hidePreview();
+
+      if (filesArr.length > 0) {
+          showPreview(filesArr[0]);
+          renderNameList(filesArr[0]); // 활성화 파일명 표시
+        } else {
+          hidePreview();
+          renderNameList(null);
+        }
     }
   });
 
-  // 파일명 리스트 렌더링 및 클릭, 삭제 버튼 이벤트 등록
-  function renderNameList() {
-    nameList.innerHTML = ''; // 초기화
+  function renderNameList(activeFile) {
+    nameList.innerHTML = '';
     filesArr.forEach((file, idx) => {
       const item = document.createElement('div');
       item.className = 'image-name-item';
       item.textContent = file.name;
-      item.style.cursor = 'pointer';
 
-      // 파일명 클릭 시 해당 이미지 미리보기 표시, 이벤트 버블링 차단
+      // 현재 활성화된 파일에 active 클래스 추가
+      if (activeFile && activeFile.name === file.name && activeFile.size === file.size) {
+        item.classList.add('active');
+      }
+
       item.addEventListener('click', (e) => {
         e.stopPropagation();
         showPreview(file);
+        // 미리보기 이미지 불러올 때 기본으로 띄워지는 이미지 파일명에 활성화 내용 적용하기
+        renderNameList(file);
       });
 
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
       removeBtn.className = 'remove-image';
-      removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-      removeBtn.style.marginLeft = '10px';
+      removeBtn.innerText = 'x';
 
-      // 삭제 버튼 클릭시 파일 배열에서 삭제, 이벤트 버블링 차단
       removeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         filesArr.splice(idx, 1);
         updateInputFiles();
-        renderNameList();
-        if (filesArr.length > 0) showPreview(filesArr[0]);
-        else hidePreview();
+
+        // 이미지 삭제시 활성화된 이미지 갱신
+        if (filesArr.length > 0){
+            if (activeFile && activeFile.name === file.name && activeFile.size === file.size) {
+                showPreview(filesArr[0]);
+                renderNameList(filesArr[0]);
+            } else {
+            renderNameList(activeFile);
+            }
+        } else {
+            hidePreview();
+            renderNameList(null);
+        }
       });
 
       item.appendChild(removeBtn);
@@ -108,7 +125,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // File 객체를 이용해 미리보기 이미지 표시
   function showPreview(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -120,7 +136,6 @@ document.addEventListener('DOMContentLoaded', function () {
     reader.readAsDataURL(file);
   }
 
-  // 미리보기 이미지 숨기고 아이콘, 텍스트 다시 보이게 함
   function hidePreview() {
     preview.style.display = 'none';
     preview.src = '';
@@ -128,14 +143,12 @@ document.addEventListener('DOMContentLoaded', function () {
     text.style.display = 'block';
   }
 
-  // 실제 form 제출 시 input[type=file] 에 파일 리스트 동기화
   function updateInputFiles() {
     const dt = new DataTransfer();
     filesArr.forEach(f => dt.items.add(f));
     input.files = dt.files;
   }
 
-  // 폼 검증 초기화 (필요시 확장 가능)
   initializeFormValidation();
 
   function initializeFormValidation() {
