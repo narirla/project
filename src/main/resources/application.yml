@@ -30,4 +30,4 @@ logging:
 
 # 게시판 업로드 위치
 upload:
-  path: uploads/bbs
+  path: C:\KDT\projects\uploads\bbs
