@@ -5,6 +5,7 @@ import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.member.svc.MemberSVC;
 import com.KDT.mosi.domain.mypage.buyer.svc.BuyerPageSVC;
 import com.KDT.mosi.web.form.mypage.buyerpage.BuyerPageUpdateForm;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,43 +50,41 @@ public class  BuyerPageController {
 
   // ✅ 마이페이지 조회
   @GetMapping("/{memberId}")
+
   public String view(@PathVariable Long memberId, Model model) {
-    if (!getLoginMemberId().equals(memberId)) {
-      return "error/403";
+    if (!getLoginMemberId().equals(memberId)) return "error/403";
+
+
+    Optional<Member>  om = memberSVC.findById(memberId);
+    Optional<BuyerPage> ob = buyerPageSVC.findByMemberId(memberId);
+    if (om.isEmpty()) return "error/404";
+
+    Member member = om.get();
+    model.addAttribute("member", member);
+
+    if (ob.isPresent()) {
+      BuyerPage page = ob.get();
+
+      // 🔽Member → BuyerPage 데이터 동기화
+//      page.setTel(member.getTel());
+//      page.setZonecode(member.getZonecode());
+//      page.setAddress(member.getAddress());
+//      page.setDetailAddress(member.getDetailAddress());
+//      page.setNotification(member.getNotification());
+
+      member.setNickname(page.getNickname());   // 닉네임도 맞춰줌
+
+      model.addAttribute("buyerPage", page);
+      return "mypage/buyerpage/viewBuyerPage";
     }
-
-    Optional<Member> optionalMember = memberSVC.findById(memberId);
-    Optional<BuyerPage> optionalBuyerPage = buyerPageSVC.findByMemberId(memberId);
-
-    if (optionalMember.isPresent()) {
-      Member member = optionalMember.get();
-      model.addAttribute("member", member);
-
-      if (optionalBuyerPage.isPresent()) {
-        BuyerPage page = optionalBuyerPage.get();
-
-        // 🔽 BuyerPage에만 존재하는 필드만 갱신
-        page.setMemberId(member.getMemberId());
-        page.setTel(member.getTel());
-
-        member.setNickname(page.getNickname());
-
-        model.addAttribute("buyerPage", page);
-        model.addAttribute("member", member);
-        return "mypage/buyerpage/viewBuyerPage";
-      } else {
-        return "redirect:/mypage/buyer/" + memberId + "/edit";
-      }
-
-    } else {
-      return "error/404";
-    }
+    return "redirect:/mypage/buyer/" + memberId + "/edit";
   }
+
 
 
   // ✅ 프로필 이미지 조회
   @GetMapping("/{memberId}/image")
-  public ResponseEntity<byte[]> image(@PathVariable Long memberId) {
+  public ResponseEntity<byte[]> image(@PathVariable("memberId") Long memberId) {
     Optional<BuyerPage> optional = buyerPageSVC.findByMemberId(memberId);
 
     if (optional.isPresent() && optional.get().getImage() != null) {
@@ -113,7 +112,7 @@ public class  BuyerPageController {
 
   // ✅ 수정 폼
   @GetMapping("/{memberId}/edit")
-  public String editForm(@PathVariable Long memberId, Model model) {
+  public String editForm(@PathVariable("memberId") Long memberId, Model model) {
     if (!getLoginMemberId().equals(memberId)) {
       return "error/403";
     }
@@ -172,10 +171,14 @@ public class  BuyerPageController {
   // ✅ 마이페이지 수정 처리
   @PostMapping("/{memberId}")
   public String update(
-      @PathVariable Long memberId,
+      @PathVariable("memberId") Long memberId,
       @Valid @ModelAttribute("form") BuyerPageUpdateForm form,
       BindingResult bindingResult,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes redirectAttributes,
+      Model model,
+      HttpSession session) throws IOException {
+
+    log.info("🟢 update() 진입: memberId = {}", memberId);
 
     // ───────────────────────────
     // 1. 권한·세션 검증
@@ -190,8 +193,14 @@ public class  BuyerPageController {
     // 2. 검증 오류 처리
     // ───────────────────────────
     if (bindingResult.hasErrors()) {
+      // 🔹 [로그] 필드별 오류 메시지 출력
       bindingResult.getFieldErrors()
-          .forEach(e -> log.warn("❌ {} : {}", e.getField(), e.getDefaultMessage()));
+          .forEach(err -> log.warn("❌ Validation error - {} : {}",
+              err.getField(), err.getDefaultMessage()));
+
+      memberSVC.findById(memberId)
+          .ifPresent(m -> model.addAttribute("member", m)); // 기존 코드
+
       return "mypage/buyerpage/editBuyerPage";
     }
 
@@ -206,6 +215,7 @@ public class  BuyerPageController {
     if (requestedNickname != null && !requestedNickname.equals(currentNickname) &&
         memberSVC.isExistNickname(requestedNickname)) {
       bindingResult.rejectValue("nickname", "duplicate", "이미 사용 중인 닉네임입니다.");
+      memberSVC.findById(memberId).ifPresent(m -> model.addAttribute("member", m));
       return "mypage/buyerpage/editBuyerPage";
     }
 
@@ -217,6 +227,13 @@ public class  BuyerPageController {
     buyerPage.setMemberId(memberId);
     buyerPage.setNickname(requestedNickname);
     buyerPage.setIntro(form.getIntro());
+    log.debug("💬 intro = {}", form.getIntro()); // ✅ intro 값 확인
+    buyerPage.setTel(form.getTel());
+    buyerPage.setAddress(form.getAddress());
+    buyerPage.setZonecode(form.getZonecode());
+    buyerPage.setDetailAddress(form.getDetailAddress());
+    buyerPage.setNotification(form.getNotification());
+
 
     if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
       try {
@@ -239,16 +256,43 @@ public class  BuyerPageController {
     member.setDetailAddress(form.getDetailAddress());
     member.setNotification("Y".equals(form.getNotification()) ? "Y" : "N");
 
+    if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
+      try {
+        member.setPic(form.getImageFile().getBytes());
+        // ✅ 이미지 데이터 유무 로그 추가
+        log.info("🖼️ Member 'pic' field updated with image data. Size: {} bytes", member.getPic().length);
+      } catch (IOException e) {
+        log.error("Failed to get image bytes for Member pic", e);
+      }
+    } else {
+      log.info("No new image file provided for Member 'pic' update.");
+    }
+
     if (form.getPasswd() != null && !form.getPasswd().isBlank()) {
       member.setPasswd(form.getPasswd());
     }
     memberSVC.modify(memberId, member);
 
     // ───────────────────────────
-    // 6. 완료 후 리다이렉트
+    // 6. 세션 정보 동기화
+    // ───────────────────────────
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember != null) {
+      loginMember.setNickname(requestedNickname);
+      loginMember.setTel(form.getTel());
+      loginMember.setZonecode(form.getZonecode());
+      loginMember.setAddress(form.getAddress());
+      loginMember.setDetailAddress(form.getDetailAddress());
+      session.setAttribute("loginMember", loginMember);   // 세션 갱신
+    }
+
+    // ───────────────────────────
+    // 7. 리다이렉트
     // ───────────────────────────
     redirectAttributes.addFlashAttribute("msg", "마이페이지 정보가 성공적으로 수정되었습니다.");
+
     return "redirect:/mypage/buyer/" + memberId;
+
   }
 
 

@@ -8,10 +8,11 @@ body {
   font-family: 'Pretendard', sans-serif;
   background-color: #fff;
   color: #1F1F1F;
-  padding: 0;
+  padding-top: 167px;
 }
 
 h2.form-title {
+  width: 938px;
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 24px;
@@ -25,12 +26,30 @@ h2.form-title {
   gap: 24px;
 }
 
+.mypage-nav > ul {
+    padding: 10px 0;
+    height: 951px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.mypage-nav a {
+  text-decoration: none !important;   /* ✅ 밑줄 제거 */
+}
+.mypage-nav a:hover,
+.mypage-nav a:active,
+.mypage-nav a:visited {
+  text-decoration: none !important;   /* ✅ 상태별 밑줄도 제거 */
+}
+
+
 /* =============================== */
 /* ✅ 전체 폼 컨테이너 */
 /* =============================== */
 .content {
   width: 938px;         /* 가로 */
   height: 1587px;       /* 세로 */
+  flex: 1;
   margin: 0 auto;       /* 가운데 정렬 */
   padding: 40px;
   box-sizing: border-box;
@@ -41,11 +60,10 @@ h2.form-title {
 
 .edit-form {
   width: 100%;
-  max-width: 720px;
+  max-width: 938px;
   background-color: #fff;
   padding: 32px;
   border-radius: 8px;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.06);
   margin-top: 16px;
 }
 

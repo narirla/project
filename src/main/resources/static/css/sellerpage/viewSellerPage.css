@@ -7,7 +7,7 @@
   width: 1200px;
   height: 1980px;
   margin: 0 auto;
-  padding: 0 40px 60px 40px; /* header 높이 고려 */
+  padding-top: 167px;
   background-color: #fff;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
   overflow-x: hidden;
