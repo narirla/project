@@ -1,4 +1,4 @@
-/*editBuyerPage.js*/
+/* editSellerPage.js */
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.querySelector('form');
   const nicknameInput = document.querySelector('#nickname');
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
       fetch(`/members/nicknameCheck?nickname=${encodeURIComponent(current)}`)
         .then(res => res.json())
         .then(data => {
-          if (!data) {  // false면 사용 가능
+          if (!data) {
             resultSpan.textContent = '사용 가능한 닉네임입니다.';
             resultSpan.className = 'form-text ms-2 text-success';
             isNicknameChecked = true;
@@ -177,5 +177,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     form.submit();
+  });
+
+  // ✅ 주소 검색 버튼 클릭 시 다음 우편번호 API 호출
+  document.getElementById('btnSearchAddr')?.addEventListener('click', () => {
+    new daum.Postcode({
+      oncomplete: data => {
+        // 우편번호 입력
+        document.getElementById('zonecode').value = data.zonecode;
+        // 도로명 주소 또는 지번 주소 입력
+        document.getElementById('address').value = data.roadAddress || data.jibunAddress;
+        // 상세주소 입력창으로 포커스 이동
+        document.getElementById('detailAddress').focus();
+      }
+    }).open();
   });
 });
