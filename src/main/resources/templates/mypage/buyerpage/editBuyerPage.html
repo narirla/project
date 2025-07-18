@@ -135,7 +135,7 @@
             <div class="form-row">
               <label for="intro">자기소개</label>
               <textarea id="intro" th:field="*{intro}" name="intro" maxlength="60"></textarea>
-              <div class="char-count" th:text="${#strings.length(form.intro)} + '자 / 60자'"></div>
+              <div class="char-count" th:text="${intro != null ? #strings.length(intro) + '자 / 60자' : '0자 / 60자'}"></div>
             </div>
 
             <div class="form-row">
