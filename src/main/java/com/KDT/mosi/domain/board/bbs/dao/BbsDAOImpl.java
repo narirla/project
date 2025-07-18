@@ -93,6 +93,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("SELECT ");
     sql.append("b.bbs_id as bbs_id, ");
     sql.append("b.bcategory as bcategory, ");
+    sql.append("b.status as status, ");
     sql.append("CASE ");
     sql.append("WHEN b.status = 'B0202' THEN '삭제된 게시글입니다.' ");
     sql.append("ELSE b.title ");
