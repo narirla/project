@@ -50,8 +50,7 @@ public class  BuyerPageController {
 
   // ✅ 마이페이지 조회
   @GetMapping("/{memberId}")
-
-  public String view(@PathVariable Long memberId, Model model) {
+  public String view(@PathVariable("memberId") Long memberId, Model model) {
     if (!getLoginMemberId().equals(memberId)) return "error/403";
 
 
