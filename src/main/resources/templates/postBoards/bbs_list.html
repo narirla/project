@@ -10,9 +10,6 @@
   <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/common.css}">
 
-  <!-- 페이지 전용 스타일 -->
-  <link rel="stylesheet" th:href="@{/css/sellerpage/sellerMypageHome.css}">
-  <link rel="stylesheet" th:href="@{/css/product/product_managing.css}">
   <link rel="stylesheet" th:href="@{/css/community/community_list.css}">
 </head>
 <body>
@@ -38,20 +35,20 @@
     <!-- ---------- 본문 영역 ---------- -->
     <section class="content">
       <section class="post-section">
-        <h2>게시글</h2>
-
+        <h2>자유 게시판</h2>
+        <hr>
         <!-- 검색바 -->
         <div class="post-search">
-          <select id="bcategory" name="bcategory">
-            <option value="">전체 검색</option>
-          </select>
-          <input type="text" id="keyword-input" placeholder="제목을 입력해주세요" />
-          <button id="search-btn" type="button">검색</button>
-        </div>
+              <select id="bcategory" name="bcategory">
+                <option value="">전체 검색</option>
+              </select>
+          <div class="search-input-wrapper">
+            <input type="text" id="keyword-input" placeholder="  키워드를 입력해주세요">
+            <img th:src="@{/img/bbs/bbs_list/icon_search.png}" alt="검색" class="search-icon">
+          </div>
 
-        <!-- 글쓰기 버튼 (로그인 시 노출) -->
-        <div th:if="${session.loginMember != null}">
-          <a th:href="@{/bbs/community/add}" class="btn-write">글쓰기</a>
+          <!-- 로그인 상태일 때만 노출 -->
+          <a th:if="${session.loginMember != null}" th:href="@{/bbs/community/add}" class="btn-write">글쓰기</a>
         </div>
       </section>
 
