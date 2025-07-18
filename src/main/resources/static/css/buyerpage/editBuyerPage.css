@@ -195,12 +195,12 @@ textarea {
   padding-bottom: 4px;
 }
 
-.section-divider {
+/* .section-divider {
   border: 0;
   height: 1px;
   background-color: #1EC4CC; /* 회원 정보 수정 아래 컬러 */
   margin: 12px 0 24px 0;
-}
+} */
 /* =============================== */
 /* ✅ 버튼 영역 */
 /* =============================== */

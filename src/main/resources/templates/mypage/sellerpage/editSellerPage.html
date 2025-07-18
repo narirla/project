@@ -32,7 +32,7 @@
                 <a href="#" class="profile-badge"> 프로가이드 ></a>
                 <div class="profile-name" th:text="${sellerPage.nickname}">닉네임</div>
                 <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
-                  <button type="submit" class="btn btn-outline-secondary w-100">구매자 전환</button>
+                  <button type="submit" class="btn-role-switch">구매자 전환</button>
                 </form>
               </div>
             </div>
@@ -98,8 +98,8 @@
 
             <div class="profile-section">
               <img class="profile-preview" id="sectionProfilePreview" th:src="@{'/mypage/seller/' + *{memberId} + '/image'}" alt="프로필 이미지">
-              <input type="file" id="imageFile" name="imageFile" th:field="*{imageFile}" hidden accept="image/*">
               <label for="imageFile" class="btn-upload">사진변경</label>
+              <input type="file" id="imageFile" name="imageFile" th:field="*{imageFile}" hidden accept="image/*">
             </div>
 
             <!--            <div class="form-row">-->
@@ -153,6 +153,7 @@
             </div>
 
             <h3 class="section-subtitle">추가 정보</h3>
+            <hr class="section-driver">
 
             <div class="form-row address-row">
               <label for="zonecode">우편번호</label>

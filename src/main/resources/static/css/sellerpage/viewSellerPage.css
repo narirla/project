@@ -1,6 +1,21 @@
 /*viewSellerPage.css*/
 
 /* =================== 판매자 마이페이지 프로필 전용 =================== */
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 167px 40px 60px 40px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.mypage-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+}
+
 
 /* 전체 카드 박스 */
 .info-summary-card {
@@ -8,8 +23,9 @@
   border-radius: 12px;
   padding: 32px;
   background-color: #fff;
-  max-width: 700px;
-  margin: 0 auto;
+  max-width: 932px;
+  max-height: 500px;
+  margin: 40px auto 0 auto;
   text-align: center;
 }
 
@@ -22,17 +38,29 @@
 }
 
 /* 프로필 전체 컨테이너 */
-.profile-card {
+.profile-wrapper {
   display: flex;
+  justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
 }
 
+.profile-left{
+
+  width: 300px;
+  height: 320px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
 /* 프로필 이미지 박스 */
 .profile-image-box {
-  width: 144px;
-  height: 144px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid #ccc;
@@ -46,21 +74,20 @@
 }
 
 /* 프로필 정보 박스 */
-.profile-info-box {
+.profile-right {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: start;
   gap: 10px;
-  width: 234px;
-  height: 264px;
-  border: 1px solid #1EC4CC;
+  width: 600px;
+  height: 320px;
   border-radius: 10px;
-  padding: 16px;
+  padding: 30px;
   box-sizing: border-box;
 }
 
 /* 닉네임 스타일 */
-.profile-info-box .nickname {
+.profile-right .nickname {
   font-size: 20px;
   font-weight: 600; /* 세미볼드 */
   color: #414141;
@@ -73,7 +100,7 @@
   display: flex;
   justify-content: center;
   gap: 40px;
-  margin: 12px 0;
+  margin: 20px 0;
 }
 
 .stat {
@@ -97,6 +124,8 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  width: 95%;
+  height: 50%;
 }
 
 .tags span {
@@ -113,6 +142,11 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
+}
+
+.contact-info .nickname {
+  font-weight: bold;
+  font-size: large;
 }
 
 .contact-info .email {
@@ -145,6 +179,13 @@
 }
 
 /* 프로필 수정하기 버튼 */
+.btn-box{
+  display: flex;
+  justify-content: center;
+
+  margin-top: 20px;
+}
+
 .btn-box .btn-primary {
   width: 180px;
   height: 38px;
@@ -164,3 +205,4 @@
 .btn-box .btn-primary:hover {
   background-color: #00aab8;
 }
+
