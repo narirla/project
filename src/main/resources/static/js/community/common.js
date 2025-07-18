@@ -272,11 +272,15 @@ class PaginationUI {
       const nav = document.createElement('nav');
       nav.className = 'pagination';
 
-      // 처음,이전 버튼 표시
-      if (!this.state.isFirstGroup) {
-          nav.appendChild(this.createButton('처음', () => this.handleFirstClick()));
-          nav.appendChild(this.createButton('이전', () => this.handlePrevClick()));
-      }
+      // 1) 항상 “처음” 버튼 추가, 첫 그룹일 땐 disabled
+      nav.appendChild(
+        this.createButton('<<', () => this.handleFirstClick(), false, this.state.isFirstGroup)
+      );
+
+      // 2) 항상 “이전” 버튼 추가, 첫 그룹일 땐 disabled
+      nav.appendChild(
+        this.createButton('<', () => this.handlePrevClick(), false, this.state.isFirstGroup)
+      );
 
       // 페이지 번호 버튼 표시
       this.state.visiblePages.forEach(pageNum => {
@@ -289,11 +293,15 @@ class PaginationUI {
           );
       });
 
-      // 다음,끝 버튼 표시
-      if (!this.state.isLastGroup) {
-          nav.appendChild(this.createButton('다음', () => this.handleNextClick()));
-          nav.appendChild(this.createButton('끝', () => this.handleLastClick()));
-      }
+      // 4) 항상 “다음” 버튼 추가, 마지막 그룹일 땐 disabled
+      nav.appendChild(
+        this.createButton('>', () => this.handleNextClick(), false, this.state.isLastGroup)
+      );
+
+      // 5) 항상 “끝” 버튼 추가, 마지막 그룹일 땐 disabled
+      nav.appendChild(
+        this.createButton('>>', () => this.handleLastClick(), false, this.state.isLastGroup)
+      );
 
       this.container.appendChild(nav);
   }
