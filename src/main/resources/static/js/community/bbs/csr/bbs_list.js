@@ -1,4 +1,4 @@
-import { ajax, PaginationUI } from '/js/common.js';
+import { ajax, PaginationUI } from '/js/community/common.js';
 import { formatRelativeTime } from '/js/community/bbs/csr/dateUtils.js';
 const $list = document.getElementById('post-tbody')
 let currentPage = 1;
@@ -70,23 +70,46 @@ async function configPagination() {
 
 // 목록 그리기 (bindent 만큼 제목에 들여쓰기)
 async function displayBbsList(bbs) {
-  console.log('목록 그리기');
   if (bbs.length === 0) {
     $list.innerHTML = '<tr><td colspan="7">게시글이 없습니다.</td></tr>';
     return;
   }
-const rows = bbs.map(b => `
-  <tr data-pid="${b.bbsId}">
-    <td>${b.bbsId}</td>
-    <td>${categoryMap[b.bcategory] ?? '기타'}</td>
-    <td class="thumb-cell"></td>
-    <td>${'&nbsp;'.repeat((b.bindent||0)*4)}${b.title}</td>
-    <td>${b.nickname}</td>
-    <td>${formatRelativeTime(b.createDate)}</td>
-    <td>${b.hit}</td>
-  </tr>
-`).join('');
-  $list.innerHTML = rows;
+const rows = bbs.map(b => {
+  const isPlaceholder = b.status === 'B0202';
+
+  if (isPlaceholder) {
+    // 번호만 td, 나머지 6개 칼럼을 colspan으로 합쳐서 placeholder-box 출력
+    return `
+      <tr data-pid="${b.bbsId}" data-status="${b.status}">
+        <td class="bbsId-cell del-bbsId">${b.bbsId}</td>
+        <td colspan="6" class="title-cell del-box">
+          <div class="placeholder-box">삭제된 게시글입니다</div>
+        </td>
+      </tr>
+    `;
+  }
+
+  // 일반 row
+  const indentHtml = b.bindent > 0
+    ? '&nbsp;'.repeat((b.bindent - 1) * 4)
+      + '<img src="/img/bbs/bbs_list/indent-lv.png" class="indent-icon"/>'
+    : '';
+
+  return `
+    <tr data-pid="${b.bbsId}" data-status="${b.status}">
+      <td>${b.bbsId}</td>
+      <td>${categoryMap[b.bcategory] ?? '기타'}</td>
+      <td class="thumb-cell"></td>
+      <td class="title-cell">
+        ${indentHtml}<span>${b.title}</span>
+      </td>
+      <td>${b.nickname}</td>
+      <td>${formatRelativeTime(b.createDate)}</td>
+      <td>${b.hit}</td>
+    </tr>
+  `;
+}).join('');
+$list.innerHTML = rows;
 
     await Promise.all(bbs.map(async b => {
       try {
@@ -96,7 +119,7 @@ const rows = bbs.map(b => `
           const url = res.url ?? res.body?.url;  // ApiResponse 감싸여 있으면 res.body.url
           const td = document.querySelector(`tr[data-pid="${b.bbsId}"] .thumb-cell`);
           if (td && url) {
-            td.innerHTML = `<img src="${url}" alt="썸네일" style="width:50px;height:auto;">`;
+            td.innerHTML = `<img src="${url}" alt="썸네일">`;
           }
         }
       } catch (e) {
