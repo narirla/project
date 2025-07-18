@@ -36,7 +36,31 @@ ul {
     background-color: #fff;
 }
 
+.profile-image {
+  width: 93.5px !important;
+  height: 93.5px !important;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  margin-bottom: 10px; /* auto 제거 */
+}
 
+.mypage-nav .nav-title {
+    width: 180px !important;
+    height: 50px !important;
+    background:#1EC4CC;
+    color:#fff;
+    font-weight:bold;
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+    text-align:center !important;
+    font-size:16px;
+}
+
+.btn-role-switch {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
 /* Content */
 .content {
     flex-grow: 1;
