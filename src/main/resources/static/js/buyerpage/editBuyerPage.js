@@ -76,11 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ──────────────────────────────────
      3) 프로필 사진 선택 시 즉시 미리보기 (및 aside 동기화)
      ────────────────────────────────── */
+  const defaultImageSrc = '/img/default-profile.png';
+
   imageInput?.addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) {
-      // 파일 선택 취소 시 기존 이미지 유지
-      // (서버에서 받은 초기 이미지로 되돌리려면, 해당 이미지의 URL을 어딘가에 저장해두고 사용해야 합니다)
+      // 파일 선택 취소 시 → 기본 이미지로 복원
+      previewImg.src = defaultImageSrc;
+      if (asideProfileImage) {
+        asideProfileImage.src = defaultImageSrc;
+      }
       return;
     }
 
@@ -88,15 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!allowExt.includes(ext)) {
       alert('이미지는 jpg · jpeg · png · gif 형식만 가능합니다.');
       imageInput.value = '';
-      // 파일 형식 오류 시 미리보기/aside 이미지도 기본 이미지로 되돌릴지 결정
-      // 예: previewImg.src = "기본 이미지 경로";
-      // 예: asideProfileImage.src = "기본 이미지 경로";
       return;
     }
     if (file.size > maxSize) {
       alert('이미지 파일은 2MB 이하만 업로드 가능합니다.');
       imageInput.value = '';
-      // 파일 크기 오류 시 미리보기/aside 이미지도 기본 이미지로 되돌릴지 결정
       return;
     }
 
@@ -106,19 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
       previewImg.src = ev.target.result;
 
       // aside의 프로필 이미지 업데이트
-      if (asideProfileImage) { // asideProfileImage 요소가 존재하는지 확인
+      if (asideProfileImage) {
         asideProfileImage.src = ev.target.result;
-        // 만약 aside에 기본 프로필 이미지가 표시되고 있었다면, 숨깁니다.
-        const asideDefaultProfileImage = document.querySelector('aside .profile-image img[th:if="${member == null or member.pic == null}"]');
-        if (asideDefaultProfileImage) {
-            asideDefaultProfileImage.style.display = 'none';
-        }
-        // 새로운 이미지를 표시합니다.
-        asideProfileImage.style.display = 'block'; // 혹시 display: none 되어있을 경우를 대비
       }
     };
     reader.readAsDataURL(file);
   });
+
 
   /* ──────────────────────────────────
      4) 클라이언트 최종 검증 후 submit

@@ -1,7 +1,5 @@
 /* index.css */
 
-/* index.css */
-
 /* ✅ Pretendard 웹폰트 적용 */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
@@ -195,10 +193,12 @@ a {
 
 .guide-list {
   display: grid;
-  grid-template-columns: repeat(2, 593px);
+  grid-template-columns: repeat(2, 586px);
   grid-template-rows: repeat(4, 160px);
-  gap: 20px 14px;
+  gap: 20px 28px;
   justify-content: center;
+  width: 1200px;
+  height: 682px;
 }
 
 .guide-card {

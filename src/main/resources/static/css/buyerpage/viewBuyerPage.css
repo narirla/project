@@ -146,6 +146,18 @@ ul {
   color: #777;
 }
 
+.notification-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.notification-checkbox-wrapper input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+}
+
 /* ✅ 수정 / 탈퇴 버튼 그룹 */
 .form-button-group {
   position: relative;            /* 기준점 설정 */

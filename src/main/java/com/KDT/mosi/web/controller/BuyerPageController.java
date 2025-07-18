@@ -143,6 +143,7 @@ public class  BuyerPageController {
           form.setNotification(member.getNotification());
 
           model.addAttribute("form", form);
+          model.addAttribute("buyerPage", entity);
           return "mypage/buyerpage/editBuyerPage";
         })
         .orElseGet(() -> {
@@ -150,6 +151,8 @@ public class  BuyerPageController {
           newPage.setMemberId(memberId);
           newPage.setNickname(member.getNickname());
           Long pageId = buyerPageSVC.create(newPage);
+
+          BuyerPage entity = newPage;
 
           BuyerPageUpdateForm form = new BuyerPageUpdateForm();
           form.setPageId(pageId);
@@ -163,6 +166,7 @@ public class  BuyerPageController {
           form.setNotification(member.getNotification());
 
           model.addAttribute("form", form);
+          model.addAttribute("buyerPage", entity);
           return "mypage/buyerpage/editBuyerPage";
         });
   }

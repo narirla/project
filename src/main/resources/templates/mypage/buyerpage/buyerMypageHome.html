@@ -23,11 +23,9 @@
           <div class="sidebar-card">
             <div class="profile-box">
               <div class="profile-image">
-                <img th:if="${member != null and member.pic != null}"
-                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
-                <!-- member가 null이거나 pic이 null이면 기본 이미지 출력 -->
-                <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}"
-                     alt="기본 프로필 이미지">
+                <img id="asideProfileImage"
+                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}"
+                     alt="프로필 이미지">
               </div>
               <div class="profile-info">
                 <a href="#" class="profile-badge">프로여행러 ></a>

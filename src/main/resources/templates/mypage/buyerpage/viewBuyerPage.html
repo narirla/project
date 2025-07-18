@@ -24,10 +24,9 @@
           <div class="sidebar-card">
             <div class="profile-box">
               <div class="profile-image">
-                <img th:if="${member != null and member.pic != null}"
-                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="초지형 이미지">
-                <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}"
-                     alt="기본 프로필 이미지">
+                <img id="asideProfileImage"
+                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}"
+                     alt="프로필 이미지">
               </div>
               <div class="profile-info">
                 <a href="#" class="profile-badge">프로에행러 ></a>
@@ -115,8 +114,11 @@
             <div class="form-row divider-top divider-bottom">
               <label>알림설정</label>
               <div class="notification-setting">
-                <input type="checkbox" disabled th:checked="${member.notification == 'Y'}"> 알림 수신 동의
-                <p>할인쿠폰/이벤트, 뉴스레터를 받아보시겠습니까?</p>
+                <label class="notification-checkbox-wrapper">
+                  <input type="checkbox" disabled th:checked="${member.notification == 'Y'}">
+                  <span>알림 수신 동의</span>
+                </label>
+                <p class="notification-desc">할인쿠폰/이벤트, 뉴스레터를 받아보시겠습니까?</p>
               </div>
             </div>
 
