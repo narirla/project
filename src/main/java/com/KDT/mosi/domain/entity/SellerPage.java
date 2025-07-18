@@ -25,4 +25,9 @@ public class SellerPage {
   private String isActive;         // 활동 여부 (Y/N)
   private Timestamp createDate;    // 생성일
   private Timestamp updateDate;    // 수정일
+  private String tel;              // 전화번호
+  private String zonecode;         // 우편번호
+  private String address;          // 기본 주소
+  private String detailAddress;    // 상세 주소
 }
+

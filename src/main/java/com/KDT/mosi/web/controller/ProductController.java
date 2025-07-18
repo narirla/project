@@ -8,10 +8,15 @@ import com.KDT.mosi.domain.product.svc.ProductImageSVC;
 import com.KDT.mosi.domain.product.svc.ProductSVC;
 import com.KDT.mosi.web.form.product.ProductCoursePointForm;
 import com.KDT.mosi.web.form.product.ProductDetailForm;
+import com.KDT.mosi.web.form.product.ProductManagingForm;
 import com.KDT.mosi.web.form.product.ProductUploadForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -21,10 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -38,34 +40,118 @@ public class ProductController {
     private final SellerPageSVC sellerPageSVC;
 
     @GetMapping("/list")
-    public String list(Model model,
-                       HttpSession session,
+    public String list(Model model, HttpSession session,
+                       HttpServletRequest request,
                        @RequestParam(name = "page", defaultValue = "1") int page,
-                       @RequestParam(name = "size", defaultValue = "12") int size) {
+                       @RequestParam(name = "size", defaultValue = "5") int size,
+                       @RequestParam(name = "status", required = false, defaultValue = "all") String status) {  // status 필수 파라미터
+
 
         Member loginMember = (Member) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            throw new IllegalStateException("로그인한 회원이 아닙니다.");
+        }
+        Long memberId = loginMember.getMemberId();
 
-        if (loginMember != null) {
-            Optional<SellerPage> optionalSellerPage = sellerPageSVC.findByMemberId(loginMember.getMemberId());
+        // status 값은 판매중 또는 판매대기로 반드시 들어온다고 가정
+        List<Product> products;
+        long totalCount;
 
-            if (optionalSellerPage.isPresent()) {
-                model.addAttribute("sellerPage", optionalSellerPage.get());
-            } else {
-                model.addAttribute("sellerPage", null);
-            }
-
-            List<Product> products = productSVC.getProductsByPage(page, size);
-            Long memberId = loginMember.getMemberId();
-
-
-            model.addAttribute("productList", products);
-            model.addAttribute("currentPage", page);
-            model.addAttribute("countProduct", productSVC.countByMemberId(memberId));
-
-            return "product/product_managing";
+        if ("all".equals(status)) {
+            // 전체 목록 조회 (상태 조건 없음)
+            products = productSVC.getProductsByMemberIdAndPage(memberId, page, size);
+            totalCount = productSVC.countByMemberId(memberId);
+        } else if ("판매중".equals(status) || "판매대기".equals(status)) {
+            // 상태 필터링
+            products = productSVC.getProductsByMemberIdAndStatusAndPage(memberId, status, page, size);
+            totalCount = productSVC.countByMemberIdAndStatus(memberId, status);
+        } else {
+            // 유효하지 않은 status 값은 기본값으로 변경 or 에러 처리
+            status = "판매중";
+            products = productSVC.getProductsByMemberIdAndStatusAndPage(memberId, status, page, size);
+            totalCount = productSVC.countByMemberIdAndStatus(memberId, status);
         }
 
-        return "redirect:/login";  // 비로그인 상태 예외 처리 추가 (보안/UX 개선)
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+        Optional<SellerPage> optionalSellerPage = sellerPageSVC.findByMemberId(memberId);
+        if (optionalSellerPage.isEmpty()) {
+            return "redirect:/mypage/seller/create";
+        }
+        SellerPage sellerPage = optionalSellerPage.get();
+
+        byte[] imageBytes = sellerPage.getImage();
+        String base64SellerImage = null;
+        if (imageBytes != null && imageBytes.length > 0) {
+            base64SellerImage = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
+        }
+
+        List<ProductManagingForm> managingForms = new ArrayList<>();
+        for (Product product : products) {
+            List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
+            List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(product.getProductId());
+
+            ProductManagingForm form = new ProductManagingForm();
+            form.setProduct(product);
+            form.setImages(images);
+            form.setCoursePoints(coursePoints);
+
+            managingForms.add(form);
+        }
+
+        // 디버깅용 출력
+        Object csrfObj1 = request.getAttribute(CsrfToken.class.getName());
+        Object csrfObj2 = request.getAttribute("_csrf");
+        System.out.println("CSRF 토큰 객체1: " + csrfObj1);
+        System.out.println("CSRF 토큰 객체2: " + csrfObj2);
+
+        CsrfToken csrfToken = null;
+        if (csrfObj1 instanceof CsrfToken) {
+            csrfToken = (CsrfToken) csrfObj1;
+        } else if (csrfObj2 instanceof CsrfToken) {
+            csrfToken = (CsrfToken) csrfObj2;
+        }
+        if (csrfToken != null) {
+            model.addAttribute("_csrf", csrfToken);
+        } else {
+            System.out.println("CSRF 토큰을 찾을 수 없습니다.");
+        }
+
+        model.addAttribute("_csrf", csrfToken);
+        model.addAttribute("productManagingForms", managingForms);
+        model.addAttribute("nickname", sellerPage.getNickname());
+        model.addAttribute("sellerImage", base64SellerImage);
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("selectedStatus", status);  // 뷰 선택값 유지용
+
+        log.info("nickname = {}", sellerPage);
+
+        return "product/product_managing";
+    }
+
+    // selectbox 값 변경에 따라 DB status값 변경
+    @PatchMapping("/product/status/{productId}")
+    @ResponseBody
+    public ResponseEntity<?> updateStatus(@PathVariable Long productId, @RequestBody Map<String, String> body) {
+        String status = body.get("status");
+
+        // 상태 값 유효성 검사
+        if (status == null || (!"판매중".equals(status) && !"판매대기".equals(status))) {
+            return ResponseEntity.badRequest().body("잘못된 상태 값입니다.");
+        }
+
+        try {
+            productSVC.updateProductStatus(productId, status);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException iae) {
+            // 예: 존재하지 않는 상품 아이디 처리
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(iae.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace(); // 서버 로그에 스택트레이스 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상태 업데이트 실패");
+        }
     }
 
     @GetMapping("/upload")
@@ -92,14 +178,9 @@ public class ProductController {
             return "redirect:/login";
         }
 
-
-
-
         // 로그인한 회원 ID를 form에 세팅
         form.setMemberId(loginMember.getMemberId());
         form.setNickname(loginMember.getNickname());
-
-
 
         if (form.getProductImages() != null && form.getProductImages().size() > 10) {
             model.addAttribute("errorMessage", "이미지는 최대 10장까지 업로드 가능합니다.");
@@ -284,6 +365,7 @@ public class ProductController {
 
         // 6) model에 DTO 등록
         model.addAttribute("productDetailForm", productDetailForm);
+        log.info("nickname = {}", sellerPage.getNickname());
 
         return "product/product_detail";
     }

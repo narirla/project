@@ -6,6 +6,8 @@ import com.KDT.mosi.domain.product.dao.ProductDAO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +24,7 @@ public class ProductSVCImpl implements ProductSVC {
   }
 
   @Override
+  @Transactional
   public Product registerProduct(Product product) {
     Long memberId = extractMemberId(product);
     validateMemberId(memberId);
@@ -29,6 +32,7 @@ public class ProductSVCImpl implements ProductSVC {
   }
 
   @Override
+  @Transactional
   public Product updateProduct(Product product) {
     Long memberId = extractMemberId(product);
     validateMemberId(memberId);
@@ -37,6 +41,7 @@ public class ProductSVCImpl implements ProductSVC {
   }
 
   @Override
+  @Transactional
   public void removeProduct(Long productId) {
     productDAO.delete(productId);
   }
@@ -44,6 +49,35 @@ public class ProductSVCImpl implements ProductSVC {
   @Override
   public Optional<Product> getProduct(Long productId) {
     return productDAO.findById(productId);
+  }
+
+  @Override
+  public List<Product> getProductsByMemberIdAndPage(Long memberId, int page, int size){
+    return productDAO.findByMemberIdWithPaging(memberId, page, size);
+  }
+
+  @Override
+  public List<Product> getProductsByMemberIdAndStatusAndPage(Long memberId, String status, int page, int size) {
+    // DAO에 적절한 메서드를 호출
+    return productDAO.findByMemberIdAndStatusWithPaging(memberId, status, page, size);
+  }
+
+  @Transactional
+  public void updateProductStatus(Long productId, String status) {
+    Optional<Product> optionalProduct = productDAO.findById(productId);
+    if (optionalProduct.isEmpty()) {
+      throw new IllegalArgumentException("해당 상품이 존재하지 않습니다.");
+    }
+
+    Product product = optionalProduct.get();
+    product.setStatus(status);
+    product.setUpdateDate(new Date(System.currentTimeMillis())); // 현재 시간으로 세팅
+    productDAO.update(product);
+  }
+
+  @Override
+  public long countByMemberIdAndStatus(Long memberId, String status) {
+    return productDAO.countByMemberIdAndStatus(memberId, status);
   }
 
   @Override
