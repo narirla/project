@@ -3,7 +3,6 @@
 /* ✅ 기본 설정 */
 /* =============================== */
 body {
-  width: 1200px;
   margin: 0 auto;
   font-family: 'Pretendard', sans-serif;
   background-color: #fff;
@@ -70,32 +69,45 @@ h2.form-title {
 /* =============================== */
 /* ✅ 프로필 이미지 영역 */
 /* =============================== */
-.profile-preview{
-  width:253px !important;     /* ← 253px로 확정 */
-  height:253px !important;    /* ← 253px로 확정 */
-  border-radius: 5px;
-  object-fit:cover;
-  border:1px solid #ccc;
+.profile-section {
+  display: flex;
+  flex-direction: column;    /* 세로 정렬 */
+  align-items: flex-start;       /* 왼쪽 정렬 */
+  gap: 14px;
+  margin-bottom: 24px;
 }
 
-/* ⬇ 버튼을 이미지 아래에 두려면 column 사용 */
-.profile-section{
-  display:flex;
-  flex-direction:column;      /* 가로 → 세로 배치 */
-  align-items:center;
-  gap:16px;
-  margin-bottom:24px;
+.profile-preview {
+  width: 253px !important;
+  height: 253px !important;
+  border-radius: 5px;
+  object-fit: cover;
+  border: 1px solid #ccc;
 }
 
 .btn-upload {
-  padding: 8px 16px;
-  font-size: 14px;
+  position: relative;
+  top: -8px;
+  width: 75px;
+  height: 25px;
   background-color: #1EC4CC;
-  color: #fff;
+  color: #FFFFFF;           /* ✅ 폰트 컬러 */
+  font-size: 14px;          /* ✅ 폰트 크기 */
+  font-weight: 500;         /* ✅ 미디움 (Medium) */
   border: none;
-  border-radius: 6px;
+  border-radius: 5px;
   cursor: pointer;
+  text-align: flex-start;
+  line-height: 25px;        /* ✅ 수직 정렬 */
+  padding: 6px 8px 6px 8px;
+  margin-left: 4px;
 }
+
+
+.btn-upload:hover {
+  background-color: #18b3b9;
+}
+
 
 /* =============================== */
 /* ✅ 폼 요소 공통 스타일 */
@@ -183,6 +195,12 @@ textarea {
   padding-bottom: 4px;
 }
 
+.section-divider {
+  border: 0;
+  height: 1px;
+  background-color: #1EC4CC; /* 회원 정보 수정 아래 컬러 */
+  margin: 12px 0 24px 0;
+}
 /* =============================== */
 /* ✅ 버튼 영역 */
 /* =============================== */

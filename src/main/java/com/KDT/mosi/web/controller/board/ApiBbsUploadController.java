@@ -1,16 +1,27 @@
 package com.KDT.mosi.web.controller.board;
 
 import com.KDT.mosi.domain.board.bbsUpload.svc.BbsUploadSVC;
+import com.KDT.mosi.domain.entity.board.BbsUpload;
 import com.KDT.mosi.domain.entity.board.UploadResult;
 import com.KDT.mosi.web.api.ApiResponse;
 import com.KDT.mosi.web.api.ApiResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -20,27 +31,32 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ApiBbsUploadController {
   private final BbsUploadSVC bbsUploadSVC;
+  private static final List<String> IMG_EXT = List.of(".png", ".jpg", ".jpeg", ".gif");
+  @Value("${upload.path}")       // C:/KDT/projects/uploads/bbs
+  private String uploadPath;
+  @Value("${upload.url-prefix}")
+  private String urlPrefix;
 
-  /**
-   * 본문 INLINED 이미지 목록 조회
-   */
   @GetMapping("/{bbsId}/images")
   public ResponseEntity<List<UploadResult>> getInlineImages(@PathVariable("bbsId") Long bbsId) {
     List<UploadResult> images = bbsUploadSVC.findInlineByBbsIdOrderBySort(bbsId)
         .stream()
-        .map(u -> new UploadResult(u.getUploadId(), u.getFilePath(),u.getUploadGroup()))
+        .map(u -> new UploadResult(
+            u.getUploadId(),
+            urlPrefix + "/" + u.getSavedName(),   // ★ 수정
+            u.getUploadGroup()))
         .toList();
     return ResponseEntity.ok(images);
   }
 
-  /**
-   * 첨부파일 목록 조회
-   */
   @GetMapping("/{bbsId}/attachments")
   public ResponseEntity<List<UploadResult>> getAttachments(@PathVariable("bbsId") Long bbsId) {
     List<UploadResult> attachments = bbsUploadSVC.findAttachmentsByBbsIdOrderBySort(bbsId)
         .stream()
-        .map(u -> new UploadResult(u.getUploadId(), u.getFilePath(),u.getUploadGroup()))
+        .map(u -> new UploadResult(
+            u.getUploadId(),
+            urlPrefix + "/" + u.getSavedName(),   // ★ 수정
+            u.getUploadGroup()))
         .toList();
     return ResponseEntity.ok(attachments);
   }
@@ -110,5 +126,32 @@ public class ApiBbsUploadController {
       bbsUploadSVC.updateSortOrder(uploadId, sortOrder);
     });
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * 게시글의 첫 번째 본문 이미지(썸네일) 반환
+   */
+  @GetMapping("/{bbsId}/thumbnail")
+  public ResponseEntity<UploadResult> getThumbnail(
+      @PathVariable("bbsId") Long bbsId
+  ) {
+    return bbsUploadSVC.findThumbnail(bbsId, "ATTACHMENT")
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.noContent().build());
+  }
+
+  @GetMapping("/attachments/{uploadId}")
+  public ResponseEntity<Resource> downloadAttachment(@PathVariable("uploadId") Long uploadId) throws IOException {
+    BbsUpload u = bbsUploadSVC.findById(uploadId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    Path path = Paths.get(uploadPath).resolve(u.getSavedName());
+    Resource resource = new UrlResource(path.toUri());
+
+    String filename = URLEncoder.encode(u.getOriginalName(), StandardCharsets.UTF_8);
+    return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + filename + "\"")
+        .body(resource);
   }
 }

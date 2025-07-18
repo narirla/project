@@ -20,8 +20,11 @@ public class SellerPageUpdateForm {
   @Size(min = 2, max = 30, message = "닉네임은 2자 이상 30자 이내여야 합니다.")
   private String nickname;
 
-  // 비밀번호 (선택 사항)
+  // 비밀번호
   private String passwd;
+
+  // 비밀번호 확인
+  private String confirmPasswd;
 
   // 전화번호
   private String tel;
@@ -29,6 +32,9 @@ public class SellerPageUpdateForm {
   // 자기소개 (최대 500자)
   @Size(max = 500, message = "자기소개는 500자 이내로 입력해주세요.")
   private String intro;
+
+  // byte[] image 프로필 이미지
+  private byte[] image;
 
   // 우편번호
   private String zonecode;

@@ -4,6 +4,7 @@ import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.SellerPage;
 import com.KDT.mosi.domain.mypage.seller.dao.SellerPageDAO;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
+import com.KDT.mosi.web.form.mypage.sellerpage.SellerPageUpdateForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -152,27 +154,41 @@ public class SellerPageController {
   @GetMapping("/edit")
   public String editForm(HttpSession session, Model model) {
     Member loginMember = (Member) session.getAttribute("loginMember");
-    if (loginMember == null) {
-      return "redirect:/login";
-    }
+    if (loginMember == null) return "redirect:/login";
 
-    Long memberId = loginMember.getMemberId();
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
-    if (optional.isEmpty()) {
-      throw new AccessDeniedException("판매자 페이지가 존재하지 않습니다.");
-    }
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(loginMember.getMemberId());
+    if (optional.isEmpty()) throw new AccessDeniedException("판매자 페이지가 존재하지 않습니다.");
 
-    model.addAttribute("sellerPage", optional.get());
-    model.addAttribute("member", loginMember);
+    SellerPage sellerPage = optional.get();
+
+    // ✅ Form 객체로 변환
+    SellerPageUpdateForm form = new SellerPageUpdateForm();
+    form.setPageId(sellerPage.getPageId());
+    form.setMemberId(sellerPage.getMemberId());
+    form.setNickname(sellerPage.getNickname());
+    form.setIntro(sellerPage.getIntro());
+    form.setTel(loginMember.getTel());
+    form.setZonecode(sellerPage.getZonecode());
+    form.setAddress(sellerPage.getAddress());
+    form.setDetailAddress(sellerPage.getDetailAddress());
+    form.setNotification("Y"); // 기존 값 반영 필요 시 수정
+    form.setImage(sellerPage.getImage()); // ✅ 이미지 추가
+
+    model.addAttribute("sellerPage", sellerPage); // 사이드바용
+    model.addAttribute("form", form);             // 수정폼용
+    model.addAttribute("member", loginMember);    // 이메일용
+
     return "mypage/sellerpage/editSellerPage";
   }
 
+
+
   /**
-   * ✅ 판매자 마이페이지 수정 처리
+   * ✅ 판매자 마이페이지 수정 처리 (Form 객체 기반)
    */
   @PostMapping("/edit")
-  public String edit(@ModelAttribute SellerPage sellerPage,
-                     @RequestParam("image") MultipartFile image,
+  public String edit(@ModelAttribute("sellerPage") SellerPageUpdateForm form,
+                     BindingResult bindingResult,
                      HttpSession session,
                      RedirectAttributes redirectAttributes) {
 
@@ -188,21 +204,34 @@ public class SellerPageController {
       throw new AccessDeniedException("판매자 마이페이지 정보가 존재하지 않습니다.");
     }
 
-    try {
-      if (image != null && !image.isEmpty()) {
-        sellerPage.setImage(image.getBytes());
+    SellerPage sellerPage = optional.get();
+
+    // 🔄 업데이트 대상 필드 복사
+    sellerPage.setNickname(form.getNickname());
+    sellerPage.setTel(form.getTel());
+    sellerPage.setIntro(form.getIntro());
+    sellerPage.setZonecode(form.getZonecode());
+    sellerPage.setAddress(form.getAddress());
+    sellerPage.setDetailAddress(form.getDetailAddress());
+
+    // 📷 이미지 처리
+    MultipartFile imageFile = form.getImageFile();
+    if (imageFile != null && !imageFile.isEmpty()) {
+      try {
+        sellerPage.setImage(imageFile.getBytes());
+      } catch (Exception e) {
+        log.error("프로필 이미지 처리 오류", e);
+        redirectAttributes.addFlashAttribute("error", "이미지 업로드에 실패했습니다.");
+        return "redirect:/mypage/seller/edit";
       }
-    } catch (Exception e) {
-      log.error("프로필 이미지 처리 오류", e);
-      redirectAttributes.addFlashAttribute("error", "이미지 업로드에 실패했습니다.");
     }
 
-    Long pageId = optional.get().getPageId();
-    sellerPageSVC.updateById(pageId, sellerPage);
-
+    sellerPageSVC.updateById(sellerPage.getPageId(), sellerPage);
     redirectAttributes.addFlashAttribute("msg", "마이페이지 정보가 수정되었습니다.");
-    return "redirect:/mypage/seller";
+
+    return "redirect:/mypage/seller/view";
   }
+
 
   /**
    * ✅ 판매자 프로필 이미지 조회

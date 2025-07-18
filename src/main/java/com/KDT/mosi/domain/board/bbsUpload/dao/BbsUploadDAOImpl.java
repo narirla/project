@@ -37,23 +37,6 @@ public class BbsUploadDAOImpl implements BbsUploadDAO{
     return key.longValue();
   }
 
-//  // 초기 다중 저장
-//  @Override
-//  public List<UploadResult> saveAll(List<BbsUpload> uploads) {
-//    StringBuffer sql = new StringBuffer();
-//    sql.append("SELECT bbs_upload_upload_group_seq.NEXTVAL FROM DUAL ");
-//    SqlParameterSource param = new MapSqlParameterSource();
-//    Long i = template.queryForObject(sql.toString(), param, Long.class);
-//
-//    Long uploadId;
-//    List<UploadResult> uploadResults = new ArrayList<>(uploads.size());
-//    for (BbsUpload upload : uploads) {
-//      upload.setUploadGroup(i);
-//      uploadId = save(upload);
-//      uploadResults.add(new UploadResult(uploadId, upload.getFilePath()));
-//    }
-//    return uploadResults;
-//  }
 
   // 글에 upload한 파일 가져오기
   @Override
@@ -201,8 +184,32 @@ public class BbsUploadDAOImpl implements BbsUploadDAO{
     return i;
   }
 
+  @Override
+  public Optional<BbsUpload> findFirstImageByBbsId(Long bbsId, String fileType) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT * ");
+    sql.append("FROM bbs_upload ");
+    sql.append("WHERE bbs_id   = :bbsId ");
+    sql.append("AND file_type = :fileType ");
+    sql.append("AND ( ");
+    sql.append("   LOWER(saved_name) LIKE '%.png' ");
+    sql.append("OR LOWER(saved_name) LIKE '%.jpg' ");
+    sql.append("OR LOWER(saved_name) LIKE '%.jpeg' ");
+    sql.append("OR LOWER(saved_name) LIKE '%.gif' ");
+    sql.append(" ) ");
+    sql.append("ORDER BY sort_order ");
+    sql.append("FETCH FIRST 1 ROWS ONLY ");
 
-
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("bbsId", bbsId)
+        .addValue("fileType",fileType);
+    try {
+      BbsUpload u = template.queryForObject(sql.toString(), param, BeanPropertyRowMapper.newInstance(BbsUpload.class));
+      return Optional.of(u);
+    } catch (EmptyResultDataAccessException e) {
+      return Optional.empty();
+    }
+  }
 
 
 }

@@ -17,11 +17,9 @@
         <aside class="sidebar">
           <div class="sidebar-card">
             <div class="profile-box">
-              <div class="profile-image">
-                <img class="profile-image" id="asideProfileImage" th:if="${member != null and member.pic != null}"
-                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
-                <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
-              </div>
+              <img class="profile-image" id="asideProfileImage"
+                   th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}"
+                   alt="프로필 이미지">
               <div class="profile-info">
                 <a href="#" class="profile-badge">프로여행러 ></a>
                 <div class="profile-name" th:text="${member.name}"></div>
@@ -91,9 +89,11 @@
             <input type="hidden" th:field="*{pageId}">
 
             <div class="profile-section">
-              <img class="profile-preview" id="sectionProfilePreview" th:src="@{'/mypage/buyer/' + *{memberId} + '/image'}" alt="프로필 이미지">
-              <input type="file" id="imageFile" name="imageFile" th:field="*{imageFile}" hidden accept="image/*">
-              <label for="imageFile" class="btn-upload">사진변경</label>
+              <div class="profile-wrapper">
+                <img class="profile-preview" id="sectionProfilePreview" th:src="@{'/mypage/buyer/' + *{memberId} + '/image'}" alt="프로필 이미지">
+                <label for="imageFile" class="btn-upload">사진변경</label>
+                <input type="file" id="imageFile" name="imageFile" th:field="*{imageFile}" hidden accept="image/*">
+              </div>
             </div>
 
 <!--            <div class="form-row">-->
@@ -147,6 +147,7 @@
             </div>
 
             <h3 class="section-subtitle">추가 정보</h3>
+            <hr class="section-divider">
 
             <div class="form-row address-row">
               <label for="zonecode">우편번호</label>

@@ -31,3 +31,4 @@ logging:
 # 게시판 업로드 위치
 upload:
   path: C:\KDT\projects\uploads\bbs
+  url-prefix: /static/uploads

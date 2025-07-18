@@ -42,4 +42,7 @@ public interface BbsUploadDAO {
 
   // 업로드 파일 임시 그룹id 발급
   Long createUploadGroup();
+
+  // 이미지 하나만 가져오기
+  Optional<BbsUpload> findFirstImageByBbsId(Long bbsId, String fileTYpe);
 }
