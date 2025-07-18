@@ -18,7 +18,7 @@ public class CsrBbsController {
 
   @GetMapping
   public String bbs() {
-    return "/postBoards/allForm_v2";
+    return "/postBoards/bbsHome";
   }
 
   @GetMapping("/community")
