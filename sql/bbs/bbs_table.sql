@@ -6,88 +6,13 @@ drop table rbbs;
 drop table bbs_like;
 DROP TABLE bbs_report;
 drop table bbs;
---DROP TABLE code;
 
---DROP TABLE member_role;
---DROP TABLE ROLE;
---DROP TABLE MEMBER;
---DROP SEQUENCE member_member_id_seq;
-
---DROP TABLE terms;
---DROP TABLE MEMBER_TERMS;
---DROP SEQUENCE terms_seq;
 --시퀀스삭제
 drop sequence bbs_bbs_id_seq;
 DROP SEQUENCE bbs_upload_upload_id_seq;
 DROP SEQUENCE rbbs_rbbs_id_seq;
 DROP SEQUENCE bbs_upload_upload_group_seq;
 
- -- MEMBER 테이블
---CREATE TABLE member (
---  member_id       NUMBER(10),
---  email           VARCHAR2(40) NOT NULL,
---  name            VARCHAR2(50) NOT NULL,
---  passwd          VARCHAR2(12) NOT NULL,
---  tel             VARCHAR2(13),
---  nickname        VARCHAR2(30),
---  gender          VARCHAR2(6),
---  address         VARCHAR2(200),
---  birth_date      DATE,  -- ✅ 생년월일
---  pic             BLOB,
---  create_date     TIMESTAMP DEFAULT SYSTIMESTAMP,
---  update_date     TIMESTAMP DEFAULT SYSTIMESTAMP
---);
----- 제약조건 추가
---ALTER TABLE member ADD CONSTRAINT member_member_id_pk PRIMARY KEY (member_id);
---ALTER TABLE member ADD CONSTRAINT member_email_uk UNIQUE(email);
---ALTER TABLE member ADD CONSTRAINT member_gender_ck CHECK (gender IN ('남자','여자'));
---
----- 시퀀스 생성
---CREATE SEQUENCE member_member_id_seq;
---
----- ROLE 테이블
---CREATE TABLE ROLE (
---  ROLE_ID    VARCHAR2(11)  NOT NULL,
---  ROLE_NAME  VARCHAR2(50)  NOT NULL,
---  CONSTRAINT PK_ROLE       PRIMARY KEY (ROLE_ID)
---);
---
---
----- MEMBER_ROLE 테이블 (회원·역할 매핑)
---CREATE TABLE MEMBER_ROLE (
---  MEMBER_ID  NUMBER(10)    NOT NULL,
---  ROLE_ID    VARCHAR2(11)  NOT NULL,
---  CONSTRAINT PK_MEMBER_ROLE           PRIMARY KEY (MEMBER_ID, ROLE_ID),
---  CONSTRAINT FK_MR_ROLE               FOREIGN KEY (ROLE_ID)   REFERENCES ROLE   (ROLE_ID)
---);
---
---ALTER TABLE MEMBER_ROLE
---ADD CONSTRAINT FK_MR_MEMBER
---  FOREIGN KEY (MEMBER_ID)
---  REFERENCES MEMBER (MEMBER_ID)
---  ON DELETE CASCADE;
-
---------------------------------------------------------
---코드
---------------------------------------------------------
---create table code(
---code_id     varchar2(11) PRIMARY KEY,       --코드
---DECODE      varchar2(30) NOT null,          --코드명
---discript    clob,                           --코드설명
---pcode_id    varchar2(11),                   --상위코드
---useyn       char(1) default 'Y' NOT null,   --사용여부 (사용:'Y',미사용:'N')
---cdate       timestamp default systimestamp,
---udate       timestamp
---);
-----외래키
---alter table code
---add constraint fk_code_pcode_id
---foreign key(pcode_id)
---references code(code_id);
---
-----제약조건
---alter table code add constraint code_useyn_ck check(useyn in ('Y','N'));
---------------------------------------------------------
 
 --------------------------------------------------------
 --게시판
@@ -307,3 +232,4 @@ ALTER TABLE bbs_upload
 CREATE SEQUENCE bbs_upload_upload_id_seq;
 CREATE SEQUENCE bbs_upload_upload_group_seq;
 
+commit;

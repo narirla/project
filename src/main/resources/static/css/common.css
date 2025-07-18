@@ -23,8 +23,8 @@
     background: #fff;
 }
 .profile-image {
-    width: 93.5px;
-    height: 93.5px;
+    width: 93.5px !important;
+    height: 93.5px !important;
     border-radius: 50%;
     overflow: hidden;
     margin: 0 auto 10px;
