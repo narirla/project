@@ -5,13 +5,13 @@
 
 .sidebar {
     width: 180px;
-    height: 1300px;
+    height: 1400px;
     flex-shrink: 0;
 }
 
 .sidebar-card  {
     width: 180px;
-    height: 1300px;
+    height: 1400px;
     border: 1px solid #82d8d8;
     border-radius: 4px;
     background: #fff;
@@ -38,7 +38,7 @@
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid #ddd;
-  margin-bottom: 10px; /* auto 제거 */
+  margin-bottom: 0; /* auto 제거 */
 }
 
 .profile-image img {

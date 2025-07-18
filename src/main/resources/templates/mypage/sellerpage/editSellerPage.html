@@ -97,14 +97,18 @@
             <input type="hidden" th:field="*{pageId}">
 
             <div class="profile-section">
-              <img class="profile-preview" id="sectionProfilePreview" th:src="@{'/mypage/seller/' + *{memberId} + '/image'}" alt="프로필 이미지">
+              <div class="profile-wrapper">
+                <img class="profile-preview" id="sectionProfilePreview"
+                     th:src="@{'/mypage/buyer/' + *{memberId} + '/image'}"
+                     alt="프로필 이미지">
+              </div>
               <label for="imageFile" class="btn-upload">사진변경</label>
               <input type="file" id="imageFile" name="imageFile" th:field="*{imageFile}" hidden accept="image/*">
             </div>
 
             <!--            <div class="form-row">-->
             <!--              <label for="name">이름</label>-->
-            <input type="hidden" th:value="${member.name}" id="name" autocomplete="name">
+<!--            <input type="hidden" th:field="*{name}" id="name" autocomplete="name">-->
             <!--            </div>-->
 
             <div class="form-row">
@@ -127,21 +131,38 @@
               <input type="tel" th:field="*{tel}" id="tel" name="tel" autocomplete="tel">
             </div>
 
+            <!-- ✅ 비밀번호 -->
             <div class="form-row">
               <label for="passwd">비밀번호</label>
-              <input type="password" th:field="*{passwd}" id="passwd" name="passwd" autocomplete="new-password">
+              <div class="password-wrapper">
+                <input type="password" th:field="*{passwd}" id="passwd" name="passwd" autocomplete="new-password">
+                <button type="button" class="toggle-password" onclick="togglePassword('passwd')">
+                  <i class="fa-solid fa-eye-slash"></i>
+                </button>
+              </div>
+              <!-- ✅ 강도 평가 메시지 -->
+              <p id="pwStrength" class="pw-strength"></p>
+              <p id="pwHint" class="form-text ms-2"></p>
             </div>
 
+            <!-- ✅ 비밀번호 확인 -->
             <div class="form-row">
               <label for="confirmPasswd">비밀번호 확인</label>
-              <input type="password" th:field="*{confirmPasswd}" id="confirmPasswd" name="confirmPasswd" autocomplete="new-password">
+              <div class="password-wrapper">
+                <input type="password" th:field="*{confirmPasswd}" id="confirmPasswd" name="confirmPasswd" autocomplete="new-password">
+                <button type="button" class="toggle-password" onclick="togglePassword('confirmPasswd')">
+                  <i class="fa-solid fa-eye-slash"></i>
+                </button>
+              </div>
               <p class="error-msg" th:if="${#fields.hasErrors('confirmPasswd')}" th:errors="*{confirmPasswd}">비밀번호 확인 오류</p>
+              <p id="pwMatchMsg" class="form-text ms-2"></p> <!-- JS에서 사용 -->
             </div>
+
 
             <div class="form-row">
               <label for="intro">자기소개</label>
-              <textarea id="intro" th:field="*{intro}" name="intro" maxlength="500"></textarea>
-              <div class="char-count" th:text="${#strings.length(form.intro)} + '자 / 500자'"></div>
+              <textarea id="intro" th:field="*{intro}" name="intro" maxlength="60"></textarea>
+              <div class="char-count" th:text="${form.intro != null ? #strings.length(form.intro) : 0} + '자 / 60자'"></div>
             </div>
 
             <div class="form-row">
@@ -151,9 +172,10 @@
                 알림 수신 동의
               </label>
             </div>
+            <hr>
 
             <h3 class="section-subtitle">추가 정보</h3>
-            <hr class="section-driver">
+            <hr>
 
             <div class="form-row address-row">
               <label for="zonecode">우편번호</label>
@@ -172,6 +194,7 @@
               <label for="detailAddress">상세주소</label>
               <input type="text" id="detailAddress" th:field="*{detailAddress}" name="detailAddress" autocomplete="address-line2">
             </div>
+            <hr>
 
             <div class="form-button-group">
               <button id="saveBtn" type="submit" class="btn btn-primary">회원 정보 수정하기</button>
@@ -189,7 +212,8 @@
       <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
 
-    <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
+    <script th:src="@{/js/sellerpage/editSellerPage.js}"></script>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   </div>
 </body>
 </html>
