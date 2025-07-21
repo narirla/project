@@ -5,10 +5,7 @@ import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
 import com.KDT.mosi.domain.product.svc.ProductImageSVC;
 import com.KDT.mosi.domain.product.svc.ProductSVC;
-import com.KDT.mosi.web.form.product.ProductCoursePointForm;
-import com.KDT.mosi.web.form.product.ProductDetailForm;
-import com.KDT.mosi.web.form.product.ProductManagingForm;
-import com.KDT.mosi.web.form.product.ProductUploadForm;
+import com.KDT.mosi.web.form.product.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +35,38 @@ public class ProductController {
     private final ProductCoursePointSVC productCoursePointSVC;
     private final SellerPageSVC sellerPageSVC;
 
-    // 판매자별 등록 상품 조회
+    // 구매자 상품 조회
     @GetMapping("/list")
     public String list(Model model, HttpSession session,
+                       HttpServletRequest request,
+                       @RequestParam(name = "page", defaultValue = "1") int page,
+                       @RequestParam(name = "size", defaultValue = "12") int size,
+                       @RequestParam(name = "category", defaultValue = "area") String category){
+
+        List<Product> products = productSVC.getProductsByPage(page, size);
+        long totalCount = productSVC.countAllProducts();
+
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+        List<ProductListForm> listForms = new ArrayList<>();
+        for (Product product : products) {
+            List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
+            List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(product.getProductId());
+
+            ProductListForm form = new ProductListForm();
+            form.setProduct(product);
+            form.setImages(images);
+            form.setCoursePoints(coursePoints);
+
+            listForms.add(form);
+        }
+
+        return "product/product_list";
+    }
+
+    // 판매자별 등록 상품 조회
+    @GetMapping("/manage")
+    public String manage(Model model, HttpSession session,
                        HttpServletRequest request,
                        @RequestParam(name = "page", defaultValue = "1") int page,
                        @RequestParam(name = "size", defaultValue = "5") int size,
@@ -232,7 +258,7 @@ public class ProductController {
         }
         productCoursePointSVC.saveAll(coursePoints);
 
-        return "redirect:/product/list";
+        return "redirect:/product/manage";
     }
 
     // 수정 페이지 호출
