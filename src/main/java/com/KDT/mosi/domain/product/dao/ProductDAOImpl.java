@@ -220,11 +220,24 @@ public class ProductDAOImpl implements ProductDAO {
     params.put("offset", offset);
     params.put("size", size);
 
-    return jdbcTemplate.query(
-        sql.toString(),
-        params,
-        new ProductRowMapper() // 기존에 만든 RowMapper
-    );
+    return jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
+  }
+
+  // 카테고리별 상품 목록
+  @Override
+  public List<Product> findByCategoryWithPaging(String category, int page, int size) {
+    int offset = (page - 1) * size;
+
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT * FROM product WHERE category = :category ");
+    sql.append("ORDER BY product_id DESC OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY");
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("category", category);
+    params.put("offset", offset);
+    params.put("size", size);
+
+    return jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
   }
 
   @Override
@@ -264,6 +277,18 @@ public class ProductDAOImpl implements ProductDAO {
   public long countAll() {
     StringBuffer sql = new StringBuffer();
     sql.append("SELECT COUNT(*) FROM product");
+
+    return jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
+  }
+
+  // 카테고리별 상품 갯수
+  @Override
+  public long countByCategory(String category) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT COUNT(*) FROM product WHERE category = :category");
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("category", category);
 
     return jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
   }

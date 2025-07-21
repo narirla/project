@@ -43,12 +43,30 @@ public class ProductController {
                        @RequestParam(name = "size", defaultValue = "12") int size,
                        @RequestParam(name = "category", defaultValue = "area") String category){
 
-        List<Product> products = productSVC.getProductsByPage(page, size);
-        long totalCount = productSVC.countAllProducts();
+        List<Product> products;
+        long totalCount;
+
+        if ("all".equals(category)) {
+            // 전체 목록 조회 (상태 조건 없음)
+            products = productSVC.getProductsByPage(page,size);
+            totalCount = productSVC.countAllProducts();
+        } else if ("area".equals(category) || "pet".equals(category)
+                    || "restaurant".equals(category) || "culture_history".equals(category)
+                    || "season_nature".equals(category) ||"silver_disables".equals(category)) {
+            // 카테고리 필터링
+            products = productSVC.getProductsByCategoryAndPageAndSize(category, page, size);
+            totalCount = productSVC.countByCategory(category);
+        } else {
+            // 유효하지 않은 category 값은 기본값으로 변경 or 에러 처리
+            category = "area";
+            products = productSVC.getProductsByPage(page,size);
+            totalCount = productSVC.countByCategory(category);
+        }
+
 
         int totalPages = (int) Math.ceil((double) totalCount / size);
 
-        List<ProductListForm> listForms = new ArrayList<>();
+        List<ProductListForm> productList = new ArrayList<>();
         for (Product product : products) {
             List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
             List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(product.getProductId());
@@ -58,8 +76,14 @@ public class ProductController {
             form.setImages(images);
             form.setCoursePoints(coursePoints);
 
-            listForms.add(form);
+            productList.add(form);
         }
+
+        model.addAttribute("productList", productList);
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("selectedCategory", category);
 
         return "product/product_list";
     }

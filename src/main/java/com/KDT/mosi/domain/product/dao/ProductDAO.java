@@ -20,6 +20,9 @@ public interface ProductDAO {
   // 멤버별 상품 전체조회(페이징 포함)
   List<Product> findByMemberIdWithPaging(Long memberId, int page, int size);
 
+  // 카테고리별 조회(페이징 포함)
+  List<Product> findByCategoryWithPaging(String category, int page, int size);
+
   // 멤버별 상품 상태별 조회(페이징 포함)
   List<Product> findByMemberIdAndStatusWithPaging(Long memberId, String status, int page, int size);
 
@@ -28,6 +31,9 @@ public interface ProductDAO {
 
   // 전체 상품 갯수 조회
   long countAll();
+
+  // 카테고리별 상품 갯수 조회
+  long countByCategory(String category);
 
   // 멤버 존재 여부 확인
   public interface MemberDAO {

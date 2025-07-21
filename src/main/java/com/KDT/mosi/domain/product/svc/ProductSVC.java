@@ -26,6 +26,9 @@ public interface ProductSVC {
   // 사용자별 상품 상태별 조회(페이징 포함)
   List<Product> getProductsByMemberIdAndStatusAndPage(Long memberId, String status, int page, int size);
 
+  // 구매자 상품 목록 페이지(페이징 포함)
+  List<Product> getProductsByCategoryAndPageAndSize(String category, int page, int size);
+
   // 페이징 조회
   List<Product> getProductsByPage(int pageNumber, int pageSize);
 
@@ -34,6 +37,8 @@ public interface ProductSVC {
 
   // 판매자별 상품 수 조회
   long countByMemberIdAndStatus(Long memberId, String status);
+
+  long countByCategory(String category);
 
   long countByMemberId(Long memberId);
 

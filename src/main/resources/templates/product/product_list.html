@@ -14,20 +14,21 @@
   <header th:replace="~{fragments/header :: header}"></header>
   <div class="page-container">
     <div class="breadcrumb">
-      홈 &gt; 테마여행 &gt; <a href="#"><span th:if="*{product?.category == 'area'}">지역</span>
-      <span th:if="*{product.category == 'pet'}">반려동물</span>
-      <span th:if="*{product.category == 'restaurant'}">맛집</span>
-      <span th:if="*{product.category == 'culture_history'}">문화/역사</span>
-      <span th:if="*{product.category == 'season_nature'}">계절/자연</span>
-      <span th:if="*{product.category == 'silver_disables'}">실버/교통약자</span>
-      <span th:if="*{!(product.category == 'area'
-                              or product.category == 'pet'
-                              or product.category == 'restaurant'
-                              or product.category == 'culture_history'
-                              or product.category == 'season_nature'
-                              or product.category == 'silver_disables')}"
-      >카테고리 없음</span>
-    </a></span>
+      <span>홈 &gt; 테마여행 &gt;
+        <span th:if="${productList.product?.category == 'area'}">지역</span>
+        <span th:if="${productList.product.category == 'pet'}">반려동물</span>
+        <span th:if="${productList.product.category == 'restaurant'}">맛집</span>
+        <span th:if="${productList.product.category == 'culture_history'}">문화/역사</span>
+        <span th:if="${productList.product.category == 'season_nature'}">계절/자연</span>
+        <span th:if="${productList.product.category == 'silver_disables'}">실버/교통약자</span>
+        <span th:if="${!(productList.product.category == 'area'
+                          or productList.product.category == 'pet'
+                          or productList.product.category == 'restaurant'
+                          or productList.product.category == 'culture_history'
+                          or productList.product.category == 'season_nature'
+                          or productList.product.category == 'silver_disables')}"
+        >전체</span>
+      </span>
     </div>
     <!--카테고리명-->
     <section class="category-header">
@@ -102,7 +103,7 @@
         </div>
         <div class="menu-frame">
           <ul>
-            <li><a href="#">지역</a></li>
+            <li><a th:href="@{product/list}">지역</a></li>
             <li><a href="#">반려동물</a></li>
             <li><a href="#">맛집</a></li>
             <li><a href="#">문화</a></li>
@@ -303,280 +304,68 @@
           </div>
         </div>
         <!--상품리스트-->
-        <section class="product-list">
-          <ul class="products">
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
+        <div class="product-list">
+          <div class="product-item" th:each="form : ${productManagingForms}">
+            <!-- 썸네일 이미지 -->
+            <img th:if="${form.images != null and #lists.size(form.images) > 0}"
+                 th:src="${form.images[0].base64ImageData}"
+                 th:alt="${form.images[0].fileName}"/>
+            <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
+                 th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
+            <div class="product-info">
+              <div class="product-info-left">
+                <h2><a th:href="@{/product/view/{id}(id=${form.product.productId})}" th:text="${form.product.title}">상품명</a></h2>
+                <div class="product-info-left-detail">
 
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
+                  <select class="status-select" th:data-product-id="${form.product.productId}" th:value="${form.product.status}">
+                    <option value="판매중" th:selected="${form.product.status == '판매중'}">판매중</option>
+                    <option value="판매대기" th:selected="${form.product.status == '판매대기'}">판매대기</option>
+                  </select>
 
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
+                  <div class="product-info-left-detail-details">
+                    <div th:if="${form.product.updateDate == null or form.product.createDate == form.product.updateDate}"
+                         th:text="${#dates.format(form.product.createDate, 'yyyy-MM-dd')}">
+                    </div>
+                    <div th:if="${form.product.updateDate != null and form.product.createDate != form.product.updateDate}"
+                         th:text="${#dates.format(form.product.updateDate, 'yyyy-MM-dd')}">
+                    </div>
+                    <div>조회수</div>
+                    <div>좋아요</div>
+                    <div>댓글수</div>
+                  </div>
                 </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
+                <span class="text-trim" th:text="${form.product.description}"></span>
               </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
+            </div>
+            <div class="product-info-right">
+              <div class="product-info-right-detail">
+                <div>0% 저렴</div>
+                <div class="price">
+                  <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|">40,000</h1>
+                  <div>원</div>
                 </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
+                <div th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
               </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
+              <div class="btn-group">
+                <button id="update-btn" class="btn-group-edit">수정</button>
+                <button id="delete-btn" class="btn-group-delete">삭제</button>
               </div>
+            </div>
+          </div>
+          <hr>
+        </div>
+        <div class="pagination">
+          <a th:if="${currentPage > 1}"
+             th:href="@{/product/manage(page=${currentPage - 1}, size=${5}, status=${selectedStatus})}">이전</a>
 
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
+          <span th:text="${currentPage} + ' / ' + ${totalPages}"></span>
 
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-            <li class="product-card">
-              <div class="thumb">
-                <img src="/static/img/product/product_list/product_img.jpg" alt="황령산 투어">
-                <button type="button" class="btn-like" aria-label="관심 등록"></button>
-              </div>
-
-              <div class="card-body">
-                <h3 class="title">[MO:SI&nbsp;Pick] 황령산 투어&nbsp;(1박 2일)</h3>
-
-                <div class="price-row">
-                  <span class="price">65,000</span><span class="won">원</span>
-                </div>
-
-                <p class="sub-benefit">가이드 구독시 10% 추가할인</p>
-
-                <div class="discount-row">
-                  <span class="discount-price">59,000</span><span class="won">원</span>
-                  <span class="badge">MO:SI&nbsp;할인가</span>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </section>
-        <div class="pagination" id="reply_pagenation" aria-label="페이지네이션">
-          <button type="button" class="page-btn next" aria-label="다음 페이지">&lt;&lt;</button>
-          <button type="button" class="page-btn prev" aria-label="이전 페이지">&lt;</button>
-          <button type="button" class="page-btn">1</button>
-          <button type="button" class="page-btn is-active">2</button>
-          <button type="button" class="page-btn">3</button>
-          <button type="button" class="page-btn">4</button>
-          <button type="button" class="page-btn">5</button>
-          <button type="button" class="page-btn">6</button>
-          <button type="button" class="page-btn">7</button>
-          <button type="button" class="page-btn">8</button>
-          <button type="button" class="page-btn">9</button>
-          <button type="button" class="page-btn">10</button>
-          <button type="button" class="page-btn next" aria-label="다음 페이지">&gt;</button>
-          <button type="button" class="page-btn next" aria-label="다음 페이지">&gt;&gt;</button>
+          <a th:if="${currentPage < totalPages}"
+             th:href="@{/product/manage(page=${currentPage + 1}, size=${5}, status=${selectedStatus})}">다음</a>
         </div>
       </main>
     </div>
+
     <!--공지-->
     <section class="notice-frame">
       <span class="notice-title">공지</span>
