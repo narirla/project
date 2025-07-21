@@ -114,7 +114,7 @@ public class BbsUploadSVCImpl implements BbsUploadSVC{
       u.setSortOrder(nextOrder++);
       Long id = save(u, file);
       String publicUrl = urlPrefix + "/" + u.getSavedName();
-      results.add(new UploadResult(id, publicUrl, uploadGroup));
+      results.add(new UploadResult(id, publicUrl, uploadGroup, file.getOriginalFilename()));
       log.info("★ publicUrl={}", publicUrl);
     }
     return results;
@@ -203,7 +203,8 @@ public class BbsUploadSVCImpl implements BbsUploadSVC{
         .map(u -> new UploadResult(
             u.getUploadId(),
             urlPrefix + "/" + u.getSavedName(),
-            u.getUploadGroup()          // 굳이 필요 없으면 null 넣어도 됨
+            u.getUploadGroup(),
+            u.getOriginalName()
         ));
   }
 }

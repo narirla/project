@@ -53,4 +53,5 @@ public interface BbsDAO {
 
   //게시글 임시저장 삭제
   int deleteTemporaryStorage(Long memberId, Long pbbsId);
+
 }

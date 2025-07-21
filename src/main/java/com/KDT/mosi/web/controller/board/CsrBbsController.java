@@ -27,7 +27,7 @@ public class CsrBbsController {
   }
 
   //게시글조회
-  @GetMapping("/{id}")
+  @GetMapping("/community/{id}")
   public String findById(
       @PathVariable("id") Long id,
       Model model
@@ -37,7 +37,7 @@ public class CsrBbsController {
     return "/postBoards/detailForm";
   }
 
-  @GetMapping("/add")
+  @GetMapping("/community/add")
   public String bbsAdd(
       HttpSession session
       ,Model model) {
@@ -47,10 +47,10 @@ public class CsrBbsController {
   }
 
   // 게시글 답글
-  @GetMapping("/add/{id}")
+  @GetMapping("/community/add/{id}")
   public String updateForm(@PathVariable("id") Long id, Model model) {
     model.addAttribute("bbsId", id);
-    return "postBoards/write_quill";
+    return "postBoards/write_quill_test";
   }
 
 }
