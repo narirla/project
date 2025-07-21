@@ -102,6 +102,7 @@ const rows = bbs.map(b => {
       <td class="thumb-cell"></td>
       <td class="title-cell">
         ${indentHtml}<span>${b.title}</span>
+        ${b.commentCnt > 0 ? `<span class="commentCnt">[${b.commentCnt}]</span>` : ''}
       </td>
       <td>${b.nickname}</td>
       <td>${formatRelativeTime(b.createDate)}</td>
@@ -110,6 +111,19 @@ const rows = bbs.map(b => {
   `;
 }).join('');
 $list.innerHTML = rows;
+
+  // — 여기에 클릭 이벤트 바인딩 추가 —
+  $list.querySelectorAll('tr[data-pid]').forEach(tr => {
+    // 삭제된 게시글은 클릭 비활성화
+    if (tr.dataset.status !== 'B0202') {
+      tr.style.cursor = 'pointer';
+      tr.addEventListener('click', async () => {
+        const id = tr.dataset.pid;
+        await ajax.get(`/api/bbs/${id}/view`);
+        window.location.href = `/bbs/community/${id}`;
+      });
+    }
+  });
 
     await Promise.all(bbs.map(async b => {
       try {

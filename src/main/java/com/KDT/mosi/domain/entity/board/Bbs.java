@@ -20,4 +20,5 @@ public class Bbs {
   private Long bindent;
   private LocalDateTime createDate;
   private LocalDateTime updateDate;
+  private int commentCnt;
 }

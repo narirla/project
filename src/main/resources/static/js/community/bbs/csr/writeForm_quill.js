@@ -18,7 +18,6 @@ const quill = new Quill('#editor', {
   theme: 'snow',
   modules: {
     toolbar: '#toolbar',
-    imageDrop: true,
     imageResize: {}
   }
 });
@@ -58,7 +57,7 @@ async function saveDraft(data) {
 }
 
 // ---------------- 폼 요소 ------------------------------------------------
-const wrap           = document.querySelector('.content-area');
+const wrap           = document.querySelector('.content');
 const frm            = wrap.querySelector('#write-form');
 const categorySelect = wrap.querySelector('#bcategory');
 const btnDraft       = wrap.querySelector('#temp-save-btn');
@@ -91,6 +90,7 @@ async function loadAttachmentsByBbsId(bbsId) {
     if (res.header.rtcd !== 'S00' || !Array.isArray(res.body)) return;
     res.body.forEach(meta => addAttachmentItem(meta)); // UI 추가
     console.log('loadAttachmentsByBbsId 실행 성공');
+    uploadGroupInput.value = res.body[0].uploadGroup;
   } catch (err) {
     console.error('첨부파일 로드 실패', err);
     console.log('loadAttachmentsByBbsId 실행 실패');
@@ -120,7 +120,6 @@ try {
       if (parentId) {
         await loadAttachmentsByBbsId(parentId);
       }
-
       if (loadRes.header.rtcd === 'S00') {
         const draft   = loadRes.body;
         const bbsId   = draft.bbsId;
@@ -128,9 +127,11 @@ try {
         quill.root.innerHTML = loadRes.body.bcontent || '';
         categorySelect.value = loadRes.body.bcategory || '';
         if (!parentId && bbsId) {
+
           await loadAttachmentsByBbsId(bbsId);
         }
       }
+
       const deleteUrl = parentId
         ? `/api/bbs/temp?pbbsId=${parentId}`
         : '/api/bbs/temp';
@@ -291,4 +292,110 @@ async function removeAttachment(uploadId, li) {
   li.remove();
 
   if (attachments.length === 0) resetAttachmentUI();
+}
+
+
+const editorEl = quill.root;
+const PLACEHOLDER = '[이미지 업로드 중...]';
+const MAX_MB = 5;
+
+function getInsertIndex() {
+  const sel = quill.getSelection(true);
+  return sel ? sel.index : quill.getLength();
+}
+
+function validImage(file){
+  if (!file.type.startsWith('image/')) return false;
+  if (file.size > MAX_MB * 1024 * 1024) {
+    console.warn('용량 초과', file.name);
+    return false;
+  }
+  return true;
+}
+
+function resolveImageUrl(meta){
+  return meta.url
+      || meta.publicUrl
+      || meta.viewUrl
+      || (meta.storeName ? `/static/uploads/${meta.storeName}` : null);
+}
+
+async function uploadInlineImage(file){
+  const fd = new FormData();
+  if (uploadGroupInput.value) fd.append('uploadGroup', uploadGroupInput.value);
+  fd.append('files', file);
+
+  const res = await ajax.post('/api/bbs/upload/images', fd);
+  if (!res || res.header?.rtcd !== 'S00') {
+    console.error('[UPLOAD FAIL RESPONSE]', res);
+    throw new Error('업로드 실패');
+  }
+
+  // 응답 전체 먼저
+  console.log('[UPLOAD RAW RESPONSE]', res);
+
+  const meta = res.body[0];
+  uploadGroupInput.value = meta.uploadGroup;
+  return meta;
+}
+
+editorEl.addEventListener('dragover', e => {
+  e.preventDefault();
+});
+
+editorEl.addEventListener('drop', async e => {
+  e.preventDefault();
+  const files = [...e.dataTransfer.files].filter(validImage);
+  if (!files.length) return;
+
+  let insertIndex = getInsertIndex();
+
+  for (const file of files) {
+    quill.insertText(insertIndex, '\n' + PLACEHOLDER);
+    const phIndex = insertIndex;
+
+    try {
+      const meta = await uploadInlineImage(file);
+      const url = resolveImageUrl(meta);
+      if (!url) throw new Error('URL 없음');
+
+      quill.deleteText(phIndex, PLACEHOLDER.length + 1);
+      quill.insertEmbed(phIndex, 'image', url);
+      quill.insertText(phIndex + 1, '\n');
+
+      // 이미지 DOM 후처리
+      setTimeout(() => {
+        const imgs = editorEl.querySelectorAll(`img[src="${url}"]`);
+        const img = imgs[imgs.length - 1];
+        if (img) {
+          img.classList.add('keep-original');   // 원본 폭 사용 (선택)
+          adjustImageParagraph(img);            // p 폭을 이미지 폭으로 축소
+        }
+      }, 0);
+
+
+      insertIndex = phIndex + 2;
+    } catch (err) {
+      quill.deleteText(phIndex, PLACEHOLDER.length + 1);
+      quill.insertText(phIndex, `[업로드 실패:${file.name}]`);
+      insertIndex = phIndex + 1;
+      console.error(err);
+    }
+  }
+});
+
+
+
+function adjustImageParagraph(img){
+  if(!img) return;
+  const p = img.closest('p');
+  if(!p) return;
+
+  if(!img.complete || img.naturalWidth === 0){
+    img.addEventListener('load', () => adjustImageParagraph(img), { once:true });
+    return;
+  }
+  p.classList.add('inline-image');
+  // 렌더된 실제 폭
+  p.style.width = img.clientWidth + 'px';
 }

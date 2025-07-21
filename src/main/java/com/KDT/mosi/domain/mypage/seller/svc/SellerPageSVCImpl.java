@@ -85,4 +85,17 @@ public class SellerPageSVCImpl implements SellerPageSVC {
   public int deleteByMemberId(Long memberId) {
     return sellerPageDAO.deleteByMemberId(memberId);
   }
+
+  /**
+   * 닉네임 중복 여부 확인
+   * - DAO를 통해 닉네임 존재 여부 조회
+   *
+   * @param nickname 중복 확인할 닉네임
+   * @return true: 이미 존재함, false: 사용 가능
+   */
+  @Override
+  public boolean existByNickname(String nickname) {
+    return sellerPageDAO.existByNickname(nickname);
+  }
+
 }
