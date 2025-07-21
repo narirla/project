@@ -1,6 +1,5 @@
 package com.KDT.mosi.web.controller;
 
-
 import com.KDT.mosi.domain.entity.*;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
@@ -39,6 +38,7 @@ public class ProductController {
     private final ProductCoursePointSVC productCoursePointSVC;
     private final SellerPageSVC sellerPageSVC;
 
+    // 판매자별 등록 상품 조회
     @GetMapping("/list")
     public String list(Model model, HttpSession session,
                        HttpServletRequest request,
@@ -132,9 +132,9 @@ public class ProductController {
     }
 
     // selectbox 값 변경에 따라 DB status값 변경
-    @PatchMapping("/product/status/{productId}")
+    @PatchMapping("/status/{productId}")
     @ResponseBody
-    public ResponseEntity<?> updateStatus(@PathVariable Long productId, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> updateStatus(@PathVariable(name = "productId") Long productId, @RequestBody Map<String, String> body) {
         String status = body.get("status");
 
         // 상태 값 유효성 검사
@@ -154,6 +154,7 @@ public class ProductController {
         }
     }
 
+    // 상품 등록 페이지 호출
     @GetMapping("/upload")
     public String uploadForm(Model model, HttpSession session, RedirectAttributes redirectAttrs) {
 
@@ -169,7 +170,7 @@ public class ProductController {
         model.addAttribute("productUploadForm", new ProductUploadForm());
         return "product/product_enroll";
     }
-
+    // 상품 등록 적용
     @PostMapping("/upload")
     public String uploadSubmit(@ModelAttribute ProductUploadForm form, HttpSession session ,Model model) throws IOException {
 
@@ -234,6 +235,7 @@ public class ProductController {
         return "redirect:/product/list";
     }
 
+    // 수정 페이지 호출
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable("id") Long id, Model model, HttpSession session, RedirectAttributes redirectAttrs) {
         Member loginMember = (Member) session.getAttribute("loginMember");
@@ -258,7 +260,7 @@ public class ProductController {
         model.addAttribute("coursePoints", coursePoints);
         return "product/product_update";
     }
-
+    // 수정 적용
     @PostMapping("/edit/{id}")
     public String editSubmit(@PathVariable Long id,
                              @ModelAttribute ProductUploadForm form,
@@ -314,6 +316,7 @@ public class ProductController {
         return "redirect:/product/view/" + id;
     }
 
+    // 상세페이지
     @GetMapping("/view/{id}")
     public String view(@PathVariable("id") Long id, Model model, HttpSession session) {
 

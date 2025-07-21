@@ -96,7 +96,7 @@
               </div>
               <div class="overall-info">
                 <div th:text="|총 ${totalCount}개 상품|"></div>
-                <form th:action="@{/list}" method="get" id="statusForm">
+                <form th:action="@{/product/list}" method="get" id="statusForm">
                   <input type="hidden" name="page" th:value="${currentPage}" />
                   <input type="hidden" name="size" th:value="5" />  <!-- size는 고정하거나 동적으로 설정 -->
 
@@ -123,9 +123,10 @@
                       <div class="product-info-left-detail">
 
                         <select class="status-select" th:data-product-id="${form.product.productId}" th:value="${form.product.status}">
-                          <option value="판매중">판매중</option>
-                          <option value="판매대기">판매대기</option>
+                          <option value="판매중" th:selected="${form.product.status == '판매중'}">판매중</option>
+                          <option value="판매대기" th:selected="${form.product.status == '판매대기'}">판매대기</option>
                         </select>
+
                         <div class="product-info-left-detail-details">
                           <div th:if="${form.product.updateDate == null or form.product.createDate == form.product.updateDate}"
                                th:text="${#dates.format(form.product.createDate, 'yyyy-MM-dd')}">
@@ -151,8 +152,8 @@
                       <div th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
                     </div>
                     <div class="btn-group">
-                      <button class="btn-group-edit">수정</button>
-                      <button class="btn-group-delete">삭제</button>
+                      <button id="update-btn" class="btn-group-edit">수정</button>
+                      <button id="delete-btn" class="btn-group-delete">삭제</button>
                     </div>
                   </div>
                 </div>
@@ -161,12 +162,12 @@
               <!-- 페이지네이션 -->
               <div class="pagination">
                 <a th:if="${currentPage > 1}"
-                   th:href="@{/list(page=${currentPage - 1}, size=${5}, status=${selectedStatus})}">이전</a>
+                   th:href="@{/product/list(page=${currentPage - 1}, size=${5}, status=${selectedStatus})}">이전</a>
 
                 <span th:text="${currentPage} + ' / ' + ${totalPages}"></span>
 
                 <a th:if="${currentPage < totalPages}"
-                   th:href="@{/list(page=${currentPage + 1}, size=${5}, status=${selectedStatus})}">다음</a>
+                   th:href="@{/product/list(page=${currentPage + 1}, size=${5}, status=${selectedStatus})}">다음</a>
               </div>
             </div>
           </div>

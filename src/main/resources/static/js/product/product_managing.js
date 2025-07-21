@@ -59,4 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   });
+
+  const deleteProduct = document.getElementById('')
 });
