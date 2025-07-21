@@ -39,7 +39,9 @@ async function addBbs(data) {
   data.status = 'B0201';
   const res = await ajax.post('/api/bbs', data);
   if (res.header.rtcd === 'S00') {
-    window.location.href = parentId ? `/bbs/${parentId}` : '/bbs';
+    newBbsId=res.body.bbsId;
+    url = '/bbs/community/'+newBbsId;
+    window.location.href = parentId ? `/bbs/community/${res.body.bbsId}` : 'url';
   } else {
     alert('저장에 실패했습니다.');
   }
@@ -50,7 +52,7 @@ async function saveDraft(data) {
   data.status = 'B0203';
   const res = await ajax.post('/api/bbs', data);
   if (res.header.rtcd === 'S00') {
-    window.location.href = '/bbs';
+    window.location.href = '/bbs/community';
   } else {
     alert('임시 저장에 실패했습니다.');
   }
