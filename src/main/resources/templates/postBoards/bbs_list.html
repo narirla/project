@@ -54,7 +54,7 @@
                   <img th:src="@{/img/bbs/bbs_list/icon_search.png}" alt="검색" class="search-icon">
                 </div>
                 <!-- 로그인 상태일 때만 노출 -->
-                <a th:if="${session.loginMember != null}" th:href="@{/bbs/add}" class="btn-write">글쓰기</a>
+                <a th:if="${session.loginMember != null}" th:href="@{/bbs/community/add}" class="btn-write">글쓰기</a>
               </div>
             </section>
             <!-- 게시글 목록 -->
