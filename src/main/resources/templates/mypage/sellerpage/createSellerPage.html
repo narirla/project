@@ -1,31 +1,77 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
-  <title>판매자 페이지 생성</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MO:SI 판매자 마이페이지 생성</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/sellerpage/createSellerPage.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
 </head>
+
 <body>
-<h1>판매자 페이지 생성</h1>
-<form th:action="@{/mypage/seller/create}" method="post" enctype="multipart/form-data">
-  <input type="hidden" id="memberId" name="memberId" th:value="${memberId}">
+  <div class="layout-wrapper">
+    <header th:replace="~{fragments/sellerHeader :: sellerHeader}"></header>
 
-  <div>
-    <label for="intro">소개글:</label>
-    <textarea id="intro" name="intro" rows="4" cols="40" maxlength="500"></textarea>
-    <div id="charCount">500자 남음</div>
+    <div class="page-container">
+      <main class="mypage-container">
+        <section class="content">
+          <h1>판매자 페이지 생성</h1>
+
+          <form th:action="@{/mypage/seller/create}" method="post" enctype="multipart/form-data" th:object="${form}">
+            <input type="hidden" th:field="*{memberId}">
+
+            <div class="profile-upload">
+              <label for="imageFile" class="profile-upload-label">
+                프로필 사진 등록
+              </label>
+              <input type="file" id="imageFile" name="imageFile" accept="image/*" hidden>
+            </div>
+
+            <!-- 닉네임 입력 -->
+            <div>
+              <label for="nickname" class="sr-only">닉네임</label>
+              <div class="nickname-box">
+                <input type="text" th:field="*{nickname}" id="nickname" name="nickname" placeholder="닉네임을 입력해주세요."
+                  autocomplete="off">
+                <button type="button" class="btn-small" id="nicknameToggleBtn">중복확인</button>
+              </div>
+              <!-- ✅ 메시지 표시 영역 -->
+              <span id="nicknameCheckMsg" class="form-text"></span>
+            </div>
+
+            <!-- 소개글 입력 -->
+            <div class="textarea-wrapper">
+              <label for="intro" class="sr-only">소개글</label>
+              <div class="textarea-box">
+                <textarea class="intro-box" th:field="*{intro}" rows="4" maxlength="500"
+                  placeholder="소개글을 입력해주세요."></textarea>
+                <div id="charCount"><span id="charCountNum">0</span><span class="unit">자</span> / <span
+                    class="maxCount">500자</span></div>
+              </div>
+            </div>
+            <div>
+              <button class="submit-btn" type="submit">등록</button>
+            </div>
+          </form>
+
+        </section>
+      </main>
+      <!-- 공지 -->
+      <div class="notice-bar">
+        <div class="notice-label">공지</div>
+        <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+        <a href="#" class="more-link">+ 더보기</a>
+      </div>
+
+      <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+    <script th:src="@{/js/sellerpage/createSellerPage.js}"></script>
   </div>
-
-  <div>
-    <label for="image">프로필 이미지:</label>
-    <input type="file" id="image" name="image" accept="image/*">
-  </div>
-
-  <div>
-    <button type="submit">등록</button>
-  </div>
-</form>
-
-<script th:src="@{/js/sellerpage/createSellerPage.js}"></script>
 </body>
+
 </html>

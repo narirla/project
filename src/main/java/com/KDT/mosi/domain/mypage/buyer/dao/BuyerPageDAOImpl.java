@@ -4,9 +4,7 @@ import com.KDT.mosi.domain.entity.BuyerPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -14,6 +12,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -33,6 +32,12 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
       buyerPage.setIntro(rs.getString("intro"));
       buyerPage.setRecentOrder(rs.getString("recent_order"));
       buyerPage.setPoint(rs.getInt("point"));
+      buyerPage.setTel(rs.getString("tel"));
+      buyerPage.setAddress(rs.getString("address"));
+      buyerPage.setZonecode(rs.getString("zonecode"));
+      buyerPage.setDetailAddress(rs.getString("detail_address"));
+      buyerPage.setNotification(rs.getString("notification"));
+
 
       if (rs.getTimestamp("create_date") != null) {
         buyerPage.setCreateDate(rs.getTimestamp("create_date").toLocalDateTime());
@@ -48,26 +53,41 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
   // ✅ 마이페이지 등록
   @Override
   public Long save(BuyerPage buyerPage) {
+
+    // 1️⃣ SQL 조립
     StringBuffer sql = new StringBuffer();
-    sql.append("INSERT INTO BUYER_PAGE ");
-    sql.append("(PAGE_ID, MEMBER_ID, IMAGE, INTRO, RECENT_ORDER, POINT, CREATE_DATE, UPDATE_DATE, NICKNAME) ");
-    sql.append("VALUES (BUYER_PAGE_SEQ.NEXTVAL, :memberId, :image, :intro, :recentOrder, :point, systimestamp, systimestamp, :nickname) ");
+    sql.append("INSERT INTO BUYER_PAGE ( PAGE_ID, MEMBER_ID, INTRO, CREATE_DATE, UPDATE_DATE, NICKNAME) ");
+    sql.append(" VALUES (BUYER_PAGE_SEQ.NEXTVAL, :memberId, :intro, systimestamp, systimestamp, :nickname) ");
 
-    SqlParameterSource param = new BeanPropertySqlParameterSource(buyerPage);
+    // 2️⃣ 바인딩 파라미터 (필요한 항목만)
+    MapSqlParameterSource param = new MapSqlParameterSource()
+        .addValue("memberId",  buyerPage.getMemberId())
+        .addValue("intro",     buyerPage.getIntro())
+        .addValue("nickname",  buyerPage.getNickname());
+
+    // 3️⃣ KeyHolder 로 PK 추출
     KeyHolder keyHolder = new GeneratedKeyHolder();
+    template.update(sql.toString(), param, keyHolder, new String[]{"PAGE_ID"});
 
-    template.update(sql.toString(), param, keyHolder, new String[]{"page_id"});
-
-    return ((Number) keyHolder.getKeys().get("page_id")).longValue();
+    // 4️⃣ PAGE_ID 반환 (NPE 방지)
+    Map<String, Object> keys = keyHolder.getKeys();
+    if (keys != null && keys.get("PAGE_ID") != null) {
+      return ((Number) keys.get("PAGE_ID")).longValue();
+    }
+    throw new IllegalStateException("❌ BuyerPage ID 생성 실패");
   }
+
 
   // ✅ 회원 ID로 조회
   @Override
   public Optional<BuyerPage> findByMemberId(Long memberId) {
     StringBuffer sql = new StringBuffer();
-    sql.append("SELECT page_id, member_id, image, intro, recent_order, point, create_date, update_date, nickname ");
+    sql.append("SELECT page_id, member_id, image, intro, recent_order, point, ");
+    sql.append("       tel, address, zonecode, detail_address, notification, "); // ⬅ 추가
+    sql.append("       create_date, update_date, nickname ");
     sql.append("  FROM BUYER_PAGE ");
     sql.append(" WHERE member_id = :memberId ");
+
 
     SqlParameterSource param = new MapSqlParameterSource().addValue("memberId", memberId);
 
@@ -126,20 +146,26 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
   // ✅ 페이지 ID로 조회 (삭제 권한 확인용)
   @Override
   public Optional<BuyerPage> findById(Long pageId) {
-    String sql = "SELECT * FROM buyer_page WHERE page_id = :pageId";
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT page_id, member_id, image, intro, recent_order, point, ");
+    sql.append("       tel, address, zonecode, detail_address, notification, ");
+    sql.append("       create_date, update_date, nickname ");
+    sql.append("  FROM BUYER_PAGE ");
+    sql.append(" WHERE page_id = :pageId");
 
     SqlParameterSource param = new MapSqlParameterSource()
         .addValue("pageId", pageId);
 
     try {
       BuyerPage buyerPage = template.queryForObject(
-          sql,
+          sql.toString(),
           param,
-          BeanPropertyRowMapper.newInstance(BuyerPage.class)
+          buyerPageRowMapper() // ⬅ 수동 매퍼 재사용
       );
       return Optional.of(buyerPage);
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
   }
+
 }

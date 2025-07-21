@@ -203,6 +203,7 @@ input[type='radio']:checked {
     overflow-y: auto;
     padding: 5px;
     box-sizing: border-box;
+    padding-right: 3px;
 }
 
 .image-name-list .image-name-item {
@@ -210,6 +211,8 @@ input[type='radio']:checked {
     font-size: 16px;
     color: #B2B2B2;
     cursor: pointer;
+    padding-right: 3px;
+    width:100%;
 }
 
 .image-name-list .image-name-item.active {

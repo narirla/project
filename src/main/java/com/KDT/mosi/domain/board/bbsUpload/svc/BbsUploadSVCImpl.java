@@ -29,6 +29,8 @@ public class BbsUploadSVCImpl implements BbsUploadSVC{
 
   @Value("${upload.path}")
   private String uploadPath;
+  @Value("${upload.url-prefix}")
+  private String urlPrefix;
 
   @Override
   @Transactional
@@ -67,8 +69,8 @@ public class BbsUploadSVCImpl implements BbsUploadSVC{
     String uuid      = UUID.randomUUID().toString().replace("-", "");
     String cleanBase = baseName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
     String safeBase  = URLEncoder.encode(cleanBase, StandardCharsets.UTF_8);
-    String savedName = String.format("%s_%s_%s.%s",
-        timestamp, uuid, safeBase,
+    String savedName = String.format("%s_%s.%s",
+        timestamp, uuid,
         ext != null ? ext : "");
 
     // 4) 디스크에 실제 저장 (uploadPath는 application.yml 의 upload.path)
@@ -85,8 +87,8 @@ public class BbsUploadSVCImpl implements BbsUploadSVC{
     upload.setOriginalName(originalName);
     upload.setSavedName(savedName);
     // 클라이언트가 URL로 접근할 경로; ResourceHandler 에 매핑된 prefix를 포함
-    upload.setFilePath("/" + uploadPath + "/" + savedName);
-
+    upload.setFilePath(urlPrefix + "/" + savedName);
+    log.warn("★ SET filePath={}", upload.getFilePath());
     // 6) DAO 호출하여 DB에 메타 저장 후, 생성된 PK 리턴
     return bbsUploadDAO.save(upload);
   }
@@ -110,12 +112,10 @@ public class BbsUploadSVCImpl implements BbsUploadSVC{
       u.setUploadGroup(uploadGroup);
       u.setFileType(fileType);
       u.setSortOrder(nextOrder++);
-
-      // 3) 파일 시스템 저장 + 메타 세팅
-      Long id = save(u, file);  // save(upload, file) 은 앞서 구현한 메서드
-
-      // 4) 결과 리스트에 추가
-      results.add(new UploadResult(id, u.getFilePath(),uploadGroup));
+      Long id = save(u, file);
+      String publicUrl = urlPrefix + "/" + u.getSavedName();
+      results.add(new UploadResult(id, publicUrl, uploadGroup, file.getOriginalFilename()));
+      log.info("★ publicUrl={}", publicUrl);
     }
     return results;
   }
@@ -195,5 +195,16 @@ public class BbsUploadSVCImpl implements BbsUploadSVC{
   @Override
   public int bindGroupToBbs(Long bbsId, Long uploadGroup) {
     return bbsUploadDAO.bindGroupToBbs(bbsId, uploadGroup);
+  }
+
+  @Override
+  public Optional<UploadResult> findThumbnail(Long bbsId, String fileType) {
+    return bbsUploadDAO.findFirstImageByBbsId(bbsId, fileType)
+        .map(u -> new UploadResult(
+            u.getUploadId(),
+            urlPrefix + "/" + u.getSavedName(),
+            u.getUploadGroup(),
+            u.getOriginalName()
+        ));
   }
 }

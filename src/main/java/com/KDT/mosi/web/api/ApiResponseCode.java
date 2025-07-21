@@ -8,6 +8,8 @@ import java.util.Arrays;
 public enum ApiResponseCode {
   // 성공 응답
   SUCCESS("S00", "Success"),
+  // 데이터 없음
+  NO_DATA("N04", "No data found"),
 
   // 공통 예외
   VALIDATION_ERROR("E01", "Validation error occurred"),

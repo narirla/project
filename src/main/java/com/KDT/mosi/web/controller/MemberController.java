@@ -154,7 +154,7 @@ public class MemberController {
    * 회원 정보 조회 페이지 (디버깅/확인용)
    */
   @GetMapping("/{id}")
-  public String view(@PathVariable Long id, Model model) {
+  public String view(@PathVariable("id") Long id, Model model) {
     memberSVC.findById(id).ifPresent(member -> model.addAttribute("member", member));
     return "member/viewMember";
   }
@@ -180,7 +180,7 @@ public class MemberController {
    * - 본인 인증 및 기존 정보 조회 후 폼 전달
    */
   @GetMapping("/{id}/edit")
-  public String editForm(@PathVariable Long id, Model model) {
+  public String editForm(@PathVariable("id") Long id, Model model) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String loginEmail = auth.getName();
     Member loginMember = memberSVC.findByEmail(loginEmail).orElseThrow();
@@ -215,7 +215,7 @@ public class MemberController {
    */
   @PostMapping("/{id}/edit")
   public String edit(
-      @PathVariable Long id,
+      @PathVariable("id") Long id,
       @Valid @ModelAttribute("form") MemberEditForm form,
       BindingResult bindingResult,
       Model model
@@ -285,13 +285,13 @@ public class MemberController {
    */
   @GetMapping("/nicknameCheck")
   @ResponseBody
-  public ResponseEntity<Boolean> nicknameCheck(@RequestParam String nickname) {
+  public ResponseEntity<Boolean> nicknameCheck(@RequestParam("nickname") String nickname) {
     boolean exist = memberSVC.isExistNickname(nickname);
     return ResponseEntity.ok(exist);  // true = 중복, false = 사용 가능
   }
 
   @PostMapping("/{id}/delete")
-  public String deleteMember(@PathVariable Long id, HttpServletRequest request) {
+  public String deleteMember(@PathVariable("id") Long id, HttpServletRequest request) {
     // 현재 로그인한 회원 ID 가져오기
     Long loginMemberId = getLoginMemberId(request);
 

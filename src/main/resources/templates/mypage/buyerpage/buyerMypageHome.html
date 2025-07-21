@@ -23,17 +23,15 @@
           <div class="sidebar-card">
             <div class="profile-box">
               <div class="profile-image">
-                <img th:if="${member != null and member.pic != null}"
-                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
-                <!-- member가 null이거나 pic이 null이면 기본 이미지 출력 -->
-                <img th:if="${member == null or member.pic == null}" th:src="@{/img/default-profile.png}"
-                     alt="기본 프로필 이미지">
+                <img id="asideProfileImage"
+                     th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}"
+                     alt="프로필 이미지">
               </div>
               <div class="profile-info">
                 <a href="#" class="profile-badge">프로여행러 ></a>
                 <div class="profile-name" th:text="${member.name}"></div>
                 <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top: 10px;">
-                  <button type="submit" class="btn btn-outline-secondary w-100">판매자 전환</button>
+                  <button type="submit" class="btn-role-switch">판매자 전환</button>
                 </form>
 
               </div>
@@ -89,6 +87,7 @@
         </aside>
 
         <section class="content">
+          <h2>내 정보</h2>
           <!-- 내 정보 -->
           <div class="info-summary-card">
             <div class="info-grid">
@@ -178,7 +177,10 @@
                 </div>
                 <div class="card-content">
                   <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                  <p class="card-price">5,000 원</p>
+                  <p class="card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="card-hint">가이드 구독시 10% 추가할인</p>
                   <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
                 </div>
               </div>
@@ -189,7 +191,10 @@
                 </div>
                 <div class="card-content">
                   <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                  <p class="card-price">5,000 원</p>
+                  <p class="card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="card-hint">가이드 구독시 10% 추가할인</p>
                   <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
                 </div>
               </div>
@@ -200,7 +205,10 @@
                 </div>
                 <div class="card-content">
                   <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                  <p class="card-price">5,000 원</p>
+                  <p class="card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="card-hint">가이드 구독시 10% 추가할인</p>
                   <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
                 </div>
               </div>

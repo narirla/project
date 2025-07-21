@@ -3,15 +3,15 @@
 /* ✅ 기본 설정 */
 /* =============================== */
 body {
-  width: 1200px;
   margin: 0 auto;
   font-family: 'Pretendard', sans-serif;
   background-color: #fff;
   color: #1F1F1F;
-  padding: 0;
+  padding-top: 167px;
 }
 
 h2.form-title {
+  width: 938px;
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 24px;
@@ -25,12 +25,30 @@ h2.form-title {
   gap: 24px;
 }
 
+.mypage-nav > ul {
+    padding: 10px 0;
+    height: 951px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.mypage-nav a {
+  text-decoration: none !important;   /* ✅ 밑줄 제거 */
+}
+.mypage-nav a:hover,
+.mypage-nav a:active,
+.mypage-nav a:visited {
+  text-decoration: none !important;   /* ✅ 상태별 밑줄도 제거 */
+}
+
+
 /* =============================== */
 /* ✅ 전체 폼 컨테이너 */
 /* =============================== */
 .content {
   width: 938px;         /* 가로 */
-  height: 1587px;       /* 세로 */
+  height: 1700px;       /* 세로 */
+  flex: 1;
   margin: 0 auto;       /* 가운데 정렬 */
   padding: 40px;
   box-sizing: border-box;
@@ -41,42 +59,52 @@ h2.form-title {
 
 .edit-form {
   width: 100%;
-  max-width: 720px;
+  max-width: 938px;
   background-color: #fff;
   padding: 32px;
   border-radius: 8px;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.06);
   margin-top: 16px;
 }
 
 /* =============================== */
 /* ✅ 프로필 이미지 영역 */
 /* =============================== */
-.profile-preview{
-  width:253px !important;     /* ← 253px로 확정 */
-  height:253px !important;    /* ← 253px로 확정 */
-  border-radius: 5px;
-  object-fit:cover;
-  border:1px solid #ccc;
+.profile-section {
+  display: flex;
+  align-items: flex-end;   /* 이미지와 버튼을 아래로 정렬 */
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
-/* ⬇ 버튼을 이미지 아래에 두려면 column 사용 */
-.profile-section{
-  display:flex;
-  flex-direction:column;      /* 가로 → 세로 배치 */
-  align-items:center;
-  gap:16px;
-  margin-bottom:24px;
+.profile-wrapper {
+  width: 253px;
+  height: 253px;
+}
+
+.profile-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  object-fit: cover;
 }
 
 .btn-upload {
-  padding: 8px 16px;
-  font-size: 14px;
+  width: 90px;
+  height: 32px;
   background-color: #1EC4CC;
-  color: #fff;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  line-height: 32px;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.btn-upload:hover {
+  background-color: #18b3b9;
 }
 
 /* =============================== */
@@ -182,4 +210,82 @@ textarea {
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.btn-primary:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/*===============================*/
+/* 에러메세지 및 성공 메세지*/
+/*===============================*/
+/* ✅ Bootstrap 없이 직접 정의한 상태 메시지 색상 */
+.text-success {
+  color: #198754 !important;  /* 초록색 */
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.text-danger {
+  color: red !important;      /* 빨간색 */
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ✅ JS 메시지 출력을 위한 기본 메시지 텍스트 박스 스타일 */
+.form-text {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ✅ Bootstrap의 margin-start 대체 (왼쪽 여백) */
+.ms-2 {
+  margin-left: 8px;
+}
+
+/* ✅ 비밀번호 입력창 wrapper 및 토글 아이콘 */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* 토글 버튼 공간 확보 */
+  box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #555;
+}
+
+/* ✅ 비밀번호 강도 힌트 */
+#pwHint {
+  color: red !important;
+  font-size: 16px;
+
+}
+
+/* ✅ 비밀번호 일치/불일치 메시지 */
+#pwMatchMsg.text-success {
+  font-size: 16px;
+  font-weight: 500;
+  color: #198754 !important;  /* 초록색 */
+
+}
+
+#pwMatchMsg.text-danger {
+  font-size: 16px;
+  font-weight: 500;
+  color: red !important;      /* 빨간색 */
+
 }

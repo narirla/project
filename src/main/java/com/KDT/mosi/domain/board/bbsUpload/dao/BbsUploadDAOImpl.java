@@ -201,8 +201,32 @@ public class BbsUploadDAOImpl implements BbsUploadDAO{
     return i;
   }
 
+  @Override
+  public Optional<BbsUpload> findFirstImageByBbsId(Long bbsId, String fileType) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT * ");
+    sql.append("FROM bbs_upload ");
+    sql.append("WHERE bbs_id   = :bbsId ");
+    sql.append("AND file_type = :fileType ");
+    sql.append("AND ( ");
+    sql.append("   LOWER(saved_name) LIKE '%.png' ");
+    sql.append("OR LOWER(saved_name) LIKE '%.jpg' ");
+    sql.append("OR LOWER(saved_name) LIKE '%.jpeg' ");
+    sql.append("OR LOWER(saved_name) LIKE '%.gif' ");
+    sql.append(" ) ");
+    sql.append("ORDER BY sort_order ");
+    sql.append("FETCH FIRST 1 ROWS ONLY ");
 
-
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("bbsId", bbsId)
+        .addValue("fileType",fileType);
+    try {
+      BbsUpload u = template.queryForObject(sql.toString(), param, BeanPropertyRowMapper.newInstance(BbsUpload.class));
+      return Optional.of(u);
+    } catch (EmptyResultDataAccessException e) {
+      return Optional.empty();
+    }
+  }
 
 
 }

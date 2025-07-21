@@ -40,4 +40,8 @@ public interface BbsUploadSVC {
 
   // 게시글 저장시 bbsId 업데이트
   int bindGroupToBbs(Long bbsId, Long uploadGroup);
+
+  // 이미지 하나만 가져오기
+  Optional<UploadResult> findThumbnail(Long bbsId, String fileType);
+
 }

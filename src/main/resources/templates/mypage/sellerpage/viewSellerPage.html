@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MO:SI 판매자 마이페이지</title>
-  <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/sellerpage/viewSellerPage.css}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
 </head>
+
 <body>
 
   <div class="layout-wrapper">
@@ -22,53 +25,52 @@
               <div class="profile-image">
                 <img th:src="${sellerPage.image != null}
                         ? @{/mypage/seller/images/profile/{id}(id=${sellerPage.pageId})}
-                        : @{/img/default-profile.png}"
-                     alt="프로필 이미지">
+                        : @{/img/default-profile.png}" alt="프로필 이미지">
               </div>
               <div class="profile-info">
                 <a href="#" class="profile-badge">🧭 프로가이드 ></a>
                 <div class="profile-name" th:text="${sellerPage.nickname}">닉네임</div>
                 <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
-                  <button type="submit" class="btn btn-outline-secondary w-100">구매자 전환</button>
+                  <button type="submit" class="btn-role-switch">구매자 전환</button>
                 </form>
               </div>
             </div>
             <nav class="mypage-nav">
-              <div class="nav-title">MY PAGE</div>
+              <div class="nav-title active">MY PAGE</div>
               <ul>
-                <li><strong>상품</strong>
+                <li><a href="#">상품</a>
                   <ul>
                     <li><a th:href="@{/product/manage}">내 상품 목록</a></li>
                     <li><a th:href="@{/product/upload}">상품 등록</a></li>
                   </ul>
                 </li>
-                <li><strong>판매 현황</strong>
+                <li><a href="#">판매 현황</a>
                   <ul>
                     <li><a th:href="@{/seller/orders}">주문 현황</a></li>
                     <li><a th:href="@{/seller/stats}">총 판매 수 / 매출액</a></li>
                     <li><a th:href="@{/seller/chart}">판매 통계</a></li>
                   </ul>
                 </li>
-                <li><strong>문의 / 리뷰</strong>
+                <li><a href="#">문의 / 리뷰</a>
                   <ul>
                     <li><a th:href="@{/seller/qna}">상품 문의</a></li>
                     <li><a th:href="@{/seller/comments}">나의 답글</a></li>
                   </ul>
                 </li>
-                <li><strong>알림 / 공지</strong>
+                <li><a href="#">알림 / 공지</a>
                   <ul>
                     <li><a th:href="@{/notice}">공지사항</a></li>
                     <li><a th:href="@{/seller/messages}">프로모션</a></li>
                   </ul>
                 </li>
-                <li><strong>내 정보</strong>
+                <li><a href="#">내 정보</a>
                   <ul>
                     <li><a th:href="@{/mypage/seller}">프로필</a></li>
-                    <li><a th:href="@{/mypage/seller/edit}">정보 수정</a></li>
-                    <li><a th:href="@{/mypage/seller/subscribers}">구독자 관리</a></li>
+                    <li><a href="#">정산 정보 관리</a></li>
+                    <li><a href="#">구독자 관리</a></li>
                   </ul>
                 </li>
-                <li><strong>고객센터</strong>
+                <li><a href="#">고객센터</a>
                   <ul>
                     <li><a th:href="@{/support/inquiry}">1:1 문의</a></li>
                     <li><a th:href="@{/support/qna}">답변 Q&A 내역</a></li>
@@ -83,67 +85,68 @@
         </aside>
         <!-- ✅ 우측 본문 -->
         <section class="content">
-          <!-- ✅ 수정 성공 메시지 출력 -->
-          <div th:if="${msg != null}" class="alert alert-success" role="alert"
-               style="margin-bottom: 20px; font-weight: bold; color: #0a667e;">
-            <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
-            <span th:text="${msg}">수정되었습니다.</span>
-          </div>
+
           <div class="info-summary-card">
-            <h2>판매자 정보 관리</h2>
-            <table class="member-info-table">
-              <tr>
-                <th><label for="nickname">닉네임</label></th>
-                <td>
-                  <input type="text" id="nickname" name="nickname" th:value="${sellerPage.nickname}"
-                         class="form-control" readonly autocomplete="nickname">
-                </td>
-              </tr>
-              <tr>
-                <th><label for="intro">자기소개</label></th>
-                <td>
-                      <textarea id="intro" name="intro" class="form-control" rows="3" readonly
-                                th:text="${sellerPage != null and sellerPage.intro != null ? sellerPage.intro : '등록된 자기소개가 없습니다.'}"></textarea>
-                </td>
-              </tr>
-              <tr>
-                <th>전화</th>
-                <td>
-                  <span th:text="${member.tel}" id="tel">010-0000-0000</span>
-                  <a th:href="@{/mypage/seller/edit}" class="btn btn-secondary" style="float:right;">변경하기</a>
-                </td>
-              </tr>
-              <tr>
-                <th><label for="notification">알림설정</label></th>
-                <td>
-                  <label>
-                    <input type="checkbox" id="notification" name="notification"
-                           disabled th:checked="${member.notification == 'Y'}"> 알림 수신 동의
-                  </label>
-                  <div style="margin-top: 8px;">판매 관련 알림을 수신하시겠습니까?</div>
-                </td>
-              </tr>
-            </table>
-            <div class="btn-group mt-4" style="text-align: right;">
-              <a th:href="@{/mypage/seller/edit}" class="btn btn-primary">회원 정보 수정</a>
-              <form th:action="@{/members/delete}" method="post" style="display: inline;">
-                <input type="hidden" id="memberId" name="memberId" th:value="${member.memberId}">
-                <button type="submit" class="btn btn-danger" onclick="return confirm('정말 탈퇴하시겠습니까?');">회원탈퇴</button>
-              </form>
+            <h2>나의 프로필</h2>
+            <div class="profile-wrapper">
+              <!-- 왼쪽: 프로필 이미지 -->
+              <div class="profile-left">
+                <div class="profile-image-box">
+                  <img th:src="${sellerPage.image != null}? @{/mypage/seller/images/profile/{id}(id=${sellerPage.pageId})}
+                  : @{/img/default-profile.png}" alt="프로필 이미지">
+                </div>
+                <div class="contact-info">
+                  <div class="nickname" th:text="${sellerPage.nickname}">최준</div>
+                  <div class="email" th:text="${member.email}">mosimosi@mosi.com</div>
+                  <div class="tel">
+                    <span th:text="${member.tel}">010-1234-5678</span>
+                    <span class="badge">인증완료</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 오른쪽: 프로필 정보 -->
+              <div class="profile-right">
+                <div class="activity-stats">
+                  <div class="stat">
+                    <div class="stat-count" th:text="${sellerPage.productCount}"> 12</div>
+                    <div class="stat-label">판매코스</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-count" th:text="${sellerPage.followerCount}"> 125</div>
+                    <div class="stat-label">팔로워</div>
+                  </div>
+                  <div class="stat">
+                    <!-- ❗ 아직 DB에 없음, 추후 FOLLOW 테이블로 구현 -->
+                    <div class="stat-count"> 0</div>
+                    <div class="stat-label"> 팔로잉</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-count" th:text="${sellerPage.reviewAvg}"> 9.8</div>
+                    <div class="stat-label">만족도</div>
+                  </div>
+                </div>
+                <div class="tags" th:if="${sellerPage.intro != null}">
+                  <span th:each="tag : ${#strings.arraySplit(sellerPage.intro, ' ')}" th:text="${tag}">#태그</span>
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="btn-box">
+            <a th:href="@{/mypage/seller/edit}" class="btn btn-primary">프로필 수정하기</a>
           </div>
         </section>
       </main>
-      <!-- 공지 -->
-      <div class="notice-bar">
-        <div class="notice-label">공지</div>
-        <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
-        <a href="#" class="more-link">+ 더보기</a>
-      </div>
-      <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
-    <script th:src="@{/js/sellerpage/viewSellerPage.js}" defer></script>
+    <!-- 공지 -->
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
+    </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
-
+  <script th:src="@{/js/sellerpage/viewSellerPage.js}" defer></script>
 </body>
+
 </html>

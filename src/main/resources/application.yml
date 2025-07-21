@@ -17,6 +17,12 @@ spring:
     restart:
       enabled: false
 
+  #파일업로드 크기 설정
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+      file-size-threshold: 0B
 
 # 웹서버 포트
 server:
@@ -31,3 +37,4 @@ logging:
 # 게시판 업로드 위치
 upload:
   path: C:\KDT\projects\uploads\bbs
+  url-prefix: /static/uploads

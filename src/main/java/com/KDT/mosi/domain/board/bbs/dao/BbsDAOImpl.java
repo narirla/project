@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -129,6 +130,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("SELECT ");
     sql.append("b.bbs_id as bbs_id, ");
     sql.append("b.bcategory as bcategory, ");
+    sql.append("b.status as status, ");
     sql.append("CASE ");
     sql.append("WHEN b.status = 'B0202' THEN '삭제된 게시글입니다.' ");
     sql.append("ELSE b.title ");
@@ -151,6 +153,27 @@ public class BbsDAOImpl implements BbsDAO {
     Map<String, Integer> map = Map.of("pageNo", pageNo, "numOfRows", numOfRows);
     List<Bbs> list = template.query(sql.toString(), map, BeanPropertyRowMapper.newInstance(Bbs.class));
 
+    if (!list.isEmpty()) {
+      List<Long> bbsIds = list.stream().map(Bbs::getBbsId).toList();
+
+      StringBuffer countSql = new StringBuffer();
+      countSql.append("SELECT bbs_id, COUNT(*) AS cnt ");
+      countSql.append("FROM rbbs ");
+      countSql.append("WHERE bbs_id IN (:bbsIds) ");
+      countSql.append("AND status <> 'C0202' ");
+      countSql.append("GROUP BY bbs_id ");
+
+      Map<String,Object> cntParams = Map.of("bbsIds", bbsIds);
+
+      List<Map<String,Object>> cntRows = template.queryForList(countSql.toString(), cntParams);
+
+      Map<Long,Integer> cntMap = cntRows.stream()
+          .collect(Collectors.toMap(
+              r -> ((Number)r.get("bbs_id")).longValue(),
+              r -> ((Number)r.get("cnt")).intValue()
+          ));
+      list.forEach(b -> b.setCommentCnt(cntMap.getOrDefault(b.getBbsId(), 0)));
+    }
     return list;
   }
 
@@ -477,6 +500,8 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("where b.member_id = :memberId ");
     sql.append("and b.status = 'B0203' ");
     sql.append("and NVL(b.pbbs_id, 0) = NVL(:pbbsId, 0) ");
+    sql.append("ORDER BY b.update_date DESC ");
+    sql.append("FETCH FIRST 1 ROWS ONLY ");
 
     Long safePbbsId = (pbbsId != null) ? pbbsId : 0L;
 

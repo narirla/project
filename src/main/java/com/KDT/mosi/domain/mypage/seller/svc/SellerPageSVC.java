@@ -33,5 +33,7 @@ public interface SellerPageSVC {
   // 삭제
   int deleteByMemberId(Long memberId);
 
+  //닉네임 중복 여부 확인
+  boolean existByNickname(String nickname);
 
 }
