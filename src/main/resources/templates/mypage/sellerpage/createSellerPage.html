@@ -35,7 +35,8 @@
             <div>
               <label for="nickname" class="sr-only">닉네임</label>
               <div class="nickname-box">
-                <input type="text" th:field="*{nickname}" id="nickname" name="nickname" placeholder="닉네임을 입력해주세요." autocomplete="off">
+                <input type="text" th:field="*{nickname}" id="nickname" name="nickname" placeholder="닉네임을 입력해주세요."
+                  autocomplete="off">
                 <button type="button" class="btn-small" id="nicknameToggleBtn">중복확인</button>
               </div>
               <!-- ✅ 메시지 표시 영역 -->
@@ -46,15 +47,17 @@
             <div class="textarea-wrapper">
               <label for="intro" class="sr-only">소개글</label>
               <div class="textarea-box">
-                <textarea class="intro-box" th:field="*{intro}" rows="4" maxlength="500" placeholder="소개글을 입력해주세요."></textarea>
-                <div id="charCount"><span id="charCountNum">0</span><span class="unit">자</span> / <span class="maxCount">500자</span></div>
+                <textarea class="intro-box" th:field="*{intro}" rows="4" maxlength="500"
+                  placeholder="소개글을 입력해주세요."></textarea>
+                <div id="charCount"><span id="charCountNum">0</span><span class="unit">자</span> / <span
+                    class="maxCount">500자</span></div>
               </div>
             </div>
-
+            <div>
+              <button class="submit-btn" type="submit">등록</button>
+            </div>
           </form>
-          <div>
-            <button type="submit">등록</button>
-          </div>
+
         </section>
       </main>
       <!-- 공지 -->
@@ -67,7 +70,8 @@
       <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
 
-    <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
+    <script th:src="@{/js/sellerpage/createSellerPage.js}"></script>
   </div>
 </body>
+
 </html>
