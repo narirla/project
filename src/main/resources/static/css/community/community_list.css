@@ -3,6 +3,7 @@
     height: 200px;
 }
 
+<<<<<<< HEAD
 
 /* community_list.css */
 .content {
@@ -10,6 +11,8 @@
   margin-top: 10px;
 }
 
+=======
+>>>>>>> origin/main
 /* 페이지 컨테이너: 헤더 높이만큼 패딩 */
 .page-container {
     background-color: #FFFFFF;
@@ -241,6 +244,17 @@
     line-height: 100%;
     letter-spacing: 0;
 }
+.commentCnt {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-style: normal;      /* Regular */
+  font-size: 15px;
+  line-height: 100%;
+  letter-spacing: 0;
+  leading-trim: none;
+  color:#56DDF8;
+  padding-left:3px;
+}
 
 
 .indent-icon {
@@ -296,4 +310,12 @@
   background-color: #00A9CA;
   color: white;
   border-radius: 4px;
+}
+
+.ql-editor p.inline-image {
+  display:inline-block;
+  margin:0;
+  padding:0;
+  line-height:0;
+  width:auto;
 }

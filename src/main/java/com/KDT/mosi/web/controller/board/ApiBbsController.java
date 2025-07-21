@@ -48,6 +48,9 @@ public class ApiBbsController {
     Long id = bbsSVC.save(bbs);
     if (saveApi.getUploadGroup() != null) {
       bbsUploadSVC.bindGroupToBbs(id,saveApi.getUploadGroup());
+      log.info("saveApi.getUploadGroup = {}", saveApi.getUploadGroup());
+    }else{
+      log.info("NOONONONONOsaveApi.getUploadGroup = {}", saveApi.getUploadGroup());
     }
     Optional<Bbs> optionalBbs = bbsSVC.findById(id);
     Bbs findedBbs = optionalBbs.orElseThrow();
@@ -102,6 +105,7 @@ public class ApiBbsController {
   ) {
     Long memberId = (Long) session.getAttribute("loginMemberId");
     bbsSVC.deleteTemporaryStorage(memberId, pbbsId);
+    log.info("삭제 완료");
     return ResponseEntity.ok(ApiResponse.of(ApiResponseCode.SUCCESS, null));
   }
 

@@ -50,4 +50,12 @@ public interface SellerPageDAO {
    */
   boolean existByMemberId(Long memberId);
 
+  /**
+   * 닉네임 중복 여부 확인
+   * @param nickname 닉네임
+   * @return true: 중복 있음, false: 사용 가능
+   */
+  boolean existByNickname(String nickname);
+
+
 }

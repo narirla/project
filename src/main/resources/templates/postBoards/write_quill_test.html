@@ -19,7 +19,7 @@
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 </head>
 
-<body>
+<body th:attr="data-parent-id=${bbsId}">
   <div class="layout-wrapper">
     <!-- header / footer 는 이미 fragment 로 존재하므로 th:replace 로만 연결 -->
     <header th:replace="~{fragments/header :: header}"></header>

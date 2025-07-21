@@ -6,11 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -113,6 +117,28 @@ public class SellerPageDAOImpl implements SellerPageDAO {
     Integer count = template.queryForObject(sql, param, Integer.class);
     return count != null && count > 0;
   }
+
+  /**
+   * 닉네임 중복 여부 확인
+   *
+   * @param nickname 확인할 닉네임
+   * @return true: 이미 존재하는 닉네임, false: 사용 가능한 닉네임
+   */
+  @Override
+  public boolean existByNickname(String nickname) {
+    // ✅ SQL: 닉네임으로 중복 여부 확인
+    String sql = "SELECT COUNT(*) FROM seller_page WHERE nickname = :nickname";
+
+    // ✅ 파라미터 바인딩용 Map (NamedParameter 방식)
+    Map<String, Object> param = Map.of("nickname", nickname);
+
+    // ✅ 쿼리 실행 → 결과는 Integer 타입으로 반환
+    Integer count = template.queryForObject(sql, param, Integer.class);
+
+    // ✅ 결과 해석: 1개 이상이면 true (중복), 아니면 false
+    return count != null && count > 0;
+  }
+
 
   /**
    * 마이페이지 정보 수정
