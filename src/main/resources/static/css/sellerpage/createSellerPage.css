@@ -43,6 +43,21 @@ form {
   outline: 1px solid #1EC4CC;
 }
 
+.form-text {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.form-text.success {
+  color: #2E7D32;  /* 사용 가능한 닉네임 */
+}
+
+.form-text.error {
+  color: #D32F2F;  /* 이미 존재하는 닉네임 */
+}
+
+
 /* ✅ label */
 label {
   display: block;
