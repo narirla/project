@@ -4,6 +4,7 @@ import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.SellerPage;
 import com.KDT.mosi.domain.mypage.seller.dao.SellerPageDAO;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
+import com.KDT.mosi.web.form.mypage.sellerpage.SellerPageCreateForm;
 import com.KDT.mosi.web.form.mypage.sellerpage.SellerPageUpdateForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -117,26 +118,32 @@ public class SellerPageController {
       throw new AccessDeniedException("이미 판매자 페이지가 존재합니다.");
     }
 
-    model.addAttribute("memberId", memberId);
+    SellerPageCreateForm form = new SellerPageCreateForm();
+    form.setMemberId(memberId);  // ★ 반드시 설정
+
+    model.addAttribute("form", form);  // ★ 추가
     return "mypage/sellerpage/createSellerPage";
   }
+
+
 
   /**
    * ✅ 판매자 마이페이지 생성 처리
    */
   @PostMapping("/create")
-  public String create(@RequestParam("memberId") Long memberId,
-                       @RequestParam("intro") String intro,
-                       @RequestParam("image") MultipartFile image,
+  public String create(@ModelAttribute("form") SellerPageCreateForm form,
+                       BindingResult bindingResult,
                        RedirectAttributes redirectAttributes) {
 
     SellerPage sellerPage = new SellerPage();
-    sellerPage.setMemberId(memberId);
-    sellerPage.setIntro(intro);
+    sellerPage.setMemberId(form.getMemberId());
+    sellerPage.setIntro(form.getIntro());
+    sellerPage.setNickname(form.getNickname());
 
     try {
-      if (image != null && !image.isEmpty()) {
-        sellerPage.setImage(image.getBytes());
+      MultipartFile imageFile = form.getImageFile();
+      if (imageFile != null && !imageFile.isEmpty()) {
+        sellerPage.setImage(imageFile.getBytes());
       }
     } catch (Exception e) {
       log.error("이미지 업로드 실패", e);
@@ -147,6 +154,7 @@ public class SellerPageController {
     redirectAttributes.addFlashAttribute("msg", "판매자 마이페이지가 생성되었습니다.");
     return "redirect:/mypage/seller";
   }
+
 
   /**
    * ✅ 판매자 마이페이지 수정 폼
@@ -248,6 +256,17 @@ public class SellerPageController {
     }
     return ResponseEntity.notFound().build();
   }
+
+  /**
+   * ✅ 닉네임 중복 확인 API
+   */
+  @GetMapping("/nickname-check")
+  @ResponseBody
+  public Map<String, Boolean> checkNickname(@RequestParam("nickname") String nickname) {
+    boolean available = !sellerPageSVC.existByNickname(nickname);
+    return Map.of("available", available);
+  }
+
 
   // ✅ 개발용 모의 주문 데이터
   private List<Map<String, Object>> mockOrders() {
