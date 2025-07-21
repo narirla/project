@@ -58,7 +58,7 @@ async function saveDraft(data) {
 }
 
 // ---------------- 폼 요소 ------------------------------------------------
-const wrap           = document.querySelector('.content-area');
+const wrap           = document.querySelector('.content');
 const frm            = wrap.querySelector('#write-form');
 const categorySelect = wrap.querySelector('#bcategory');
 const btnDraft       = wrap.querySelector('#temp-save-btn');
