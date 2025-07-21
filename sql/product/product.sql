@@ -28,7 +28,7 @@ CREATE TABLE product(
         req_people   			varchar2(45)		NOT NULL,
         target  				varchar2(45) 		NOT NULL,
         stucks  				varchar2(90),
-        description  			varchar2(600) 	    NOT NULL,
+        description  			varchar2(1500) 	    NOT NULL,
         detail  				varchar2(3000)      NOT NULL,
         file_name     			varchar2(255) 	    NOT NULL,
         file_type     			varchar2(50) 		NOT NULL,

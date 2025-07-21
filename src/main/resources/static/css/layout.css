@@ -13,7 +13,7 @@ html, body {
 }
 
 .layout-wrapper {
-  width: 1200px;
+  max-width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
 }
@@ -161,7 +161,7 @@ header {
   height: 47px;
   display: flex;
   justify-content: center;
-  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
   box-sizing: border-box;
 }
 .header-nav ul {
@@ -190,8 +190,9 @@ header {
   color: #000;
   white-space: nowrap;
 }
-.header-nav li:hover {
-  border-bottom: 1px solid #0099AD;
+.header-nav ul li a:hover {
+  border-bottom: 2px solid #0099AD;
+  color: #0099AD;
 }
 
 /* ============================= */

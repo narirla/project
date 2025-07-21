@@ -18,7 +18,7 @@ public class CsrBbsController {
 
   @GetMapping
   public String bbs() {
-    return "/postBoards/allForm_v2";
+    return "/postBoards/bbsHome";
   }
 
   @GetMapping("/community")
@@ -43,7 +43,7 @@ public class CsrBbsController {
       ,Model model) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     model.addAttribute("user", loginMember);
-    return "postBoards/write_quill";
+    return "postBoards/write_quill_test";
   }
 
   // 게시글 답글

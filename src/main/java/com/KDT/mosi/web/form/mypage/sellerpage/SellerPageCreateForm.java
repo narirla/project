@@ -21,7 +21,7 @@ public class SellerPageCreateForm {
   private String intro;
 
   // 별명
-  @Size(max = 10)
+  @Size(max = 10, message = "닉네임은 10자 이내로 입력해주세요.")
   private String nickname;
 
   // 최근 판매 상품명 (최대 100자)

@@ -1,140 +1,201 @@
 /*editBuyerPage.js*/
 document.addEventListener('DOMContentLoaded', () => {
-  const form          = document.querySelector('form');
+
+  // ─── 요소 캐싱 ───
+  const form = document.querySelector('#buyerUpdateForm');
   const nicknameInput = document.querySelector('#nickname');
-  const nicknameBtn   = document.querySelector('#nicknameToggleBtn');
-  const resultSpan    = document.querySelector('#nicknameCheckMsg');
+  const nicknameBtn = document.querySelector('#nicknameToggleBtn');
+  const resultSpan = document.querySelector('#nicknameCheckMsg');
   const introTextarea = document.querySelector('#intro');
-  const imageInput    = document.querySelector('#imageFile');
-  const saveBtn       = document.querySelector('#saveBtn');
+  const imageInput = document.querySelector('#imageFile');
+  const previewImg = document.querySelector('#sectionProfilePreview');
+  const asideProfileImage = document.querySelector('#asideProfileImage');
+  const pwInput = document.querySelector('#passwd');
+  const pwConfirmInput = document.querySelector('#confirmPasswd');
+  const pwMatchMsg = document.querySelector('#pwMatchMsg');
+  const pwStrengthBox = document.getElementById("pwStrength");
+  const pwHintBox = document.getElementById("pwHint");
+  const imageMsg = document.getElementById("imageMsg");
 
-  /* ───────────────────── 공통 값 ───────────────────── */
-  const csrfInput   = document.querySelector('input[name="_csrf"]');
-  const csrfToken   = csrfInput?.value;
-  const csrfHeader  = 'X-CSRF-TOKEN';
-
-  let isNicknameChecked = false;
-  let checkedNickname   = '';
-  const originalNickname = nicknameInput.value.trim();
-  let isEditing = false;
+  // ─── 상수 ───
   const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
+  const allowExt = ['jpg', 'jpeg', 'png', 'gif'];
+  const maxSize = 2 * 1024 * 1024; // 2MB
+  const defaultImageSrc = '/img/default-profile.png';
 
-  /* ─────────────── ❶ 닉네임 중복 확인 ─────────────── */
-  nicknameBtn.addEventListener('click', async () => {
-    const current = nicknameInput.value.trim();
+  // ─── 닉네임 중복 확인 ───
+  nicknameBtn?.addEventListener('click', async () => {
+    const nickname = nicknameInput.value.trim();
 
-    if (!isEditing) {
-      nicknameInput.readOnly = false;
-      nicknameInput.focus();
-      nicknameBtn.textContent = '중복 확인';
-      resultSpan.textContent = '';
-      resultSpan.className = 'form-text ms-2';
-      isEditing = true;
-      isNicknameChecked = false;
+    if (!nickname) return showError('닉네임을 입력해주세요.');
+    if (nickname.length < 2) return showError('닉네임은 2자 이상이어야 합니다.');
+    if (nickname.length > 30) return showError('닉네임은 30자 이하여야 합니다.');
+    if (!nicknameRegex.test(nickname)) return showError('닉네임은 한글·영문·숫자만 사용할 수 있습니다.');
+
+    try {
+      const res = await fetch(`/members/nicknameCheck?nickname=${encodeURIComponent(nickname)}`);
+      const duplicated = await res.json();
+
+      if (duplicated) {
+        showError('이미 사용 중인 닉네임입니다.');
+      } else {
+        resultSpan.textContent = '사용 가능한 닉네임입니다.';
+        resultSpan.className = 'form-text ms-2 text-success';
+      }
+    } catch (err) {
+      console.error(err);
+      showError('중복 확인 중 오류가 발생했습니다.');
+    }
+  });
+
+  nicknameInput?.addEventListener('input', resetNicknameMsg);
+
+  function showError(msg) {
+    resultSpan.textContent = msg;
+    resultSpan.className = 'form-text ms-2 text-danger';
+    nicknameInput.focus();
+  }
+  function resetNicknameMsg() {
+    resultSpan.textContent = '';
+    resultSpan.className = 'form-text ms-2';
+  }
+
+  // ─── 주소 검색 ───
+  document.getElementById('btnSearchAddr')?.addEventListener('click', () => {
+    new daum.Postcode({
+      oncomplete: data => {
+        document.getElementById('zonecode').value = data.zonecode;
+        document.getElementById('address').value = data.roadAddress || data.jibunAddress;
+        document.getElementById('detailAddress').focus();
+      }
+    }).open();
+  });
+
+  // ─── 이미지 업로드 미리보기 + 용량 검사 ───
+  imageInput?.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) {
+      previewImg.src = defaultImageSrc;
+      if (asideProfileImage) asideProfileImage.src = defaultImageSrc;
+      imageMsg.textContent = '';
       return;
     }
 
-    if (!current) return showError('닉네임을 입력해주세요.');
-    if (current.length < 2 || current.length > 30)
-      return showError('닉네임은 2자 이상 30자 이하로 입력해주세요.');
-    if (!nicknameRegex.test(current))
-      return showError('닉네임은 한글, 영문, 숫자만 사용할 수 있습니다.');
-
-    try {
-      const res = await fetch(`/members/nicknameCheck?nickname=${encodeURIComponent(current)}`, {
-        method: 'GET',
-        credentials: 'same-origin'
-      });
-      const duplicated = await res.json();
-      if (!duplicated) {
-        resultSpan.textContent = '사용 가능한 닉네임입니다.';
-        resultSpan.className   = 'form-text ms-2 text-success';
-        isNicknameChecked = true;
-        checkedNickname   = current;
-
-        nicknameInput.readOnly = true;
-        nicknameBtn.textContent = '변경하기';
-        isEditing = false;
-      } else {
-        showError('이미 사용 중인 닉네임입니다.');
-      }
-    } catch (e) {
-      showError('중복 확인 중 오류 발생');
-      console.error(e);
-    }
-  });
-
-  nicknameInput.addEventListener('input', () => {
-    isNicknameChecked = false;
-    resultSpan.textContent = '';
-    resultSpan.className = 'form-text ms-2';
-  });
-
-  /* ─────────────── ❷ 회원정보 저장(POST) ─────────────── */
-  saveBtn.addEventListener('click', async () => {
-    const nickname = nicknameInput.value.trim();
-
-    if (!nickname) return alertAndFocus('닉네임을 입력해주세요.');
-    if (nickname.length < 2 || nickname.length > 30)
-      return alertAndFocus('닉네임은 2자 이상 30자 이하로 입력해주세요.');
-    if (!nicknameRegex.test(nickname))
-      return alertAndFocus('닉네임은 한글, 영문, 숫자만 사용할 수 있습니다.');
-    if (nickname !== originalNickname && (!isNicknameChecked || checkedNickname !== nickname))
-      return alertAndFocus('닉네임 중복 확인을 해주세요.');
-    if (introTextarea.value.length > 500)
-      return alertAndFocus('자기소개는 최대 500자까지 입력할 수 있습니다.', introTextarea);
-
-    if (imageInput.files.length > 0) {
-      const file = imageInput.files[0];
-      const allowed = ['jpg', 'jpeg', 'png', 'gif'];
-      const ext = file.name.split('.').pop().toLowerCase();
-      const max = 2 * 1024 * 1024;
-
-      if (!allowed.includes(ext)) {
-        alert('이미지는 jpg, jpeg, png, gif 형식만 가능합니다.');
-        imageInput.value = '';
-        return;
-      }
-
-      if (file.size > max) {
-        alert('이미지 크기는 최대 2MB까지 가능합니다.');
-        imageInput.value = '';
-        return;
-      }
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!allowExt.includes(ext)) {
+      imageMsg.textContent = '이미지는 jpg · jpeg · png · gif 형식만 가능합니다.';
+      imageMsg.className = 'form-text ms-2 text-danger';
+      imageInput.value = '';
+      previewImg.src = defaultImageSrc;
+      return;
     }
 
-    /* ➋ fetch 로 전송 */
-    const fd = new FormData(form);
-    try {
-      const res = await fetch(form.action, {
-        method      : 'POST',
-        body        : fd,
-        headers     : { [csrfHeader]: csrfToken },
-        credentials : 'same-origin'
-      });
-      if (res.redirected) {
-        location.href = res.url;
-      } else if (res.ok) {
-        alert('수정이 완료되었습니다.');
-        location.reload();
-      } else {
-        alert('오류 발생 (status ' + res.status + ')');
-      }
-    } catch (e) {
-      console.error(e);
-      alert('네트워크 오류가 발생했습니다.');
+    if (file.size > maxSize) {
+      imageMsg.textContent = '이미지 용량은 2MB 이하만 가능합니다.';
+      imageMsg.className = 'form-text ms-2 text-danger';
+      imageInput.value = '';
+      previewImg.src = defaultImageSrc;
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      previewImg.src = ev.target.result;
+      if (asideProfileImage) asideProfileImage.src = ev.target.result;
+      imageMsg.textContent = '';
+    };
+    reader.readAsDataURL(file);
   });
 
-  /* ──────────────── 헬퍼 함수 ──────────────── */
-  function showError(msg) {
-    resultSpan.textContent = msg;
-    resultSpan.className   = 'form-text ms-2 text-danger';
-    nicknameInput.focus();
+  // ─── 비밀번호 강도 평가 ───
+  pwInput?.addEventListener('input', () => {
+    evaluatePasswordStrength(pwInput.value);
+    checkPasswordMatch(pwInput.value, pwConfirmInput.value);
+  });
+
+  function evaluatePasswordStrength(password) {
+    if (!pwStrengthBox || !pwHintBox) return;
+
+    const hasDigit = /\d/.test(password);
+    const hasAlpha = /[a-zA-Z]/.test(password);
+    const hasSymbol = /[^a-zA-Z0-9]/.test(password);
+    const hasRepeat = /(.)\1{2,}/.test(password);
+
+    if (password.length < 8 || hasRepeat) {
+      pwStrengthBox.textContent = "약함";
+      pwStrengthBox.className = "pw-strength weak";
+      pwHintBox.textContent = "비밀번호는 8자 ~ 12자, 대소문자, 숫자, 특수문자를 포함하고 동일 문자를 3회 이상 반복할 수 없습니다.";
+      return;
+    }
+
+    if (hasDigit && hasAlpha && hasSymbol) {
+      pwStrengthBox.textContent = "강함";
+      pwStrengthBox.className = "pw-strength strong";
+      pwHintBox.textContent = "";
+    } else if ((hasDigit && hasAlpha) || (hasAlpha && hasSymbol)) {
+      pwStrengthBox.textContent = "보통";
+      pwStrengthBox.className = "pw-strength medium";
+      pwHintBox.textContent = "영문, 숫자, 특수문자를 조합하세요.";
+    } else {
+      pwStrengthBox.textContent = "약함";
+      pwStrengthBox.className = "pw-strength weak";
+      pwHintBox.textContent = "비밀번호가 너무 단순합니다.";
+    }
   }
 
-  function alertAndFocus(msg, el = nicknameInput) {
+  // ─── 비밀번호 일치 확인 ───
+  pwConfirmInput?.addEventListener('input', () => {
+    checkPasswordMatch(pwInput.value, pwConfirmInput.value);
+  });
+
+  function checkPasswordMatch(password, confirmPassword) {
+    if (!password || !confirmPassword) {
+      pwMatchMsg.textContent = '';
+      pwMatchMsg.className = 'form-text ms-2';
+      return;
+    }
+
+    if (password === confirmPassword) {
+      pwMatchMsg.textContent = '비밀번호가 일치합니다.';
+      pwMatchMsg.className = 'form-text ms-2 text-success';
+    } else {
+      pwMatchMsg.textContent = '비밀번호가 일치하지 않습니다.';
+      pwMatchMsg.className = 'form-text ms-2 text-danger';
+    }
+  }
+
+  // ─── 비밀번호 보기 토글 ───
+  window.togglePassword = function(id) {
+    const pwInput = document.getElementById(id);
+    const wrapper = pwInput.parentElement;
+    const toggleBtn = wrapper.querySelector('.toggle-password');
+    const icon = toggleBtn.querySelector('i');
+
+    if (pwInput.type === "text") {
+      pwInput.type = "password";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      pwInput.type = "text";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  };
+
+  // ─── 최종 폼 유효성 검사 후 제출 ───
+  form?.addEventListener('submit', e => {
+    const nick = nicknameInput.value.trim();
+    if (!nick) return block('닉네임을 입력해주세요.');
+    if (nick.length < 2) return block('닉네임은 2자 이상이어야 합니다.');
+    if (nick.length > 30) return block('닉네임은 30자 이하여야 합니다.');
+    if (!nicknameRegex.test(nick)) return block('닉네임은 한글·영문·숫자만 사용할 수 있습니다.');
+    if (introTextarea.value.length > 60)
+      return block('자기소개는 최대 60자까지 입력할 수 있습니다.');
+  });
+
+  function block(msg) {
     alert(msg);
-    el.focus();
+    event.preventDefault();
   }
+
 });

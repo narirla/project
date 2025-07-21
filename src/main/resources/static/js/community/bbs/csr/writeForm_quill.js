@@ -40,7 +40,7 @@ async function addBbs(data) {
   data.status = 'B0201';
   const res = await ajax.post('/api/bbs', data);
   if (res.header.rtcd === 'S00') {
-    window.location.href = parentId ? `/csr/bbs/${parentId}` : '/csr/bbs';
+    window.location.href = parentId ? `/bbs/${parentId}` : '/bbs';
   } else {
     alert('저장에 실패했습니다.');
   }
@@ -51,7 +51,7 @@ async function saveDraft(data) {
   data.status = 'B0203';
   const res = await ajax.post('/api/bbs', data);
   if (res.header.rtcd === 'S00') {
-    window.location.href = '/csr/bbs';
+    window.location.href = '/bbs';
   } else {
     alert('임시 저장에 실패했습니다.');
   }

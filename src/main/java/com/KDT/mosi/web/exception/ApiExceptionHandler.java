@@ -4,6 +4,7 @@ import com.KDT.mosi.web.api.ApiResponse;
 import com.KDT.mosi.web.api.ApiResponseCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -93,6 +94,9 @@ public class ApiExceptionHandler {
                 null
         );
         
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
     }
 }
