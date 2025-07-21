@@ -9,4 +9,5 @@ public class UploadResult {
   private Long uploadId;
   private String url;
   private Long uploadGroup;
+  private String originalName;
 }
