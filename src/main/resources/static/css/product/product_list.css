@@ -648,6 +648,7 @@ ul {
   border-radius:4px;
   color:#FFF;
 }
+
 /***************************공지***********************************/
 .notice-frame {
   box-sizing: border-box;
@@ -703,5 +704,9 @@ ul {
   text-decoration: none;
   cursor: pointer;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/product
 .notice-title{margin-right:19px;}
 .notice-more{margin-left:auto;} 

@@ -30,3 +30,4 @@ public class SellerPage {
   private String address;          // 기본 주소
   private String detailAddress;    // 상세 주소
 }
+
