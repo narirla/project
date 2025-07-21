@@ -70,7 +70,7 @@ public class Product {
   @Column(length=90)
   private String stucks;
 
-  @Column(length=600, nullable=false)
+  @Column(length=1500, nullable=false)
   private String description;
 
   @Column(length=3000, nullable=false)

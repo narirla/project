@@ -14,6 +14,8 @@
 
   <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css}">
   <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css}" />
+  <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
 </head>
 
 <body>
@@ -25,14 +27,12 @@
           <div class="sidebar-card">
             <div class="profile-box">
               <div class="profile-image">
-                <img th:if="${sellerPage != null and sellerPage.image != null}"
-                  th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}" alt="프로필 이미지">
-                <img th:if="${sellerPage == null or sellerPage.image == null}" th:src="@{/img/default-profile.png}"
-                  alt="기본 프로필 이미지">
+                <img th:if="${sellerImage != null}" th:src="${sellerImage}" alt="프로필 이미지">
+                <img th:if="${sellerImage == null}" th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
               </div>
               <div class="profile-info">
                 <a href="#" class="profile-badge"> 프로가이드 ></a>
-                <div class="profile-name" th:text="${nickname}">이름</div>
+                <div class="profile-name" th:text="${nickname}"></div>
                 <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
                   <button type="submit" class="btn btn-outline-secondary w-100">구매자 전환</button>
                 </form>
@@ -43,7 +43,7 @@
               <ul>
                 <li><a href="#">상품</a>
                   <ul>
-                    <li><a th:href="@{/product/list}">내 상품 목록</a></li>
+                    <li><a th:href="@{/product/manage}">내 상품 목록</a></li>
                     <li><a th:href="@{/product/upload}">상품 등록</a></li>
                   </ul>
                 </li>
@@ -96,49 +96,65 @@
                 <input class="search-box-input" type="text" placeholder="상품명을 입력해주세요.">
               </div>
               <div class="overall-info">
-                <div>총 12개</div>
-                <select>
-                  <option value="on_sale">판매중</option>
-                  <option value="coming_soon">판매대기</option>
-                </select>
+                <div th:text="|총 ${totalCount}개 상품|"></div>
+                <form th:action="@{/product/manage}" method="get" id="statusForm">
+                  <input type="hidden" name="page" th:value="${currentPage}" />
+                  <input type="hidden" name="size" th:value="5" />  <!-- size는 고정하거나 동적으로 설정 -->
+
+                  <select name="status" onchange="document.getElementById('statusForm').submit()">
+                    <option value="all" th:selected="${selectedStatus == 'all'}">전체</option>
+                    <option value="판매중" th:selected="${selectedStatus == '판매중'}">판매중</option>
+                    <option value="판매대기" th:selected="${selectedStatus == '판매대기'}">판매대기</option>
+                  </select>
+                </form>
               </div>
               <hr>
               <!-- 상품목록 -->
               <div class="product-list">
-                <div class="product-item" th:each="product : ${products}">
-                  <img th:src="@{${product.imageUrl}}" alt="상품 이미지">
+                <div class="product-item" th:each="form : ${productManagingForms}">
+                  <!-- 썸네일 이미지 -->
+                  <img th:if="${form.images != null and #lists.size(form.images) > 0}"
+                       th:src="${form.images[0].base64ImageData}"
+                       th:alt="${form.images[0].fileName}"/>
+                  <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
+                       th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
                   <div class="product-info">
                     <div class="product-info-left">
-                      <h2 th:text="${product.title}">일이삼사오륙칠팔구십일이삼사오륙칠팔구십일이삼사</h2>
+                      <h2><a th:href="@{/product/view/{id}(id=${form.product.productId})}" th:text="${form.product.title}">상품명</a></h2>
                       <div class="product-info-left-detail">
-                        <select th:field="*{status}">
-                          <option value="on_sale" th:selected="${product.status == 'on_sale'}">판매중</option>
-                          <option value="coming_soon" th:selected="${product.status == 'coming_soon'}">판매대기
-                          </option>
+
+                        <select class="status-select" th:data-product-id="${form.product.productId}" th:value="${form.product.status}">
+                          <option value="판매중" th:selected="${form.product.status == '판매중'}">판매중</option>
+                          <option value="판매대기" th:selected="${form.product.status == '판매대기'}">판매대기</option>
                         </select>
+
                         <div class="product-info-left-detail-details">
-                          <div th:text="${#temporals.format(product.createDate, 'yyyy-MM-dd')}">날짜</div>
+                          <div th:if="${form.product.updateDate == null or form.product.createDate == form.product.updateDate}"
+                               th:text="${#dates.format(form.product.createDate, 'yyyy-MM-dd')}">
+                          </div>
+                          <div th:if="${form.product.updateDate != null and form.product.createDate != form.product.updateDate}"
+                               th:text="${#dates.format(form.product.updateDate, 'yyyy-MM-dd')}">
+                          </div>
                           <div>조회수</div>
                           <div>좋아요</div>
                           <div>댓글수</div>
                         </div>
                       </div>
-                      <textarea th:text="${product.description}"
-                        readonly>우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항우항항</textarea>
+                      <span class="text-trim" th:text="${form.product.description}"></span>
                     </div>
                   </div>
                   <div class="product-info-right">
                     <div class="product-info-right-detail">
                       <div>0% 저렴</div>
                       <div class="price">
-                        <h1 th:text="${product.salesPrice + '원'}">40,000</h1>
+                        <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|">40,000</h1>
                         <div>원</div>
                       </div>
-                      <div th:text="'정가 ' + ${product.normalPrice} + '원'">원</div>
+                      <div th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
                     </div>
                     <div class="btn-group">
-                      <button class="btn-group-edit">수정</button>
-                      <button class="btn-group-delete">삭제</button>
+                      <button id="update-btn" class="btn-group-edit">수정</button>
+                      <button id="delete-btn" class="btn-group-delete">삭제</button>
                     </div>
                   </div>
                 </div>
@@ -146,6 +162,13 @@
               </div>
               <!-- 페이지네이션 -->
               <div class="pagination">
+                <a th:if="${currentPage > 1}"
+                   th:href="@{/product/manage(page=${currentPage - 1}, size=${5}, status=${selectedStatus})}">이전</a>
+
+                <span th:text="${currentPage} + ' / ' + ${totalPages}"></span>
+
+                <a th:if="${currentPage < totalPages}"
+                   th:href="@{/product/manage(page=${currentPage + 1}, size=${5}, status=${selectedStatus})}">다음</a>
               </div>
             </div>
           </div>
@@ -155,6 +178,7 @@
     <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
   <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
+  <script th:src="@{/js/product/product_managing.js}"></script>
 </body>
 
 </html>

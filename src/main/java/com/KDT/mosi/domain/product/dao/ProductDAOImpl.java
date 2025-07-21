@@ -191,6 +191,7 @@ public class ProductDAOImpl implements ProductDAO {
   }
 
   // findById
+  @Override
   public Optional<Product> findById(Long productId) {
     StringBuffer sql = new StringBuffer();
     sql.append("SELECT * FROM product WHERE product_id = :productId");
@@ -200,11 +201,60 @@ public class ProductDAOImpl implements ProductDAO {
 
     List<Product> list = jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
 
-    if (list.isEmpty()) {
-      return Optional.empty();
-    } else {
-      return Optional.of(list.get(0));
-    }
+    return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
+  }
+
+  @Override
+  public List<Product> findByMemberIdWithPaging(Long memberId, int page, int size) {
+    int offset = (page - 1) * size;
+
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT * FROM product ")
+        .append("WHERE member_id = :memberId ")
+        .append("ORDER BY product_id DESC ")
+        .append("OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY");
+    // ↑ Oracle 12c 이상에서 사용 가능한 방식입니다.
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("memberId", memberId);
+    params.put("offset", offset);
+    params.put("size", size);
+
+    return jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
+  }
+
+  // 카테고리별 상품 목록
+  @Override
+  public List<Product> findByCategoryWithPaging(String category, int page, int size) {
+    int offset = (page - 1) * size;
+
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT * FROM product WHERE category = :category ");
+    sql.append("ORDER BY product_id DESC OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY");
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("category", category);
+    params.put("offset", offset);
+    params.put("size", size);
+
+    return jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
+  }
+
+  @Override
+  public List<Product> findByMemberIdAndStatusWithPaging(Long memberId, String status, int page, int size) {
+    int offset = (page - 1) * size;
+
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT * FROM product WHERE member_id = :memberId AND status = :status ");
+    sql.append("ORDER BY product_id DESC OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY");
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("memberId", memberId);
+    params.put("status", status);
+    params.put("offset", offset);
+    params.put("size", size);
+
+    return jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
   }
 
   // findAllByPage (Oracle 기준 페이징 처리)
@@ -231,15 +281,39 @@ public class ProductDAOImpl implements ProductDAO {
     return jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
   }
 
-  // 특정 판매자의 판매등록 글 갯수
+  // 카테고리별 상품 갯수
+  @Override
+  public long countByCategory(String category) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT COUNT(*) FROM product WHERE category = :category");
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("category", category);
+
+    return jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
+  }
+
+  // 로그인 한 사용자의 등록 상품 갯수
+  @Override
+  public long countByMemberIdAndStatus(Long memberId, String status) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT COUNT(*) FROM product WHERE member_id = :memberId AND status = :status");
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("memberId", memberId);
+    params.put("status", status);
+
+    return jdbcTemplate.queryForObject(sql.toString(), params, Long.class);
+  }
+
   @Override
   public long countByMemberId(Long memberId) {
     StringBuffer sql = new StringBuffer();
-    sql.append("SELECT COUNT(*) FROM product  ");
-    sql.append(" WHERE member_id = :memberId");
-    Map<String, Object> paramMap = new HashMap<>();
-    paramMap.put("memberId", memberId);
+    sql.append("SELECT COUNT(*) FROM product WHERE member_id = :memberId");
 
-    return jdbcTemplate.queryForObject(sql.toString(), paramMap, Long.class);
+    Map<String, Object> params = new HashMap<>();
+    params.put("memberId", memberId);
+
+    return jdbcTemplate.queryForObject(sql.toString(), params, Long.class);
   }
 }
