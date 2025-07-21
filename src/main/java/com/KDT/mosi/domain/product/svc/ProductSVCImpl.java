@@ -62,6 +62,13 @@ public class ProductSVCImpl implements ProductSVC {
     return productDAO.findByMemberIdAndStatusWithPaging(memberId, status, page, size);
   }
 
+  // 카테고리별 상품출력
+  @Override
+  public List<Product> getProductsByCategoryAndPageAndSize(String category, int page, int size) {
+    // DAO에 적절한 메서드를 호출
+    return productDAO.findByCategoryWithPaging(category, page, size);
+  }
+
   @Transactional
   public void updateProductStatus(Long productId, String status) {
     Optional<Product> optionalProduct = productDAO.findById(productId);
@@ -78,6 +85,13 @@ public class ProductSVCImpl implements ProductSVC {
   @Override
   public long countByMemberIdAndStatus(Long memberId, String status) {
     return productDAO.countByMemberIdAndStatus(memberId, status);
+  }
+
+  // 카테고리별 상품 갯수
+  @Override
+  public long countByCategory(String category) {
+    // DAO에 적절한 메서드를 호출
+    return productDAO.countByCategory(category);
   }
 
   @Override
