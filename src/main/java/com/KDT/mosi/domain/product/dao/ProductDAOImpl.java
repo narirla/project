@@ -229,7 +229,7 @@ public class ProductDAOImpl implements ProductDAO {
     int offset = (page - 1) * size;
 
     StringBuffer sql = new StringBuffer();
-    sql.append("SELECT * FROM product WHERE category = :category ");
+    sql.append("SELECT * FROM product WHERE category = :category AND status = '판매중' ");
     sql.append("ORDER BY product_id DESC OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY");
 
     Map<String, Object> params = new HashMap<>();
@@ -285,12 +285,12 @@ public class ProductDAOImpl implements ProductDAO {
   @Override
   public long countByCategory(String category) {
     StringBuffer sql = new StringBuffer();
-    sql.append("SELECT COUNT(*) FROM product WHERE category = :category");
+    sql.append("SELECT COUNT(*) FROM product WHERE category = :category AND status = '판매중'");
 
     Map<String, Object> params = new HashMap<>();
     params.put("category", category);
 
-    return jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
+    return jdbcTemplate.queryForObject(sql.toString(), params, Long.class);
   }
 
   // 로그인 한 사용자의 등록 상품 갯수
