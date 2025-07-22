@@ -8,114 +8,108 @@
   <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/product/product_list.css}">
+  <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css}">
+  <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css}"
 </head>
 
 <body>
-  <header th:replace="~{fragments/header :: header}"></header>
-  <div class="page-container">
-    <div class="breadcrumb">
-      <span>홈 &gt; 테마여행 &gt;
-        <span th:if="${productList.product?.category == 'area'}">지역</span>
-        <span th:if="${productList.product.category == 'pet'}">반려동물</span>
-        <span th:if="${productList.product.category == 'restaurant'}">맛집</span>
-        <span th:if="${productList.product.category == 'culture_history'}">문화/역사</span>
-        <span th:if="${productList.product.category == 'season_nature'}">계절/자연</span>
-        <span th:if="${productList.product.category == 'silver_disables'}">실버/교통약자</span>
-        <span th:if="${!(productList.product.category == 'area'
-                          or productList.product.category == 'pet'
-                          or productList.product.category == 'restaurant'
-                          or productList.product.category == 'culture_history'
-                          or productList.product.category == 'season_nature'
-                          or productList.product.category == 'silver_disables')}"
-        >전체</span>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="page-container">
+  <div class="breadcrumb">
+      <span>홈 &gt; 테마여행 &gt; <span id="category-select" th:attr="data-category=${selectedCategory}"
+                                   th:text="${selectedCategory}"></span>
+      </span>
+  </div>
+  <!--카테고리명-->
+  <section class="category-header">
+    <h1 class="category-select" th:text="${selectedCategory}"></h1>
+  </section>
+  <!--가장 인기있는 키워드-->
+  <section class="top-keywords-frame">
+    <div class="top-keywords-header">
+      <span class="top-keywords-title">가장 인기있는 키워드 Top5
+        <span class="hot-badge">Hot</span>
       </span>
     </div>
-    <!--카테고리명-->
-    <section class="category-header">
-      <h1>카테고리명</h1>
-    </section>
+    <!-- 키워드 카드 리스트 -->
+    <div class="keyword-cards">
+      <!-- 카드 #1 -->
+      <div class="keyword-card">
+        <div class="keyword-content">
+          <img th:src="@{/img/product/product_list/pet.png}" alt="">
+        </div>
+        <span class="keyword-label">반려견</span>
+      </div>
+      <!-- 필요 시 카드 내 Hot 배지 -->
+      <!-- <span class="hot-badge">Hot</span> -->
 
-    <!--가장 인기있는 키워드-->
-    <section class="top-keywords-frame">
-      <div class="top-keywords-header">
-        <span class="top-keywords-title">가장 인기있는 키워드 Top5</span>
-        <span class="hot-badge">Hot</span>
+      <!-- 카드 #2 -->
+      <div class="keyword-card">
+        <div class="keyword-content">
+          <img th:src="@{/img/product/product_list/restaurant.png}" alt="">
+        </div>
+        <span class="keyword-label">맛집</span>
       </div>
 
-      <!-- 키워드 카드 리스트 -->
-      <div class="keyword-cards">
-        <!-- 카드 #1 -->
-        <div class="keyword-card">
-          <div class="keyword-content">
-            <div class="keyword-icon" style="background-image: url('../../static/img/product/product_list/반려견.png');">
-            </div>
-            <span class="keyword-label">반려견</span>
-          </div>
-          <!-- 필요 시 카드 내 Hot 배지 -->
-          <!-- <span class="hot-badge">Hot</span> -->
+      <!-- 카드 #3 -->
+      <div class="keyword-card">
+        <div class="keyword-content">
+          <img th:src="@{/img/product/product_list/sea.png}" alt="">
         </div>
-
-        <!-- 카드 #2 -->
-        <div class="keyword-card">
-          <div class="keyword-content">
-            <div class="keyword-icon" style="background-image: url('../../static/img/product/product_list/맛집.png');">
-            </div>
-            <span class="keyword-label">맛집</span>
-          </div>
-        </div>
-
-        <!-- 카드 #3 -->
-        <div class="keyword-card">
-          <div class="keyword-content">
-            <div class="keyword-icon" style="background-image: url('../../static/img/product/product_list/바다.png');">
-            </div>
-            <span class="keyword-label">바다</span>
-          </div>
-        </div>
-
-        <!-- 카드 #4 -->
-        <div class="keyword-card">
-          <div class="keyword-content">
-            <div class="keyword-icon" style="background-image: url('../../static/img/product/product_list/카페.png');">
-            </div>
-            <span class="keyword-label">카페</span>
-          </div>
-        </div>
-
-        <!-- 카드 #5 -->
-        <div class="keyword-card">
-          <div class="keyword-content">
-            <div class="keyword-icon" style="background-image: url('../../static/img/product/product_list/연인.png');">
-            </div>
-            <span class="keyword-label">연인</span>
-          </div>
-        </div>
+        <span class="keyword-label">바다</span>
       </div>
-    </section>
 
+
+      <!-- 카드 #4 -->
+      <div class="keyword-card">
+        <div class="keyword-content">
+          <img th:src="@{/img/product/product_list/cafe.png}" alt="">
+        </div>
+        <span class="keyword-label">카페</span>
+      </div>
+
+
+      <!-- 카드 #5 -->
+      <div class="keyword-card">
+        <div class="keyword-content">
+          <img th:src="@{/img/product/product_list/lover.png}" alt="">
+        </div>
+        <span class="keyword-label">연인</span>
+      </div>
+    </div>
+  </section>
+  <div class="sort-first-depth">
+    <aside class="sidebar">
+      <div class="guide-box">
+        <ul>
+          <li class="left-sort">탑 글래스 여행가이드</li>
+          <li class="right-sort">모시에서 만나보세요!</li>
+        </ul>
+      </div>
+      <div class="menu-frame">
+        <ul>
+          <li th:classappend="${selectedCategory} == 'area' ? 'active'">
+            <a th:href="@{/product/list(category='area')}">지역</a>
+          </li>
+          <li th:classappend="${selectedCategory} == 'pet' ? 'active'">
+            <a th:href="@{/product/list(category='pet')}">반려동물</a>
+          </li>
+          <li th:classappend="${selectedCategory} == 'restaurant' ? 'active'">
+            <a th:href="@{/product/list(category='restaurant')}">맛집</a>
+          </li>
+          <li th:classappend="${selectedCategory} == 'culture_history' ? 'active'">
+            <a th:href="@{/product/list(category='culture_history')}">문화/역사</a>
+          </li>
+          <li th:classappend="${selectedCategory} == 'season_nature' ? 'active'">
+            <a th:href="@{/product/list(category='season_nature')}">계절/자연</a>
+          </li>
+          <li th:classappend="${selectedCategory} == 'silver_disables' ? 'active'">
+            <a th:href="@{/product/list(category='silver_disables')}">실버/교통약자</a>
+          </li>
+        </ul>
+      </div>
+    </aside>
     <div class="content-wrapper">
-      <aside class="sidebar">
-        <div class="guide-box">
-          <ul>
-            <li>탑 글래스 여행가이드</li>
-            <li>모시에서 만나보세요!</li>
-          </ul>
-        </div>
-        <div class="menu-frame">
-          <ul>
-            <li><a th:href="@{product/list}">지역</a></li>
-            <li><a href="#">반려동물</a></li>
-            <li><a href="#">맛집</a></li>
-            <li><a href="#">문화</a></li>
-            <li><a href="#">역사</a></li>
-            <li><a href="#">계절</a></li>
-            <li><a href="#">자연</a></li>
-            <li><a href="#">실버</a></li>
-            <li><a href="#">교통약자</a></li>
-          </ul>
-        </div>
-      </aside>
-
       <!--main-->
       <main class="main-content">
         <form class="filter-form">
@@ -232,7 +226,7 @@
           <div class="keyword-container">
             <!-- 키워드 입력 -->
             <div class="filter-item filter-keywords">
-              <input type="text" class="keyword-input" name="keywords" placeholder="키워드를 추가해 보세요. ex) #연인 #우정 #만두" />
+              <input type="text" class="keyword-input" name="keywords" placeholder="키워드를 추가해 보세요. ex) #연인 #우정 #만두"/>
             </div>
           </div>
           <div class="formButton-container">
@@ -245,18 +239,17 @@
             </div>
           </div>
         </form>
-
-
         <!--리스트 갯수-->
         <div class="service-controls">
           <div class="service-count">
-            <p>3,501개의 서비스</p>
+            <p th:text="|${totalCount}개의 상품|"></p>
+            <button type="button" class="dropdown-toggle">
+              <span class="selected-label">인기순
+                <a th:replace="~{fragments/expand_button :: ex_btn}"></a>
+              </span>
+            </button>
           </div>
           <div class="custom-dropdown">
-            <button type="button" class="dropdown-toggle">
-              <span class="selected-label">인기순</span>
-              <img src="/static/img/product/product_list/arrow-down.png" class="arrow-icon" alt="">
-            </button>
             <ul class="dropdown-menu">
               <li>
                 <label>
@@ -305,110 +298,47 @@
         </div>
         <!--상품리스트-->
         <div class="product-list">
-          <div class="product-item" th:each="form : ${productManagingForms}">
-            <!-- 썸네일 이미지 -->
-            <img th:if="${form.images != null and #lists.size(form.images) > 0}"
-                 th:src="${form.images[0].base64ImageData}"
-                 th:alt="${form.images[0].fileName}"/>
-            <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
-                 th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
-            <div class="product-info">
-              <div class="product-info-left">
-                <h2><a th:href="@{/product/view/{id}(id=${form.product.productId})}" th:text="${form.product.title}">상품명</a></h2>
-                <div class="product-info-left-detail">
-
-                  <select class="status-select" th:data-product-id="${form.product.productId}" th:value="${form.product.status}">
-                    <option value="판매중" th:selected="${form.product.status == '판매중'}">판매중</option>
-                    <option value="판매대기" th:selected="${form.product.status == '판매대기'}">판매대기</option>
-                  </select>
-
-                  <div class="product-info-left-detail-details">
-                    <div th:if="${form.product.updateDate == null or form.product.createDate == form.product.updateDate}"
-                         th:text="${#dates.format(form.product.createDate, 'yyyy-MM-dd')}">
-                    </div>
-                    <div th:if="${form.product.updateDate != null and form.product.createDate != form.product.updateDate}"
-                         th:text="${#dates.format(form.product.updateDate, 'yyyy-MM-dd')}">
-                    </div>
-                    <div>조회수</div>
-                    <div>좋아요</div>
-                    <div>댓글수</div>
-                  </div>
-                </div>
-                <span class="text-trim" th:text="${form.product.description}"></span>
+          <div class="product-item" th:each="form : ${productList}">
+            <a th:href="@{/product/view/{id}(id=${form.product.productId})}">
+              <div class="thumbnail">
+                <img th:if="${form.images != null and #lists.size(form.images) > 0}"
+                     th:src="${form.images[0].base64ImageData}" th:alt="${form.images[0].fileName}"/>
+                <img th:if="${form.images == null or #lists.isEmpty(form.images)}" th:src="@{/img/default-product.png}"
+                     alt="기본 상품 이미지"/>
               </div>
-            </div>
-            <div class="product-info-right">
-              <div class="product-info-right-detail">
-                <div>0% 저렴</div>
-                <div class="price">
-                  <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|">40,000</h1>
-                  <div>원</div>
-                </div>
-                <div th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
+              <div class="product-info">
+                <h3><a th:text="${form.product.title}">상품명</a></h3>
+                <p class="s-price"
+                   th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                <p class="n-price"
+                   th:text="|${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
               </div>
-              <div class="btn-group">
-                <button id="update-btn" class="btn-group-edit">수정</button>
-                <button id="delete-btn" class="btn-group-delete">삭제</button>
-              </div>
-            </div>
+            </a>
           </div>
-          <hr>
         </div>
         <div class="pagination">
           <a th:if="${currentPage > 1}"
-             th:href="@{/product/manage(page=${currentPage - 1}, size=${5}, status=${selectedStatus})}">이전</a>
-
+             th:href="@{/product/list(page=${currentPage - 1}, size=12, category=${selectedCategory})}">이전</a>
           <span th:text="${currentPage} + ' / ' + ${totalPages}"></span>
-
           <a th:if="${currentPage < totalPages}"
-             th:href="@{/product/manage(page=${currentPage + 1}, size=${5}, status=${selectedStatus})}">다음</a>
+             th:href="@{/product/list(page=${currentPage + 1}, size=12, category=${selectedCategory})}">다음</a>
         </div>
       </main>
     </div>
+  </div>
 
-    <!--공지-->
-    <section class="notice-frame">
-      <span class="notice-title">공지</span>
-      <span class="notice-text">
+  <!--공지-->
+  <section class="notice-frame">
+    <span class="notice-title">공지</span>
+    <span class="notice-text">
         &lt;하나LIVE&gt;25년 6월 1일 방송 - 동유럽 구매 인증 이벤트 당첨자 안내
       </span>
-      <a href="#" class="notice-more">+ 더보기</a>
-    </section>
+    <a href="#" class="notice-more">+ 더보기</a>
+  </section>
 
-  </div>
-  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script th:src="@{/js/product/product_list.js}"></script>
 </body>
-<script>
-  document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-    const btn = dropdown.querySelector('.dropdown-toggle');
-    const labelSpan = btn.querySelector('.selected-label');   // ← 이제 null 아님
-
-    // 토글 열기/닫기
-    btn.addEventListener('click', e => {
-      e.stopPropagation();               // 열자마자 닫히는 현상 방지
-      dropdown.classList.toggle('open');
-    });
-
-    // 옵션 클릭 → 레이블 교체 + 자동 닫기
-    dropdown.querySelectorAll('input[type="radio"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        labelSpan.textContent = radio.parentElement.textContent.trim();
-        dropdown.classList.remove('open');
-      });
-    });
-  });
-
-  // 바깥 클릭 시 닫기
-  document.addEventListener('click', e => {
-    document.querySelectorAll('.custom-dropdown.open').forEach(d => {
-      if (!d.contains(e.target)) d.classList.remove('open');
-    });
-  });
-  document.addEventListener('click', e => {
-    if (e.target.classList.contains('btn-like')) {
-      e.target.classList.toggle('is-active');
-    }
-  });
-</script>
 
 </html>
