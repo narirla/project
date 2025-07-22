@@ -45,15 +45,21 @@ public class ProductController {
   public String list(Model model,
                      @RequestParam(name = "page", defaultValue = "1") int page,
                      @RequestParam(name = "size", defaultValue = "12") int size,
-                     @RequestParam(name = "category", defaultValue = "area") String category) {
+                     @RequestParam(name = "category", required = false) String category) {
+
+    List<Product> products;
+    long totalCount;
     try {
       // 유효성 검사 및 기본값 지정
       if (category == null || !validCategories.contains(category)) {
-        category = "area";
+        products = productSVC.getProductsByPage(page,size);
+        totalCount = productSVC.countAllProducts();
+        category = "all";
+      } else{
+        products = productSVC.getProductsByCategoryAndPageAndSize(category, page, size);
+        totalCount = productSVC.countByCategory(category);
       }
 
-      List<Product> products = productSVC.getProductsByCategoryAndPageAndSize(category, page, size);
-      long totalCount = productSVC.countByCategory(category);
       int totalPages = (int) Math.ceil((double) totalCount / size);
 
       List<ProductListForm> productList = new ArrayList<>();

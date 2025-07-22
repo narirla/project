@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
   // 1.공통 카테고리 코드-한글 변환
     const categoryMap = {
+      "all": "전체",
       "area": "지역",
       "pet": "반려동물",
       "restaurant": "맛집",
