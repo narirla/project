@@ -33,7 +33,7 @@
                 <a href="#" class="profile-badge"> 프로가이드 ></a>
                 <div class="profile-name" th:text="${nickname}"></div>
                 <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
-                  <button type="submit" class="btn btn-outline-secondary w-100">구매자 전환</button>
+                  <button type="submit" class="btn-role-switch">구매자 전환</button>
                 </form>
               </div>
             </div>
@@ -152,8 +152,8 @@
                       <div th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
                     </div>
                     <div class="btn-group">
-                      <button id="update-btn" class="btn-group-edit">수정</button>
-                      <button id="delete-btn" class="btn-group-delete">삭제</button>
+                      <button class="btn-group-edit" th:data-product-id="${form.product.productId}" onclick="editProduct(this)">수정</button>
+                      <button class="btn-group-delete" th:data-product-id="${form.product.productId}" onclick="deleteProduct(this)">삭제</button>
                     </div>
                   </div>
                 </div>

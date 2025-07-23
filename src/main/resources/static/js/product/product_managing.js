@@ -60,5 +60,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  const deleteProduct = document.getElementById('')
 });
+
+// 수정 버튼 클릭 함수
+function editProduct(button) {
+  const productId = button.dataset.productId;
+  location.href = `/product/edit/${productId}`;
+}
+
+// 삭제 버튼 클릭 함수  
+function deleteProduct(button) {
+  const productId = button.dataset.productId;
+  if (confirm('정말로 이 상품을 삭제하시겠습니까?')) {
+    location.href = `/product/delete/${productId}`;
+  }
+}
