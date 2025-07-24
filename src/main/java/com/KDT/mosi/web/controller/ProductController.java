@@ -60,8 +60,22 @@ public class ProductController {
         totalCount = productSVC.countByCategory(category);
       }
 
+      // *페이지네이션 구조를 만들기 위한 파트*
+      int currentPage = page;
       int totalPages = (int) Math.ceil((double) totalCount / size);
+      int displayPageNum = 10; // 한 그룹에 보여줄 페이지 수
 
+      int endPage = (int) (Math.ceil(currentPage / (double) displayPageNum) * displayPageNum);
+      int startPage = endPage - displayPageNum + 1;
+
+      if (startPage < 1) {
+        startPage = 1;
+      }
+      if (endPage > totalPages) {
+        endPage = totalPages;
+      }
+
+      // 상품 목록별 이미지,코스 정보 값 가져와서 각 상품에 포함시키기
       List<ProductListForm> productList = new ArrayList<>();
       for (Product product : products) {
         List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
@@ -80,6 +94,10 @@ public class ProductController {
       model.addAttribute("currentPage", page);
       model.addAttribute("totalPages", totalPages);
       model.addAttribute("selectedCategory", category);
+
+      // *Thymeleaf로 전달할 페이징 관련 모델 속성*
+      model.addAttribute("startPage", startPage);
+      model.addAttribute("endPage", endPage);
 
       return "product/product_list";
 
@@ -123,7 +141,19 @@ public class ProductController {
       totalCount = productSVC.countByMemberIdAndStatus(memberId, status);
     }
 
+    int currentPage = page;
     int totalPages = (int) Math.ceil((double) totalCount / size);
+    int displayPageNum = 10; // 한 그룹에 보여줄 페이지 수 (10개 단위)
+
+    int endPage = (int) (Math.ceil(currentPage / (double) displayPageNum) * displayPageNum);
+    int startPage = endPage - displayPageNum + 1;
+
+    if (startPage < 1) {
+      startPage = 1;
+    }
+    if (endPage > totalPages) {
+      endPage = totalPages;
+    }
 
     Optional<SellerPage> optionalSellerPage = sellerPageSVC.findByMemberId(memberId);
     if (optionalSellerPage.isEmpty()) {
@@ -176,6 +206,8 @@ public class ProductController {
     model.addAttribute("currentPage", page);
     model.addAttribute("totalPages", totalPages);
     model.addAttribute("selectedStatus", status);  // 뷰 선택값 유지용
+    model.addAttribute("startPage", startPage);
+    model.addAttribute("endPage", endPage);
 
     log.info("nickname = {}", sellerPage);
 
@@ -215,9 +247,28 @@ public class ProductController {
       redirectAttrs.addFlashAttribute("redirectAfterLogin", "/product/upload");
       return "redirect:/login";
     }
-    System.out.println(loginMember.getNickname());
 
-    model.addAttribute("nickname", loginMember.getNickname());
+
+    Long memberId = loginMember.getMemberId();
+
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
+    if (optional.isEmpty()) {
+      return "redirect:/mypage/seller/create";
+    }
+    SellerPage sellerPage = optional.get();
+
+    byte[] imageBytes = sellerPage.getImage();
+    String base64SellerImage = null;
+    if (imageBytes != null && imageBytes.length > 0) {
+      base64SellerImage = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
+    }
+    System.out.println(sellerPage.getNickname());
+    System.out.println(sellerPage.getImage() == null);
+    System.out.println(imageBytes.length);
+    System.out.println(base64SellerImage);
+
+    model.addAttribute("nickname", sellerPage.getNickname());
+    model.addAttribute("sellerImage", base64SellerImage);
     model.addAttribute("productUploadForm", new ProductUploadForm());
     return "product/product_enroll";
   }
