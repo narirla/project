@@ -56,14 +56,19 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
 
     // 1️⃣ SQL 조립
     StringBuffer sql = new StringBuffer();
-    sql.append("INSERT INTO BUYER_PAGE ( PAGE_ID, MEMBER_ID, INTRO, CREATE_DATE, UPDATE_DATE, NICKNAME) ");
-    sql.append(" VALUES (BUYER_PAGE_SEQ.NEXTVAL, :memberId, :intro, systimestamp, systimestamp, :nickname) ");
+    // ✅ 수정 후: address, zonecode, detailAddress 추가
+    sql.append("INSERT INTO BUYER_PAGE (PAGE_ID, MEMBER_ID, INTRO, ADDRESS, ZONECODE, DETAIL_ADDRESS, CREATE_DATE, UPDATE_DATE, NICKNAME) ");
+    sql.append("  VALUES (BUYER_PAGE_SEQ.NEXTVAL, :memberId, :intro, :address, :zonecode, :detailAddress, systimestamp, systimestamp, :nickname) ");
+
 
     // 2️⃣ 바인딩 파라미터 (필요한 항목만)
     MapSqlParameterSource param = new MapSqlParameterSource()
         .addValue("memberId",  buyerPage.getMemberId())
         .addValue("intro",     buyerPage.getIntro())
-        .addValue("nickname",  buyerPage.getNickname());
+        .addValue("nickname",  buyerPage.getNickname())
+        .addValue("address",   buyerPage.getAddress())
+        .addValue("zonecode",  buyerPage.getZonecode())
+        .addValue("detailAddress", buyerPage.getDetailAddress());
 
     // 3️⃣ KeyHolder 로 PK 추출
     KeyHolder keyHolder = new GeneratedKeyHolder();

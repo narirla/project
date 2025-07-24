@@ -17,6 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const pwHintBox = document.getElementById("pwHint");
   const imageMsg = document.getElementById("imageMsg");
 
+  const currentPwInput = document.getElementById('currentPasswd');
+  const currentPwMsg = document.getElementById('currentPwMsg'); // 오류 메시지 출력용 span 요소
+
+  const telInput = document.querySelector('#tel');
+  const telMsg = document.querySelector('#telMsg');
+
   // ─── 상수 ───
   const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
   const allowExt = ['jpg', 'jpeg', 'png', 'gif'];
@@ -107,6 +113,35 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsDataURL(file);
   });
 
+  // ─── 기존 비밀번호 일치 확인 ───
+  currentPwInput?.addEventListener('blur', async () => {
+    const currentPw = currentPwInput.value.trim();
+    if (!currentPw) {
+      currentPwMsg.textContent = '현재 비밀번호를 입력해주세요.';
+      currentPwMsg.className = 'form-text ms-2 text-danger';
+      return;
+    }
+
+    try {
+      const res = await fetch(`/members/passwordCheck?passwd=${encodeURIComponent(currentPw)}`);
+      const result = await res.json();
+
+      if (result) {
+        currentPwMsg.textContent = '기존 비밀번호와 일치합니다.';
+        currentPwMsg.className = 'form-text ms-2 text-success';
+      } else {
+        currentPwMsg.textContent = '기존 비밀번호와 일치하지 않습니다.';
+        currentPwMsg.className = 'form-text ms-2 text-danger';
+      }
+    } catch (err) {
+      console.error(err);
+      currentPwMsg.textContent = '비밀번호 확인 중 오류가 발생했습니다.';
+      currentPwMsg.className = 'form-text ms-2 text-danger';
+    }
+  });
+
+
+
   // ─── 비밀번호 강도 평가 ───
   pwInput?.addEventListener('input', () => {
     evaluatePasswordStrength(pwInput.value);
@@ -121,27 +156,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasSymbol = /[^a-zA-Z0-9]/.test(password);
     const hasRepeat = /(.)\1{2,}/.test(password);
 
+    // 기존 클래스 제거
+    pwStrengthBox.classList.remove("text-success", "text-warning", "text-danger");
+
     if (password.length < 8 || hasRepeat) {
       pwStrengthBox.textContent = "약함";
-      pwStrengthBox.className = "pw-strength weak";
+      pwStrengthBox.className = "pw-strength weak text-danger";  // ✅ 빨간색
       pwHintBox.textContent = "비밀번호는 8자 ~ 12자, 대소문자, 숫자, 특수문자를 포함하고 동일 문자를 3회 이상 반복할 수 없습니다.";
+      pwHintBox.className = "form-text ms-2 text-danger"; // ✅ 빨간색 안내
       return;
     }
 
     if (hasDigit && hasAlpha && hasSymbol) {
       pwStrengthBox.textContent = "강함";
-      pwStrengthBox.className = "pw-strength strong";
+      pwStrengthBox.className = "pw-strength strong text-success";  // ✅ 초록색
       pwHintBox.textContent = "";
+      pwHintBox.className = "form-text ms-2"; // 초기화
     } else if ((hasDigit && hasAlpha) || (hasAlpha && hasSymbol)) {
       pwStrengthBox.textContent = "보통";
-      pwStrengthBox.className = "pw-strength medium";
+      pwStrengthBox.className = "pw-strength medium text-warning";  // ✅ 노란색
       pwHintBox.textContent = "영문, 숫자, 특수문자를 조합하세요.";
+      pwHintBox.className = "form-text ms-2 text-warning";
     } else {
       pwStrengthBox.textContent = "약함";
-      pwStrengthBox.className = "pw-strength weak";
+      pwStrengthBox.className = "pw-strength weak text-danger";
       pwHintBox.textContent = "비밀번호가 너무 단순합니다.";
+      pwHintBox.className = "form-text ms-2 text-danger";
     }
   }
+
 
   // ─── 비밀번호 일치 확인 ───
   pwConfirmInput?.addEventListener('input', () => {
@@ -189,13 +232,70 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nick.length < 2) return block('닉네임은 2자 이상이어야 합니다.');
     if (nick.length > 30) return block('닉네임은 30자 이하여야 합니다.');
     if (!nicknameRegex.test(nick)) return block('닉네임은 한글·영문·숫자만 사용할 수 있습니다.');
-    if (introTextarea.value.length > 60)
-      return block('자기소개는 최대 60자까지 입력할 수 있습니다.');
+    if (introTextarea.value.length > 150)
+      return block('자기소개는 최대 500자까지 입력할 수 있습니다.');
   });
 
   function block(msg) {
     alert(msg);
     event.preventDefault();
   }
+
+  // 플래시 메시지 확인 후 모달 띄우기
+  const flashMsg = document.querySelector('[name="flashMsg"]');
+  const successModal = document.getElementById('successModal');
+  const confirmBtn = document.getElementById('confirmBtn');
+
+  if (flashMsg && flashMsg.value) {
+    successModal.style.display = 'flex';
+
+    confirmBtn.addEventListener('click', () => {
+      window.location.href = `/mypage/buyer/${flashMsg.dataset.memberId}`;  // 또는 '/mypage/buyer/view'
+    });
+  }
+
+  // ─── 기본 이미지로 변경 버튼 동작 ───
+  const deleteImageBtn = document.getElementById('deleteImageBtn');
+  const deleteImageInput = document.getElementById('deleteImage');
+
+  deleteImageBtn?.addEventListener('click', () => {
+    // 미리보기 이미지 기본 이미지로 변경
+    previewImg.src = defaultImageSrc;
+    if (asideProfileImage) asideProfileImage.src = defaultImageSrc;
+
+    // 기존 업로드 input 초기화
+    if (imageInput) imageInput.value = '';
+
+    // 삭제 플래그 true 설정
+    deleteImageInput.value = true;
+
+    // 안내 메시지 초기화
+    imageMsg.textContent = '';
+  });
+
+
+  const flashMsgFadeOut = document.querySelector('#flashMsg');
+  if (flashMsgFadeOut) {
+    setTimeout(() => {
+      flashMsgFadeOut.style.transition = 'opacity 1s ease-out';
+      flashMsgFadeOut.style.opacity = '0';
+      setTimeout(() => flashMsgFadeOut.remove(), 1000);
+    }, 3000);
+  }
+
+  telInput?.addEventListener('blur', () => {
+    const telValue = telInput.value.trim();
+    const telRegex = /^010-?\d{4}-?\d{4}$/;
+
+    if (telValue && !telRegex.test(telValue)) {
+      telMsg.textContent = '전화번호 형식은 010-0000-0000입니다.';
+      telMsg.className = 'form-text ms-2 text-danger';
+    } else {
+      telMsg.textContent = '';
+      telMsg.className = 'form-text ms-2';
+    }
+  });
+
+
 
 });

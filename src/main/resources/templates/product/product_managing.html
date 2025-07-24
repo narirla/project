@@ -18,7 +18,7 @@
 
 <body>
   <div class="layout-wrapper">
-    <header th:replace="~{fragments/header :: header}"></header>
+    <header th:replace="~{fragments/sellerHeader :: sellerHeader}"></header>
     <div class="page-container">
       <main class="mypage-container">
         <aside class="sidebar">
@@ -26,18 +26,19 @@
             <div class="profile-box">
               <div class="profile-image">
                 <img th:if="${sellerPage != null and sellerPage.image != null}"
-                  th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}" alt="프로필 이미지">
-                <img th:if="${sellerPage == null or sellerPage.image == null}" th:src="@{/img/default-profile.png}"
-                  alt="기본 프로필 이미지">
+                     th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}"
+                     alt="프로필 이미지">
+                <img th:if="${sellerPage == null or sellerPage.image == null}"
+                     th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
               </div>
               <div class="profile-info">
                 <a href="#" class="profile-badge"> 프로가이드 ></a>
-                <div class="profile-name" th:text="${nickname}">이름</div>
+                <div class="profile-name" th:text="${sellerPage.nickname}">닉네임</div>
                 <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
-                  <button type="submit" class="btn btn-outline-secondary w-100">구매자 전환</button>
+                  <button type="submit" class="btn-role-switch">구매자 전환</button>
                 </form>
               </div>
-            </div>
+            </div>iv>
             <nav class="mypage-nav">
               <div class="nav-title active">MY PAGE</div>
               <ul>

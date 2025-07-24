@@ -120,6 +120,36 @@ public interface MemberSVC {
    */
   int deleteById(Long memberId);
 
+  /**
+   * 이메일로 회원 ID 조회
+   * - 주어진 이메일을 기준으로 해당 회원의 memberId를 조회한다.
+   * - 결과가 없으면 Optional.empty()를 반환한다.
+   *
+   * @param email 조회할 회원 이메일
+   * @return Optional<Long> 회원 ID
+   */
   Optional<Long> findMemberIdByEmail(String email);
 
+  /**
+   * 회원 전화번호 수정
+   * - 주어진 회원 ID를 기준으로 전화번호를 새 값으로 수정한다.
+   *
+   * @param memberId 수정할 회원 ID
+   * @param tel 새 전화번호
+   * @return 수정된 행 수 (1: 성공, 0: 실패)
+   */
+  int updateTel(Long memberId, String tel);
+
+  /**
+   * 회원 비밀번호 수정
+   * - 주어진 회원 ID를 기준으로 비밀번호를 새 값으로 수정한다.
+   *
+   * @param memberId 수정할 회원 ID
+   * @param passwd 새 비밀번호 (암호화된 상태)
+   * @return 수정된 행 수 (1: 성공, 0: 실패)
+   */
+  int updatePasswd(Long memberId, String passwd);
+
+
+  String findPasswdById(Long memberId);
 }

@@ -88,7 +88,17 @@
         </aside>
 
         <section class="content">
+
+          <!-- ✅ 수정 완료 알림 모달 -->
+          <div id="successModal" class="modal" th:if="${msg != null}">
+            <div class="modal-content">
+              <p th:text="${msg}">수정이 완료되었습니다.</p>
+              <button id="confirmBtn" class="btn btn-primary">확인</button>
+            </div>
+          </div>
+
           <h2>회원 정보 수정</h2>
+          <hr class="top-line">
 
           <form th:action="@{/mypage/seller/edit}" th:object="${form}" method="post" enctype="multipart/form-data">
 
@@ -100,12 +110,24 @@
             <div class="profile-section">
               <div class="profile-wrapper">
                 <img class="profile-preview" id="sectionProfilePreview"
-                     th:src="@{'/mypage/buyer/' + *{memberId} + '/image'}"
+                     th:src="@{'/mypage/seller/images/profile/' + ${form.pageId} + '?t=' + ${timestamp}}"
+                     onerror="this.onerror=null; this.src='/img/default-profile.png';"
                      alt="프로필 이미지">
               </div>
+
+              <!-- 사진 변경 버튼 -->
               <label for="imageFile" class="btn-upload">사진변경</label>
               <input type="file" id="imageFile" name="imageFile" th:field="*{imageFile}" hidden accept="image/*">
+
+              <!-- ✅ 기본 이미지로 변경 버튼 추가 -->
+              <button type="button" id="deleteImageBtn" class="btn-upload" style="background-color: #ccc; color: #333;">
+                기본 이미지
+              </button>
+              <input type="hidden" id="deleteImage" name="deleteImage" th:field="*{deleteImage}" value="false">
+
+              <p id="imageMsg" class="form-text ms-2 text-danger"></p>
             </div>
+
 
             <!--            <div class="form-row">-->
             <!--              <label for="name">이름</label>-->
@@ -130,6 +152,20 @@
             <div class="form-row">
               <label for="tel">전화번호</label>
               <input type="tel" th:field="*{tel}" id="tel" name="tel" autocomplete="tel">
+              <span id="telMsg" class="form-text ms-2"></span>
+            </div>
+
+            <!-- ✅ 기존 비밀번호 확인 -->
+            <div class="form-row">
+              <label for="currentPasswd">기존 비밀번호</label>
+              <div class="password-wrapper">
+                <input type="password" th:field="*{currentPasswd}" id="currentPasswd" name="currentPasswd" autocomplete="current-password">
+                <button type="button" class="toggle-password" onclick="togglePassword('currentPasswd')">
+                  <i class="fa-solid fa-eye-slash"></i>
+                </button>
+              </div>
+              <p class="error-msg" th:if="${#fields.hasErrors('currentPasswd')}" th:errors="*{currentPasswd}">현재 비밀번호 오류</p>
+              <p id="currentPwMsg" class="form-text ms-2"></p>
             </div>
 
             <!-- ✅ 비밀번호 -->
@@ -156,46 +192,52 @@
                 </button>
               </div>
               <p class="error-msg" th:if="${#fields.hasErrors('confirmPasswd')}" th:errors="*{confirmPasswd}">비밀번호 확인 오류</p>
-              <p id="pwMatchMsg" class="form-text ms-2"></p> <!-- JS에서 사용 -->
+              <p id="pwMatchMsg" class="form-text ms-2"></p>
             </div>
 
 
             <div class="form-row">
               <label for="intro">자기소개</label>
-              <textarea id="intro" th:field="*{intro}" name="intro" maxlength="60"></textarea>
-              <div class="char-count" th:text="${form.intro != null ? #strings.length(form.intro) : 0} + '자 / 60자'"></div>
+              <div class="intro-wrapper">
+                <textarea id="intro" th:field="*{intro}" name="intro" maxlength="150"></textarea>
+                <div class="char-count" th:text="${form.intro != null ? #strings.length(form.intro) : 0} + '자 / 150자'"></div>
+              </div>
             </div>
+
 
             <div class="form-row">
               <label for="notification">알림 설정</label>
-              <label class="inline-label">
-                <input type="checkbox" id="notification" name="notification" th:field="*{notification}" value="Y">
-                알림 수신 동의
-              </label>
+              <div class="notification-wrapper">
+                <label class="inline-label">
+                  <input type="checkbox" id="notification" name="notification" th:field="*{notification}" value="Y">
+                  알림 수신 동의
+                </label>
+                <p class="notification-desc">할인쿠폰/이벤트, 뉴스레터를 받아보시겠습니까?</p>
+              </div>
             </div>
-            <hr>
+            <hr class="bottom-line">
 
             <h3 class="section-subtitle">추가 정보</h3>
-            <hr>
+            <hr class="top-line">
 
             <div class="form-row address-row">
               <label for="zonecode">우편번호</label>
               <div>
-                <input type="text" id="zonecode" th:field="*{zonecode}" name="zonecode" autocomplete="postal-code" readonly>
+                <input type="text" id="zonecode" th:field="*{zonecode}"  autocomplete="postal-code" readonly>
                 <button type="button" class="btn-small" id="btnSearchAddr">주소 검색</button>
               </div>
             </div>
 
             <div class="form-row">
               <label for="address">기본주소</label>
-              <input type="text" id="address" th:field="*{address}" name="address" autocomplete="address-line1" readonly>
+              <input type="text" id="address" th:field="*{address}"  autocomplete="address-line1" readonly>
             </div>
 
             <div class="form-row">
               <label for="detailAddress">상세주소</label>
-              <input type="text" id="detailAddress" th:field="*{detailAddress}" name="detailAddress" autocomplete="address-line2">
+              <input type="text" id="detailAddress" th:field="*{detailAddress}"  autocomplete="address-line2">
             </div>
-            <hr>
+            <hr class="bottom-line">
 
             <div class="form-button-group">
               <button id="saveBtn" type="submit" class="btn btn-primary">회원 정보 수정하기</button>

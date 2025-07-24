@@ -19,8 +19,8 @@ public class BuyerPageSaveForm {
   @Size(min = 2, max = 30, message = "닉네임은 최소 2자, 최대 30자까지 입력 가능합니다.")
   private String nickname;
 
-  // 자기소개 (선택 사항, 최대 500자)
-  @Size(max = 500, message = "자기소개는 500자 이내로 입력해주세요.")
+  // 자기소개 (선택 사항, 최대 150자)
+  @Size(max = 150, message = "자기소개는 150자 이내로 입력해주세요.")
   private String intro;
 
   // 최근 주문 상품명 (선택 사항, 최대 100자)
