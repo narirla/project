@@ -97,7 +97,7 @@ public class CsrBbsController {
       ,Model model) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     model.addAttribute("user", loginMember);
-    return "postBoards/write_quill_test";
+    return "postBoards/write_quill";
   }
 
   // 게시글 답글
