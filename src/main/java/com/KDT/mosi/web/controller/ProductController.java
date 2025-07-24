@@ -331,9 +331,6 @@ public class ProductController {
 
     List<ProductImage> images = productImageSVC.findByProductId(id);
     List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
-    
-    // 디버깅: 이미지 개수 확인
-    log.info("상품 ID {}의 이미지 개수: {}", id, images != null ? images.size() : 0);
 
     // ProductUpdateForm에 기존 데이터 설정
     ProductUpdateForm form = new ProductUpdateForm();
@@ -405,7 +402,7 @@ public class ProductController {
       product.setStatus(existingProduct.getStatus());
     }
     
-    // createDate는 기존 값 유지 (수정 시 변경하면 안됨)
+    // createDate는 기존 값 유지
     product.setCreateDate(existingProduct.getCreateDate());
 
     Product updateProduct = productSVC.updateProduct(product);
@@ -420,7 +417,7 @@ public class ProductController {
       }
     }
 
-    // 새 이미지 저장 (기존 방식 그대로)
+    // 새 이미지 저장
     List<ProductImage> images = new ArrayList<>();
     int order = 1;
     if (form.getUploadImages() != null) {
@@ -439,14 +436,14 @@ public class ProductController {
     }
     productImageSVC.saveAll(images);
 
-    // 기존 코스포인트 삭제 (간단하게)
+    // 기존 코스포인트 삭제
     if (form.getDeleteCoursePointIds() != null) {
       for (Long coursePointId : form.getDeleteCoursePointIds()) {
         productCoursePointSVC.deleteByProductId(coursePointId);
       }
     }
 
-    // 새 코스포인트 저장 (기존 방식 그대로)
+    // 새 코스포인트 저장
     List<ProductCoursePoint> coursePoints = new ArrayList<>();
     if (form.getCoursePoints() != null) {
       int pointOrder = 1;

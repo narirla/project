@@ -1,19 +1,10 @@
-/* ======================= */
-/* ========= 기본 ========= */
-/* ======================= */
 
+/* 기본 레이아웃 */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
-/* body{
-    height: 3500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-} */
 
 .product-registration {
     font-family: 'Noto Sans KR', sans-serif;
@@ -21,29 +12,22 @@
     color: #414141;
     line-height: 1.6;
     margin-bottom: 100px;
-
 }
 
 .page-container{
     height: 2600px;
 }
 
-
 .page-container section{
     width: 941px;
 }
 
-/* ======================= */
-/* ======= 등록내용 ======= */
-/* ======================= */
-
-/* 상품 기본 정보 등록 */
+/* 폼 기본 구조 */
 .resgistratrion-title {
     font-size: larger;
     padding-top: 40px;
     padding-bottom: 20px;
 }
-
 
 .form-group {
     display: flex;
@@ -51,8 +35,6 @@
     border-top: solid 2px #B2B2B2;
 }
 
-
-/* label */
 .form-group label {
     width: 220px;
     background-color: #EFEFEF;
@@ -66,8 +48,6 @@
     color: #FF3030;
 }
 
-
-/* input 내용들 */
 .form-group div {
     padding-left: 20px;
     padding-top: 7px;
@@ -76,6 +56,7 @@
     align-items: center;
 }
 
+/* 입력 필드 스타일 */
 .form-group div .pname {
     border-radius: 5px;
     width: 480px;
@@ -118,7 +99,7 @@
     padding-right: 30px;
 }
 
-/* 라디오버튼 */
+/* 라디오 버튼 */
 input[type='radio'] {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -138,7 +119,6 @@ input[type='radio']:checked {
     box-shadow: 0 0 0 1.6px #80CCD6;
 }
 
-
 /* 카테고리 */
 .form-group div select {
     border-radius: 5px;
@@ -151,7 +131,6 @@ input[type='radio']:checked {
 .form-group div select:focus {
     outline: none;
 }
-
 
 /* 이미지 업로드 영역*/
 .form-group.img{
@@ -168,6 +147,7 @@ input[type='radio']:checked {
     padding: 0;
 }
 
+/* 파일 업로드 영역 */
 .image-upload-container .image-upload-single .upload-box{
     border: 1px dashed #D9D9D9;
     border-radius: 5px;
@@ -201,6 +181,7 @@ input[type='radio']:checked {
     text-align:center;
 }
 
+/* 파일 목록 */
 .image-name-list{
     display: flex;
     flex-direction: column;
@@ -234,14 +215,17 @@ input[type='radio']:checked {
     white-space: nowrap;
 }
 
+/* 파일 기본 스타일 */
 .image-name-list .image-name-item.active {
     color: #22C5CD;
 }
 
+/* 활성 상태 스타일 (현재 미리보기 중인 파일) */
 .image-name-list .image-name-item.active span {
     color: #22C5CD;
 }
 
+/* 파일 삭제 버튼 */
 .image-name-list .remove-image {
     display: flex;
     justify-content: center;
@@ -261,7 +245,6 @@ input[type='radio']:checked {
     background-color: #414141;
 }
 
-
 /* 상품 설명 */
 .pdescription {
     height: 400px;
@@ -277,10 +260,7 @@ input[type='radio']:checked {
     padding: 10px;
 }
 
-
-
-
-/* 가격 정보 상세 기입 */
+/* 가격 정보 입력 영역 */
 .price {
     height: 350px;
 }
@@ -314,9 +294,7 @@ input[type='radio']:checked {
     padding-right: 0;
 }
 
-
-
-/* 등록 취소 버튼 */
+/* 액션 버튼 */
 .form-group.submit-btn {
     display: flex;
     justify-content: center;
@@ -327,32 +305,31 @@ input[type='radio']:checked {
 .form-group.submit-btn button {
     margin-left: 10px;
     margin-right: 10px;
-
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-
     text-align: center;
     text-decoration: none;
-
     width: 120px;
     height: 35px;
-
     border: none;
     border-radius: 10px;
 }
 
+/* 제출 버튼 */
 .form-group.submit-btn button:first-child {
     background-color: #80CCD6;
     color: #fff;
     font-size: medium;
 }
+
 .form-group.submit-btn button:first-child:hover{
     background-color: #0099AD;
     color: #fff;
     font-weight: bold;
 }
 
+/* 취소 버튼 */
 .form-group.submit-btn button:last-child {
     background-color: #fff;
     color: #414141;
@@ -367,7 +344,7 @@ input[type='radio']:checked {
     border: none;
 }
 
-/* 현재 파일 정보 스타일 - 사용자 요청사항만 */
+/* 파일 정보 */
 .current-file-info {
     margin-right: 3px;
     font-size: 14px;
@@ -395,20 +372,11 @@ input[type='radio']:checked {
     text-decoration: underline;
 }
 
-/* 파일 선택 버튼의 "선택된 파일 없음" 텍스트 숨기기 */
+/* 파일 input 스타일 */
 input[type="file"] {
     font-size: 0;
 }
 
 input[type="file"]::-webkit-file-upload-button {
     font-size: 14px;
-}
-
-/* form-group div 기본 스타일 (enroll과 동일) */
-.form-group div {
-    padding-left: 20px;
-    padding-top: 7px;
-    padding-bottom: 7px;
-    display: flex;
-    align-items: center;
 }

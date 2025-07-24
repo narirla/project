@@ -91,11 +91,8 @@
             <div class="resgistratrion-title">상품 기본 정보 수정</div>
             <div class="resgistration-content">
               <form id="productForm" class="post-form" th:object="${productUploadForm}" th:action="@{/product/edit/{id}(id=${productUploadForm.product.productId})}" method="post" enctype="multipart/form-data">
-                <!-- 수정을 위한 상품 ID (hidden) -->
                 <input type="hidden" th:field="*{product.productId}" th:if="${productUploadForm.product.productId != null}">
-                <!-- 삭제할 이미지 ID들을 담을 hidden input -->
                 <input type="hidden" name="deleteImageIds" id="deleteImageIds" value="" />
-
                 <!-- 카테고리 -->
                 <div class="form-group">
                   <label><b>*</b>&nbsp카테고리</label>
@@ -235,7 +232,6 @@
                         <span th:text="${image.fileName}">기존 이미지명</span>
                         <button type="button" class="remove-image" th:attr="data-image-id=${image.imageId}">×</button>
                       </div>
-                      <!-- 새로운 파일명들이 여기에 추가됨 -->
                     </div>
                   </div>
                 </div>

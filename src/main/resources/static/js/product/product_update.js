@@ -1,21 +1,24 @@
+
 document.addEventListener('DOMContentLoaded', function () {
+  // 기본 설정
   const uploadBox = document.querySelector('.upload-box');
   const input = document.querySelector('#productImage');
   const preview = uploadBox.querySelector('.image-preview');
   const icon = uploadBox.querySelector('i');
   const text = uploadBox.querySelector('p');
   const nameList = document.getElementById('imageNameList');
-
   const maxCount = 10;
   let filesArr = [];
 
   initializeExistingImages();
 
+  // 업로드 박스 클릭 이벤트
   uploadBox.addEventListener('click', function (e) {
     if(e.target === input) return;
     input.click();
   });
 
+  // 파일 선택 처리
   input.addEventListener('change', function (e) {
     const newFiles = Array.from(input.files);
     filesArr = filesArr.concat(newFiles.filter(newFile =>
@@ -28,8 +31,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     updateInputFiles();
-    
+
     if (filesArr.length > 0) {
+      // 새 파일 업로드 시 모든 active 제거
+      document.querySelectorAll('.image-name-item.active').forEach(el => el.classList.remove('active'));
       showPreview(filesArr[0]);
       renderNameList(filesArr[0]);
     } else {
@@ -38,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  // 드래그 효과
   uploadBox.addEventListener('dragover', function (e) {
     e.preventDefault();
     this.style.borderColor = '#3498db';
@@ -50,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
     this.style.background = '#f8f9fa';
   });
 
+  // 파일 드롭 처리
   uploadBox.addEventListener('drop', function (e) {
     e.preventDefault();
     this.style.borderColor = '#e0e0e0';
@@ -66,8 +73,10 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       updateInputFiles();
-      
+
       if (filesArr.length > 0) {
+        // 새 파일 드롭 시 모든 active 제거
+        document.querySelectorAll('.image-name-item.active').forEach(el => el.classList.remove('active'));
         showPreview(filesArr[0]);
         renderNameList(filesArr[0]);
       } else {
@@ -77,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  // 새 파일 목록 렌더링
   function renderNameList(activeFile) {
     const newFileItems = nameList.querySelectorAll('.new-file-item');
     newFileItems.forEach(item => item.remove());
@@ -84,21 +94,24 @@ document.addEventListener('DOMContentLoaded', function () {
     filesArr.forEach((file, idx) => {
       const item = document.createElement('div');
       item.className = 'image-name-item new-file-item';
-      
+
       const fileNameSpan = document.createElement('span');
       fileNameSpan.textContent = file.name;
       item.appendChild(fileNameSpan);
 
+      // 현재 미리보기 파일이면 active 추가
       if (activeFile && activeFile.name === file.name && activeFile.size === file.size) {
         item.classList.add('active');
       }
 
+      // 파일 클릭 시 미리보기 변경
       item.addEventListener('click', (e) => {
         e.stopPropagation();
         showPreview(file);
         renderNameList(file);
       });
 
+      // 파일 삭제 버튼
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
       removeBtn.className = 'remove-image';
@@ -127,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // 이미지 미리보기 표시
   function showPreview(source) {
     if (source instanceof File) {
       const reader = new FileReader();
@@ -145,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // 미리보기 숨기기
   function hidePreview() {
     preview.style.display = 'none';
     preview.src = '';
@@ -152,17 +167,18 @@ document.addEventListener('DOMContentLoaded', function () {
     text.style.display = 'block';
   }
 
+  // input 파일 속성 업데이트
   function updateInputFiles() {
     const dt = new DataTransfer();
     filesArr.forEach(f => dt.items.add(f));
     input.files = dt.files;
   }
 
+  // 기존 이미지 초기화
   function initializeExistingImages() {
     const existingImages = document.querySelectorAll('.existing-image');
-    
+
     if (existingImages.length > 0) {
-      // 첫 번째 이미지를 자동으로 미리보기로 설정
       const firstImage = existingImages[0];
       const firstImageId = firstImage.getAttribute('data-image-id');
       showPreview(`/product-images/${firstImageId}/data`);
@@ -172,31 +188,34 @@ document.addEventListener('DOMContentLoaded', function () {
     existingImages.forEach((imageItem) => {
       const fileName = imageItem.getAttribute('data-image-name');
       const imageId = imageItem.getAttribute('data-image-id');
-      
+
+      // 이미지 클릭 이벤트
       imageItem.addEventListener('click', function(e) {
         if (e.target.tagName === 'BUTTON') return;
         e.stopPropagation();
-        
+
         showPreview(`/product-images/${imageId}/data`);
-        
+
+        // 모든 active 제거 후 현재만 활성화
         document.querySelectorAll('.image-name-item.active').forEach(el => el.classList.remove('active'));
         this.classList.add('active');
       });
-      
+
+      // 이미지 삭제 이벤트
       const removeBtn = imageItem.querySelector('.remove-image');
       if (removeBtn) {
         removeBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          // 모달 확인 제거하고 즉시 삭제
           imageItem.remove();
         });
       }
     });
   }
 
+  // 문서 파일 업로드
   const documentFileInput = document.querySelector('input[name="documentFile"]');
   let currentBlobUrl = null;
-  
+
   if (documentFileInput) {
     documentFileInput.addEventListener('change', function(e) {
       const currentFileInfo = document.querySelector('.current-file-info');
@@ -204,16 +223,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const file = e.target.files[0];
         const fileName = file.name;
         const fileSize = Math.round(file.size / 1024);
-        
+
+        // 이전 Blob URL 메모리 해제
         if (currentBlobUrl) {
           URL.revokeObjectURL(currentBlobUrl);
         }
-        
+
         currentBlobUrl = URL.createObjectURL(file);
-        
+
         const fileLink = currentFileInfo.querySelector('.current-file-link');
         const fileSizeSpan = currentFileInfo.querySelector('.file-size');
-        
+
         if (fileLink) {
           fileLink.textContent = fileName;
           fileLink.href = currentBlobUrl;
