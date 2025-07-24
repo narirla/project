@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   });
-
   // 4. Select Box 변경 시 페이지네이션 1페이지로 초기화 기능
   const statusForm = document.getElementById('statusForm'); // HTML에서 form의 id가 'statusForm'이라고 가정
   const statusSelectElement = statusForm ? statusForm.querySelector('select[name="status"]') : null;
@@ -75,3 +74,4 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
 });
+

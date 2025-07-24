@@ -9,11 +9,13 @@ import com.KDT.mosi.web.form.product.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.*;
 
@@ -63,7 +67,9 @@ public class ProductController {
       // *페이지네이션 구조를 만들기 위한 파트*
       int currentPage = page;
       int totalPages = (int) Math.ceil((double) totalCount / size);
+
       int displayPageNum = 10; // 한 그룹에 보여줄 페이지 수
+
 
       int endPage = (int) (Math.ceil(currentPage / (double) displayPageNum) * displayPageNum);
       int startPage = endPage - displayPageNum + 1;
@@ -143,6 +149,7 @@ public class ProductController {
 
     int currentPage = page;
     int totalPages = (int) Math.ceil((double) totalCount / size);
+
     int displayPageNum = 10; // 한 그룹에 보여줄 페이지 수 (10개 단위)
 
     int endPage = (int) (Math.ceil(currentPage / (double) displayPageNum) * displayPageNum);
@@ -340,55 +347,130 @@ public class ProductController {
 
   // 수정 페이지 호출
   @GetMapping("/edit/{id}")
-  public String editForm(@PathVariable("id") Long id, Model model, HttpSession session, RedirectAttributes redirectAttrs) {
+  public String editForm(@PathVariable("id") Long id, Model model,
+                         HttpSession session,
+                         RedirectAttributes redirectAttrs) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       redirectAttrs.addFlashAttribute("redirectAfterLogin", "/product/edit/" + id);
       return "redirect:/login";
     }
 
+    Long memberId = loginMember.getMemberId();
+
     Product product = productSVC.getProduct(id).orElseThrow(() -> new IllegalArgumentException("없는 상품입니다."));
     if (product.getMember() == null || !product.getMember().getMemberId().equals(loginMember.getMemberId())) {
       return "redirect:/accessDenied";
     }
 
+    Optional<SellerPage> optionalSellerPage = sellerPageSVC.findByMemberId(memberId);
+    if (optionalSellerPage.isEmpty()) {
+      return "redirect:/mypage/seller/create";
+    }
+    SellerPage sellerPage = optionalSellerPage.get();
+
+    byte[] imageBytes = sellerPage.getImage();
+    String base64SellerImage = null;
+    if (imageBytes != null && imageBytes.length > 0) {
+      base64SellerImage = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
+    }
+
     List<ProductImage> images = productImageSVC.findByProductId(id);
     List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
 
-    ProductUploadForm form = toForm(product);
+    // ProductUpdateForm에 기존 데이터 설정
+    ProductUpdateForm form = new ProductUpdateForm();
+    form.setProduct(product);
+    form.setExistingImages(images);
+    form.setCoursePoints(coursePoints);
+    form.setNickname(loginMember.getNickname());
+    form.setSellerImage(base64SellerImage);
+    if (sellerPage.getIntro() != null) {
+      form.setIntro(sellerPage.getIntro());
+    }
 
+    model.addAttribute("sellerImage", base64SellerImage);
     model.addAttribute("nickname", loginMember.getNickname());
-    model.addAttribute("product", form);
+    model.addAttribute("productUploadForm", form);
     model.addAttribute("images", images);
     model.addAttribute("coursePoints", coursePoints);
     return "product/product_update";
   }
 
   // 수정 적용
+  @Transactional
   @PostMapping("/edit/{id}")
-  public String editSubmit(@PathVariable Long id,
-                           @ModelAttribute ProductUploadForm form,
-                           Model model) throws IOException {
-    if (form.getProductImages() != null && form.getProductImages().size() > 10) {
-      model.addAttribute("errorMessage", "이미지는 최대 10장까지 업로드 가능합니다.");
-      return "product/edit";
+  public String editSubmit(@PathVariable("id") Long id,
+                           @ModelAttribute ProductUpdateForm form,
+                           HttpSession session,
+                           Model model,
+                           RedirectAttributes redirectAttrs) throws IOException {
+
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
+      redirectAttrs.addFlashAttribute("redirectAfterLogin", "/product/edit/" + id);
+      return "redirect:/login";
     }
 
-    Product product = toEntity(form);
+    // 기존과 동일한 이미지 개수 검증
+    if (form.getUploadImages() != null && form.getUploadImages().size() > 10) {
+      model.addAttribute("errorMessage", "이미지는 최대 10장까지 업로드 가능합니다.");
+      return "product/product_update";
+    }
+
+    // 기존 상품 정보 조회
+    Product existingProduct = productSVC.getProduct(id).orElseThrow(() -> 
+        new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+    // form의 Product 사용
+    Product product = form.getProduct();
     product.setProductId(id);
     product.setUpdateDate(new Date(System.currentTimeMillis()));
+    product.setMember(loginMember);
+    
+    // 새로운 문서 파일이 업로드된 경우에만 파일 정보 업데이트
+    MultipartFile docFile = form.getDocumentFile();
+    if (docFile != null && !docFile.isEmpty()) {
+      product.setFileName(docFile.getOriginalFilename());
+      product.setFileType(docFile.getContentType());
+      product.setFileSize(docFile.getSize());
+      product.setFileData(docFile.getBytes());
+    } else {
+      // 새 파일이 없으면 기존 파일 정보 유지
+      product.setFileName(existingProduct.getFileName());
+      product.setFileType(existingProduct.getFileType());
+      product.setFileSize(existingProduct.getFileSize());
+      product.setFileData(existingProduct.getFileData());
+    }
+    
+    // status가 null이면 기존 값 유지
+    if (product.getStatus() == null || product.getStatus().trim().isEmpty()) {
+      product.setStatus(existingProduct.getStatus());
+    }
+    
+    // createDate는 기존 값 유지
+    product.setCreateDate(existingProduct.getCreateDate());
 
-    productSVC.updateProduct(product);
+    Product updateProduct = productSVC.updateProduct(product);
+    if (updateProduct == null || updateProduct.getProductId() == null) {
+      throw new IllegalStateException("상품 수정 후 productId가 없습니다.");
+    }
 
-    // 기존 이미지 및 코스포인트 삭제 후 재등록
-    productImageSVC.deleteByProductId(id);
+    // 기존 이미지 삭제 처리
+    if (form.getDeleteImageIds() != null && !form.getDeleteImageIds().isEmpty()) {
+      for (Long imageId : form.getDeleteImageIds()) {
+        productImageSVC.deleteByProductId(imageId);
+      }
+    }
+
+    // 새 이미지 저장
     List<ProductImage> images = new ArrayList<>();
     int order = 1;
-    if (form.getProductImages() != null) {
-      for (MultipartFile file : form.getProductImages()) {
+    if (form.getUploadImages() != null) {
+      for (MultipartFile file : form.getUploadImages()) {
         if (file != null && !file.isEmpty()) {
           ProductImage pi = new ProductImage();
-          pi.setProduct(product);  // product 객체 직접 세팅
+          pi.setProduct(updateProduct);
           pi.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
           pi.setFileSize(file.getSize());
           pi.setMimeType(file.getContentType());
@@ -400,31 +482,84 @@ public class ProductController {
     }
     productImageSVC.saveAll(images);
 
-    productCoursePointSVC.deleteByProductId(id);
+    // 기존 코스포인트 삭제
+    if (form.getDeleteCoursePointIds() != null) {
+      for (Long coursePointId : form.getDeleteCoursePointIds()) {
+        productCoursePointSVC.deleteByProductId(coursePointId);
+      }
+    }
+
+    // 새 코스포인트 저장
     List<ProductCoursePoint> coursePoints = new ArrayList<>();
     if (form.getCoursePoints() != null) {
       int pointOrder = 1;
-      for (ProductCoursePointForm pointForm : form.getCoursePoints()) {
-        ProductCoursePoint pcp = new ProductCoursePoint();
-        pcp.setProduct(product);  // product 객체 직접 세팅
-        pcp.setLatitude(pointForm.getLatitude());
-        pcp.setLongitude(pointForm.getLongitude());
-        pcp.setDescription(pointForm.getDescription());
-        pcp.setPointOrder(pointOrder++);
-        pcp.setCreatedAt(new Date(System.currentTimeMillis()));
-        coursePoints.add(pcp);
+      for (ProductCoursePoint coursePoint : form.getCoursePoints()) {
+        if (coursePoint.getLatitude() != null && coursePoint.getLongitude() != null) {
+          ProductCoursePoint pcp = new ProductCoursePoint();
+          pcp.setProduct(updateProduct);
+          pcp.setLatitude(coursePoint.getLatitude());
+          pcp.setLongitude(coursePoint.getLongitude());
+          pcp.setDescription(coursePoint.getDescription());
+          pcp.setPointOrder(pointOrder++);
+          pcp.setCreatedAt(new Date(System.currentTimeMillis()));
+          coursePoints.add(pcp);
+        }
       }
     }
     productCoursePointSVC.saveAll(coursePoints);
 
-    return "redirect:/product/view/" + id;
+    return "redirect:/product/manage";
+  }
+
+  @GetMapping("/delete/{id}")
+  public String deleteForm(@PathVariable("id") Long id,
+                           HttpSession session,
+                           RedirectAttributes redirectAttrs) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
+      return "redirect:/login";
+    }
+
+    // 권한 확인
+    Product product = productSVC.getProduct(id).orElseThrow(() -> new IllegalArgumentException("없는 상품입니다."));
+    if (product.getMember() == null || !product.getMember().getMemberId().equals(loginMember.getMemberId())) {
+      return "redirect:/accessDenied";
+    }
+
+    // 바로 삭제 처리
+    productSVC.removeProduct(id);
+    redirectAttrs.addFlashAttribute("message", "상품이 삭제되었습니다.");
+    return "redirect:/product/manage";
+  }
+
+  // 삭제 적용
+  @PostMapping("/delete/{id}")
+  public String deleteSubmit(@PathVariable("id") Long id,
+                             HttpSession session,
+                             RedirectAttributes redirectAttrs) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
+      return "redirect:/login";
+    }
+
+    // 권한 재확인
+    Product product = productSVC.getProduct(id).orElseThrow(() -> new IllegalArgumentException("없는 상품입니다."));
+    if (product.getMember() == null || !product.getMember().getMemberId().equals(loginMember.getMemberId())) {
+      return "redirect:/accessDenied";
+    }
+
+    // 한 번에 모든 관련 데이터 삭제
+    productSVC.removeProduct(id);
+
+    redirectAttrs.addFlashAttribute("message", "상품이 삭제되었습니다.");
+    return "redirect:/product/manage";
   }
 
   // 상세페이지
   @GetMapping("/view/{id}")
   public String view(@PathVariable("id") Long id, Model model, HttpSession session) {
 
-    // 3) 로그인 회원 정보 조회
+    // 1) 로그인 회원 정보 조회
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       // 필요 시 로그인 페이지로 리다이렉트 또는 예외 처리
@@ -432,11 +567,11 @@ public class ProductController {
     }
     Long memberId = loginMember.getMemberId();
 
-    // 1) 상품 조회, 없으면 예외 처리
+    // 2) 상품 조회, 없으면 예외 처리
     Product product = productSVC.getProduct(id)
         .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
 
-    // 2) 상품 이미지, 코스 포인트 리스트 조회
+    // 3) 상품 이미지, 코스 포인트 리스트 조회
     List<ProductImage> images = productImageSVC.findByProductId(id);
     List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
 
@@ -548,8 +683,27 @@ public class ProductController {
     form.setPriceDetail(product.getPriceDetail());
     form.setGpriceDetail(product.getGpriceDetail());
     form.setStatus(product.getStatus());
-
     return form;
   }
 
+  // 파일 다운로드
+  @GetMapping("/download/product/{productId}")
+  public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable("productId") Long productId) {
+    // 상품 조회
+    Product product = productSVC.getProduct(productId).orElse(null);
+    if (product == null || product.getFileData() == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    // 파일명 설정(없으면 기본값)
+    String fileName = product.getFileName() != null ?
+        product.getFileName() :
+        "product_" + productId + "_detail.txt";
+
+    // 파일 다운로드(한글로 파일명 인코딩)
+    return ResponseEntity.ok()
+        .header("Content-Disposition", "attachment; filename*=UTF-8''" +
+            URLEncoder.encode(fileName, StandardCharsets.UTF_8))
+        .body(new ByteArrayResource(product.getFileData()));
+  }
 }
