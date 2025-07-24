@@ -19,4 +19,9 @@ public class BbsReportSVCImpl implements BbsReportSVC {
   public int getTotalCountReport(Long bbsId) {
     return bbsReportDAO.getTotalCountReport(bbsId);
   }
+
+  @Override
+  public boolean getReport(Long bbsId, Long memberId) {
+    return bbsReportDAO.getReport(bbsId, memberId);
+  }
 }

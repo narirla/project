@@ -8,6 +8,7 @@ import com.KDT.mosi.domain.terms.svc.TermsSVC;
 import com.KDT.mosi.web.form.member.MemberEditForm;
 import com.KDT.mosi.web.form.member.MemberJoinForm;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -323,9 +324,32 @@ public class MemberController {
     return loginMember != null ? loginMember.getMemberId() : null;
   }
 
+  /**
+   * 회원탈퇴
+   * @return
+   */
   @GetMapping("/goodbye")
   public String goodbyePage() {
     return "member/goodbye";
+  }
+
+
+  /**
+   *  비밀번호 일치 여부 확인 API (판매자 마이페이지 수정용)
+   * - 세션의 loginMember 정보 기반으로 입력된 비밀번호가 맞는지 확인
+   * - 사용 예: 기존 비밀번호 확인 필드에서 비동기 호출
+   */
+  @GetMapping("/passwordCheck")
+  @ResponseBody
+  public boolean passwordCheck(@RequestParam("passwd") String passwd, HttpSession session) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
+      return false; // 비로그인 상태
+    }
+
+    return memberSVC.findById(loginMember.getMemberId())
+        .map(member -> passwordEncoder.matches(passwd, member.getPasswd()))
+        .orElse(false);
   }
 
 

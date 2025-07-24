@@ -6,4 +6,6 @@ public interface RBbsLikeSVC {
 
   // 게시글의 좋아요 갯수
   int getTotalCountLike(Long rbbsId);
+
+  boolean getLike(Long rbbsId, Long memberId);
 }

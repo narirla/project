@@ -9,7 +9,7 @@
   <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/product/product_list.css}">
   <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css}">
-  <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css}"
+  <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css}">
 </head>
 
 <body>
@@ -299,15 +299,16 @@
         <!--상품리스트-->
         <div class="product-list">
           <div class="product-item" th:each="form : ${productList}">
-            <a th:href="@{/product/view/{id}(id=${form.product.productId})}">
+            <a class="product-item-container" th:href="@{/product/view/{id}(id=${form.product.productId})}">
               <div class="thumbnail">
                 <img th:if="${form.images != null and #lists.size(form.images) > 0}"
                      th:src="${form.images[0].base64ImageData}" th:alt="${form.images[0].fileName}"/>
-                <img th:if="${form.images == null or #lists.isEmpty(form.images)}" th:src="@{/img/default-product.png}"
+                <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
+                     th:src="@{/img/default-product.png}"
                      alt="기본 상품 이미지"/>
               </div>
               <div class="product-info">
-                <h3><a th:text="${form.product.title}">상품명</a></h3>
+                <h3 th:text="${form.product.title}">상품명</h3>
                 <p class="s-price"
                    th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
                 <p class="n-price"
@@ -316,12 +317,37 @@
             </a>
           </div>
         </div>
-        <div class="pagination">
+        <div class="pagination" th:if="${totalCount > 0}">
           <a th:if="${currentPage > 1}"
-             th:href="@{/product/list(page=${currentPage - 1}, size=12, category=${selectedCategory})}">이전</a>
-          <span th:text="${currentPage} + ' / ' + ${totalPages}"></span>
+             th:href="@{/product/list(page=1, size=12, category=${selectedCategory})}"
+             class="page-link">&lt;&lt;</a>
+          <span th:unless="${currentPage > 1}" class="page-link-spacer">&lt;&lt;</span>
+
+          <a th:if="${currentPage > 1}"
+             th:with="prevPageTarget = (${currentPage == startPage and startPage > 1} ? ${startPage - 1} : ${currentPage - 1})"
+             th:href="@{/product/list(page=${prevPageTarget}, size=12, category=${selectedCategory})}"
+             class="page-link">&lt;</a>
+          <span th:unless="${currentPage > 1}" class="page-link-spacer">&lt;</span>
+
+          <th:block th:each="i : ${#numbers.sequence(startPage, endPage)}">
+            <a th:if="${i == currentPage}"
+               th:href="@{/product/list(page=${i}, size=12, category=${selectedCategory})}"
+               class="page-link active" th:text="${i}">1</a>
+            <a th:if="${i != currentPage}"
+               th:href="@{/product/list(page=${i}, size=12, category=${selectedCategory})}"
+               class="page-link" th:text="${i}">1</a>
+          </th:block>
+
           <a th:if="${currentPage < totalPages}"
-             th:href="@{/product/list(page=${currentPage + 1}, size=12, category=${selectedCategory})}">다음</a>
+             th:with="nextPageTarget = (${currentPage == endPage and endPage < totalPages} ? ${endPage + 1} : ${currentPage + 1})"
+             th:href="@{/product/list(page=${nextPageTarget}, size=12, category=${selectedCategory})}"
+             class="page-link">&gt;</a>
+          <span th:unless="${currentPage < totalPages}" class="page-link-spacer">&gt;</span>
+
+          <a th:if="${currentPage < totalPages}"
+             th:href="@{/product/list(page=${totalPages}, size=12, category=${selectedCategory})}"
+             class="page-link">&gt;&gt;</a>
+          <span th:unless="${currentPage < totalPages}" class="page-link-spacer">&gt;&gt;</span>
         </div>
       </main>
     </div>

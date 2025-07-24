@@ -25,6 +25,8 @@ public class BuyerPageUpdateForm {
 
   private String confirmPasswd;
 
+  private String currentPasswd;
+
   @Pattern(regexp = "^(010-?\\d{4}-?\\d{4})?$", message = "전화번호 형식은 010-0000-0000입니다.")
   private String tel;
 
@@ -33,11 +35,13 @@ public class BuyerPageUpdateForm {
   private String detailAddress;
   private String notification;
 
-  @Size(max = 500, message = "자기소개는 500자 이내로 입력해주세요.")
+  @Size(max = 150, message = "자기소개는 150자 이내로 입력해주세요.")
   private String intro;
 
   @NotBlank(message = "이름은 필수 항목입니다.")
   private String name;
+
+  private Boolean deleteImage;
 
   @Override
   public String toString() {

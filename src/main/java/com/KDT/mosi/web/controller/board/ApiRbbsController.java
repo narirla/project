@@ -1,6 +1,8 @@
 package com.KDT.mosi.web.controller.board;
 
 import com.KDT.mosi.domain.board.rbbs.svc.RbbsSVC;
+import com.KDT.mosi.domain.board.rbbsLike.svc.RBbsLikeSVC;
+import com.KDT.mosi.domain.board.rbbsReport.svc.RBbsReportSVC;
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.board.Rbbs;
 import com.KDT.mosi.web.api.ApiResponse;
@@ -26,6 +28,9 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class ApiRbbsController {
   private final RbbsSVC rbbsSVC;
+  private final RBbsLikeSVC rbbsLikeSVC;
+  private final RBbsReportSVC rBbsReportSVC;
+
 
   // 댓글 추가
   @PostMapping
@@ -67,11 +72,25 @@ public class ApiRbbsController {
   public ResponseEntity<ApiResponse<List<Rbbs>>> listPage(
       @PathVariable("bbsId") Long bbsId,
       @RequestParam(value="pageNo",   defaultValue="1") int pageNo,
-      @RequestParam(value="numOfRows",defaultValue="10") int numOfRows
+      @RequestParam(value="numOfRows",defaultValue="10") int numOfRows,
+      @SessionAttribute(value="loginMember", required=false) Member loginMember
   ) {
     log.info("bbsId={}, pageNo={}, numOfRows={}", bbsId, pageNo, numOfRows);
     List<Rbbs> list      = rbbsSVC.findAll(bbsId, pageNo, numOfRows);
-    int         totalCnt = rbbsSVC.getTotalCount(bbsId);
+
+    for (Rbbs r : list) {
+      byte[] pic = r.getPic();
+      if (pic != null && pic.length > 0) {
+        String base64 = java.util.Base64.getEncoder().encodeToString(pic);
+        r.setPicData("data:image/jpeg;base64," + base64);
+      }
+      boolean liked = (loginMember != null) && rbbsLikeSVC.getLike(r.getRbbsId(), loginMember.getMemberId());
+      r.setLiked(liked);
+      boolean reported = (loginMember != null) && rBbsReportSVC.getReport(r.getRbbsId(), loginMember.getMemberId());
+      r.setReported(reported);
+    }
+
+    int totalCnt = rbbsSVC.getTotalCount(bbsId);
 
     ApiResponse<List<Rbbs>> resp = ApiResponse.of(
         ApiResponseCode.SUCCESS,
@@ -85,11 +104,24 @@ public class ApiRbbsController {
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse<Rbbs>> get(
       @PathVariable("bbsId") Long bbsId,
-      @PathVariable("id")    Long id
+      @PathVariable("id")    Long id,
+      HttpSession session
   ) {
+    Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
     Rbbs comment = rbbsSVC.findById(id)
         .filter(r -> r.getBbsId().equals(bbsId))
         .orElseThrow(() -> new NoSuchElementException("댓글을 찾을 수 없습니다. id=" + id));
+
+    boolean liked = false;
+    if (loginMemberId != null) {
+      liked = rbbsLikeSVC.getLike(id, loginMemberId);
+      log.info("id ={},loginMemberId={} ",id,loginMemberId);
+    }
+    comment.setLiked(liked);
+
+    int cntLike = rbbsLikeSVC.getTotalCountLike(comment.getRbbsId());
+    comment.setLikeCount(cntLike);
 
     ApiResponse<Rbbs> resp = ApiResponse.of(ApiResponseCode.SUCCESS, comment);
     return ResponseEntity.ok(resp);
@@ -164,10 +196,5 @@ public class ApiRbbsController {
 
     return ResponseEntity.ok(bbsApiResponse);  //상태코드 200, 응답메세지Body:bbsApiResponse객채가 json포맷 문자열로 변환됨
   }
-
-
-
-
-
 }
 

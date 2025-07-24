@@ -200,6 +200,11 @@ public class MemberDAOImpl implements MemberDAO {
     return template.update(sql, param);
   }
 
+  /**
+   *
+   * @param email
+   * @return
+   */
   @Override
   public Optional<Long> findMemberIdByEmail(String email) {
     String sql = "SELECT member_id FROM member WHERE email = :email";
@@ -213,8 +218,66 @@ public class MemberDAOImpl implements MemberDAO {
     }
   }
 
+  /**
+   * 회원 ID 존재 여부 확인
+   * - 주어진 회원 ID가 데이터베이스에 존재하는지 여부를 확인한다.
+   *
+   * @param memberId 확인할 회원 ID
+   * @return true: 존재함, false: 존재하지 않음
+   */
   @Override
   public boolean isExistMemberId(Long memberId) {
     return findById(memberId).isPresent();
   }
+
+  /**
+   * 회원 전화번호 수정
+   * - 주어진 회원 ID를 기준으로 전화번호를 새 값으로 수정한다.
+   * - 현재는 구현되지 않은 상태이며 0을 반환한다.
+   *
+   * @param memberId 수정할 회원 ID
+   * @param tel 새 전화번호
+   * @return 수정된 행 수 (0: 미구현 상태)
+   */
+  @Override
+  public int updateTel(Long memberId, String tel) {
+    String sql = "UPDATE member SET tel = :tel, update_date = systimestamp WHERE member_id = :memberId";
+
+    MapSqlParameterSource param = new MapSqlParameterSource()
+        .addValue("tel", tel)
+        .addValue("memberId", memberId);
+
+    return template.update(sql, param);
+  }
+
+
+  /**
+   * 회원 비밀번호 수정
+   * - 주어진 회원 ID를 기준으로 비밀번호를 새 값으로 수정한다.
+   * - 현재는 구현되지 않은 상태이며 0을 반환한다.
+   *
+   * @param memberId 수정할 회원 ID
+   * @param passwd 새 비밀번호 (암호화된 상태)
+   * @return 수정된 행 수 (0: 미구현 상태)
+   */
+  @Override
+  public int updatePasswd(Long memberId, String passwd) {
+    String sql = "UPDATE member SET passwd = :passwd, update_date = systimestamp WHERE member_id = :memberId";
+
+    MapSqlParameterSource param = new MapSqlParameterSource()
+        .addValue("passwd", passwd)
+        .addValue("memberId", memberId);
+
+    return template.update(sql, param);
+  }
+
+
+  @Override
+  public String findPasswdById(Long memberId) {
+    String sql = "SELECT passwd FROM member WHERE member_id = :memberId";
+    Map<String, Object> param = Map.of("memberId", memberId);
+    return template.queryForObject(sql, param, String.class);
+  }
+
+
 }
