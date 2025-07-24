@@ -7,4 +7,7 @@ public interface BbsLikeDAO {
 
   // 게시글의 좋아요 갯수
   int getTotalCountLike(Long bbsId);
+
+  //게시글 좋아요 유무
+  boolean getLike(Long bbsId,Long memberId);
 }

@@ -18,4 +18,9 @@ public class BbsLikeSVCImpl implements BbsLikeSVC {
   public int getTotalCountLike(Long bbsId) {
     return bbsLikeDAO.getTotalCountLike(bbsId);
   }
+
+  @Override
+  public boolean getLike(Long bbsId, Long memberId) {
+    return bbsLikeDAO.getLike(bbsId, memberId);
+  }
 }

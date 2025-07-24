@@ -46,4 +46,15 @@ public class BbsReportDAOImpl implements BbsReportDAO {
 
     return i;
   }
+
+  @Override
+  public boolean getReport(Long bbsId, Long memberId) {
+    String sql = "SELECT count(bbs_id) FROM bbs_report WHERE bbs_id=:bbsId AND member_id=:memberId ";
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("bbsId",bbsId)
+        .addValue("memberId",memberId);
+    int i = template.queryForObject(sql, param, Integer.class);
+    if(i>0) return true;
+    return false;
+  }
 }

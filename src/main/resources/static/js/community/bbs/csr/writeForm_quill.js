@@ -1,4 +1,4 @@
-import { ajax } from '/js/community/common.js';
+import { ajax } from '/js/community/bbs/common.js';
 import '/js/community/vendor/ignoreDeprecatedEvents.js';
 
 const Quill = window.Quill;
@@ -39,9 +39,8 @@ async function addBbs(data) {
   data.status = 'B0201';
   const res = await ajax.post('/api/bbs', data);
   if (res.header.rtcd === 'S00') {
-    newBbsId=res.body.bbsId;
-    url = '/bbs/community/'+newBbsId;
-    window.location.href = parentId ? `/bbs/community/${res.body.bbsId}` : 'url';
+    const newId = res.body.bbsId;
+    window.location.href =`/bbs/community/${newId}`;
   } else {
     alert('저장에 실패했습니다.');
   }
@@ -59,7 +58,7 @@ async function saveDraft(data) {
 }
 
 // ---------------- 폼 요소 ------------------------------------------------
-const wrap           = document.querySelector('.content');
+const wrap           = document.querySelector('.content-area');
 const frm            = wrap.querySelector('#write-form');
 const categorySelect = wrap.querySelector('#bcategory');
 const btnDraft       = wrap.querySelector('#temp-save-btn');
@@ -129,11 +128,11 @@ try {
         quill.root.innerHTML = loadRes.body.bcontent || '';
         categorySelect.value = loadRes.body.bcategory || '';
         if (!parentId && bbsId) {
-
+          console.log("첨부파일 불러오기")
           await loadAttachmentsByBbsId(bbsId);
         }
       }
-
+      console.log("삭제시작")
       const deleteUrl = parentId
         ? `/api/bbs/temp?pbbsId=${parentId}`
         : '/api/bbs/temp';
@@ -295,6 +294,7 @@ async function removeAttachment(uploadId, li) {
 
   if (attachments.length === 0) resetAttachmentUI();
 }
+
 
 
 const editorEl = quill.root;

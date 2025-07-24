@@ -47,4 +47,15 @@ public class BbsLikeDAOImpl implements BbsLikeDAO {
 
     return i;
   }
+
+  @Override
+  public boolean getLike(Long bbsId, Long memberId) {
+    String sql = "SELECT count(bbs_id) FROM bbs_like WHERE bbs_id=:bbsId AND member_id=:memberId ";
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("bbsId",bbsId)
+        .addValue("memberId",memberId);
+    int i = template.queryForObject(sql, param, Integer.class);
+    if(i>0) return true;
+    return false;
+  }
 }
