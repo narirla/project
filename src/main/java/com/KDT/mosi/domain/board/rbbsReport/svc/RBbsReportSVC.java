@@ -8,4 +8,7 @@ public interface RBbsReportSVC {
 
   // 게시글의 좋아요 갯수
   int getTotalCountReport(Long rbbsId);
+
+  //게시글 신고 유무
+  boolean getReport(Long rbbsId,Long memberId);
 }

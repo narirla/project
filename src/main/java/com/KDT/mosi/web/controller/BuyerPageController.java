@@ -9,8 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -80,9 +79,9 @@ public class  BuyerPageController {
   }
 
 
-
   // ✅ 프로필 이미지 조회
   @GetMapping("/{memberId}/image")
+  @ResponseBody
   public ResponseEntity<byte[]> image(@PathVariable("memberId") Long memberId) {
     Optional<BuyerPage> optional = buyerPageSVC.findByMemberId(memberId);
 
@@ -104,10 +103,21 @@ public class  BuyerPageController {
           .body(image);
     }
 
-    return ResponseEntity.status(HttpStatus.FOUND)
-        .header(HttpHeaders.LOCATION, "/img/default-profile.png")
-        .build();
+    // ✅ 이미지가 없을 경우 기본 이미지 파일을 바이트 배열로 반환
+    try {
+      ClassPathResource defaultImage = new ClassPathResource("static/img/default-profile.png");
+      byte[] imageBytes = defaultImage.getInputStream().readAllBytes();
+
+      return ResponseEntity.ok()
+          .contentType(MediaType.IMAGE_PNG)
+          .body(imageBytes);
+
+    } catch (IOException e) {
+      log.error("기본 이미지 로드 실패", e);
+      return ResponseEntity.notFound().build();
+    }
   }
+
 
   // ✅ 수정 폼
   @GetMapping("/{memberId}/edit")
@@ -129,6 +139,8 @@ public class  BuyerPageController {
     // 2. buyerPage 있으면 form 구성
     return buyerPageSVC.findByMemberId(memberId)
         .map(entity -> {
+          log.info("🔍 BuyerPage image is null? {}", entity.getImage() == null);
+
           BuyerPageUpdateForm form = new BuyerPageUpdateForm();
           form.setPageId(entity.getPageId());
           form.setMemberId(entity.getMemberId());
@@ -136,9 +148,9 @@ public class  BuyerPageController {
           form.setNickname(entity.getNickname() != null ? entity.getNickname() : member.getNickname());
           form.setTel(member.getTel());
           form.setName(member.getName());
-          form.setZonecode(member.getZonecode());
-          form.setAddress(member.getAddress());
-          form.setDetailAddress(member.getDetailAddress());
+          form.setZonecode(entity.getZonecode());
+          form.setAddress(entity.getAddress());
+          form.setDetailAddress(entity.getDetailAddress());
           form.setNotification(member.getNotification());
 
           model.addAttribute("form", form);
@@ -164,6 +176,10 @@ public class  BuyerPageController {
           form.setDetailAddress(member.getDetailAddress());
           form.setNotification(member.getNotification());
 
+          if (entity.getImage() != null) {
+            form.setDeleteImage(false);  // ✅ 이미지 존재 표시용 값 (실제 삭제 아님)
+          }
+
           model.addAttribute("form", form);
           model.addAttribute("buyerPage", entity);
           return "mypage/buyerpage/editBuyerPage";
@@ -182,6 +198,7 @@ public class  BuyerPageController {
       HttpSession session) throws IOException {
 
     log.info("🟢 update() 진입: memberId = {}", memberId);
+    log.info("📥 [form 전체값 확인] {}", form);
 
     // ───────────────────────────
     // 1. 권한·세션 검증
@@ -222,29 +239,37 @@ public class  BuyerPageController {
       return "mypage/buyerpage/editBuyerPage";
     }
 
-    // ───────────────────────────
-    // 4. BuyerPage 갱신
-    // ───────────────────────────
+   // ───────────────────────────
+   // 4. BuyerPage 갱신
+   // ───────────────────────────
     BuyerPage buyerPage = new BuyerPage();
     buyerPage.setPageId(form.getPageId());
     buyerPage.setMemberId(memberId);
     buyerPage.setNickname(requestedNickname);
     buyerPage.setIntro(form.getIntro());
-    log.debug("💬 intro = {}", form.getIntro()); // ✅ intro 값 확인
+    log.debug("💬 intro = {}", form.getIntro());
+
     buyerPage.setTel(form.getTel());
+    log.info("📞 BuyerPage 전화번호 수정: {}", form.getTel());
+
     buyerPage.setAddress(form.getAddress());
     buyerPage.setZonecode(form.getZonecode());
     buyerPage.setDetailAddress(form.getDetailAddress());
+    log.info("🏠 BuyerPage 주소 수정: ({}) {} {}", form.getZonecode(), form.getAddress(), form.getDetailAddress());
+
     buyerPage.setNotification(form.getNotification());
 
 
+
     if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
-      try {
-        buyerPage.setImage(form.getImageFile().getBytes());
-      } catch (IOException e) {
-        log.error("이미지 처리 실패", e);
-      }
+      buyerPage.setImage(form.getImageFile().getBytes());
+    } else {
+      // 기존 이미지 유지
+      buyerPageSVC.findById(form.getPageId()).ifPresent(existing -> {
+        buyerPage.setImage(existing.getImage());
+      });
     }
+
     buyerPageSVC.update(form.getPageId(), buyerPage);
 
     // ───────────────────────────
@@ -257,6 +282,9 @@ public class  BuyerPageController {
     member.setZonecode(form.getZonecode());
     member.setAddress(form.getAddress());
     member.setDetailAddress(form.getDetailAddress());
+    log.info("📦 Member 주소정보 확인: zonecode={}, address={}, detailAddress={}",
+        member.getZonecode(), member.getAddress(), member.getDetailAddress());
+
     member.setNotification("Y".equals(form.getNotification()) ? "Y" : "N");
 
     if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
@@ -273,8 +301,18 @@ public class  BuyerPageController {
 
     if (form.getPasswd() != null && !form.getPasswd().isBlank()) {
       member.setPasswd(form.getPasswd());
+      log.info("🔐 비밀번호가 새롭게 입력됨: 변경 처리 예정");
+    } else {
+      log.info("🔐 비밀번호 미입력: 기존 비밀번호 유지");
     }
+
     memberSVC.modify(memberId, member);
+
+    // ✅ 비밀번호 변경 완료 로그
+    if (form.getPasswd() != null && !form.getPasswd().isBlank()) {
+      log.info("✅ 비밀번호 변경 완료: memberId = {}", memberId);
+    }
+
 
     // ───────────────────────────
     // 6. 세션 정보 동기화

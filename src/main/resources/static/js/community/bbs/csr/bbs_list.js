@@ -1,4 +1,4 @@
-import { ajax, PaginationUI } from '/js/community/common.js';
+import { ajax, PaginationUI } from '/js/community/bbs/common.js';
 import { formatRelativeTime } from '/js/community/bbs/csr/dateUtils.js';
 const $list = document.getElementById('post-tbody')
 let currentPage = 1;
@@ -102,7 +102,7 @@ const rows = bbs.map(b => {
       <td class="thumb-cell"></td>
       <td class="title-cell">
         ${indentHtml}<span>${b.title}</span>
-        ${b.commentCnt > 0 ? `<span class="commentCnt">[${b.commentCnt}]</span>` : ''}
+       ${b.commentCnt > 0 ? `<span class="commentCnt">[${b.commentCnt}]</span>` : ''}
       </td>
       <td>${b.nickname}</td>
       <td>${formatRelativeTime(b.createDate)}</td>
@@ -124,6 +124,7 @@ $list.innerHTML = rows;
       });
     }
   });
+
 
     await Promise.all(bbs.map(async b => {
       try {

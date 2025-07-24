@@ -210,15 +210,66 @@ public class MemberSVCImpl implements MemberSVC {
     return memberDAO.isExistNickname(nickname);
   }
 
+  /**
+   * 회원 ID로 회원 탈퇴 처리
+   * - 먼저 연관된 구매자 마이페이지 데이터를 삭제한 후 회원 데이터를 삭제한다.
+   *
+   * @param memberId 삭제할 회원 ID
+   * @return 삭제된 회원 수 (1: 성공, 0: 실패)
+   */
   @Override
   public int deleteById(Long memberId) {
     buyerPageDAO.deleteByMemberId(memberId);
     return memberDAO.deleteById(memberId);
   }
 
+  /**
+   * 이메일을 기반으로 회원 ID를 조회한다.
+   * - 회원이 존재하지 않을 경우 Optional.empty() 반환
+   *
+   * @param email 조회할 회원 이메일
+   * @return Optional<Long> 회원 ID
+   */
   @Override
   public Optional<Long> findMemberIdByEmail(String email) {
     return memberDAO.findMemberIdByEmail(email);
   }
+
+  /**
+   * 회원의 전화번호를 수정한다.
+   *
+   * @param memberId 수정할 대상 회원 ID
+   * @param tel 새 전화번호
+   * @return 수정된 행 수 (1: 성공, 0: 실패)
+   */
+  @Override
+  public int updateTel(Long memberId, String tel) {
+    return memberDAO.updateTel(memberId, tel);
+  }
+
+  /**
+   * 회원의 비밀번호를 수정한다.
+   *
+   * @param memberId 수정할 대상 회원 ID
+   * @param passwd 암호화된 새 비밀번호
+   * @return 수정된 행 수 (1: 성공, 0: 실패)
+   */
+  @Override
+  public int updatePasswd(Long memberId, String passwd) {
+    return memberDAO.updatePasswd(memberId, passwd);
+  }
+
+  /**
+   * 회원 ID를 기준으로 암호화된 비밀번호를 조회한다.
+   * - 비밀번호 확인(예: 기존 비밀번호 확인) 시 사용된다.
+   *
+   * @param memberId 조회할 회원 ID
+   * @return 암호화된 비밀번호 (없을 경우 null 또는 예외 발생 가능)
+   */
+  @Override
+  public String findPasswdById(Long memberId) {
+    return memberDAO.findPasswdById(memberId);
+  }
+
 
 }

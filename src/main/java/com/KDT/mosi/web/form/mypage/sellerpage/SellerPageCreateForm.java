@@ -16,8 +16,8 @@ public class SellerPageCreateForm {
   // 새 프로필 이미지 파일 (선택 시 덮어씀)
   private MultipartFile imageFile;
 
-  // 자기소개 (최대 500자)
-  @Size(max = 500, message = "자기소개는 500자 이내로 입력해주세요.")
+  // 자기소개 (최대 150자)
+  @Size(max = 150, message = "자기소개는 150자 이내로 입력해주세요.")
   private String intro;
 
   // 별명
