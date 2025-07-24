@@ -18,7 +18,7 @@
 </head>
 
 <body>
-  
+
 <div class="layout-wrapper">
   <header th:replace="~{fragments/header :: header}"></header>
   <div class="page-container">
@@ -27,10 +27,10 @@
         <div class="sidebar-card">
           <div class="profile-box">
             <div class="profile-image">
-                <img th:if="${sellerPage != null and sellerPage.image != null}"
-                  th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}" alt="프로필 이미지">
-                <img th:if="${sellerPage == null or sellerPage.image == null}" th:src="@{/img/default-profile.png}"
-                  alt="기본 프로필 이미지">
+              <img th:if="${sellerPage != null and sellerPage.image != null}"
+                   th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}" alt="프로필 이미지">
+              <img th:if="${sellerPage == null or sellerPage.image == null}" th:src="@{/img/default-profile.png}"
+                   alt="기본 프로필 이미지">
             </div>
             <div class="profile-info">
               <a href="#" class="profile-badge"> 프로가이드 ></a>
@@ -102,7 +102,7 @@
 
               <form th:action="@{/product/manage}" method="get" id="statusForm">
                 <input type="hidden" name="page" value="1">
-                <input type="hidden" name="size" th:value="5"/>  <select name="status">
+                <input type="hidden" name="size" th:value="5"/> <select name="status">
                 <option value="all" th:selected="${selectedStatus == 'all'}">전체</option>
                 <option value="판매중" th:selected="${selectedStatus == '판매중'}">판매중</option>
                 <option value="판매대기" th:selected="${selectedStatus == '판매대기'}">판매대기</option>
@@ -167,9 +167,9 @@
               <hr>
             </div>
             <!-- 페이지네이션 -->
-            <div class="pagination" th:if="${totalCount > 0}"> <a th:if="${currentPage > 1}"
-                                                                  th:href="@{/product/manage(page=1, size=5, category=${selectedStatus})}"
-                                                                  class="page-link">&lt;&lt;</a>
+            <div class="pagination" th:if="${totalCount > 0}"><a th:if="${currentPage > 1}"
+                                                                 th:href="@{/product/manage(page=1, size=5, category=${selectedStatus})}"
+                                                                 class="page-link">&lt;&lt;</a>
               <span th:unless="${currentPage > 1}" class="page-link-spacer">&lt;&lt;</span>
               <a th:if="${currentPage > 1}"
                  th:with="prevPageTarget = (${currentPage == startPage and startPage > 1} ? ${startPage - 1} : ${currentPage - 1})"
@@ -195,6 +195,7 @@
                  class="page-link">&gt;&gt;</a>
               <span th:unless="${currentPage < totalPages}" class="page-link-spacer">&gt;&gt;</span>
             </div>
+          </div>
         </div>
       </section>
     </main>
