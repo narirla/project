@@ -78,6 +78,9 @@ public class SellerPageController {
     log.info("🟢 recentQnaCnt: {}", sellerPage.getRecentQnaCnt());
     log.info("🟢 optional.get(): {}", optional.get());
 
+    // 판매자 페이지로 이동할 때 session에 저장된 loginMember 객체의 닉네임을 판매자용 닉네임으로 업데이트
+    loginMember.setNickname(sellerPage.getNickname());
+    session.setAttribute("loginMember", loginMember);
 
     model.addAttribute("member", loginMember);
     model.addAttribute("sellerPage", optional.get());
