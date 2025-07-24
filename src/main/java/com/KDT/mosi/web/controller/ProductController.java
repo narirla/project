@@ -269,10 +269,6 @@ public class ProductController {
     if (imageBytes != null && imageBytes.length > 0) {
       base64SellerImage = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
     }
-    System.out.println(sellerPage.getNickname());
-    System.out.println(sellerPage.getImage() == null);
-    System.out.println(imageBytes.length);
-    System.out.println(base64SellerImage);
 
     model.addAttribute("nickname", sellerPage.getNickname());
     model.addAttribute("sellerImage", base64SellerImage);

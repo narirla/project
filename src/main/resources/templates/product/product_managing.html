@@ -159,8 +159,10 @@
                         th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
                   </div>
                   <div class="btn-group">
-                    <button id="update-btn" class="btn-group-edit">수정</button>
-                    <button id="delete-btn" class="btn-group-delete">삭제</button>
+                    <button class="btn-group-edit"
+                            th:onclick="|location.href='@{/product/edit/{id}(id=${form.product.productId})}'|">수정</button>
+                    <button class="btn-group-delete"
+                            th:onclick="|if(confirm('해당 상품을 삭제하시겠습니까?')) location.href='@{/product/delete/{id}(id=${form.product.productId})}'|">삭제</button>
                   </div>
                 </div>
               </div>
