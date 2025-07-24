@@ -46,4 +46,15 @@ public class RBbsReportDAOImpl implements RBbsReportDAO {
 
     return i;
   }
+
+  @Override
+  public boolean getReport(Long rbbsId, Long memberId) {
+    String sql = "SELECT count(rbbs_id) FROM rbbs_report WHERE rbbs_id=:rbbsId AND member_id=:memberId ";
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("rbbsId",rbbsId)
+        .addValue("memberId",memberId);
+    int i = template.queryForObject(sql, param, Integer.class);
+    if(i>0) return true;
+    return false;
+  }
 }

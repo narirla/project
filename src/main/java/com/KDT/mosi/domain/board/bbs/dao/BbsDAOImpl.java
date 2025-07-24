@@ -300,6 +300,7 @@ public class BbsDAOImpl implements BbsDAO {
     sql.append("END AS title, ");
     sql.append("NVL(m.member_id, 0) AS member_id, ");
     sql.append("m.nickname as nickname, ");
+    sql.append("m.pic as pic, ");
     sql.append("b.hit AS hit, ");
     sql.append("CASE ");
     sql.append("WHEN b.status = 'B0202' THEN to_clob('삭제된 게시글입니다.') ");
@@ -400,21 +401,27 @@ public class BbsDAOImpl implements BbsDAO {
    */
   @Override
   public int updateStep(Long bgroup, Bbs parentBbs) {
-    // 1) 최대 child step 조회
+    long pIndent  = parentBbs.getBindent();
+
     StringBuffer sql = new StringBuffer();
     sql.append("SELECT NVL(MAX(step), :parentStep) ");
     sql.append("FROM bbs ");
     sql.append("WHERE bgroup       = :bgroup ");
-    sql.append("  AND pbbs_id      = :parentId ");
-    sql.append("  AND bindent      = :childBindent ");
 
-    long childBindent = parentBbs.getBindent() + 1;
-    // MapSqlParameterSource로 선언
+
+    // — bindent 레벨별 분기 —
+    if (pIndent == 0) {              // 댓글 → 대댓글들
+
+    } else if (pIndent == 1) {       // 대댓글 → 대대댓글들
+      sql.append("  AND pbbs_id = :parentId ");
+    } else {                         // 대대댓글 → 더 깊이 없음
+      // MAX(step)이 parentStep 그대로이므로 아래서 +1만 하면 됨
+    }
+
     MapSqlParameterSource param = new MapSqlParameterSource()
         .addValue("bgroup",       bgroup)
         .addValue("parentId",     parentBbs.getBbsId())
-        .addValue("parentStep",   parentBbs.getStep())
-        .addValue("childBindent", childBindent);
+        .addValue("parentStep",   parentBbs.getStep());
 
     Long lastStep = template.queryForObject(sql.toString(), param, Long.class);
     int newStep = lastStep.intValue() + 1;

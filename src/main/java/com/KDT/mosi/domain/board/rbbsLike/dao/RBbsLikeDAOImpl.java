@@ -40,11 +40,25 @@ public class RBbsLikeDAOImpl implements RBbsLikeDAO {
 
   @Override
   public int getTotalCountLike(Long rbbsId) {
-    String sql = "SELECT count(*) FROM rbbs_like WHERE bbs_id = :rbbsId ";
+    String sql = "SELECT count(*) FROM rbbs_like WHERE rbbs_id = :rbbsId ";
 
     SqlParameterSource param = new MapSqlParameterSource().addValue("rbbsId",rbbsId);
     int i = template.queryForObject(sql, param, Integer.class);
 
     return i;
+  }
+
+  @Override
+  public boolean getLike(Long rbbsId, Long memberId) {
+    String sql = "SELECT count(*) FROM rbbs_like WHERE rbbs_id = :rbbsId AND member_id = :memberId";
+
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("rbbsId",rbbsId)
+        .addValue("memberId",memberId);
+    int i = template.queryForObject(sql, param, Integer.class);
+
+    if (i>0) return true;
+
+    return false;
   }
 }

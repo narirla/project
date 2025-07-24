@@ -12,6 +12,7 @@ public class Bbs {
   private String title;
   private Long memberId;
   private String nickname;
+  private byte[] pic;
   private Long hit;
   private String bcontent;
   private Long pbbsId;
