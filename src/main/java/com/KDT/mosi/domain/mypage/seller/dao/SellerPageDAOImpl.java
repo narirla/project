@@ -41,6 +41,9 @@ public class SellerPageDAOImpl implements SellerPageDAO {
       sellerpage.setNickname(rs.getString("nickname"));
       sellerpage.setSalesCount(rs.getInt("sales_count"));
       sellerpage.setReviewAvg(rs.getDouble("review_avg"));
+      sellerpage.setZonecode(rs.getString("zonecode"));
+      sellerpage.setAddress(rs.getString("address"));
+      sellerpage.setDetailAddress(rs.getString("detail_address"));
 
       if (rs.getTimestamp("create_date") != null) {
         sellerpage.setCreateDate(rs.getTimestamp("create_date"));
@@ -153,8 +156,12 @@ public class SellerPageDAOImpl implements SellerPageDAO {
     sql.append("    NICKNAME = :nickname, ");
     sql.append("    SALES_COUNT = :salesCount, ");
     sql.append("    REVIEW_AVG = :reviewAvg, ");
+    sql.append("    ZONECODE = :zonecode, ");
+    sql.append("    ADDRESS = :address, ");
+    sql.append("    DETAIL_ADDRESS = :detailAddress, ");
     sql.append("    UPDATE_DATE = systimestamp ");
     sql.append("WHERE PAGE_ID = :pageId");
+
 
     SqlParameterSource param = new MapSqlParameterSource()
         .addValue("image", sellerpage.getImage())
@@ -162,6 +169,9 @@ public class SellerPageDAOImpl implements SellerPageDAO {
         .addValue("nickname", sellerpage.getNickname())
         .addValue("salesCount", sellerpage.getSalesCount())
         .addValue("reviewAvg", sellerpage.getReviewAvg())
+        .addValue("zonecode", sellerpage.getZonecode())
+        .addValue("address", sellerpage.getAddress())
+        .addValue("detailAddress", sellerpage.getDetailAddress())
         .addValue("pageId", pageId);
 
     return template.update(sql.toString(), param);

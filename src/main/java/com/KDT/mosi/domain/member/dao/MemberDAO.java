@@ -99,4 +99,25 @@ public interface MemberDAO {
    * @return true: 존재함, false: 없음
    */
   boolean isExistMemberId(Long memberId);
+
+
+  /**
+   * 회원 ID를 기준으로 전화번호를 수정한다.
+   *
+   * @param memberId 수정 대상 회원 ID
+   * @param tel      새 전화번호
+   * @return 수정된 행 수 (1: 성공, 0: 실패)
+   */
+  int updateTel(Long memberId, String tel);
+
+  /**
+   * 회원 ID를 기준으로 비밀번호를 수정한다.
+   *
+   * @param memberId 수정 대상 회원 ID
+   * @param passwd   새 비밀번호 (암호화된 상태)
+   * @return 수정된 행 수 (1: 성공, 0: 실패)
+   */
+  int updatePasswd(Long memberId, String passwd);
+
+  String findPasswdById(Long memberId);
 }
