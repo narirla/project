@@ -48,9 +48,6 @@ public class ApiBbsController {
     Long id = bbsSVC.save(bbs);
     if (saveApi.getUploadGroup() != null) {
       bbsUploadSVC.bindGroupToBbs(id,saveApi.getUploadGroup());
-      log.info("saveApi.getUploadGroup = {}", saveApi.getUploadGroup());
-    }else{
-      log.info("NOONONONONOsaveApi.getUploadGroup = {}", saveApi.getUploadGroup());
     }
     Optional<Bbs> optionalBbs = bbsSVC.findById(id);
     Bbs findedBbs = optionalBbs.orElseThrow();

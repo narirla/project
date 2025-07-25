@@ -1,4 +1,4 @@
-import { ajax } from '/js/community/bbs/common.js';
+import { ajax } from '/js/community/common.js';
 import '/js/community/vendor/ignoreDeprecatedEvents.js';
 
 const Quill = window.Quill;
