@@ -81,12 +81,12 @@
         <section class="content">
 
           <!-- ✅ 수정 완료 알림 모달 -->
-          <!-- <div id="successModal" class="modal" th:if="${msg != null}">
+          <div id="successModal" class="modal" th:if="${msg != null}">
             <div class="modal-content">
               <p th:text="${msg}">수정이 완료되었습니다.</p>
               <button id="confirmBtn" class="btn btn-primary">확인</button>
             </div>
-          </div> -->
+          </div>
 
           <input type="hidden" name="flashMsg" th:value="${msg}" th:data-member-id="*{memberId}">
 
