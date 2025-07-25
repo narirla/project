@@ -1,0 +1,649 @@
+==============================================
+--BBS
+==============================================
+--테이블 삭제
+DROP TABLE rbbs_like;
+DROP TABLE rbbs_report;
+DROP TABLE bbs_upload;
+drop table rbbs;
+drop table bbs_like;
+DROP TABLE bbs_report;
+drop table bbs;
+DROP TABLE code;
+
+--시퀀스삭제
+drop sequence bbs_bbs_id_seq;
+DROP SEQUENCE bbs_upload_upload_id_seq;
+DROP SEQUENCE rbbs_rbbs_id_seq;
+DROP SEQUENCE bbs_upload_upload_group_seq;
+
+--------------------------------------------------------
+--코드
+--------------------------------------------------------
+create table code(
+code_id     varchar2(11) PRIMARY KEY,       --코드
+DECODE      varchar2(30) NOT null,          --코드명
+discript    clob,                           --코드설명
+pcode_id    varchar2(11),                   --상위코드
+useyn       char(1) default 'Y' NOT null,   --사용여부 (사용:'Y',미사용:'N')
+cdate       timestamp default systimestamp,
+udate       timestamp
+);
+
+--외래키
+alter table code
+add constraint fk_code_pcode_id
+foreign key(pcode_id)
+references code(code_id) ON DELETE CASCADE;
+
+--제약조건
+alter table code add constraint code_useyn_ck check(useyn in ('Y','N'));
+--------------------------------------------------------
+
+--------------------------------------------------------
+--게시판
+--------------------------------------------------------
+create table bbs(
+BBS_ID       number(10)    PRIMARY KEY,
+BCATEGORY    varchar2(11)  NOT null,
+status       varchar2(11)  NOT NULL,
+title        varchar2(100) NOT null,
+member_id    number(10)    NOT null,
+hit          number(5)     DEFAULT 0 NOT null,
+bcontent     clob          NOT null,
+pbbs_id      number(10),
+bgroup       number(10)      NOT null,
+step         number(3)      NOT null,
+bindent      number(3)      NOT null,
+CREATE_DATE  timestamp    default systimestamp,
+UPDATE_DATE  timestamp    default systimestamp
+);
+
+-- 작성자 아이디 외래키 지정
+ALTER TABLE bbs
+ADD CONSTRAINT fk_bbs_md
+FOREIGN KEY (member_id)
+REFERENCES member(member_id) ON DELETE CASCADE;
+
+-- 상태코드 외래키 지정
+ALTER TABLE bbs
+ADD CONSTRAINT fk_bbs_BC
+FOREIGN KEY (BCATEGORY)
+REFERENCES code(code_id) ON DELETE CASCADE;
+--
+
+-- 상태코드 외래키 지정
+ALTER TABLE bbs
+ADD CONSTRAINT fk_bbs_status
+FOREIGN KEY (status)
+REFERENCES code(code_id) ON DELETE CASCADE;
+--
+
+-- 상태코드 외래키 지정
+ALTER TABLE bbs
+ADD CONSTRAINT fk_bbs_PD
+FOREIGN KEY (PBBS_ID)
+REFERENCES bbs(BBS_ID) ON DELETE CASCADE;
+--
+
+--시퀸스 생성
+CREATE SEQUENCE bbs_bbs_id_seq;
+--------------------------------------------------------
+
+
+--------------------------------------------------------
+--게시판 좋아요 테이블
+--------------------------------------------------------
+CREATE TABLE bbs_like (
+bbs_id       NUMBER(10)    NOT NULL,
+member_id    NUMBER(10)    NOT NULL,
+create_date  TIMESTAMP     DEFAULT SYSTIMESTAMP NOT NULL,
+CONSTRAINT pk_bbs_like       PRIMARY KEY (bbs_id, member_id)
+);
+
+-- 게시글 아이디 외래키 지정
+ALTER TABLE bbs_like
+ADD CONSTRAINT fk_bbs_like_bbs
+FOREIGN KEY (bbs_id)
+REFERENCES bbs(BBS_ID) ON DELETE CASCADE;
+--
+
+-- 작성자 아이디 외래키 지정
+ALTER TABLE bbs_like
+ADD CONSTRAINT fk_bbs_like_mem
+FOREIGN KEY (member_id)
+REFERENCES member(member_id) ON DELETE CASCADE;
+--------------------------------------------------------
+
+--------------------------------------------------------
+-- 게시판 신고 테이블
+--------------------------------------------------------
+CREATE TABLE bbs_report (
+bbs_id      NUMBER(10)    NOT NULL,
+member_id   NUMBER(10)    NOT NULL,
+reason      VARCHAR2(300) NULL,
+report_date TIMESTAMP     DEFAULT SYSTIMESTAMP NOT NULL,
+CONSTRAINT pk_bbs_report       PRIMARY KEY (bbs_id, member_id)
+);
+
+-- 게시글 아이디 외래키 지정
+ALTER TABLE bbs_report
+ADD CONSTRAINT fk_bbs_report_bbs
+FOREIGN KEY (bbs_id)
+REFERENCES bbs(BBS_ID) ON DELETE CASCADE;
+--
+
+-- 작성자 아이디 외래키 지정
+ALTER TABLE bbs_report
+ADD CONSTRAINT fk_bbs_report_mem
+FOREIGN KEY (member_id)
+REFERENCES member(member_id) ON DELETE CASCADE;
+--------------------------------------------------------
+
+--------------------------------------------------------
+-- 댓글 테이블 생성
+--------------------------------------------------------
+CREATE TABLE rbbs (
+  rbbs_id      NUMBER(10)     PRIMARY KEY,            -- 댓글 PK
+  bbs_id       NUMBER(10)     NOT NULL,               -- 원글 ID
+  member_id    NUMBER(10)     NOT NULL,               -- 작성자 회원 ID
+  status       VARCHAR2(11),                            -- 댓글 상태 코드
+  prbbs_id     NUMBER(10),
+  bcontent     CLOB           NOT NULL,               -- 댓글 내용
+  bgroup       NUMBER(10),                              -- 부모 댓글 ID (self reference)
+  step         NUMBER(3)      NOT NULL,               -- 출력 순서
+  bindent      NUMBER(3)      NOT NULL,               -- 들여쓰기 깊이
+  create_date  TIMESTAMP      DEFAULT SYSTIMESTAMP,   -- 생성 일시
+  update_date  TIMESTAMP      DEFAULT SYSTIMESTAMP    -- 수정 일시
+);
+
+-- 외래키: 원글 참조
+ALTER TABLE rbbs
+  ADD CONSTRAINT fk_rbbs_bbs
+    FOREIGN KEY (bbs_id)
+    REFERENCES bbs(bbs_id) ON DELETE CASCADE;
+
+-- 외래키: 작성자(회원) 참조
+ALTER TABLE rbbs
+  ADD CONSTRAINT fk_rbbs_member
+    FOREIGN KEY (member_id)
+    REFERENCES member(member_id) ON DELETE CASCADE;
+
+-- 외래키: 부모 댓글(self reference)
+ALTER TABLE rbbs
+  ADD CONSTRAINT fk_rbbs_parent
+    FOREIGN KEY (bgroup)
+    REFERENCES rbbs(rbbs_id) ON DELETE CASCADE;
+
+-- 외래키: 상태코드 참조
+ALTER TABLE rbbs
+  ADD CONSTRAINT fk_rbbs_status
+    FOREIGN KEY (status)
+    REFERENCES code(code_id) ON DELETE CASCADE;
+
+-- 시퀀스 생성
+CREATE SEQUENCE rbbs_rbbs_id_seq;
+--------------------------------------------------------
+
+--------------------------------------------------------
+--댓글 좋아요 테이블
+--------------------------------------------------------
+CREATE TABLE rbbs_like (
+rbbs_id      NUMBER(10)    NOT NULL,
+member_id    NUMBER(10)    NOT NULL,
+create_date  TIMESTAMP     DEFAULT SYSTIMESTAMP NOT NULL,
+CONSTRAINT rpk_bbs_like       PRIMARY KEY (rbbs_id, member_id)
+);
+
+-- 게시글 아이디 외래키 지정
+ALTER TABLE rbbs_like
+ADD CONSTRAINT fk_rbbs_like_bbs
+FOREIGN KEY (rbbs_id)
+REFERENCES rbbs(RBBS_ID) ON DELETE CASCADE;
+--
+
+-- 작성자 아이디 외래키 지정
+ALTER TABLE rbbs_like
+ADD CONSTRAINT fk_rbbs_like_mem
+FOREIGN KEY (member_id)
+REFERENCES member(member_id) ON DELETE CASCADE;
+--------------------------------------------------------
+
+--------------------------------------------------------
+-- 댓글 신고 테이블
+--------------------------------------------------------
+CREATE TABLE rbbs_report (
+rbbs_id     NUMBER(10)    NOT NULL,
+member_id   NUMBER(10)    NOT NULL,
+reason      VARCHAR2(300) NULL,
+report_date TIMESTAMP     DEFAULT SYSTIMESTAMP NOT NULL,
+CONSTRAINT pk_rbbs_report       PRIMARY KEY (rbbs_id, member_id)
+);
+
+-- 게시글 아이디 외래키 지정
+ALTER TABLE rbbs_report
+ADD CONSTRAINT fk_rbbs_report_bbs
+FOREIGN KEY (rbbs_id)
+REFERENCES rbbs(RBBS_ID) ON DELETE CASCADE;
+--
+
+-- 작성자 아이디 외래키 지정
+ALTER TABLE rbbs_report
+ADD CONSTRAINT fk_rbbs_report_mem
+FOREIGN KEY (member_id)
+REFERENCES member(member_id) ON DELETE CASCADE;
+--------------------------------------------------------
+
+--------------------------------------------------------
+-- 게시글 사진 테이블 생성
+--------------------------------------------------------
+CREATE TABLE bbs_upload (
+  upload_id    NUMBER(10)       PRIMARY KEY,
+  bbs_id      NUMBER(10),
+  upload_group NUMBER(10),
+  file_type VARCHAR2(20) DEFAULT 'INLINE',
+  sort_order  NUMBER(5)        NOT NULL,      -- 본문 내 삽입 순서
+  file_path   VARCHAR2(2000)   NOT NULL,
+  original_name VARCHAR2(255),
+  saved_name    VARCHAR2(255),
+  uploaded_at TIMESTAMP        DEFAULT SYSTIMESTAMP
+);
+
+ALTER TABLE bbs_upload
+  ADD CONSTRAINT fk_bbs_upload_bbs
+    FOREIGN KEY (bbs_id)
+    REFERENCES bbs(bbs_id)
+    ON DELETE CASCADE;
+
+-- 시퀀스 생성
+CREATE SEQUENCE bbs_upload_upload_id_seq;
+CREATE SEQUENCE bbs_upload_upload_group_seq;
+
+SELECT constraint_name, table_name, column_name
+FROM user_cons_columns
+WHERE constraint_name = 'SYS_C009167';
+
+SELECT constraint_name, constraint_type, status
+FROM user_constraints
+WHERE constraint_name = 'SYS_C009167';
+
+SELECT code_id FROM code;
+
+SELECT * FROM bbs WHERE bbs_id = 60;
+
+==========================================================
+--member
+==========================================================
+-- 기존 테이블 및 시퀀스 삭제 (있으면)
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE member_terms CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE terms CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE member_role CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE role CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE member CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+  EXECUTE IMMEDIATE 'DROP SEQUENCE member_member_id_seq';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+  EXECUTE IMMEDIATE 'DROP SEQUENCE terms_seq';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+-- 역할 테이블
+CREATE TABLE role (
+  role_id    VARCHAR2(11) PRIMARY KEY,
+  role_name  VARCHAR2(50) NOT NULL
+);
+
+-- 회원 테이블 (생년월일 추가됨)
+CREATE TABLE member (
+  member_id       NUMBER(10),
+  email           VARCHAR2(40) NOT NULL,
+  name            VARCHAR2(50) NOT NULL,
+  passwd          VARCHAR2(100) NOT NULL,
+  tel             VARCHAR2(13),
+  nickname        VARCHAR2(30),
+  gender          VARCHAR2(6),
+  address         VARCHAR2(200),
+  birth_date      DATE,  -- ✅ 생년월일
+  pic             BLOB,
+  create_date     TIMESTAMP DEFAULT SYSTIMESTAMP,
+  update_date     TIMESTAMP DEFAULT SYSTIMESTAMP
+);
+
+-- 제약조건 추가
+ALTER TABLE member ADD CONSTRAINT member_member_id_pk PRIMARY KEY (member_id);
+ALTER TABLE member ADD CONSTRAINT member_email_uk UNIQUE(email);
+ALTER TABLE member ADD CONSTRAINT member_gender_ck CHECK (gender IN ('남자','여자'));
+
+-- 우편 번호, 상세주소 컬럼 추가
+ALTER TABLE MEMBER ADD ZONECODE VARCHAR2(10);
+ALTER TABLE MEMBER ADD DETAIL_ADDRESS VARCHAR2(200);
+
+-- 닉네임 중복 불가
+ALTER TABLE member ADD CONSTRAINT member_nickname_uk UNIQUE(nickname);
+
+-- 시퀀스 생성
+CREATE SEQUENCE member_member_id_seq;
+
+-- 역할 매핑
+CREATE TABLE member_role (
+  member_id  NUMBER(10),
+  role_id    VARCHAR2(11),
+  PRIMARY KEY (member_id, role_id),
+  FOREIGN KEY (member_id) REFERENCES member(member_id) ON DELETE CASCADE,
+  FOREIGN KEY (role_id) REFERENCES role(role_id) ON DELETE CASCADE
+);
+
+-- 초기 역할 지정
+INSERT INTO member_role VALUES (1, 'R01'); -- 짱구 : 구매자
+INSERT INTO member_role VALUES (2, 'R02'); -- 형만 : 판매자
+INSERT INTO member_role VALUES (3, 'R01'); -- 봉미선 : 구매자
+INSERT INTO member_role VALUES (4, 'R01'); -- 짱아 : 구매자
+INSERT INTO member_role VALUES (5, 'R02'); -- 맹구 : 판매자
+
+-- 역할 전환/제거 예시
+INSERT INTO member_role VALUES (1, 'R02');
+DELETE FROM member_role WHERE member_id = 1 AND role_id = 'R01';
+
+
+-- 약관 테이블 및 트리거
+CREATE SEQUENCE terms_seq;
+
+CREATE TABLE terms (
+  terms_id     NUMBER(10) PRIMARY KEY,
+  name         VARCHAR2(50) NOT NULL,
+  content      CLOB NOT NULL,
+  is_required  CHAR(1) DEFAULT 'Y' CHECK (is_required IN ('Y','N')),
+  version      VARCHAR2(20) NOT NULL,
+  created_at   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL
+);
+
+CREATE OR REPLACE TRIGGER trg_terms_before_insert
+BEFORE INSERT ON terms
+FOR EACH ROW
+BEGIN
+  IF :NEW.terms_id IS NULL THEN
+    SELECT terms_seq.NEXTVAL INTO :NEW.terms_id FROM dual;
+  END IF;
+END;
+/
+
+-- 회원 약관 동의 테이블
+CREATE TABLE member_terms (
+  member_id  NUMBER(10) NOT NULL,
+  terms_id   NUMBER(10) NOT NULL,
+  agreed_at  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  PRIMARY KEY (member_id, terms_id),
+  FOREIGN KEY (member_id) REFERENCES member(member_id) ON DELETE CASCADE,
+  FOREIGN KEY (terms_id) REFERENCES terms(terms_id) ON DELETE CASCADE
+);
+
+==============================================
+--PRODUCT
+==============================================
+-- 기존 테이블 삭제
+DROP TABLE product CASCADE CONSTRAINT;
+DROP TABLE product_image CASCADE CONSTRAINT;
+DROP TABLE product_course_point CASCADE CONSTRAINT;
+-- 기존 시퀀스 삭제
+DROP SEQUENCE PRODUCT_PRODUCT_ID_SEQ;
+DROP SEQUENCE IMAGE_IMAGE_ID_SEQ;
+DROP SEQUENCE COURSE_COURSE_ID_SEQ;
+
+
+-- 테이블 생성
+CREATE TABLE product(
+        product_id           NUMBER(10),
+        member_id              NUMBER(10),
+        category              varchar2(30)     NOT NULL,
+        title                    varchar2(90)     NOT NULL,
+        guide_yn              char(1)              NOT NULL,
+         normal_price        NUMBER(7)            NOT NULL,
+        guide_price           NUMBER(7)          NOT NULL,
+        sales_price           NUMBER(7)          NOT NULL,
+        sales_guide_price NUMBER(7)          NOT NULL,
+        total_day             NUMBER(2)            NOT NULL,
+        total_time             NUMBER(2)          NOT NULL,
+           req_money              NUMBER(7)           NOT NULL,
+        sleep_info           char(1),
+        transport_info     varchar2(45),
+        food_info              char(1),
+        req_people            varchar2(45)      NOT NULL,
+        target                 varchar2(45)       NOT NULL,
+        stucks                 varchar2(90),
+        description           varchar2(1500)    NOT NULL,
+        detail                 varchar2(3000)  NOT NULL,
+        file_name           varchar2(255)    NOT NULL,
+        file_type           varchar2(50)       NOT NULL,
+        file_size           NUMBER                NOT NULL,
+        file_data           BLOB                   NOT NULL,
+        price_detail         varchar2(450)    NOT NULL,
+        gprice_detail         varchar2(450)    NOT NULL,
+        status                  varchar2(12)     NOT NULL,
+        create_date           date,
+        update_date           date
+);
+
+-- 제약 조건 추가
+ALTER TABLE product ADD PRIMARY KEY(product_id);
+ALTER TABLE product ADD FOREIGN KEY(member_id) REFERENCES member(member_id) ON DELETE CASCADE;
+ALTER TABLE product ADD CHECK (category IN ('area','pet','restaurant','culture_history','season_nature','silver_disables'));
+ALTER TABLE product ADD CHECK (guide_yn IN ('Y', 'N'));
+ALTER TABLE product MODIFY (guide_yn DEFAULT 'N');
+ALTER TABLE product MODIFY (normal_price DEFAULT 0);
+ALTER TABLE product MODIFY (guide_price DEFAULT 0);
+ALTER TABLE product MODIFY (sales_price DEFAULT 0);
+ALTER TABLE product MODIFY (sales_guide_price DEFAULT 0);
+ALTER TABLE product ADD CHECK (total_day >=0);
+ALTER TABLE product MODIFY (total_day DEFAULT 0);
+ALTER TABLE product ADD CHECK (total_time >= 0 AND total_time < 24);
+ALTER TABLE product MODIFY (total_time DEFAULT 0);
+ALTER TABLE product ADD CHECK (req_money >= 0);
+ALTER TABLE product MODIFY (req_money DEFAULT 0);
+ALTER TABLE product ADD CHECK (sleep_info IN ('Y', 'N'));
+ALTER TABLE product MODIFY (sleep_info DEFAULT 'N');
+ALTER TABLE product ADD CHECK (food_info IN ('Y', 'N'));
+ALTER TABLE product MODIFY (food_info DEFAULT 'N');
+ALTER TABLE product ADD CHECK (status IN ('판매중', '판매대기'));
+ALTER TABLE product MODIFY (create_date NOT NULL);
+ALTER TABLE product MODIFY (create_date DEFAULT sysdate);
+ALTER TABLE product MODIFY (update_date DEFAULT sysdate);
+
+-- 시퀀스 생성
+CREATE SEQUENCE PRODUCT_PRODUCT_ID_SEQ;
+
+-- 테이블 생성
+CREATE TABLE product_image(
+        image_id        NUMBER(10),
+        product_id     NUMBER(10),
+        image_data     BLOB                 NOT NULL,
+        image_order     NUMBER(2)           NOT NULL,
+        file_name        varchar2(255),
+        file_size      NUMBER,
+        mime_type        varchar2(50),
+        upload_time    date                   NOT NULL
+);
+
+-- 제약 조건 추가
+ALTER TABLE product_image ADD PRIMARY KEY(image_id);
+ALTER TABLE product_image ADD FOREIGN KEY(product_id) REFERENCES product(product_id) ON DELETE CASCADE;
+ALTER TABLE product_image MODIFY (upload_time DEFAULT sysdate);
+
+
+-- 시퀀스 생성
+CREATE SEQUENCE IMAGE_IMAGE_ID_SEQ;
+
+-- 테이블 생성
+CREATE TABLE product_course_point (
+        course_point_id    NUMBER(10),
+        product_id           NUMBER(10),
+        point_order           NUMBER              NOT NULL,
+        latitude              NUMBER(9,6)        NOT NULL,
+        longitude              NUMBER(9,6)        NOT NULL,
+        description         varchar2(500),
+        created_at           date
+);
+
+-- 제약 조건 추가
+ALTER TABLE product_course_point ADD PRIMARY KEY(course_point_id);
+ALTER TABLE product_course_point ADD FOREIGN KEY(product_id) REFERENCES product(product_id) ON DELETE CASCADE;
+ALTER TABLE product_course_point MODIFY (created_at DEFAULT sysdate);
+
+-- 시퀀스 생성
+CREATE SEQUENCE COURSE_COURSE_ID_SEQ;
+
+COMMIT;
+
+=================================================
+--BUYER_PAGE
+=================================================
+-- 기존 테이블 삭제 (예외 무시)
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE buyer_page CASCADE CONSTRAINTS';
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END;
+/
+
+-- 기존 시퀀스 삭제
+DROP SEQUENCE buyer_page_seq;
+
+-- 테이블 재생성
+CREATE TABLE BUYER_PAGE (
+    PAGE_ID          NUMBER(10)       PRIMARY KEY,                           -- 마이페이지 ID
+    MEMBER_ID        NUMBER(10)       NOT NULL,                              -- 회원 ID (외래키)
+    IMAGE            BLOB,                                                  -- 프로필 이미지
+    INTRO            VARCHAR2(500),                                         -- 자기소개글
+    RECENT_ORDER     VARCHAR2(100),                                         -- 최근 주문 상품명
+    POINT            NUMBER(10),                                            -- 적립 포인트
+    TEL              VARCHAR2(20),                                          -- 연락처
+    ADDRESS          VARCHAR2(200),                                         -- 주소
+    ZONECODE         VARCHAR2(10),                                          -- 우편번호
+    DETAIL_ADDRESS   VARCHAR2(200),                                         -- 상세주소
+    NOTIFICATION     VARCHAR2(1),                                           -- 알림 수신 여부 ('Y' or NULL)
+    NICKNAME         VARCHAR2(30)    NOT NULL ,                                          -- 닉네임
+    CREATE_DATE      TIMESTAMP         DEFAULT systimestamp,                -- 생성일시
+    UPDATE_DATE      TIMESTAMP         DEFAULT systimestamp,                -- 수정일시
+    CONSTRAINT FK_BUYER_PAGE_MEMBER_ID FOREIGN KEY (MEMBER_ID)
+        REFERENCES MEMBER(MEMBER_ID) ON DELETE CASCADE
+);
+
+
+-- 시퀀스 재생성
+CREATE SEQUENCE BUYER_PAGE_SEQ
+  START WITH 1
+  INCREMENT BY 1
+  NOCACHE
+  NOCYCLE;
+
+-- 닉네임 유니크 제약조건 추가
+ALTER TABLE BUYER_PAGE
+  ADD CONSTRAINT UK_BUYERPAGE_NICKNAME UNIQUE (NICKNAME);
+
+COMMIT;
+
+=====================================================
+--SELLER_PAGE
+=====================================================
+-- =======================================
+-- ✅ 1. 기존 테이블 및 시퀀스 삭제
+-- =======================================
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE SELLER_PAGE CASCADE CONSTRAINTS';
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END;
+/
+
+DROP SEQUENCE SELLER_PAGE_SEQ;
+/
+
+-- =======================================
+-- ✅ 2. SELLER_PAGE 테이블 생성
+-- =======================================
+CREATE TABLE SELLER_PAGE (
+  PAGE_ID           NUMBER(10) PRIMARY KEY,                 -- 마이페이지 ID
+  MEMBER_ID         NUMBER(10) NOT NULL,                    -- 회원 ID (외래키)
+  IMAGE             BLOB,                                   -- 프로필 이미지
+  INTRO             VARCHAR2(500),                          -- 자기소개
+  NICKNAME          VARCHAR2(30),                           -- 닉네임 (UNIQUE)
+  SALES_COUNT       NUMBER(10) DEFAULT 0,                   -- 누적 판매 건수
+  TOTAL_SALES       NUMBER(10) DEFAULT 0,                   -- 누적 매출액
+  REVIEW_AVG        NUMBER(3,2) DEFAULT 0,                  -- 평균 평점
+  REVIEW_COUNT      NUMBER(10) DEFAULT 0,                   -- 리뷰 수
+  RECENT_ORDER_CNT  NUMBER(10) DEFAULT 0,                   -- 최근 1주 주문 수
+  RECENT_QNA_CNT    NUMBER(10) DEFAULT 0,                   -- 최근 1주 문의 수
+  FOLLOWER_COUNT    NUMBER(10) DEFAULT 0,                   -- 팔로워 수
+  PRODUCT_COUNT     NUMBER(10) DEFAULT 0,                   -- 등록 상품 수
+  CATEGORY          VARCHAR2(50),                           -- 주력 카테고리
+  BANK_ACCOUNT      VARCHAR2(50),                           -- 정산 계좌
+  SNS_LINK          VARCHAR2(200),                          -- SNS 링크
+  IS_ACTIVE         CHAR(1) DEFAULT 'Y',                    -- 활동 여부
+  CREATE_DATE       TIMESTAMP DEFAULT systimestamp,         -- 생성일시
+  UPDATE_DATE       TIMESTAMP DEFAULT systimestamp          -- 수정일시
+);
+
+
+-- =======================================
+-- ✅ 3. 제약 조건 추가
+-- =======================================
+
+-- 닉네임 중복 방지 (UNIQUE)
+ALTER TABLE SELLER_PAGE ADD CONSTRAINT UK_SELLERPAGE_NICKNAME UNIQUE (NICKNAME);
+
+-- 회원 외래키 참조 (MEMBER 테이블)
+ALTER TABLE SELLER_PAGE ADD CONSTRAINT FK_SELLER_PAGE_MEMBER_ID FOREIGN KEY (MEMBER_ID) REFERENCES MEMBER(MEMBER_ID) ON DELETE CASCADE ;
+
+
+
+-- =======================================
+-- ✅ 4. 시퀀스 생성
+-- =======================================
+CREATE SEQUENCE SELLER_PAGE_SEQ
+  START WITH 1
+  INCREMENT BY 1
+  NOCACHE
+  NOCYCLE;
+
+-- 전화번호, 우편번호, 주소, 상세주소 추가
+ALTER TABLE SELLER_PAGE ADD TEL VARCHAR2(20);             -- 전화번호
+ALTER TABLE SELLER_PAGE ADD ZONECODE VARCHAR2(10);        -- 우편번호
+ALTER TABLE SELLER_PAGE ADD ADDRESS VARCHAR2(200);        -- 기본 주소
+ALTER TABLE SELLER_PAGE ADD DETAIL_ADDRESS VARCHAR2(200); -- 상세 주소
+
+COMMIT;
+
+
+
+
+
+
