@@ -291,28 +291,36 @@ public class MemberController {
     return ResponseEntity.ok(exist);  // true = 중복, false = 사용 가능
   }
 
+  /**
+   *
+   * @param id
+   * @param request
+   * @return
+   */
   @PostMapping("/{id}/delete")
   public String deleteMember(@PathVariable("id") Long id, HttpServletRequest request) {
-    // 현재 로그인한 회원 ID 가져오기
     Long loginMemberId = getLoginMemberId(request);
-
-    // 로그인 정보가 없거나 본인이 아닌 경우
     if (loginMemberId == null || !loginMemberId.equals(id)) {
       return "error/403";
     }
 
-    // 1. 회원 탈퇴 처리
-    memberSVC.deleteById(id);
+    try {
+      // 1. 회원 탈퇴 처리
+      memberSVC.deleteById(id);
 
-    // 2. 마이페이지 정보 삭제
-    buyerPageSVC.deleteByMemberId(id);
+      // 2. 마이페이지 정보 삭제
+      buyerPageSVC.deleteByMemberId(id);
 
-    // 3. 세션 무효화
-    request.getSession().invalidate();
+      // 3. 세션 무효화
+      request.getSession().invalidate();
 
-    // 4. 탈퇴 완료 페이지로 이동
-    return "redirect:/goodbye";
+      return "redirect:/goodbye";
+    } catch (Exception e) {
+      e.printStackTrace();  // 또는 log.error("회원 탈퇴 실패", e);
+      throw e;  // 개발 단계에서는 그대로 다시 던져도 됨
+    }
   }
+
 
 
   /**
