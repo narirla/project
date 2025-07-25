@@ -27,8 +27,8 @@
         <div class="sidebar-card">
           <div class="profile-box">
             <div class="profile-image">
-              <img th:if="${sellerPage != null and sellerPage.image != null}"
-                   th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}" alt="프로필 이미지">
+              <img th:if="${sellerImage != null}"
+                   th:src="${sellerImage}" alt="프로필 이미지">
               <img th:if="${sellerPage == null or sellerPage.image == null}" th:src="@{/img/default-profile.png}"
                    alt="기본 프로필 이미지">
             </div>
