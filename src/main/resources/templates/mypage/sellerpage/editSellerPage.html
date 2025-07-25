@@ -99,7 +99,7 @@
           <h2>회원 정보 수정</h2>
           <hr class="top-line">
 
-          <form th:action="@{/mypage/seller/edit}" th:object="${form}" method="post" enctype="multipart/form-data">
+          <form th:action="@{/mypage/seller/{id}/edit(id=${form.memberId})}" th:object="${form}" method="post" enctype="multipart/form-data">
 
           <!-- ✅ 현재 프로필 이미지 -->
             <input type="hidden" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}">

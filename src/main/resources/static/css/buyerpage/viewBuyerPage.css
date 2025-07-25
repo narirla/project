@@ -202,5 +202,7 @@ ul {
   color: #414141;
   text-decoration: underline;
   cursor: pointer;
+  background: none;
+  border: none;
 }
 

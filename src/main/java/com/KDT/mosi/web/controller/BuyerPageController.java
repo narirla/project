@@ -337,14 +337,20 @@ public class  BuyerPageController {
   }
 
 
-  // ✅ 기본 진입 시 로그인한 회원의 마이페이지로 리다이렉트
   @GetMapping
   public String buyerMypageHome(Model model) {
     Long loginMemberId = getLoginMemberId();
-    model.addAttribute("memberId", loginMemberId);
 
-    memberSVC.findById(loginMemberId).ifPresent(member -> model.addAttribute("member", member));
+    Optional<Member> optionalMember = memberSVC.findById(loginMemberId);
+    if (optionalMember.isEmpty()) {
+      return "error/403"; // 로그인 정보 없음
+    }
+
+    Member member = optionalMember.get();
+    model.addAttribute("memberId", loginMemberId);
+    model.addAttribute("member", member);
 
     return "mypage/buyerpage/buyerMypageHome";
   }
+
 }
