@@ -332,7 +332,7 @@ public class  BuyerPageController {
     // ───────────────────────────
     redirectAttributes.addFlashAttribute("msg", "마이페이지 정보가 성공적으로 수정되었습니다.");
 
-    return "redirect:/mypage/buyer/" + memberId;
+    return "redirect:/mypage/buyer/" + memberId + "/edit";
 
   }
 
