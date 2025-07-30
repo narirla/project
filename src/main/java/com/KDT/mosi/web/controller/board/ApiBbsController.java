@@ -48,6 +48,9 @@ public class ApiBbsController {
     Long id = bbsSVC.save(bbs);
     if (saveApi.getUploadGroup() != null) {
       bbsUploadSVC.bindGroupToBbs(id,saveApi.getUploadGroup());
+      log.info("saveApi.getUploadGroup = {}", saveApi.getUploadGroup());
+    }else{
+      log.info("NOONONONONOsaveApi.getUploadGroup = {}", saveApi.getUploadGroup());
     }
     Optional<Bbs> optionalBbs = bbsSVC.findById(id);
     Bbs findedBbs = optionalBbs.orElseThrow();
@@ -169,6 +172,12 @@ public class ApiBbsController {
     bbs.setBbsId(id);
     int updatedRow = bbsSVC.updateById(id, bbs);
 
+    if (updateApi.getUploadGroup() != null) {
+      bbsUploadSVC.bindGroupToBbs(id,updateApi.getUploadGroup());
+      log.info("updateApi.getUploadGroup = {}",updateApi.getUploadGroup());
+    }else{
+      log.info("NOONONONONOupdateApi.getUploadGroup = {}", updateApi.getUploadGroup());
+    }
 
     //5) 수정된게시글 조회
     optionalBbs = bbsSVC.findById(id);
