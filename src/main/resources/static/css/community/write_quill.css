@@ -240,7 +240,7 @@
 .file-upload-section .upload-label {
     font-weight: 600;
 }
-
+/*
 .file-upload-buttons {
     display: flex;
     gap: 10px;
@@ -255,7 +255,41 @@
     cursor: pointer;
     font-size: 14px;
 }
+*/
+.file-upload-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
 
+.upload-label {
+  align-self: flex-start;
+
+}
+
+.file-upload-buttons {
+  display: flex;
+  align-items: flex-start; /* 버튼 상단 기준으로 UL 정렬 */
+  gap: 8px;                /* 버튼과 리스트 사이 여백 */
+}
+
+.file-upload-buttons .file-list {
+  display: flex;
+  flex-direction: column;  /* LI들을 세로로 배치 */
+  margin: 0;               /* 기본 마진 제거 */
+  padding: 0;              /* 기본 들여쓰기 제거 */
+  list-style: none;        /* 불릿 제거 */
+}
+
+.file-upload-buttons .file-list .attachment-item {
+  display: flex;           /* 파일명 + X 버튼을 한 줄에 정렬 */
+  align-items: center;
+  margin-bottom: 4px;      /* 항목 간 간격 */
+}
+
+.file-upload-buttons .file-list .attachment-item:hover {
+    color: #1EC4CC;
+}
 
 
 /* Button Group */

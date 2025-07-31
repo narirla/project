@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const frm      = document.getElementById('edit-form');
     const li_list = document.getElementById('file-list');
 
+
     // ---------------- Quill 에디터 초기화 ------------------------------------
     const quill = new Quill('#editor', {
       theme: 'snow',
@@ -28,7 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ---------------- 파일/첨부 관련 요소 ------------------------------------
-    const attachmentsListDownload = document.querySelector('.attachment_list');
+    const attachmentsListDownload = document.querySelector('.contentAttachment');
+    const attachmentsList = document.querySelector('.attachment_list');
     const fileInput        = document.getElementById('file-input');
     const fileNameDisplay  = document.getElementById('file-name-display');
     const uploadGroupInput = document.getElementById('upload-group');   // <input type="hidden" id="upload-group" name="uploadGroup">
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     quill.enable(false);
     const uploadIds = [];
     const deletedAttachments = [];          // 첨부파일 삭제버튼을 누른 id의 배열
+
 
     // 바이트 → KB/MB 로 바꿔주는 유틸
     function formatBytes(bytes) {
@@ -59,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             attachmentsListDownload.classList.remove('hidden');
-            attachmentsListDownload.innerHTML = '';
+            attachmentsList.innerHTML = '';
             res.body.forEach(meta => addAttachmentItemDownloadList(meta));
         }catch (err) {
              console.error('첨부파일 로드 실패', err);
@@ -87,10 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         span.className = 'attachment-size';
         span.textContent = `  |  {${formatBytes(meta.size)}}`;
         li.appendChild(span);
-
-
-
-        attachmentsListDownload.appendChild(li);
+        attachmentsList.appendChild(li);
     }
 
     // 카테고리 매핑 로드 (페이지 최초 1회만 호출)
@@ -870,6 +870,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const res = await ajax.get(`/api/bbs/upload/${bbsId}/attachments`);
         if (res.header.rtcd !== 'S00' || !Array.isArray(res.body) || res.body.length === 0) return null;
+
         res.body.forEach(meta => addAttachmentItem(meta)); // UI 추가
         console.log('loadAttachmentsByBbsId 실행 성공');
 
