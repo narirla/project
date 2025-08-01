@@ -2,6 +2,7 @@ package com.KDT.mosi.domain.member.dao;
 
 import com.KDT.mosi.domain.entity.Member;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberDAO {
@@ -121,5 +122,5 @@ public interface MemberDAO {
 
   String findPasswdById(Long memberId);
 
-  String findRoleByMemberId(Long memberId);  // ✅ 역할 조회 메서드 추가
+  List<String> findRolesByMemberId(Long memberId);
 }

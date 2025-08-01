@@ -27,8 +27,15 @@
       <input type="hidden" name="redirect" th:value="${redirect}">
 
       <!-- ✅ 이메일 (username) 입력 -->
-      <input type="email" name="username" placeholder="이메일" th:value="${param.username}" required class="input-item"
-        autocomplete="email">
+      <div class="input-item">
+        <input type="email" id="email" name="username" placeholder="이메일" th:value="${param.username}" required class="input-item"
+               autocomplete="email">
+
+        <!-- ✅ 이메일 지우기 버튼 추가 -->
+        <button type="button" class="btn-clear email-clear" aria-label="입력 삭제">
+          <i class="fa-solid fa-circle-xmark"></i>
+        </button>
+      </div>
 
       <!-- ✅ 비밀번호 입력 + 보기/삭제 버튼 -->
       <div class="input-item">
@@ -39,7 +46,7 @@
           <i class="fa-solid fa-eye"></i>
         </button>
 
-        <button type="button" class="btn-clear" aria-label="입력 삭제">
+        <button type="button" class="btn-clear pw-clear" aria-label="입력 삭제">
           <i class="fa-solid fa-circle-xmark"></i>
         </button>
       </div>

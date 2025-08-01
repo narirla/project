@@ -76,6 +76,17 @@ public class MemberRoleDAOImpl implements MemberRoleDAO {
     return template.update(sql, param);
   }
 
+  @Override
+  public int deleteRole(Long memberId, String roleId) {
+    String sql = "DELETE FROM member_role WHERE member_id = :memberId AND role_id = :roleId";
+
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("memberId", memberId)
+        .addValue("roleId", roleId);
+
+    return template.update(sql, param);
+  }
+
 
 
 
