@@ -14,7 +14,11 @@
 
 <body>
   <div class="layout-wrapper">
-    <header th:replace="~{fragments/header :: header}"></header>
+    <header th:replace="${loginRole} == 'SELLER' ?
+        ~{fragments/sellerHeader :: sellerHeader} :
+        ~{fragments/header :: header}">
+    </header>
+
     <div class="page-container">
       <div class="main-banner" style="height: 500px;">
         <img th:src="@{/img/gwanganbridge.png}" alt="광안대교 메인 배너"
@@ -132,7 +136,6 @@
                 <span class="price">5,000원</span>
                 <span class="sale">4,500원</span>
                 <span class="tag">MO:SI 인기</span>
-
               </div>
             </div>
           </div>
@@ -149,7 +152,7 @@
 
           <!-- 가이드 카드 반복 구조 -->
           <div class="guide-card guide-bg">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="류제홍">
+            <img th:src="@{/img/guide1.png}" alt="류제홍">
             <div class="guide-info">
               <div class="desc">가이드의 페이커</div>
               <div class="name">류제홍</div>
@@ -161,7 +164,7 @@
           </div>
 
           <div class="guide-card guide-bg">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="소련여자">
+            <img th:src="@{/img/guide2.png}" alt="소련여자">
             <div class="guide-info">
               <div class="desc">홍차 마시러 갈 사람?</div>
               <div class="name">소련여자</div>
@@ -173,7 +176,7 @@
           </div>
 
           <div class="guide-card guide-bg">
-            <img src="https://randomuser.me/api/portraits/men/33.jpg" alt="최준">
+            <img th:src="@{/img/guide3.png}" alt="최준">
             <div class="guide-info">
               <div class="desc">이 사람에 대한 정보가 없어요</div>
               <div class="name">최준</div>
@@ -185,7 +188,7 @@
           </div>
 
           <div class="guide-card guide-bg">
-            <img src="https://randomuser.me/api/portraits/men/34.jpg" alt="김영남">
+            <img th:src="@{/img/guide4.png}" alt="김영남">
             <div class="guide-info">
               <div class="desc">이 사람에 대한 정보가 없어요</div>
               <div class="name">김영남</div>
@@ -197,7 +200,7 @@
           </div>
 
           <div class="guide-card guide-bg">
-            <img src="https://randomuser.me/api/portraits/men/35.jpg" alt="빠니보틀">
+            <img th:src="@{/img/guide5.png}" alt="빠니보틀">
             <div class="guide-info">
               <div class="desc">이 사람에 대한 정보가 없어요</div>
               <div class="name">빠니보틀</div>
@@ -209,7 +212,7 @@
           </div>
 
           <div class="guide-card guide-bg">
-            <img src="https://randomuser.me/api/portraits/men/36.jpg" alt="잇섭">
+            <img th:src="@{/img/guide6.png}" alt="잇섭">
             <div class="guide-info">
               <div class="desc">새 기계 언박싱마스터</div>
               <div class="name">잇섭</div>
@@ -221,7 +224,7 @@
           </div>
 
           <div class="guide-card guide-bg">
-            <img src="https://randomuser.me/api/portraits/men/37.jpg" alt="곽튜브">
+            <img th:src="@{/img/guide7.png}" alt="곽튜브">
             <div class="guide-info">
               <div class="desc">이 사람에 대한 정보가 없어요</div>
               <div class="name">곽튜브</div>
@@ -233,7 +236,7 @@
           </div>
 
           <div class="guide-card guide-bg">
-            <img src="https://randomuser.me/api/portraits/men/38.jpg" alt="김원훈">
+            <img th:src="@{/img/guide8.png}" alt="김원훈">
             <div class="guide-info">
               <div class="desc">할래 말래? 갈래 말래?</div>
               <div class="name">김원훈</div>
@@ -252,7 +255,7 @@
         <!-- 커뮤니티 섹션 타이틀 -->
         <div class="community-header">
           <span class="title">MO:SI 커뮤니티에 놀러오세요</span>
-          <a href="#" class="guide-more">전체보기 ></a>
+          <a th:href="@{/bbs}" class="community-more">전체보기 ></a>
         </div>
 
         <!-- 게시글 + 카테고리 좌우 배치 -->

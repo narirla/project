@@ -120,4 +120,6 @@ public interface MemberDAO {
   int updatePasswd(Long memberId, String passwd);
 
   String findPasswdById(Long memberId);
+
+  String findRoleByMemberId(Long memberId);  // ✅ 역할 조회 메서드 추가
 }

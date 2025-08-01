@@ -65,6 +65,11 @@ public class RoleChangeController {
     HttpSession session = request.getSession(true);
     session.setAttribute("loginMember", loginMember);
     session.setAttribute("loginMemberId", memberId);  // ✅ ID도 세션에 저장
+
+    session.setAttribute("loginRole", "SELLER");
+    log.info("✅ 세션에 저장된 loginRole: {}", session.getAttribute("loginRole"));
+
+
     log.info("🔁 역할 전환 후 세션에 loginMember 저장됨: {}", loginMember.getEmail());
 
     // 판매자 페이지 없으면 생성 페이지로 이동
@@ -109,6 +114,11 @@ public class RoleChangeController {
     HttpSession session = request.getSession(true);
     session.setAttribute("loginMember", loginMember);
     session.setAttribute("loginMemberId", memberId);  // ✅ ID도 세션에 저장
+
+    session.setAttribute("loginRole", "BUYER");
+    log.info("✅ 세션에 저장된 loginRole: {}", session.getAttribute("loginRole"));
+
+
     log.info("🔁 역할 전환 후 세션에 loginMember 저장됨: {}", loginMember.getEmail());
 
     // 구매자 마이페이지로 이동

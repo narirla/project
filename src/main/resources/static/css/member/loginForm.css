@@ -22,14 +22,20 @@ body {
 
 /* ✅ 로고 스타일 */
 .logo {
-  font-size: 28px;
-  font-weight: bold;
+  font-size: 40px;
+  font-weight: 800;
   letter-spacing: 2px;
   color: #222;
   margin-bottom: 48px;
   cursor: default;
   user-select: none; /* 선택 방지 */
 }
+
+.logo-link {
+  text-decoration: none;   /* 밑줄 제거 */
+  color: inherit;          /* h1 .logo 색상 그대로 사용 */
+}
+
 
 /* ✅ 로그인 폼 */
 .login-form {

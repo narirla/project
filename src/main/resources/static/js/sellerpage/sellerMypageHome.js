@@ -32,9 +32,9 @@ if (moreLink) {
 }
 
 // ✅ "전체보기" 버튼 공통 처리
-document.querySelectorAll('.view-all').forEach(btn => {
-  btn.addEventListener('click', function (e) {
-    e.preventDefault();
-    alert('전체보기 기능은 추후 구현 예정입니다.');
-  });
-});
+//document.querySelectorAll('.view-all').forEach(btn => {
+//  btn.addEventListener('click', function (e) {
+//    e.preventDefault();
+//    alert('전체보기 기능은 추후 구현 예정입니다.');
+//  });
+//});

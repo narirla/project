@@ -26,12 +26,12 @@
 
     <!-- 로고, 검색창, 사용자 메뉴 -->
     <div class="header-main">
-      <a th:href="@{/}" class="logo">
+      <a th:href="@{/?role=BUYER}" class="logo">
         <img th:src="@{/img/msi.png}" alt="MO:SI 아이콘" style="width:64px; height:64px; margin-left:23px;">
         <span>MO:SI</span>
       </a>
       <div class="search-box">
-        <input type="text" id="search-input" placeholder="검색어를 입력하세요." aria-label="검색어 입력창">
+        <input type="text" id="search-input-buyer" placeholder="검색어를 입력하세요." aria-label="검색어 입력창">
         <button type="submit" aria-label="검색"><i class="fa fa-search" aria-hidden="true"></i></button>
       </div>
       <div class="user-menu">
