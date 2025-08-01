@@ -33,11 +33,16 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     // ✅ 세션에 로그인 정보 저장
     HttpSession session = request.getSession(true);
     session.setAttribute("loginMember", member);
-    session.setAttribute("loginMemberId", member.getMemberId());  // 🔧 추가
+    session.setAttribute("loginMemberId", member.getMemberId());
 
-    log.info("✅ 로그인 성공: 세션에 loginMember 저장 - {}", member.getEmail());
+    // ✅ 🔥 여기서 ROLE 조회
+    String role = memberSVC.findRoleByMemberId(member.getMemberId());
+    session.setAttribute("loginRole", role);   // BUYER or SELLER
+
+    log.info("✅ 로그인 성공: 세션에 loginMember & loginRole 저장 - {}", member.getEmail());
 
     response.sendRedirect("/");
   }
+
 
 }

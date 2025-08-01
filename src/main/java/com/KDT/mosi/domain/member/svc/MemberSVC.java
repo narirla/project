@@ -152,4 +152,6 @@ public interface MemberSVC {
 
 
   String findPasswdById(Long memberId);
+
+  String findRoleByMemberId(Long memberId);
 }

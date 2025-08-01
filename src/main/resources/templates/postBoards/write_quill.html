@@ -22,7 +22,14 @@
 <body th:attr="data-parent-id=${bbsId}">
 <div class="layout-wrapper">
     <!-- header / footer 는 이미 fragment 로 존재하므로 th:replace 로만 연결 -->
-    <header th:replace="~{fragments/header :: header}"></header>
+    <header th:replace="${loginRole} == 'SELLER' ?
+        ~{fragments/sellerHeader :: sellerHeader} :
+        ~{fragments/header :: header}">
+    </header>
+
+
+
+
 
     <!-- ========================= MAIN LAYOUT ========================= -->
 

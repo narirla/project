@@ -279,5 +279,19 @@ public class MemberDAOImpl implements MemberDAO {
     return template.queryForObject(sql, param, String.class);
   }
 
+  @Override
+  public String findRoleByMemberId(Long memberId) {
+    String sql = """
+            SELECT r.role_name
+            FROM member_role mr
+            JOIN role r ON mr.role_id = r.role_id
+            WHERE mr.member_id = :memberId
+        """;
+
+    Map<String, Object> params = Map.of("memberId", memberId);
+
+    return template.queryForObject(sql, params, String.class);
+  }
+
 
 }

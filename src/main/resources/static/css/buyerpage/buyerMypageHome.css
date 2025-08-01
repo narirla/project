@@ -2,38 +2,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Pretendard', sans-serif;
-    color: #333;
-    background-color: #FFFFFF;
-    padding-top: 167px;
+  font-family: 'Pretendard', sans-serif;
+  color: #333;
+  background-color: #FFFFFF;
+  padding-top: 167px;
 }
 
 a {
-    text-decoration: none;
-    color: inherit;
+  text-decoration: none;
+  color: inherit;
 }
 
 ul {
-    list-style: none;
+  list-style: none;
 }
 
 .page-container {
-    width: 1200px;
-    margin: 0 auto 40px auto;
-    background-color: #fff;
+  width: 1200px;
+  margin: 0 auto 40px auto;
+  background-color: #fff;
 }
 
 .mypage-container {
-    display: flex;
-    gap: 30px;
-    padding: 40px 20px;
-    background-color: #fff;
+  display: flex;
+  gap: 30px;
+  padding: 40px 20px;
+  background-color: #fff;
 }
 
 .profile-image {
@@ -42,35 +42,47 @@ ul {
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid #ddd;
-  margin-bottom: 10px; /* auto 제거 */
+  margin-bottom: 10px;
+  /* auto 제거 */
 }
 
 .mypage-nav .nav-title {
-    width: 180px !important;
-    height: 50px !important;
-    background:#1EC4CC;
-    color:#fff;
-    font-weight:bold;
-    padding-top: 15px !important;
-    padding-bottom: 15px !important;
-    text-align:center !important;
-    font-size:16px;
+  width: 180px !important;
+  height: 50px !important;
+  background: #1EC4CC;
+  color: #fff;
+  font-weight: bold;
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  text-align: center !important;
+  font-size: 16px;
 }
 
 .btn-role-switch {
-    margin-top: 0;
-    margin-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 10px;
 }
+
+.view-all {
+  margin-right: 10px;
+}
+
 /* Content */
 .content {
-    flex-grow: 1;
-    width: calc(100% - 230px);
+  flex-grow: 1;
+  width: calc(100% - 230px);
 }
 
 .content-header h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+.section-header {
+  margin-top: 70px;
+  margin-bottom: 16px;
 }
 
 /* ============================= */
@@ -78,196 +90,248 @@ ul {
 /* ============================= */
 
 /* 메인 섹션 제목(H2) 스타일 */
-body > div > div > main > section > h2{
+body>div>div>main>section>h2 {
   font-size: 24px;
-  font-weight: 700;      /* Bold */
+  font-weight: 700;
+  /* Bold */
   color: #414141;
   padding-left: 2px;
   padding-bottom: 15px;
 }
 
-/* 전체 카드 */
-.info-summary-card{
-  width:948px;
-  height:196px;
-  border:1px solid #E0E0E0;
-  border-radius:8px;
-  background:#FFFFFF;
-  padding:0;
-  box-sizing:border-box;
-  margin-bottom: 40px;
+/* ✅ 상단 & 하단 공통 */
+.info-summary-card {
+  position: relative;
+  width: 942px;
+  height: 196px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 30px;
+  font-family: 'Pretendard', sans-serif;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ────────── 상단 2칸(마일리지·포인트) ────────── */
-.info-grid{
-  display:flex;
-  width:100%;
-  height:124px;
+/* ✅ 상단(info-grid) */
+.info-grid {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 123px;  /* ✅ 높이 고정 */
 }
 
-/* 각 칸 : 제목=좌상단, 값=우하단 */
-.info-item.info-main{
-  flex:1;
-  position:relative;      /* 제목·값 절대배치 기준 */
-  padding:24px 32px;      /* 좌우 32, 상하 24 */
-}
-
-/* ① 제목(마일리지·포인트) */
-.info-item.info-main .title{
-  position:absolute;
-  top:0;
-  left:0;
-  font-size:20px;
-  font-weight:700;
-  color:rgba(65,65,65,0.6);   /* #414141 60% */
-  padding-top: 18px;
-  padding-left: 30px;
-}
-
-/* ② 값(숫자) */
-.info-item.info-main .value{
-  position:absolute;
-  right:0;
-  bottom:0;
-  font-size:36px;
-  font-weight:700;
-  color:#414141;
-  border-bottom:1px solid #DEDEDE; /* 값 하단 언더라인 */
-  padding-bottom: 18px;
-  padding-right: 35px;
-}
-
-/* ③ 두 칸 사이 세로 구분선 */
-.info-grid .info-item.info-main:not(:first-child)::before{
-  content:'';
-  position:absolute;
-  left:0;
-  top:15%;
-  width:1px;
-  height:70%;
-  background:#DEDEDE;
+.info-grid .info-item {
+  flex: 1;
+  position: relative;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;   /* ✅ 세로 방향 정렬 */
+  justify-content: space-between; /* ✅ 위-아래 간격 배치 */
+  height: 123px; /* ✅ 상단 박스 높이 고정 */
 }
 
 
-/* ────────── 하단 3칸(작성 가능 리뷰 등) ────────── */
-.info-grid-bottom{
-  display:flex;
-  width:100%;
-  height:71px;
-  border-top:1px solid #E0E0E0;
+/* ① 상단 제목 */
+.info-grid .info-item .title {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(65, 65, 65, 0.6); /* #414141 60% */
+  text-align: left;
 }
 
-.info-grid-bottom .info-item{
-  flex:1;
-  position:relative;
-  padding:16px 24px;
-  text-align:center;
+/* ② 상단 값 */
+.info-grid .info-item .value {
+  font-size: 36px;
+  font-weight: bold;
+  color: #414141;
+  text-align: right;
+  position: relative;    /* ✅ after 위치 기준 */
+  padding-bottom: 4px;   /* ✅ 글자와 밑줄 간격 */
 }
 
-/* 하단 타이틀 */
-.info-grid-bottom .title{
-  font-size:20px;
-  font-weight:500;          /* Medium */
-  color:rgba(65,65,65,0.6);
+.info-grid .value::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;              /* ✅ 오른쪽 정렬 */
+  width: 50%;            /* ✅ 밑줄 길이 (숫자 아래 짧게) */
+  height: 1px;
+  background-color: #e5e5e5;
 }
 
-/* 하단 값 */
-.info-grid-bottom .value{
-  font-size:24px;
-  font-weight:700;          /* Bold */
-  color:rgba(65,65,65,0.6);
-  margin-left:4px;
+/* ③ 상단 세로선 */
+.info-grid .info-item:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 105px;
+  background-color: #e5e5e5;
 }
 
-/* 하단 3칸 사이 구분선 */
-.info-grid-bottom .info-item:not(:first-child)::before{
-  content:'';
-  position:absolute;
-  left:0;
-  top:50%;
-  transform:translateY(-50%);
-  width:1px;
-  height:40px;
-  background:#DEDEDE;
+
+/* ✅ 하단(info-grid-bottom) */
+.info-grid-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background-color: #fff;
+  position: relative; /* ✅ 선 위치 고정을 위해 필요 */
+  height: 70px;
+}
+
+/* ✅ 상하 구분선 (길이 910px) */
+.info-summary-card::after {
+  content: '';
+  position: absolute;
+  top: 123px;        /* ✅ 상단 박스 높이에 맞춰 위치 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 910px;      /* ✅ 선 길이 */
+  height: 0.5px;
+  background-color: #e5e5e5;
+}
+
+/* ① 하단 아이템 */
+.info-grid-bottom .info-item {
+  display: flex;
+  justify-content: space-between;  /* ✅ title은 왼쪽, value는 오른쪽 */
+  align-items: center;
+  padding: 0 20px;                /* ✅ 좌우 동일한 여백 */
+  position: relative;
+}
+
+/* ② 하단 제목 */
+.info-grid-bottom .info-item .title {
+  font-size: 20px;
+  color: rgba(65,65,65,0.6);
+  font-weight: 500;
+}
+
+/* ③ 하단 값 */
+.info-grid-bottom .info-item .value {
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(65,65,65,0.6);
+  border-bottom: 1px solid #e5e5e5;  /* ✅ 밑줄 추가 */
+  padding-bottom: 4px;  ;
+}
+
+/* ④ 하단 세로선 */
+.info-grid-bottom .info-item:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  width: 1px;
+  height: 40px;
+  background: #DEDEDE;
 }
 
 /* Recent Orders */
 .recent-orders table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
 }
 
-.recent-orders th, .recent-orders td {
-    padding: 15px 10px;
-    text-align: center;
-    border-bottom: 1px solid #f0f0f0;
+.recent-orders th,
+.recent-orders td {
+  padding: 15px 10px;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .recent-orders thead {
-    background-color: #fafafa;
-    border-top: 1px solid #e0e0e0;
+  position: relative;       /* ::after 위치 기준 */
+  background-color: #FFFFFF;
+  border-top: 2px solid #414141; /* 위쪽 굵은 라인 유지 */
 }
 
+.recent-orders thead::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;              /* 1.5px 대신 2px로 안정적으로 표시 */
+  background-color: #414141;
+}
+
+
 .order-item {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
 }
 
 .order-item-image {
-    width: 50px;
-    height: 50px;
-    background-color: #ececec;
-    border-radius: 4px;
-    background-size: cover;
-    background-position: center;
+  width: 50px;
+  height: 50px;
+  background-color: #ececec;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center;
 }
 
 .price {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 /* Ad Banner */
 .ad-banner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f7f7f7;
-    padding: 15px 20px;
-    border-radius: 4px;
-    margin-bottom: 30px;
-    gap: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7f7f7;
+  padding: 15px 20px;
+  border-radius: 4px;
+  margin-bottom: 30px;
+  gap: 40px;
 }
 
 .ad-arrow {
-    background: none;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    line-height: 22px;
-    text-align: center;
-    cursor: pointer;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
 }
 
 /* ========================= */
 /* ✅ Tour Card (찜한 코스)  */
 /* ========================= */
 
+.card-wrapper {
+  display: flex;
+  justify-content: center;
+  /* ✅ 가로 중앙 정렬 */
+  width: 100%;
+  margin: 0 auto;
+}
+
 .card-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  /* ✅ grid → flex로 변경 */
+  justify-content: center;
+  /* ✅ 가로 중앙 정렬 */
+  align-items: center;
+  /* ✅ 세로 중앙 정렬 (높이 맞출 때) */
   gap: 24px;
-  width: 912px;     /* 요청된 크기 */
+  width: 912px;
+  /* 요청된 크기 */
   height: 400px;
 }
 
 /* 전체 카드 */
 .tour-card {
   width: 290px;
-  height: 398px;
+  height: 410px;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid #e1e4e8;
@@ -280,25 +344,33 @@ body > div > div > main > section > h2{
 .card-image {
   width: 290px;
   height: 290px;
-  background-size: cover;
-  background-position: center;
   position: relative;
 }
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 비율 유지하면서 잘 맞게 채움 */
+  display: block;
+}
+
 
 /* 하트 아이콘 */
 .heart-icon {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 11px;
   font-size: 24px;
   color: #fff;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  /* ✅ 외곽선(Stroke) – 20% 투명 검정 */
+  -webkit-text-stroke: 2px rgba(0, 0, 0, 0.2);
 }
 
 /* 콘텐츠 영역 */
 .card-content {
   width: 290px;
-  height: 96px;
+  height: 124px;
   padding: 12px 16px;
   box-sizing: border-box;
   display: flex;
@@ -308,13 +380,15 @@ body > div > div > main > section > h2{
 
 /* 코스 제목 */
 .card-title {
-  font-size: 16px;
-  font-weight: 500;           /* Medium */
+  font-size: 14px;
+  /* ✅ 기존 16px → 14px 로 축소 */
+  font-weight: 500;
   color: #414141;
-  margin: 0;
-  overflow: hidden;
+  margin: 2px 0;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  /* ✅ 줄바꿈 없이 한 줄 유지 */
+  overflow: visible;
+  text-overflow: unset;
 }
 
 .card-price {
@@ -325,14 +399,16 @@ body > div > div > main > section > h2{
 /* 금액 숫자 */
 .card-price .amount {
   font-size: 24px;
-  font-weight: 600;  /* SemiBold */
+  font-weight: 600;
+  /* SemiBold */
   margin-right: 2px;
 }
 
 /* 원 단위 */
 .card-price .unit {
   font-size: 20px;
-  font-weight: 400;  /* Regular */
+  font-weight: 400;
+  /* Regular */
   vertical-align: baseline;
 }
 
@@ -340,7 +416,8 @@ body > div > div > main > section > h2{
 /* 할인가 */
 .card-discount {
   font-size: 22px;
-  font-weight: 600;           /* SemiBold */
+  font-weight: 600;
+  /* SemiBold */
   color: #0099AD;
   margin: 0;
 }
@@ -353,7 +430,8 @@ body > div > div > main > section > h2{
   line-height: 22px;
   margin-left: 8px;
   font-size: 14px;
-  font-weight: 600;           /* SemiBold */
+  font-weight: 600;
+  /* SemiBold */
   text-align: center;
   color: #FFFFFF;
   border-radius: 4px;
@@ -363,33 +441,214 @@ body > div > div > main > section > h2{
 
 /* Guide List */
 .guide-list {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
 }
 
+/* ✅ 가이드 카드 전체 */
+.guide-card {
+  width: 215px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* ✅ 가이드 이미지 */
 .guide-card .guide-image {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    margin: 0 auto 10px;
-    background-size: cover;
-    background-position: center;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #ddd;
+  /* 필요 시 색상 변경 가능 */
+  margin: 0 auto 10px;
 }
 
+.guide-card .guide-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ✅ 가이드 이름 */
 .guide-card .guide-name {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 6px;
+  width: 92px;
+  height: 31px;
+  line-height: 31px;
+  /* ✅ 세로 중앙 정렬 */
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  /* ✅ SemiBold */
+  color: #333;
+  margin: 0 auto;
 }
 
-/* Recent Courses */
-.recent-courses .card-list {
-    grid-template-columns: repeat(4, 1fr);
+
+/* 최근 본 코스 */
+.recent-course-list {
+  display: flex;
+  gap: 12px;
+  /* 카드 간격 */
+  justify-content: center;
+  /* 카드 중앙 정렬 */
+  overflow-x: hidden;
+  /* 스크롤바 숨김 */
+  scroll-behavior: smooth;
+  /* 부드러운 이동 */
+  width: 863px;
+  height: 290px;
+  padding: 0 5px;
 }
 
-.recent-courses .card-image {
-    height: 140px;
+
+/* ✅ 개별 카드 */
+.recent-course-card {
+  width: 200px;
+  height: 290px;
+  /* 카드 전체 높이 고정 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 이미지 & 텍스트 중앙정렬 */
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+}
+
+/* ✅ 카드 이미지 */
+.recent-course-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.recent-course-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ✅ 카드 콘텐츠 */
+.recent-course-content {
+  width: 200px;
+  text-align: center;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  /* 텍스트 간격 일정하게 */
+  margin: 8px 8px 8px 24px;
+}
+
+/* ✅ 제목 */
+.recent-course-content .recent-course-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  /* Medium */
+  color: #414141;
+  margin: 0;
+}
+
+/* ✅ 가격 */
+.recent-course-content .recent-course-card-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin: 4px 0 0 0;
+  color: #000;
+}
+
+.recent-course-content .recent-course-card-price .amount {
+  font-size: 20px;
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.recent-course-content .recent-course-card-price .unit {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* ✅ 힌트 */
+.recent-course-content .recent-course-card-hint {
+  font-size: 12px;
+  font-weight: 500;
+  color: #1E7889;
+  margin: 2px 0;
+}
+
+/* ✅ 할인가 */
+.recent-course-content .recent-course-card-discount {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0099AD;
+  margin: 2px 0 0 0;
+}
+
+/* ✅ 할인 배지 */
+.recent-discount-badge {
+  display: inline-block;
+  width: 87px;
+  height: 22px;
+  line-height: 22px;
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  color: #FFFFFF;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #56DDF8 0%, #09D0C0 100%);
+  vertical-align: middle;
 }
 
 
+/* ✅ 전체 래퍼 */
+.recent-course-wrapper {
+  position: relative;
+  width: 910px;
+  /* 리스트 너비 + 여백 */
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ✅ 버튼 공통 스타일 */
+.slide-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s;
+}
+
+.slide-btn:hover {
+  background-color: rgba(240, 240, 240, 1);
+}
+
+/* 왼쪽 버튼 */
+.prev-btn {
+  left: -50px;
+  /* 필요 시 조정 */
+}
+
+/* 오른쪽 버튼 */
+.next-btn {
+  right: -50px;
+  /* 필요 시 조정 */
+}
