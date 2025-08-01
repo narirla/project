@@ -25,15 +25,22 @@ body {
 
 .mypage-container {
   display: flex;
-  gap: 24px;
+  gap: 30px;
+  padding: 40px 20px;
 }
 
 /* =============================== */
 /* ✅ 사이드바 영역 */
-.sidebar {
+/*.sidebar {
   width: 180px;
+}*/
+.profile-badge{
+  margin-top: 10px;
 }
 
+.profile-name{
+  margin-top: 5px;
+}
 /* =============================== */
 /* ✅ 콘텐츠 영역 */
 .content {
@@ -204,7 +211,7 @@ hr.top-line, hr.bottom-line {
 #intro {
   width: 100%;
   height: 94px;
-  padding: 10px 10px 24px 10px;
+  padding: 10px 10px 10px 10px;
   border: 2px solid #1EC4CC;
   border-radius: 6px;
   box-sizing: border-box;
@@ -247,8 +254,8 @@ hr.top-line, hr.bottom-line {
 /* ✅ 글자 수를 textarea 내부 오른쪽 하단에 표시 */
 .char-count {
   position: absolute;
-  bottom: 6px;
-  right: 18px;
+  bottom: -14px;
+  right: 15px;
   font-size: 13px;
   color: #999;
   background-color: transparent;

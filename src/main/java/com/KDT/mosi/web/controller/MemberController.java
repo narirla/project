@@ -123,6 +123,9 @@ public class MemberController {
 
     // 역할과 약관 ID 목록
     List<String> roles = form.getRoles() != null ? form.getRoles() : new ArrayList<>();
+    if (roles.isEmpty()) {
+      roles.add("R01");  // ✅ 기본 역할 부여
+    }
     List<Long> terms = form.getAgreedTermsIds() != null ? form.getAgreedTermsIds() : new ArrayList<>();
 
     // 회원가입 처리
@@ -319,6 +322,9 @@ public class MemberController {
     }
 
     try {
+      // ✅ 0. 회원-역할 매핑 삭제
+      memberSVC.deleteMemberRoles(id);   // 👉 memberRoleDAO.deleteByMemberId(id) 호출
+
       // 1. 회원 탈퇴 처리
       memberSVC.deleteById(id);
       log.info("✅ [회원 DB 삭제 완료] memberId = {}", id);
