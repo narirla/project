@@ -153,7 +153,9 @@ public interface MemberSVC {
 
   String findPasswdById(Long memberId);
 
-  String findRoleByMemberId(Long memberId);
+  // ✅ MemberSVC.java
+  List<String> findRolesByMemberId(Long memberId);
+
 
   /**
    * 특정 회원의 모든 역할 매핑 삭제

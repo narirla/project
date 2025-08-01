@@ -1,18 +1,22 @@
 /*member/loginForm.js*/
 document.addEventListener("DOMContentLoaded", () => {
   const pwInput = document.getElementById("password");
+  const emailInput = document.getElementById("email");  // ✅ 이메일 input
   const eyeBtn = document.querySelector(".btn-eye");
-  const clearBtn = document.querySelector(".btn-clear");
+  const pwClearBtn = document.querySelector(".pw-clear"); // ✅ 비밀번호용 X 버튼
+  const emailClearBtn = document.querySelector(".email-clear"); // ✅ 이메일용 X 버튼
   const eyeIcon = eyeBtn.querySelector("i");
-  const capsWarning = document.getElementById("caps-warning"); // ✅ Caps Lock 경고 요소
+  const capsWarning = document.getElementById("caps-warning");
+  const rememberChk = document.getElementById("remember");
 
-  // ✅ 기본 상태 설정
+  // ✅ 초기 상태
   eyeIcon.classList.remove("fa-eye");
   eyeIcon.classList.add("fa-eye-slash");
-  clearBtn.style.display = "none";
+  pwClearBtn.style.display = "none";
+  emailClearBtn.style.display = "none";
   if (capsWarning) capsWarning.style.display = "none";
 
-  // 👁 비밀번호 보기 토글 버튼
+  // 👁 비밀번호 보기 토글
   eyeBtn.addEventListener("click", () => {
     const isHidden = pwInput.type === "password";
     pwInput.type = isHidden ? "text" : "password";
@@ -26,23 +30,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ❌ 입력 삭제 버튼
-  clearBtn.addEventListener("click", () => {
+  // ❌ 비밀번호 X 버튼
+  pwClearBtn.addEventListener("click", () => {
     pwInput.value = "";
     pwInput.focus();
-    clearBtn.style.display = "none";
-    eyeBtn.classList.remove("shift-left"); // 👁 아이콘 위치 원복
+    pwClearBtn.style.display = "none";
+    eyeBtn.classList.remove("shift-left");
     if (capsWarning) capsWarning.style.display = "none";
   });
 
-  // ✅ 입력 시 X 버튼 보이기 + 👁 위치 이동 처리
+  // ✅ 비밀번호 입력 시 X 버튼 표시
   pwInput.addEventListener("input", () => {
     if (pwInput.value) {
-      clearBtn.style.display = "block";
-      eyeBtn.classList.add("shift-left");   // 👁 왼쪽 이동
+      pwClearBtn.style.display = "block";
+      eyeBtn.classList.add("shift-left");
     } else {
-      clearBtn.style.display = "none";
-      eyeBtn.classList.remove("shift-left"); // 👁 오른쪽 복귀
+      pwClearBtn.style.display = "none";
+      eyeBtn.classList.remove("shift-left");
+    }
+  });
+
+  // ✅ 이메일 X 버튼
+  emailClearBtn.addEventListener("click", () => {
+    emailInput.value = "";
+    emailInput.focus();
+    emailClearBtn.style.display = "none";
+  });
+
+  // ✅ 이메일 입력 시 X 버튼 표시
+  emailInput.addEventListener("input", () => {
+    if (emailInput.value) {
+      emailClearBtn.style.display = "block";
+    } else {
+      emailClearBtn.style.display = "none";
     }
   });
 
@@ -54,5 +74,23 @@ document.addEventListener("DOMContentLoaded", () => {
       if (capsWarning) capsWarning.style.display = "none";
     }
   });
+
+  // ✅ 이메일 기억하기(localStorage)
+  const savedEmail = localStorage.getItem("savedEmail");
+  if (savedEmail) {
+    emailInput.value = savedEmail;
+    rememberChk.checked = true;
+    emailClearBtn.style.display = "block"; // 저장된 이메일 있을 때 X 버튼 표시
+  }
+
+  const loginForm = document.querySelector("form");
+  loginForm.addEventListener("submit", () => {
+    if (rememberChk.checked) {
+      localStorage.setItem("savedEmail", emailInput.value);
+    } else {
+      localStorage.removeItem("savedEmail");
+    }
+  });
 });
+
 

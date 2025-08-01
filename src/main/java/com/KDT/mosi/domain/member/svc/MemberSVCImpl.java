@@ -272,10 +272,12 @@ public class MemberSVCImpl implements MemberSVC {
     return memberDAO.findPasswdById(memberId);
   }
 
+  // ✅ MemberSVCImpl.java
   @Override
-  public String findRoleByMemberId(Long memberId) {
-    return memberDAO.findRoleByMemberId(memberId);
+  public List<String> findRolesByMemberId(Long memberId) {
+    return memberDAO.findRolesByMemberId(memberId);
   }
+
 
   @Override
   public int deleteMemberRoles(Long memberId) {

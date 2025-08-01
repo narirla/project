@@ -36,7 +36,6 @@ body {
   color: inherit;          /* h1 .logo 색상 그대로 사용 */
 }
 
-
 /* ✅ 로그인 폼 */
 .login-form {
   width: 300px;
@@ -117,6 +116,21 @@ body {
   cursor: default;
   user-select: none;
 }
+
+/* ✅ 이메일 X 버튼 (email-clear) */
+.email-clear {
+  position: absolute;
+  top: 60%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #444;
+  cursor: pointer;
+  display: none;
+}
+
 
 /* ✅ 로그인 버튼 */
 .login-btn {
