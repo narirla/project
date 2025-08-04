@@ -19,6 +19,15 @@
     height: 1000px;
 }
 
+.mypage-container {
+  flex: 1;
+  display: flex;
+  gap: 30px;
+  padding: 40px 20px;
+  background-color: #fff;
+  min-height: calc(100vh - 150px - 80px); /* ✅ 헤더/푸터 제외 높이 확보 */
+}
+
 .mypage-nav ul li a:hover {
     color: #80CCD6;
 }
