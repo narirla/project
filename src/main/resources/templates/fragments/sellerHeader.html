@@ -1,7 +1,6 @@
 <!-- sellerHeader.html -->
 <header th:fragment="sellerHeader">
   <div class="header-inner">
-
     <!-- 최상단 로그인/회원가입 or 사용자 정보 -->
     <div class="header-top-bar">
       <div class="user-links">
@@ -52,14 +51,60 @@
 
     <!-- 내비게이션 메뉴 -->
     <nav class="header-nav">
-      <ul>
-        <li><a th:href="@{/menu}">전체메뉴</a></li>
-        <li><a th:href="@{/product/list}">테마여행</a></li>
-        <li><a th:href="@{/bbs}">커뮤니티</a></li>
-        <li><a th:href="@{/airhotel}">항공/호텔</a></li>
-        <li><a th:href="@{/information}">관광 정보</a></li>
-      </ul>
-    </nav>
+      <div class="dropdown-wrapper">
+        <ul class="menu">
+          <li class="menu-item dropdown">
+            <a href="#" class="menuButton">전체메뉴</a>
+            <div class="dropdown-menu">
+              <!-- 테마여행 -->
+              <div class="dropdown-section">
+                <h4>테마여행</h4>
+                <ul>
+                  <li><a href="#">지역</a></li>
+                  <li><a href="#">반려동물</a></li>
+                  <li><a href="#">맛집</a></li>
+                  <li><a href="#">문화/역사</a></li>
+                  <li><a href="#">계절/자연</a></li>
+                  <li><a href="#">실버/교통약자</a></li>
+                </ul>
+              </div>
+              <!-- 커뮤니티 -->
+              <div class="dropdown-section">
+                <h4>커뮤니티</h4>
+                <ul>
+                  <li><a th:href="@{/review}">리뷰</a></li>
+                  <li><a th:href="@{/bbs/community}">자유 게시판</a></li>
+                </ul>
+              </div>
+              <!-- 항공 / 호텔 -->
+              <div class="dropdown-section">
+                <h4>항공/호텔</h4>
+                <ul>
+                  <li><a href="#">항공</a></li>
+                  <li><a href="#">호텔</a></li>
+                </ul>
+              </div>
+              <!-- 관광 정보 -->
+              <div class="dropdown-section">
+                <h4>관광 정보</h4>
+                <ul>
+                  <li><a href="#">맛집</a></li>
+                  <li><a href="#">교통약자 편의시설</a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
 
+          <!-- 다른 메뉴 -->
+          <li><a th:href="@{/product/list}">테마여행</a></li>
+          <li><a th:href="@{/bbs}">커뮤니티</a></li>
+          <li><a th:href="@{/airhotel}">항공/호텔</a></li>
+          <li><a th:href="@{/information}">관광 정보</a></li>
+        </ul>
+      </div>
+    </nav>
   </div>
 </header>
+
+
+
