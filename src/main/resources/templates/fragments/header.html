@@ -49,9 +49,10 @@
 
     <!-- 내비게이션 메뉴 -->
     <nav class="header-nav">
-      <div class="dropdown-wrapper">
-        <ul class="menu">
-          <li class="menu-item dropdown">
+      <ul class="menu">
+        <li class="menu-item">
+          <div class="dropdown-wrapper">
+
             <a href="#" class="menuButton">전체메뉴</a>
             <div class="dropdown-menu">
               <!-- 테마여행 -->
@@ -91,15 +92,14 @@
                 </ul>
               </div>
             </div>
-          </li>
-
-          <!-- 다른 메뉴 -->
-          <li><a th:href="@{/product/list}">테마여행</a></li>
-          <li><a th:href="@{/bbs}">커뮤니티</a></li>
-          <li><a th:href="@{/airhotel}">항공/호텔</a></li>
-          <li><a th:href="@{/information}">관광 정보</a></li>
-        </ul>
-      </div>
+          </div>
+        </li>
+        <!-- 다른 메뉴 -->
+        <li><a th:href="@{/product/list}">테마여행</a></li>
+        <li><a th:href="@{/bbs}">커뮤니티</a></li>
+        <li><a th:href="@{/airhotel}">항공/호텔</a></li>
+        <li><a th:href="@{/information}">관광 정보</a></li>
+      </ul>
     </nav>
   </div>
 </header>
