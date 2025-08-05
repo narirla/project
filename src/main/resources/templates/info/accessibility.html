@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MO:SI 판매자 마이페이지 – 커뮤니티</title>
+  <title>관광 정보</title>
 
   <!-- 공통 스타일 -->
   <link rel="stylesheet" th:href="@{/css/layout.css}">
@@ -25,8 +25,6 @@
         ~{fragments/header :: header}">
   </header>
 
-
-
   <!-- ========================= MAIN LAYOUT ========================= -->
   <div class="page-container">
     <main class="mypage-container">
@@ -42,7 +40,6 @@
           </nav>
         </div>
       </aside>
-
 
       <!-- ---------- 본문 영역 ---------- -->
       <section class="content">
@@ -64,19 +61,16 @@
                 <div id="pagination" style="margin-top:1rem;"></div> <!-- 🔸 페이징 버튼 -->
               </section>
             </article>
-
-
           </section>
         </main>
       </section>
     </main>
   </div>
 
-
   <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
-<script th:src="@{/js/layout.js}"></script>
 <!-- ========================= SCRIPTS ========================= -->
+<script th:src="@{/js/layout.js}"></script>
 </body>
 
 </html>
