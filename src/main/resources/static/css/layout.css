@@ -181,6 +181,7 @@ header {
   justify-content: center;
   border-bottom: 1px solid #eee;
   box-sizing: border-box;
+  position: relative;
 }
 
 .header-nav ul {
@@ -314,41 +315,38 @@ footer {
 
 .menu-item {
   position: relative;
+  text-align: center;
 }
 
 .menu-item a {
   text-decoration: none;
   color: #333;
   font-weight: 600;
-  padding: 0px 10px;
+  padding: 10px 10px;
 }
 
 /*===============드롭다운 메뉴 스타일==================*/
 /* ✅ 드롭다운 기준점 wrapper 추가 */
 .dropdown-wrapper {
-  position: relative;       /* ✅ 드롭다운 기준점 */
+  /*position: relative;*/       /* ✅ 드롭다운 기준점 */
   display: inline-block;    /* ✅ 크기 맞춰 기준점 잡기 */
 }
 
 .dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 47px;                /* ✅ 메뉴 아래쪽으로 내림 */
-  left: 34%;                /* ✅ wrapper 중앙을 기준점으로 */
-  transform: translateX(-25%); /* ✅ 정확히 가운데 정렬 */
+  position: fixed;
+  top: 167px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 1013px;
   height: 350px;
   background: #fff;
-  border: 1px solid #fff;
-  padding: 0px 20px;
-  /*box-shadow: 0 4px 10px rgba(0,0,0,0.1);*/
-  flex-direction: row;
+  z-index: 2000;
+  padding: 0 20px 0 167px;
+  display: flex;
   justify-content: center;
   gap: 20px;
-  z-index: 2000;
-  padding-left: 167px;
+  border: 1px solid #D4D4D4;
 }
-
 
 /* ✅ 카테고리 하나 (테마여행 / 커뮤니티 / 관광정보) */
 .dropdown-section {
@@ -367,6 +365,7 @@ footer {
   color: #0099AD;
   border-bottom: 1px solid #ddd;
   padding-bottom: 5px;
+  margin-top: 12px;
   text-align: center;
 }
 
