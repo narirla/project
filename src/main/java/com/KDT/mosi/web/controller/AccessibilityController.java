@@ -14,7 +14,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/info")
+@RequestMapping("/information")
 public class AccessibilityController {
 
   private final MemberRoleDAO memberRoleDAO;
