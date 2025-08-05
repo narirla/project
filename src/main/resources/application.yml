@@ -33,8 +33,45 @@ server:
 logging:
   level:
     root: info
+    com.KDT.mosi.domain.publicdatamanage: DEBUG
+    org.springframework.boot: info # Spring Boot 관련 디버그 로그
+    org.springframework.jdbc: info # JDBC 관련 디버그 로그
+    org.hibernate: info          # JPA/Hibernate 관련 디버그 로그 (JPA 사용 시)
 
 # 게시판 업로드 위치
 upload:
   path: C:\KDT\projects\uploads\bbs
   url-prefix: /static/uploads
+
+# 공공데이터 api
+busan:
+  api:
+    common:
+      numOfRows: 100
+      resultType: json
+      serviceKey: ${API_SERVICE_KEY}
+    facility:
+      url: https://apis.data.go.kr/6260000/BusanFcltsDsgstInfoService/getFcltsDsgstInfo
+    food:
+      url: https://apis.data.go.kr/6260000/FoodService/getFoodKr
+
+#카카오 api
+kakao:
+  api:
+    key: 9eb31105e83dcf3d0dc84b734b609fa8
+    url:
+      geocode: https://dapi.kakao.com/v2/local/search/address.json
+
+  # ElasticSearchConfig에서 @Value로 읽어올 속성들
+elasticsearch:
+  host: localhost
+  port: 9200
+
+# Spring Data Elasticsearch의 자동 인덱스 생성 설정은 유지
+# @Document 어노테이션이 붙은 엔티티를 자동으로 감지하여 인덱스를 생성/업데이트합니다.
+# 이 부분은 ElasticSearchConfig에서 ElasticsearchConfiguration을 상속받으므로 더 이상 필요 없을 수도 있습니다.
+# 하지만 명시적으로 두는 것이 좋습니다.
+data:
+  elasticsearch:
+    indices:
+      auto-create: true

@@ -13,38 +13,40 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
   private final UserDetailsService userDetailsService;
-  private final LoginSuccessHandler loginSuccessHandler; // ✅ 커스텀 로그인 성공 핸들러 주입
+  private final LoginSuccessHandler loginSuccessHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
         .formLogin(form -> form
-            .loginPage("/login")                      // 로그인 폼 경로
-            .loginProcessingUrl("/login")             // 로그인 처리 경로
-            .successHandler(loginSuccessHandler)      // 로그인 성공 핸들러 등록
+            .loginPage("/login")
+            .loginProcessingUrl("/login")
+            .successHandler(loginSuccessHandler)
             .permitAll()
         )
         .logout(logout -> logout
-            .logoutUrl("/login/logout")               // 로그아웃 처리 경로
-            .logoutSuccessUrl("/")                    // 로그아웃 후 이동 경로
+            .logoutUrl("/login/logout")
+            .logoutSuccessUrl("/")
         )
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
                 "/", "/login/**",
                 "/members/join", "/members/join/**",
                 "/members/emailCheck", "/members/nicknameCheck",
-                "/find/**", "/css/**", "/js/**", "/img/**"
+                "/find/**", "/css/**", "/js/**", "/img/**",
+                "/api/image-proxy", // ✅ 이미지 프록시 URL을 허용하도록 추가
+                "/api/food/**" // 혹시 몰라 food API도 추가
             ).permitAll()
-            .requestMatchers("/mypage/seller/**").authenticated()   // ✅ 판매자 마이페이지 허용
+            .requestMatchers("/mypage/seller/**").authenticated()
             .requestMatchers("/mypage/role/**").authenticated()
             .requestMatchers("/members/*/delete").authenticated()
             .anyRequest().authenticated()
         )
         .exceptionHandling(ex -> ex
-            .accessDeniedPage("/error/403")           // 권한 오류 페이지 지정
+            .accessDeniedPage("/error/403")
         )
-        .userDetailsService(userDetailsService);      // 사용자 정보 제공자
+        .userDetailsService(userDetailsService);
 
     return http.build();
   }

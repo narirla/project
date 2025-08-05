@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>투어 정보</title>
+  <link rel="stylesheet" th:href="@{/css/tourinfo/tour-info-style.css}">
+</head>
+<body>
+<div class="tour-info-container">
+  <header>
+    <h1>부산 투어 정보</h1>
+  </header>
+
+  <div class="content-wrapper">
+    <iframe src="http://localhost:5601/app/dashboards#/view/65d8491e-de6d-4c3a-90e7-039f3c4d9489?embed=true&_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3A'2025-08-04T00%3A00%3A00.000Z'%2Cto%3A'2025-08-05T00%3A00%3A00.000Z'))&kiosk" height="600" width="800"></iframe>
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li><a href="#" class="menu-link active" data-type="food" data-endpoint="/api/food">맛집 정보</a></li>
+          <!-- data-type을 'facility'로 수정 -->
+          <li><a href="#" class="menu-link" data-type="facility" data-endpoint="/api/facility">시설 정보</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="search-section">
+        <h2 id="data-title">맛집 정보</h2>
+        <form id="search-form">
+          <select id="search-type">
+            <!-- JS에서 동적으로 옵션이 채워집니다 -->
+          </select>
+          <input type="text" id="search-keyword" placeholder="검색어를 입력하세요">
+          <button type="submit">검색</button>
+        </form>
+      </div>
+
+      <div class="data-section">
+        <!-- 데이터가 카드 형태로 여기에 표시됩니다 -->
+        <div id="data-list">
+          <!-- JS에서 데이터 카드들이 채워집니다 -->
+        </div>
+        <div id="pagination-container" class="pagination-controls">
+          <!-- 페이지네이션 버튼이 여기에 표시됩니다 -->
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script th:src="@{/js/tourinfo/tour-info-manager.js}"></script>
+</body>
+</html>
