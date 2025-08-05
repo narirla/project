@@ -26,7 +26,6 @@ public class CsrBbsController {
   final private BbsLikeSVC bbsLikeSVC;
   final private RbbsSVC rbbsSVC;
 
-
   @GetMapping
   public String bbs() {
     return "/postBoards/bbsHome";
@@ -34,7 +33,7 @@ public class CsrBbsController {
 
   @GetMapping("/community")
   public String community() {
-    return "/postBoards/bbs_list";
+    return "postBoards/bbs_list";
   }
 
   //게시글조회
@@ -51,7 +50,7 @@ public class CsrBbsController {
 
     // Base64로 변환하여 data URI 스킴으로 넘기기
     if (findedBbs.getPic() != null) {
-      String base64 = java.util.Base64
+      String base64 = Base64
           .getEncoder()
           .encodeToString(findedBbs.getPic());
       model.addAttribute("picData", "data:image/jpeg;base64," + base64);
@@ -97,7 +96,7 @@ public class CsrBbsController {
       ,Model model) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     model.addAttribute("user", loginMember);
-    return "postBoards/write_quill_test";
+    return "postBoards/write_quill";
   }
 
   // 게시글 답글
@@ -106,7 +105,7 @@ public class CsrBbsController {
     model.addAttribute("bbsId", id);
     Member loginMember = (Member) session.getAttribute("loginMember");
     model.addAttribute("user", loginMember);
-    return "postBoards/write_quill_test";
+    return "postBoards/write_quill";
   }
 
 }

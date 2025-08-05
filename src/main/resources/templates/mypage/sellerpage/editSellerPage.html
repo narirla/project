@@ -99,7 +99,7 @@
           <h2>회원 정보 수정</h2>
           <hr class="top-line">
 
-          <form th:action="@{/mypage/seller/edit}" th:object="${form}" method="post" enctype="multipart/form-data">
+          <form th:action="@{/mypage/seller/{id}/edit(id=${form.memberId})}" th:object="${form}" method="post" enctype="multipart/form-data">
 
           <!-- ✅ 현재 프로필 이미지 -->
             <input type="hidden" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}">
@@ -253,9 +253,9 @@
 
       <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
-
-    <script th:src="@{/js/sellerpage/editSellerPage.js}"></script>
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   </div>
+  <script th:src="@{/js/sellerpage/editSellerPage.js}"></script>
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <script th:src="@{/js/layout.js}"></script>
 </body>
 </html>

@@ -169,47 +169,49 @@ public class SellerPageController {
   /**
    * ✅ 판매자 마이페이지 수정 폼
    */
-  @GetMapping("/edit")
-  public String editForm(HttpSession session, Model model) {
-    // 1. 로그인 회원 확인
+  @GetMapping("/{id}/edit")
+  public String editForm(@PathVariable("id") Long id, HttpSession session, Model model) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) return "redirect:/login";
 
-    // 2. 판매자 페이지 조회
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(loginMember.getMemberId());
+    if (!id.equals(loginMember.getMemberId())) {
+      throw new AccessDeniedException("본인의 마이페이지만 수정할 수 있습니다.");
+    }
+
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(id);
     if (optional.isEmpty()) throw new AccessDeniedException("판매자 페이지가 존재하지 않습니다.");
 
     SellerPage sellerPage = optional.get();
 
-    // 3. 수정 폼 객체 생성 및 값 설정
     SellerPageUpdateForm form = new SellerPageUpdateForm();
     form.setPageId(sellerPage.getPageId());
     form.setMemberId(sellerPage.getMemberId());
-    form.setNickname(sellerPage.getNickname());   // 판매자 닉네임
-    form.setIntro(sellerPage.getIntro());         // 자기소개
-    form.setTel(loginMember.getTel());            // 회원 전화번호 (Member 테이블)
-    form.setPasswd("");                           // 비밀번호: 수정 시만 입력
-    form.setZonecode(sellerPage.getZonecode());   // 주소
+    form.setNickname(sellerPage.getNickname());
+    form.setIntro(sellerPage.getIntro());
+    form.setTel(loginMember.getTel());
+    form.setPasswd("");
+    form.setZonecode(sellerPage.getZonecode());
     form.setAddress(sellerPage.getAddress());
     form.setDetailAddress(sellerPage.getDetailAddress());
-    form.setNotification("Y");                    // 알림 설정 기본값
-    form.setImage(sellerPage.getImage());         // 프로필 이미지
+    form.setNotification("Y");
+    form.setImage(sellerPage.getImage());
 
-    // 4. 뷰에 전달할 모델 속성 설정
-    model.addAttribute("sellerPage", sellerPage);   // 사이드바에서 사용
-    model.addAttribute("form", form);               // 수정폼에서 사용
-    model.addAttribute("member", loginMember);      // 이메일 출력용
-    model.addAttribute("timestamp", System.currentTimeMillis()); // 이미지 캐싱 방지
+    model.addAttribute("sellerPage", sellerPage);
+    model.addAttribute("form", form);
+    model.addAttribute("member", loginMember);
+    model.addAttribute("timestamp", System.currentTimeMillis());
 
     return "mypage/sellerpage/editSellerPage";
   }
 
 
+
   /**
    * ✅ 판매자 마이페이지 수정 처리 (Form 객체 기반)
    */
-  @PostMapping("/edit")
-  public String edit(@ModelAttribute("sellerPage") SellerPageUpdateForm form,
+  @PostMapping("/{id}/edit")
+  public String edit(@PathVariable("id") Long id,
+                     @ModelAttribute("form") SellerPageUpdateForm form,
                      BindingResult bindingResult,
                      HttpSession session,
                      RedirectAttributes redirectAttributes) {
@@ -219,9 +221,11 @@ public class SellerPageController {
       return "redirect:/login";
     }
 
-    Long memberId = loginMember.getMemberId();
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
+    if (!id.equals(loginMember.getMemberId())) {
+      throw new AccessDeniedException("본인의 마이페이지만 수정할 수 있습니다.");
+    }
 
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(id);
     if (optional.isEmpty()) {
       throw new AccessDeniedException("판매자 마이페이지 정보가 존재하지 않습니다.");
     }
@@ -238,7 +242,6 @@ public class SellerPageController {
 
     // 📷 이미지 처리
     if (Boolean.TRUE.equals(form.getDeleteImage())) {
-      // 기본 이미지로 변경 → DB에 null 저장
       sellerPage.setImage(null);
     } else {
       MultipartFile imageFile = form.getImageFile();
@@ -248,10 +251,9 @@ public class SellerPageController {
         } catch (Exception e) {
           log.error("프로필 이미지 처리 오류", e);
           redirectAttributes.addFlashAttribute("error", "이미지 업로드에 실패했습니다.");
-          return "redirect:/mypage/seller/edit";
+          return "redirect:/mypage/seller/" + id + "/edit";
         }
       } else {
-        // 기존 이미지 유지
         sellerPage.setImage(optional.get().getImage());
       }
     }
@@ -262,20 +264,23 @@ public class SellerPageController {
 
     // 🛠️ Member 테이블의 전화번호, 비밀번호도 수정
     if (form.getTel() != null && !form.getTel().isBlank()) {
-      memberSVC.updateTel(memberId, form.getTel());
+      memberSVC.updateTel(id, form.getTel());
       loginMember.setTel(form.getTel());
-      log.info(" 전화번호 수정 완료 ");
     }
+
     if (form.getPasswd() != null && !form.getPasswd().isBlank()) {
       String encodedPw = passwordEncoder.encode(form.getPasswd());
-      memberSVC.updatePasswd(memberId, encodedPw);
+      memberSVC.updatePasswd(id, encodedPw);
       msg.append(" 비밀번호가 수정되었습니다.");
-      log.info(" 비밀번호 수정 완료 ");
     }
+
+    // 세션 nickname 업데이트
+    loginMember.setNickname(form.getNickname());
+    session.setAttribute("loginMember", loginMember);
 
     redirectAttributes.addFlashAttribute("msg", msg.toString());
 
-    return "redirect:/mypage/seller/edit";
+    return "redirect:/mypage/seller/" + id + "/edit";
   }
 
 

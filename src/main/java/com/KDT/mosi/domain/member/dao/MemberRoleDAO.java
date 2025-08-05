@@ -36,5 +36,11 @@ public interface MemberRoleDAO {
    */
   int deleteByMemberId(Long memberId);
 
-
+  /**
+   * ✅ 특정 역할만 삭제 (예: R02만 제거)
+   * @param memberId 회원 ID
+   * @param roleId 삭제할 역할 ID
+   * @return 삭제된 행 수 (0 또는 1)
+   */
+  int deleteRole(Long memberId, String roleId);
 }

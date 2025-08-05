@@ -67,6 +67,14 @@ CREATE TABLE member (
 ALTER TABLE member ADD CONSTRAINT member_member_id_pk PRIMARY KEY (member_id);
 ALTER TABLE member ADD CONSTRAINT member_email_uk UNIQUE(email);
 ALTER TABLE member ADD CONSTRAINT member_gender_ck CHECK (gender IN ('남자','여자'));
+
+
+
+-- 우편 번호, 상세주소 컬럼 추가
+ALTER TABLE MEMBER ADD ZONECODE VARCHAR2(10);
+ALTER TABLE MEMBER ADD DETAIL_ADDRESS VARCHAR2(200);
+
+-- 닉네임 중복 불가
 ALTER TABLE member ADD CONSTRAINT member_nickname_uk UNIQUE(nickname);
 
 -- 시퀀스 생성
@@ -97,8 +105,8 @@ CREATE TABLE member_role (
   member_id  NUMBER(10),
   role_id    VARCHAR2(11),
   PRIMARY KEY (member_id, role_id),
-  FOREIGN KEY (member_id) REFERENCES member(member_id),
-  FOREIGN KEY (role_id) REFERENCES role(role_id)
+  FOREIGN KEY (member_id) REFERENCES member(member_id) ON DELETE CASCADE,
+  FOREIGN KEY (role_id) REFERENCES role(role_id) ON DELETE CASCADE
 );
 
 -- 초기 역할 지정
@@ -112,8 +120,6 @@ INSERT INTO member_role VALUES (5, 'R02'); -- 맹구 : 판매자
 INSERT INTO member_role VALUES (1, 'R02');
 DELETE FROM member_role WHERE member_id = 1 AND role_id = 'R01';
 
--- 커밋
-COMMIT;
 
 -- 약관 테이블 및 트리거
 CREATE SEQUENCE terms_seq;
@@ -143,6 +149,9 @@ CREATE TABLE member_terms (
   terms_id   NUMBER(10) NOT NULL,
   agreed_at  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   PRIMARY KEY (member_id, terms_id),
-  FOREIGN KEY (member_id) REFERENCES member(member_id),
-  FOREIGN KEY (terms_id) REFERENCES terms(terms_id)
+  FOREIGN KEY (member_id) REFERENCES member(member_id) ON DELETE CASCADE,
+  FOREIGN KEY (terms_id) REFERENCES terms(terms_id) ON DELETE CASCADE
 );
+
+-- 커밋
+COMMIT;

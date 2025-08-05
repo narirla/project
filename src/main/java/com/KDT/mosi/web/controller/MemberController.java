@@ -1,5 +1,6 @@
 package com.KDT.mosi.web.controller;
 
+import com.KDT.mosi.domain.entity.BuyerPage;
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.member.dao.RoleDAO;
 import com.KDT.mosi.domain.member.svc.MemberSVC;
@@ -122,11 +123,25 @@ public class MemberController {
 
     // 역할과 약관 ID 목록
     List<String> roles = form.getRoles() != null ? form.getRoles() : new ArrayList<>();
+    if (roles.isEmpty()) {
+      roles.add("R01");  // ✅ 기본 역할 부여
+    }
     List<Long> terms = form.getAgreedTermsIds() != null ? form.getAgreedTermsIds() : new ArrayList<>();
 
     // 회원가입 처리
     try {
       Long savedId = memberSVC.join(member, roles, terms);
+
+      // 2️⃣ BuyerPage 저장
+      BuyerPage buyerPage = new BuyerPage();
+      buyerPage.setMemberId(savedId);
+      buyerPage.setNickname(member.getNickname());
+      buyerPage.setTel(member.getTel());
+      buyerPage.setZonecode(member.getZonecode());
+      buyerPage.setAddress(member.getAddress());
+      buyerPage.setDetailAddress(member.getDetailAddress());
+
+      buyerPageSVC.create(buyerPage);
 
       // 환영 페이지로 닉네임 전달
       model.addAttribute("nickname", form.getNickname());
@@ -291,28 +306,46 @@ public class MemberController {
     return ResponseEntity.ok(exist);  // true = 중복, false = 사용 가능
   }
 
+  /**
+   *
+   * @param id
+   * @param request
+   * @return
+   */
   @PostMapping("/{id}/delete")
   public String deleteMember(@PathVariable("id") Long id, HttpServletRequest request) {
-    // 현재 로그인한 회원 ID 가져오기
     Long loginMemberId = getLoginMemberId(request);
-
-    // 로그인 정보가 없거나 본인이 아닌 경우
+    log.info("🟢 [탈퇴 요청 진입] memberId = {}", id);
     if (loginMemberId == null || !loginMemberId.equals(id)) {
+      log.warn("⛔ [탈퇴 실패] 로그인 ID 불일치 또는 비로그인");
       return "error/403";
     }
 
-    // 1. 회원 탈퇴 처리
-    memberSVC.deleteById(id);
+    try {
+      // ✅ 0. 회원-역할 매핑 삭제
+      memberSVC.deleteMemberRoles(id);   // 👉 memberRoleDAO.deleteByMemberId(id) 호출
 
-    // 2. 마이페이지 정보 삭제
-    buyerPageSVC.deleteByMemberId(id);
+      // 1. 회원 탈퇴 처리
+      memberSVC.deleteById(id);
+      log.info("✅ [회원 DB 삭제 완료] memberId = {}", id);
 
-    // 3. 세션 무효화
-    request.getSession().invalidate();
+      // 2. 마이페이지 정보 삭제
+      buyerPageSVC.deleteByMemberId(id);
+      log.info("✅ [마이페이지 삭제 완료] memberId = {}", id);
 
-    // 4. 탈퇴 완료 페이지로 이동
-    return "redirect:/goodbye";
+      // 3. 세션 무효화
+      request.getSession().invalidate();
+      log.info("✅ [마이페이지 삭제 완료] memberId = {}", id);
+
+      log.info("➡️ [리다이렉트] /members/goodbye");
+      return "redirect:/members/goodbye";
+    } catch (Exception e) {
+      log.error("❌ [탈퇴 처리 중 예외 발생]", e);
+      e.printStackTrace();  // 또는 log.error("회원 탈퇴 실패", e);
+      throw e;  // 개발 단계에서는 그대로 다시 던져도 됨
+    }
   }
+
 
 
   /**
