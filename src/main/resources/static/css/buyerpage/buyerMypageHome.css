@@ -198,7 +198,7 @@ body>div>div>main>section>h2 {
   display: flex;
   justify-content: space-between;  /* ✅ title은 왼쪽, value는 오른쪽 */
   align-items: center;
-  padding: 0 30px;                /* ✅ 좌우 동일한 여백 */
+  padding: 0 35px;                /* ✅ 좌우 동일한 여백 */
   position: relative;
 }
 
