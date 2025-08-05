@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class RestaurantPageController {
 
-  @GetMapping
+  @GetMapping("/restaurant")
   public String showMapPage() {
     return "info/info-restaurant";  // templates/info/info-restaurant.html
   }
