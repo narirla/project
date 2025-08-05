@@ -1,4 +1,3 @@
-/*layout.js*/
 document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ layout.js 실행됨');
 
@@ -8,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
   menuButtons.forEach((menuButton, index) => {
     const dropdownMenu = menuButton.nextElementSibling;
     console.log(`✅ ${index+1}번째 dropdownMenu 연결됨:`, dropdownMenu);
+
+    // ✅ 페이지 진입 시 드롭다운 초기화
+    dropdownMenu.style.display = 'none';
 
     menuButton.addEventListener('click', (e) => {
       e.preventDefault();
