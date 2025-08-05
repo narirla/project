@@ -198,7 +198,7 @@ body>div>div>main>section>h2 {
   display: flex;
   justify-content: space-between;  /* ✅ title은 왼쪽, value는 오른쪽 */
   align-items: center;
-  padding: 0 20px;                /* ✅ 좌우 동일한 여백 */
+  padding: 0 30px;                /* ✅ 좌우 동일한 여백 */
   position: relative;
 }
 
@@ -493,14 +493,10 @@ body>div>div>main>section>h2 {
 /* 최근 본 코스 */
 .recent-course-list {
   display: flex;
-  gap: 12px;
-  /* 카드 간격 */
-  justify-content: center;
-  /* 카드 중앙 정렬 */
-  overflow-x: hidden;
-  /* 스크롤바 숨김 */
-  scroll-behavior: smooth;
-  /* 부드러운 이동 */
+  gap: 12px;    /* 카드 간격 */
+  justify-content: center;  /* 카드 중앙 정렬 */
+  overflow-x: hidden;   /* 스크롤바 숨김 */
+  scroll-behavior: smooth;  /* 부드러운 이동 */
   width: 863px;
   height: 290px;
   padding: 0 5px;
