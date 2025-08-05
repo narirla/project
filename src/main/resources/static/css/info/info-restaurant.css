@@ -41,7 +41,7 @@
 
 
 /* ---------- 리뷰 영역 ---------- */
-.accessibility-list {
+.restaurant-list {
     /* outline: 1px solid #EDEDED; */
     margin-bottom: 50px;
     display: flex;
@@ -51,7 +51,7 @@
 }
 
 
-.accessibility-list h2 {
+.restaurant-list h2 {
     font-size: 24px;
     font-weight: 700;
     color: #414141;
