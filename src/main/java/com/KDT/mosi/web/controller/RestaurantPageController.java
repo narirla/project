@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class RestaurantPageController {
 
+
+  /**
+   * 부산맛집 정보
+   * @return 맛집 정보 페이지로 이동
+   */
   @GetMapping
   public String showMapPage() {
     return "info/info-restaurant";  // templates/info/info-restaurant.html
