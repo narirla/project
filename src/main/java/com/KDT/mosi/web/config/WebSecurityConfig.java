@@ -36,7 +36,7 @@ public class WebSecurityConfig {
                 "/members/emailCheck", "/members/nicknameCheck",
                 "/members/goodbye",
                 "/find/**", "/css/**", "/js/**", "/img/**",
-                "/information/**",
+                "/info/**",
                 "/api/**"
             ).permitAll()
             .requestMatchers("/mypage/seller/**").authenticated()   // ✅ 판매자 마이페이지 허용
