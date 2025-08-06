@@ -1,0 +1,68 @@
+/* ---------- 사이드바 높이 조절 ---------*/
+.sidebar-card{
+    height: 200px;
+}
+
+/* ---------- 본문 영역 ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.content {
+    width: 950px;
+    margin-top: 10px;
+}
+
+.community-wrapper {
+    height: 800px;
+}
+
+.mypage-container {
+  flex: 1;
+  display: flex;
+  gap: 30px;
+  padding: 40px 20px;
+  background-color: #fff;
+  min-height: calc(100vh - 150px - 80px); /* ✅ 헤더/푸터 제외 높이 확보 */
+  height: 900px;
+}
+
+.mypage-nav ul li a:hover {
+    color: #80CCD6;
+}
+
+.sidebar,
+.mypage-nav {
+    height: 700px;
+}
+
+
+/* ---------- 리뷰 영역 ---------- */
+.restaurant-list {
+    /* outline: 1px solid #EDEDED; */
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.restaurant-list h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #414141;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #1EC4CC;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    width: 100%;
+}
+
+.search-section iframe{
+    border: none;
+
+    margin-top: 30px;
+}

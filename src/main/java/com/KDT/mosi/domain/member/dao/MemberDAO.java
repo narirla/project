@@ -2,6 +2,7 @@ package com.KDT.mosi.domain.member.dao;
 
 import com.KDT.mosi.domain.entity.Member;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberDAO {
@@ -120,4 +121,6 @@ public interface MemberDAO {
   int updatePasswd(Long memberId, String passwd);
 
   String findPasswdById(Long memberId);
+
+  List<String> findRolesByMemberId(Long memberId);
 }

@@ -23,9 +23,9 @@ import java.util.Optional;
 public class MemberSVCImpl implements MemberSVC {
 
   private final MemberDAO memberDAO;
-  private final MemberRoleDAO memberroleDAO;
   private final TermsDAO termsDAO;
   private final BuyerPageDAO buyerPageDAO;
+  private final MemberRoleDAO memberRoleDAO;
 
   /**
    * 회원 등록 (기본형)
@@ -41,7 +41,7 @@ public class MemberSVCImpl implements MemberSVC {
     Long memberId = memberDAO.save(member);
 
     // 2. 기본 역할(R01) 자동 부여
-    memberroleDAO.addRole(memberId, "R01");
+    memberRoleDAO.addRole(memberId, "R01");
 
     return memberId;
   }
@@ -65,7 +65,7 @@ public class MemberSVCImpl implements MemberSVC {
     if (roles != null && !roles.isEmpty()) {
       log.info("역할 등록 시작: {}", roles);
       for (String roleId : roles) {
-        memberroleDAO.addRole(memberId, roleId);
+        memberRoleDAO.addRole(memberId, roleId);
       }
       log.info("역할 등록 완료");
     } else {
@@ -194,7 +194,7 @@ public class MemberSVCImpl implements MemberSVC {
    */
   @Override
   public boolean hasRole(Long memberId, String roleId) {
-    return memberroleDAO.findRolesByMemberId(memberId)
+    return memberRoleDAO.findRolesByMemberId(memberId)
         .stream()
         .anyMatch(role -> role.getRoleId().equals(roleId));
   }
@@ -269,6 +269,18 @@ public class MemberSVCImpl implements MemberSVC {
   @Override
   public String findPasswdById(Long memberId) {
     return memberDAO.findPasswdById(memberId);
+  }
+
+  // ✅ MemberSVCImpl.java
+  @Override
+  public List<String> findRolesByMemberId(Long memberId) {
+    return memberDAO.findRolesByMemberId(memberId);
+  }
+
+
+  @Override
+  public int deleteMemberRoles(Long memberId) {
+    return memberRoleDAO.deleteByMemberId(memberId);
   }
 
 

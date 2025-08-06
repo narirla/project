@@ -21,9 +21,13 @@
 </head>
 
 <body>
-<div class="layout-wrapper">
-  <!-- header / footer 는 이미 fragment 로 존재하므로 th:replace 로만 연결 -->
-  <header th:replace="~{fragments/header :: header}"></header>
+
+  <div class="layout-wrapper">
+    <!-- header / footer 는 이미 fragment 로 존재하므로 th:replace 로만 연결 -->
+    <header th:replace="${loginRole} == 'SELLER' ?
+        ~{fragments/sellerHeader :: sellerHeader} :
+        ~{fragments/header :: header}">
+    </header>
   <!-- ========================= MAIN LAYOUT ========================= -->
   <div class="page-container">
     <main class="mypage-container">
@@ -83,6 +87,7 @@
 <!-- ========================= SCRIPTS ========================= -->
 <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
 <script type="module" th:src="@{/js/community/bbs/csr/bbs_list.js}"></script>
+<script th:src="@{/js/layout.js}"></script>
 </body>
 
 </html>

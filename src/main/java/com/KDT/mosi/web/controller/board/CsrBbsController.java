@@ -5,7 +5,9 @@ import com.KDT.mosi.domain.board.bbsLike.svc.BbsLikeSVC;
 import com.KDT.mosi.domain.board.bbsReport.svc.BbsReportSVC;
 import com.KDT.mosi.domain.board.rbbs.svc.RbbsSVC;
 import com.KDT.mosi.domain.entity.Member;
+import com.KDT.mosi.domain.entity.Role;
 import com.KDT.mosi.domain.entity.board.Bbs;
+import com.KDT.mosi.domain.member.dao.MemberRoleDAO;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -25,6 +28,7 @@ public class CsrBbsController {
   final private BbsReportSVC bbsReportSVC;
   final private BbsLikeSVC bbsLikeSVC;
   final private RbbsSVC rbbsSVC;
+  final private MemberRoleDAO memberRoleDAO;
 
   @GetMapping
   public String bbs() {
@@ -32,7 +36,14 @@ public class CsrBbsController {
   }
 
   @GetMapping("/community")
-  public String community() {
+  public String community(HttpSession session, Model model) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+
+    if (loginMember != null){
+      List<Role> roles = memberRoleDAO.findRolesByMemberId(loginMember.getMemberId());
+      boolean isSeller = roles.stream().anyMatch(role -> "R02".equals(role.getRoleId()));
+      model.addAttribute("loginRole", isSeller ? "SELLER" : "BUYER");
+    }
     return "postBoards/bbs_list";
   }
 
@@ -46,7 +57,15 @@ public class CsrBbsController {
     Optional<Bbs> optionalBbs = bbsSVC.findById(id);
     Bbs findedBbs = optionalBbs.orElseThrow();  // 찾고자하는 게시글이 없으면 NoSuchElementException 예외발생
     model.addAttribute("bbs", findedBbs);
+
     Member loginMember = (Member) session.getAttribute("loginMember");
+
+    //  헤더 분기용 loginRole 처리
+    if (loginMember != null) {
+      List<Role> roles = memberRoleDAO.findRolesByMemberId(loginMember.getMemberId());
+      boolean isSeller = roles.stream().anyMatch(role -> "R02".equals(role.getRoleId()));
+      model.addAttribute("loginRole", isSeller ? "SELLER" : "BUYER");
+    }
 
     // Base64로 변환하여 data URI 스킴으로 넘기기
     if (findedBbs.getPic() != null) {
@@ -96,6 +115,14 @@ public class CsrBbsController {
       ,Model model) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     model.addAttribute("user", loginMember);
+
+    // 헤더 분기용 loginRole 추가
+    if (loginMember != null) {
+      List<Role> roles = memberRoleDAO.findRolesByMemberId(loginMember.getMemberId());
+      boolean isSeller = roles.stream().anyMatch(role -> "R02".equals(role.getRoleId()));
+      model.addAttribute("loginRole", isSeller ? "SELLER" : "BUYER");
+    }
+
     return "postBoards/write_quill";
   }
 
@@ -105,6 +132,14 @@ public class CsrBbsController {
     model.addAttribute("bbsId", id);
     Member loginMember = (Member) session.getAttribute("loginMember");
     model.addAttribute("user", loginMember);
+
+    // 헤더 분기용 loginRole 추가
+    if (loginMember != null) {
+      List<Role> roles = memberRoleDAO.findRolesByMemberId(loginMember.getMemberId());
+      boolean isSeller = roles.stream().anyMatch(role -> "R02".equals(role.getRoleId()));
+      model.addAttribute("loginRole", isSeller ? "SELLER" : "BUYER");
+    }
+
     return "postBoards/write_quill";
   }
 

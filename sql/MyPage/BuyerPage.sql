@@ -22,11 +22,11 @@ CREATE TABLE BUYER_PAGE (
     ZONECODE         VARCHAR2(10),                                          -- 우편번호
     DETAIL_ADDRESS   VARCHAR2(200),                                         -- 상세주소
     NOTIFICATION     VARCHAR2(1),                                           -- 알림 수신 여부 ('Y' or NULL)
-    NICKNAME         VARCHAR2(30),                                          -- 닉네임
+    NICKNAME         VARCHAR2(30)    NOT NULL ,                                          -- 닉네임
     CREATE_DATE      TIMESTAMP         DEFAULT systimestamp,                -- 생성일시
     UPDATE_DATE      TIMESTAMP         DEFAULT systimestamp,                -- 수정일시
     CONSTRAINT FK_BUYER_PAGE_MEMBER_ID FOREIGN KEY (MEMBER_ID)
-        REFERENCES MEMBER(MEMBER_ID)
+        REFERENCES MEMBER(MEMBER_ID) ON DELETE CASCADE
 );
 
 

@@ -24,9 +24,13 @@
           <form th:action="@{/mypage/seller/create}" method="post" enctype="multipart/form-data" th:object="${form}">
             <input type="hidden" th:field="*{memberId}">
 
-            <div class="profile-upload">
-              <label for="imageFile" class="profile-upload-label">
-                프로필 사진 등록
+            <div class="profile-section">
+              <label for="imageFile" class="profile-preview-box">
+                <img id="profilePreview" class="profile-preview" alt="미리보기" style="display: none;">
+                <span class="profile-placeholder-text" id="placeholderText">프로필 사진 등록</span>
+                <button type="button" id="removeImageBtn" class="remove-image-btn" style="display: none;" aria-label="이미지 삭제">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
               </label>
               <input type="file" id="imageFile" name="imageFile" accept="image/*" hidden>
             </div>
@@ -72,6 +76,7 @@
 
     <script th:src="@{/js/sellerpage/createSellerPage.js}"></script>
   </div>
+  <script th:src="@{/js/layout.js}"></script>
 </body>
 
 </html>

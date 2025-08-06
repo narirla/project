@@ -13,6 +13,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,35 +27,31 @@ public class MemberDAOImpl implements MemberDAO {
   /**
    * 회원 저장
    * - 시퀀스를 사용하여 member_id 자동 생성
-   * - 생성된 ID를 KeyHolder로 반환
    */
   @Override
   public Long save(Member member) {
-    StringBuffer sql = new StringBuffer();
-    sql.append("INSERT INTO member (member_id, email, name, passwd, tel, nickname, gender, address, birth_date, pic, create_date, update_date) ");
-    sql.append("VALUES (member_member_id_seq.nextval, :email, :name, :passwd, :tel, :nickname, :gender, :address, :birthDate, :pic, systimestamp, systimestamp)");
+    String sql = """
+      INSERT INTO member 
+        (member_id, email, name, passwd, tel, nickname, gender, address, birth_date, pic, create_date, update_date) 
+      VALUES 
+        (member_member_id_seq.nextval, :email, :name, :passwd, :tel, :nickname, :gender, :address, :birthDate, :pic, systimestamp, systimestamp)
+      """;
 
     SqlParameterSource param = new BeanPropertySqlParameterSource(member);
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
-    template.update(sql.toString(), param, keyHolder, new String[]{"member_id"});
-
+    template.update(sql, param, keyHolder, new String[]{"member_id"});
     return ((Number) keyHolder.getKeys().get("member_id")).longValue();
   }
 
-  /**
-   * 이메일로 회원 조회
-   * - 존재하지 않으면 Optional.empty() 반환
-   */
+  /** 이메일로 회원 조회 */
   @Override
   public Optional<Member> findByEmail(String email) {
-    StringBuffer sql = new StringBuffer();
-    sql.append("SELECT * FROM member ");
-    sql.append(" WHERE email = :email");
+    String sql = "SELECT * FROM member WHERE email = :email";
 
     try {
       Member member = template.queryForObject(
-          sql.toString(),
+          sql,
           new MapSqlParameterSource("email", email),
           BeanPropertyRowMapper.newInstance(Member.class)
       );
@@ -64,19 +61,14 @@ public class MemberDAOImpl implements MemberDAO {
     }
   }
 
-  /**
-   * 회원 ID로 조회
-   * - 존재하지 않으면 Optional.empty() 반환
-   */
+  /** 회원 ID로 조회 */
   @Override
   public Optional<Member> findById(Long memberId) {
-    StringBuffer sql = new StringBuffer();
-    sql.append("SELECT * FROM member ");
-    sql.append(" WHERE member_id = :memberId");
+    String sql = "SELECT * FROM member WHERE member_id = :memberId";
 
     try {
       Member member = template.queryForObject(
-          sql.toString(),
+          sql,
           new MapSqlParameterSource("memberId", memberId),
           BeanPropertyRowMapper.newInstance(Member.class)
       );
@@ -86,73 +78,47 @@ public class MemberDAOImpl implements MemberDAO {
     }
   }
 
-  /**
-   * 이메일 중복 여부 확인
-   * @return true: 이미 존재함, false: 사용 가능
-   */
+  /** 이메일 중복 여부 확인 */
   @Override
   public boolean isExistEmail(String email) {
-    StringBuffer sql = new StringBuffer();
-    sql.append("SELECT count(*) FROM member ");
-    sql.append(" WHERE email = :email");
+    String sql = "SELECT count(*) FROM member WHERE email = :email";
 
     Integer count = template.queryForObject(
-        sql.toString(),
+        sql,
         new MapSqlParameterSource("email", email),
         Integer.class
     );
     return count != null && count > 0;
   }
 
-  /**
-   * 회원 정보 수정
-   * - name, passwd, tel, nickname, gender, address, birth_date, pic, update_date
-   * - 수정된 행 수 반환
-   */
+  /** 회원 정보 수정 */
   @Override
   public int update(Member member) {
-    StringBuffer sql = new StringBuffer();
-    sql.append("UPDATE member SET ");
-    sql.append("  name = :name, ");
-    sql.append("  passwd = :passwd, ");
-    sql.append("  tel = :tel, ");
-    sql.append("  nickname = :nickname, ");
-    sql.append("  gender = :gender, ");
-    sql.append("  address = :address, ");
-    sql.append("  birth_date = :birthDate, ");
-    sql.append("  pic = :pic, ");
-    sql.append("  update_date = systimestamp ");
-    sql.append("WHERE member_id = :memberId");
+    String sql = """
+      UPDATE member SET 
+        name = :name, passwd = :passwd, tel = :tel, nickname = :nickname, gender = :gender, 
+        address = :address, birth_date = :birthDate, pic = :pic, update_date = systimestamp 
+      WHERE member_id = :memberId
+    """;
 
     SqlParameterSource param = new BeanPropertySqlParameterSource(member);
-    return template.update(sql.toString(), param);
+    return template.update(sql, param);
   }
 
-  /**
-   * 전화번호로 이메일 찾기
-   * - 존재하지 않으면 Optional.empty() 반환
-   */
+  /** 전화번호로 이메일 찾기 */
   @Override
   public Optional<String> findEmailByTel(String tel) {
     String sql = "SELECT email FROM member WHERE tel = :tel";
 
     try {
-      String email = template.queryForObject(
-          sql,
-          new MapSqlParameterSource("tel", tel),
-          String.class
-      );
+      String email = template.queryForObject(sql, new MapSqlParameterSource("tel", tel), String.class);
       return Optional.ofNullable(email);
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
   }
 
-  /**
-   * 비밀번호 재설정
-   * - email 기준으로 passwd와 update_date 수정
-   * @return 수정된 행 수
-   */
+  /** 비밀번호 재설정 */
   @Override
   public int updatePassword(String email, String newPassword) {
     String sql = "UPDATE member SET passwd = :passwd, update_date = systimestamp WHERE email = :email";
@@ -164,47 +130,23 @@ public class MemberDAOImpl implements MemberDAO {
     return template.update(sql, param);
   }
 
-  /**
-   * 닉네임 중복 여부 확인
-   * @return true: 중복 있음, false: 사용 가능
-   */
+  /** 닉네임 중복 여부 확인 */
   @Override
   public boolean isExistNickname(String nickname) {
     String sql = "SELECT COUNT(*) FROM member WHERE nickname = :nickname";
 
-    Integer count = template.queryForObject(
-        sql,
-        new MapSqlParameterSource("nickname", nickname),
-        Integer.class
-    );
-
+    Integer count = template.queryForObject(sql, new MapSqlParameterSource("nickname", nickname), Integer.class);
     return count != null && count > 0;
   }
 
-  /**
-   * 회원 탈퇴
-   * - member_id를 기준으로 회원 정보를 삭제한다.
-   *
-   * @param memberId 삭제할 회원의 고유 ID
-   * @return 삭제된 행 수 (1: 성공, 0: 실패)
-   */
+  /** 회원 탈퇴 */
   @Override
   public int deleteById(Long memberId) {
-    // 삭제할 SQL 정의
     String sql = "DELETE FROM member WHERE member_id = :memberId";
-
-    // 파라미터 바인딩
-    MapSqlParameterSource param = new MapSqlParameterSource("memberId", memberId);
-
-    // SQL 실행 후 삭제된 행 수 반환
-    return template.update(sql, param);
+    return template.update(sql, new MapSqlParameterSource("memberId", memberId));
   }
 
-  /**
-   *
-   * @param email
-   * @return
-   */
+  /** 이메일로 회원 ID 찾기 */
   @Override
   public Optional<Long> findMemberIdByEmail(String email) {
     String sql = "SELECT member_id FROM member WHERE email = :email";
@@ -218,27 +160,13 @@ public class MemberDAOImpl implements MemberDAO {
     }
   }
 
-  /**
-   * 회원 ID 존재 여부 확인
-   * - 주어진 회원 ID가 데이터베이스에 존재하는지 여부를 확인한다.
-   *
-   * @param memberId 확인할 회원 ID
-   * @return true: 존재함, false: 존재하지 않음
-   */
+  /** 회원 ID 존재 여부 확인 */
   @Override
   public boolean isExistMemberId(Long memberId) {
     return findById(memberId).isPresent();
   }
 
-  /**
-   * 회원 전화번호 수정
-   * - 주어진 회원 ID를 기준으로 전화번호를 새 값으로 수정한다.
-   * - 현재는 구현되지 않은 상태이며 0을 반환한다.
-   *
-   * @param memberId 수정할 회원 ID
-   * @param tel 새 전화번호
-   * @return 수정된 행 수 (0: 미구현 상태)
-   */
+  /** 전화번호 수정 */
   @Override
   public int updateTel(Long memberId, String tel) {
     String sql = "UPDATE member SET tel = :tel, update_date = systimestamp WHERE member_id = :memberId";
@@ -250,16 +178,7 @@ public class MemberDAOImpl implements MemberDAO {
     return template.update(sql, param);
   }
 
-
-  /**
-   * 회원 비밀번호 수정
-   * - 주어진 회원 ID를 기준으로 비밀번호를 새 값으로 수정한다.
-   * - 현재는 구현되지 않은 상태이며 0을 반환한다.
-   *
-   * @param memberId 수정할 회원 ID
-   * @param passwd 새 비밀번호 (암호화된 상태)
-   * @return 수정된 행 수 (0: 미구현 상태)
-   */
+  /** 비밀번호 수정 */
   @Override
   public int updatePasswd(Long memberId, String passwd) {
     String sql = "UPDATE member SET passwd = :passwd, update_date = systimestamp WHERE member_id = :memberId";
@@ -271,13 +190,30 @@ public class MemberDAOImpl implements MemberDAO {
     return template.update(sql, param);
   }
 
-
+  /** 회원 ID로 비밀번호 조회 */
   @Override
   public String findPasswdById(Long memberId) {
     String sql = "SELECT passwd FROM member WHERE member_id = :memberId";
-    Map<String, Object> param = Map.of("memberId", memberId);
-    return template.queryForObject(sql, param, String.class);
+    return template.queryForObject(sql, Map.of("memberId", memberId), String.class);
   }
 
+
+  /**
+   * ✅ 다중 ROLE 지원
+   * - queryForList로 다중 ROLE 처리
+   */
+  @Override
+  public List<String> findRolesByMemberId(Long memberId) {
+    String sql = """
+            SELECT r.role_name
+            FROM member_role mr
+            JOIN role r ON mr.role_id = r.role_id
+            WHERE mr.member_id = :memberId
+        """;
+
+    Map<String, Object> params = Map.of("memberId", memberId);
+
+    return template.queryForList(sql, params, String.class);
+  }
 
 }

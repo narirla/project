@@ -332,19 +332,25 @@ public class  BuyerPageController {
     // ───────────────────────────
     redirectAttributes.addFlashAttribute("msg", "마이페이지 정보가 성공적으로 수정되었습니다.");
 
-    return "redirect:/mypage/buyer/" + memberId;
+    return "redirect:/mypage/buyer/" + memberId + "/edit";
 
   }
 
 
-  // ✅ 기본 진입 시 로그인한 회원의 마이페이지로 리다이렉트
   @GetMapping
   public String buyerMypageHome(Model model) {
     Long loginMemberId = getLoginMemberId();
-    model.addAttribute("memberId", loginMemberId);
 
-    memberSVC.findById(loginMemberId).ifPresent(member -> model.addAttribute("member", member));
+    Optional<Member> optionalMember = memberSVC.findById(loginMemberId);
+    if (optionalMember.isEmpty()) {
+      return "error/403"; // 로그인 정보 없음
+    }
+
+    Member member = optionalMember.get();
+    model.addAttribute("memberId", loginMemberId);
+    model.addAttribute("member", member);
 
     return "mypage/buyerpage/buyerMypageHome";
   }
+
 }

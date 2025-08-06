@@ -260,7 +260,7 @@ input[type='radio']:checked {
     padding: 10px;
 }
 
-/* 가격 정보 입력 영역 */
+/* 가격 정보 */
 .price {
     height: 350px;
 }

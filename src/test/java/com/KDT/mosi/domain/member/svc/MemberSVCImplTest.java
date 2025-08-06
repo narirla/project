@@ -24,9 +24,10 @@ class MemberSVCImplTest {
   private BuyerPageDAO buyerPageDAO = Mockito.mock(BuyerPageDAO.class);
   private MemberSVC memberSVC;
 
+
   @BeforeEach
   void init() {
-    memberSVC = new MemberSVCImpl(memberDAO, memberRoleDAO, termsDAO, buyerPageDAO);
+    memberSVC = new MemberSVCImpl(memberDAO, termsDAO, buyerPageDAO, memberRoleDAO);
   }
 
   @Test
