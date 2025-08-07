@@ -41,4 +41,9 @@ public interface FacilityDataManagementSVC {
    * @return 조건에 맞는 FacilityDocument의 페이징된 결과
    */
   Page<FacilityDocument> searchFacilities(String searchType, String keyword, Pageable pageable);
+
+  /**
+   * Elasticsearch의 facility 인덱스를 삭제합니다.
+   */
+  void deleteFacilityIndex();
 }

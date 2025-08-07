@@ -1,11 +1,14 @@
 package com.KDT.mosi.domain.publicdatamanage.restaurant.svc;
 
+
+import com.KDT.mosi.domain.publicdatamanage.facility.document.FacilityDocument;
 import com.KDT.mosi.domain.publicdatamanage.restaurant.document.FoodDocument;
 import com.KDT.mosi.domain.publicdatamanage.restaurant.document.FoodDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class FoodDataManagementSVCImpl implements FoodDataManagementSVC {
 
   private final FoodDocumentRepository foodDocumentRepository;
+  private final ElasticsearchOperations elasticsearchOperations;
 
   @Override
   public FoodDocument saveFoodDocument(FoodDocument document) {
@@ -75,6 +79,21 @@ public class FoodDataManagementSVCImpl implements FoodDataManagementSVC {
       default:
         log.warn("Invalid searchType: {}. Defaulting to title search.", searchType);
         return foodDocumentRepository.findByTitleContaining(keyword, pageable);
+    }
+  }
+
+  @Override
+  public void deleteFoodInfoIndex() {
+    // ElasticsearchOperations를 이용해 인덱스를 삭제합니다.
+    if (elasticsearchOperations.indexOps(FoodDocument.class).exists()) {
+      boolean isDeleted = elasticsearchOperations.indexOps(FoodDocument.class).delete();
+      if (isDeleted) {
+        log.info("기존 Elasticsearch 인덱스 'food_info' 삭제 성공.");
+      } else {
+        log.error("기존 Elasticsearch 인덱스 'food_info' 삭제 실패.");
+      }
+    } else {
+      log.info("삭제할 Elasticsearch 인덱스 'food_info'가 존재하지 않습니다.");
     }
   }
 }

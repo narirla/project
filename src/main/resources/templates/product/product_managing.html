@@ -150,7 +150,7 @@
                 </div>
                 <div class="product-info-right">
                   <div class="product-info-right-detail">
-                    <div>0% 저렴</div>
+                    <div th:text="|${form.salesRate}% 저렴|"></div>
                     <div class="price">
                       <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|"></h1>
                       <div>원</div>

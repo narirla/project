@@ -232,7 +232,7 @@ CSS
     display: flex;
     flex-direction: column;
     align-items: start;
-    justify-content: start;
+    justify-content: space-between;
     width: 550px;
     height: 190px;
     padding-top: 15px;
@@ -240,11 +240,18 @@ CSS
     color: #414141;
 }
 
+.product-info-left h2{
+    font-size: 20px;
+}
+.product-info-left .text-trim{
+    display: inline-block;
+    height: 80px;
+}
 
 .product-info-left-detail{
     display: flex;
     margin-top: 10px;
-    margin-bottom: 27px;
+    margin-bottom: 10px;
 }
 
 .product-info-left-detail select{

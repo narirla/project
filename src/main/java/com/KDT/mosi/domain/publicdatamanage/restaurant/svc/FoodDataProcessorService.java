@@ -13,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,17 +23,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +37,7 @@ import java.util.stream.Collectors;
 public class FoodDataProcessorService {
 
   private final RestTemplate restTemplate;
-  private final FoodDataManagementSVC foodDataManagementSVC;
+  private final FoodDataManagementSVC dataManagementService;
 
   @Value("${busan.api.common.serviceKey}")
   private String apiKey;
@@ -55,53 +51,49 @@ public class FoodDataProcessorService {
   @Value("${kakao.api.url.geocode}")
   private String kakaoGeocodeUrl;
 
-  /**
-   * 부산 맛집 데이터를 API에서 가져와서 처리하고 Elasticsearch에 저장하는 전체 프로세스입니다.
-   *
-   * @throws Exception 데이터 처리 중 발생할 수 있는 예외
-   */
+  @Scheduled(cron = "0 0 */6 * * *")
+  public void scheduledDataFetch() {
+    log.info("스케줄러 시작: 부산 공공데이터 인덱스 초기화 및 갱신");
+    try {
+      dataManagementService.deleteFoodInfoIndex();
+      fetchAndProcessAllFoodData();
+    } catch (Exception e) {
+      log.error("스케줄러 실행 중 오류 발생: {}", e.getMessage(), e);
+    }
+    log.info("스케줄러 완료: 부산 공공데이터 인덱스 초기화 및 갱신");
+  }
+
   public void fetchAndProcessAllFoodData() throws Exception {
     log.info("Starting to fetch and process food data.");
-
-    Optional<FoodDocument> latestDocument = foodDataManagementSVC.findLatestFoodDocument();
+    Optional<FoodDocument> latestDocument = dataManagementService.findLatestFoodDocument();
     long totalCountFromApi = fetchTotalCount();
     log.info("Total count from API: {}, Latest document found: {}", totalCountFromApi, latestDocument.isPresent());
 
-    // 데이터 갱신 조건 확인:
-    // 1. 가장 최근 문서가 있고, 갱신일이 30일 이내이면서
-    // 2. 현재 저장된 문서의 총 개수가 API의 총 데이터 개수와 동일한 경우
     if (latestDocument.isPresent() &&
-        ChronoUnit.DAYS.between(latestDocument.get().getTimestamp(), LocalDate.now()) < 30 &&
-        foodDataManagementSVC.countAllFoodDocuments() == totalCountFromApi) {
+        ChronoUnit.DAYS.between(latestDocument.get().getTimestamp(), LocalDate.now()) < 1 &&
+        dataManagementService.countAllFoodDocuments() == totalCountFromApi) {
       log.info("Data is up-to-date. Skipping full data refresh.");
       return;
     }
 
-    // 조건에 맞지 않으면 기존 데이터 삭제 후 재로딩
     log.info("Data is outdated or incomplete. Deleting all existing documents and reloading.");
-    foodDataManagementSVC.deleteAllFoodDocuments();
+    dataManagementService.deleteAllFoodDocuments();
 
     int numOfRows = 100;
     long totalPages = (long) Math.ceil((double) totalCountFromApi / numOfRows);
-
     log.info("Fetching a total of {} pages with {} rows per page.", totalPages, numOfRows);
 
     for (int pageNo = 1; pageNo <= totalPages; pageNo++) {
       List<FoodItem> items = fetchFoodData(pageNo, numOfRows);
       if (items != null && !items.isEmpty()) {
         List<FoodDocument> documents = processFoodData(items);
-        foodDataManagementSVC.saveAllFoodDocuments(documents);
+        dataManagementService.saveAllFoodDocuments(documents);
         log.info("Page {} processed and saved. ({} documents)", pageNo, documents.size());
       }
     }
     log.info("Finished fetching and processing all food data.");
   }
 
-
-  /**
-   * API에서 전체 데이터의 총 개수를 조회합니다.
-   * @return API가 제공하는 총 데이터 개수
-   */
   private long fetchTotalCount() {
     try {
       URI uri = UriComponentsBuilder.fromUriString(apiUrl)
@@ -111,9 +103,7 @@ public class FoodDataProcessorService {
           .build()
           .encode()
           .toUri();
-
       ResponseEntity<FoodResponse> response = restTemplate.getForEntity(uri, FoodResponse.class);
-
       if (response.getBody() != null && response.getBody().getBody() != null) {
         return response.getBody().getBody().getTotalCount();
       }
@@ -125,12 +115,6 @@ public class FoodDataProcessorService {
     return 0;
   }
 
-  /**
-   * 특정 페이지의 맛집 데이터를 API에서 가져옵니다.
-   * @param pageNo 페이지 번호
-   * @param numOfRows 한 페이지당 가져올 데이터 수
-   * @return FoodItem 리스트
-   */
   private List<FoodItem> fetchFoodData(int pageNo, int numOfRows) {
     try {
       URI uri = UriComponentsBuilder.fromUriString(apiUrl)
@@ -140,9 +124,7 @@ public class FoodDataProcessorService {
           .build()
           .encode()
           .toUri();
-
       ResponseEntity<FoodResponse> response = restTemplate.getForEntity(uri, FoodResponse.class);
-
       if (response.getBody() != null && response.getBody().getBody() != null && response.getBody().getBody().getItems() != null) {
         return response.getBody().getBody().getItems().getItem();
       }
@@ -154,36 +136,43 @@ public class FoodDataProcessorService {
     return Collections.emptyList();
   }
 
-
-  /**
-   * FoodItem 리스트를 FoodDocument 리스트로 변환합니다.
-   * @param items 변환할 FoodItem 리스트
-   * @return FoodDocument 리스트
-   */
   private List<FoodDocument> processFoodData(List<FoodItem> items) {
     return items.stream()
         .map(item -> {
-          if (item.getMainImgThumb() != null) {
-            log.info("처리 중인 맛집의 이미지 URL: {}", item.getMainImgThumb());
+          // 기존 위도/경도 값 가져오기 (변수명 수정)
+          GeoPoint existingGeoPoint = null;
+          try {
+            if (item.getLat() != null && item.getLng() != null) {
+              double lat = Double.parseDouble(item.getLat().toString());
+              double lng = Double.parseDouble(item.getLng().toString());
+              existingGeoPoint = new GeoPoint(lat, lng);
+            }
+          } catch (NumberFormatException e) {
+            log.warn("기존 위도/경도 값 변환 실패: {}, {}", item.getLat(), item.getLng());
           }
-          // 1. 문자열 필드 클리닝
+
+          GeoPoint finalGeoPoint;
+
+          // 기존 위도/경도 값이 유효한지 확인하는 로직
+          if (isGeoPointValidForBusan(existingGeoPoint)) {
+            finalGeoPoint = existingGeoPoint;
+            log.info("기존 유효한 좌표 사용: 위도={}, 경도={}", finalGeoPoint.getLat(), finalGeoPoint.getLon());
+          } else {
+            // 기존 값이 없거나 유효하지 않으면 지오코딩 실행
+            String cleanAddr1 = cleanString(item.getAddr1());
+            log.warn("기존 좌표가 유효하지 않거나 없어 지오코딩을 시작합니다. 주소: {}", cleanAddr1);
+            finalGeoPoint = geocodeAddress(cleanAddr1);
+          }
+
           String cleanAddr1 = cleanString(item.getAddr1());
           String cleanUsageTime = cleanString(item.getUsageDayWeekAndTime());
           String cleanItemContents = cleanString(item.getItemcntnts());
-
-          // 2. 주메뉴 문자열을 파싱
           List<String> rprsntvMenu = processRprsntvMenuString(item.getRprsntvMenu());
-
-          // 3. 지오코딩 (lat, lng 필드가 이미 있다면 사용하고, 없다면 주소로 지오코딩)
-          GeoPoint geoPoint = (item.getLat() != 0 && item.getLng() != 0)
-              ? new GeoPoint(item.getLat(), item.getLng())
-              : geocodeAddress(cleanAddr1);
 
           return FoodDocument.builder()
               .ucSeq(item.getUcSeq())
-              // .mainTitle(item.getMainTitle()) // mainTitle 필드는 title과 중복되므로 주석 처리
               .gugunNm(item.getGugunNm())
-              .geoPoint(geoPoint)
+              .geoPoint(finalGeoPoint) // 최종 GeoPoint 사용
               .title(item.getTitle())
               .subtitle(item.getSubtitle())
               .addr1(cleanAddr1)
@@ -202,85 +191,47 @@ public class FoodDataProcessorService {
   }
 
   /**
-   * 주메뉴 문자열에서 가격 정보를 제거하고 메뉴 항목별로 분리하여 리스트로 반환합니다.
-   *
-   * @param menuText 파싱할 원본 주메뉴 문자열
-   * @return 정리된 메뉴 항목 리스트
+   * GeoPoint가 부산광역시의 대략적인 범위 내에 있는지 확인하는 헬퍼 메서드
    */
-  private List<String> processRprsntvMenuString(String menuText) {
-    if (menuText == null || menuText.trim().isEmpty()) {
+  private boolean isGeoPointValidForBusan(GeoPoint geoPoint) {
+    if (geoPoint == null) {
+      return false;
+    }
+    double lat = geoPoint.getLat();
+    double lng = geoPoint.getLon();
+
+    // 부산광역시 위도/경도 범위 설정
+    double minLat = 34.88;
+    double maxLat = 35.50;
+    double minLng = 128.87;
+    double maxLng = 129.35;
+
+    return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+  }
+
+  private List<String> processRprsntvMenuString(String rprsntvMenuText) {
+    if (rprsntvMenuText == null || rprsntvMenuText.trim().isEmpty()) {
       return Collections.emptyList();
     }
+    String tempText = rprsntvMenuText;
+    tempText = tempText.replaceAll("(?<=\\d),(?=\\d{3})", "");
+    String[] itemsArray = tempText.split("[,\\n]");
+    List<String> finalItems = new ArrayList<>();
+    for (String item : itemsArray) {
+      String processedItem = item.trim();
+      if (processedItem.isEmpty()) {
+        continue;
+      }
+      processedItem = processedItem.replaceAll("(?i)[₩￦][\\s0-9/-]*", "");
+      processedItem = processedItem.replaceAll(" +", " ").trim();
 
-    // 1. 가격 정보를 포함하는 모든 패턴을 제거합니다.
-    // - "숫자", "숫자,숫자", "숫자/숫자" 형태의 가격 (예: 9000, 15,000, 15000/16000)
-    // - "숫자 원" 형태의 가격 (예: 10000원)
-    // - "숫자 만원" 형태의 가격 (예: 1만원)
-    String cleanedText = menuText
-        .replaceAll("\\s*\\d+(?:,\\d{3})*(?:\\s*(?:원|만원))?", "") // 숫자+원/만원 제거 (예: 10000원)
-        .replaceAll("\\s*[0-9]+(?:/[0-9]+)?", "") // 숫자+슬래시+숫자 제거 (예: 15000/16000)
-        .replaceAll("\\s*[￦,]+", "") // '￦' 기호와 콤마 제거
-        .replaceAll("\\s+", " ") // 연속된 공백을 하나의 공백으로 축소
-        .trim();
-
-    // 2. 남은 문자열을 쉼표(,), 슬래시(/), 공백을 기준으로 분리합니다.
-    // 이는 "물밀면, 비빔밀면" 또는 "물밀면 / 비빔밀면" 같은 경우를 처리합니다.
-    String[] itemsArray = cleanedText.split("[,/\\s]+");
-
-    // 3. 리스트로 변환하고, 각 항목의 앞뒤 공백을 제거한 후 비어있는 항목을 걸러냅니다.
-    List<String> items = Arrays.stream(itemsArray)
-        .map(String::trim)
-        .filter(item -> !item.isEmpty())
-        .collect(Collectors.toList());
-
-    // 4. 최종적으로 리스트에 중복되는 항목이 있으면 제거합니다.
-    return items.stream().distinct().collect(Collectors.toList());
+      if (!processedItem.isEmpty()) {
+        finalItems.add(processedItem);
+      }
+    }
+    return finalItems.stream().distinct().collect(Collectors.toList());
   }
 
-  /**
-   * 가격 문자열에 3자리마다 콤마를 추가합니다.
-   *
-   * @param priceString 포매팅할 가격 문자열 (예: "9000" 또는 "15000/16000")
-   * @return 포매팅된 문자열 (예: "9,000" 또는 "15,000/16,000")
-   */
-  private String formatPrice(String priceString) {
-    if (priceString == null || priceString.trim().isEmpty()) {
-      return "";
-    }
-
-    // '/'가 포함된 경우 (예: 15000/16000)를 처리
-    if (priceString.contains("/")) {
-      String[] prices = priceString.split("/");
-      return Arrays.stream(prices)
-          .map(this::formatSinglePrice)
-          .collect(Collectors.joining(" / "));
-    } else {
-      return formatSinglePrice(priceString);
-    }
-  }
-
-  /**
-   * 단일 가격 문자열에 3자리마다 콤마를 추가합니다.
-   *
-   * @param priceStr 포매팅할 가격 문자열
-   * @return 포매팅된 문자열
-   */
-  private String formatSinglePrice(String priceStr) {
-    try {
-      long priceValue = Long.parseLong(priceStr.replaceAll("[^\\d]", ""));
-      NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
-      return nf.format(priceValue);
-    } catch (NumberFormatException e) {
-      return priceStr;
-    }
-  }
-
-
-  /**
-   * 문자열에서 줄바꿈 문자를 제거하고 앞뒤 공백을 정리합니다.
-   * @param text 정리할 문자열
-   * @return 정제된 문자열
-   */
   private String cleanString(String text) {
     if (text == null) {
       return null;
@@ -288,22 +239,41 @@ public class FoodDataProcessorService {
     return text.replace("\n", " ").trim();
   }
 
-  /**
-   * 카카오 Geocoding API를 사용하여 주소를 위도와 경도로 변환
-   * @param address 변환할 주소
-   * @return 변환된 위도, 경도 정보가 담긴 GeoPoint 객체, 실패 시 null
-   */
   private GeoPoint geocodeAddress(String address) {
     if (address == null || address.trim().isEmpty()) {
+      log.warn("주소 데이터가 비어있어 지오코딩을 수행하지 않습니다.");
       return null;
     }
 
+    String cleanedAddress = address;
+
+    String roadAddressPattern = "([가-힣]+\\s*[로길]\\s*\\d+(?:-\\d+)?)\\b";
+
+    java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(roadAddressPattern);
+    java.util.regex.Matcher matcher = pattern.matcher(cleanedAddress);
+
+    if (matcher.find()) {
+      cleanedAddress = cleanedAddress.substring(0, matcher.end()).trim();
+    }
+
+    cleanedAddress = cleanedAddress.replaceAll("[-,\\s]*$", "").trim();
+
+    if (cleanedAddress.startsWith("부산 ")) {
+      cleanedAddress = cleanedAddress.replaceFirst("부산 ", "부산광역시 ");
+    } else if (!cleanedAddress.startsWith("부산광역시")) {
+      cleanedAddress = "부산광역시 " + cleanedAddress;
+    }
+
+    log.info("지오코딩을 위해 최종 정제된 주소: {}", cleanedAddress);
+
     try {
-      String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
       URI uri = UriComponentsBuilder.fromUriString(kakaoGeocodeUrl)
-          .queryParam("query", encodedAddress)
+          .queryParam("query", cleanedAddress)
           .build()
+          .encode()
           .toUri();
+
+      log.info("최종 API 호출 URI: {}", uri);
 
       HttpHeaders headers = new HttpHeaders();
       headers.set("Authorization", "KakaoAK " + kakaoApiKey);
@@ -311,19 +281,24 @@ public class FoodDataProcessorService {
 
       ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
 
+      log.info("카카오 API 응답 본문: {}", response.getBody());
+
       if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
         int latIndex = response.getBody().indexOf("\"y\":\"");
         int lngIndex = response.getBody().indexOf("\"x\":\"");
         if (latIndex != -1 && lngIndex != -1) {
           String latStr = response.getBody().substring(latIndex + 5, response.getBody().indexOf("\"", latIndex + 5));
           String lngStr = response.getBody().substring(lngIndex + 5, response.getBody().indexOf("\"", lngIndex + 5));
-          double latitude = Double.parseDouble(latStr);
-          double longitude = Double.parseDouble(lngStr);
-          return new GeoPoint(latitude, longitude);
+          double lat = Double.parseDouble(latStr);
+          double lng = Double.parseDouble(lngStr);
+          log.info("지오코딩 성공: 주소='{}' -> 위도={}, 경도={}", cleanedAddress, lat, lng);
+          return new GeoPoint(lat, lng);
+        } else {
+          log.error("지오코딩 실패: 응답에서 위도/경도 정보를 찾을 수 없습니다. 주소='{}'", cleanedAddress);
         }
       }
     } catch (Exception e) {
-      log.error("Geocoding failed for address: {}", address, e);
+      log.error("지오코딩 처리 중 오류 발생: 주소='{}', 에러: {}", cleanedAddress, e.getMessage());
     }
     return null;
   }
@@ -334,7 +309,6 @@ public class FoodDataProcessorService {
   public static class FoodResponse {
     @JacksonXmlProperty(localName = "header")
     private FoodHeader header;
-
     @JacksonXmlProperty(localName = "body")
     private FoodBody body;
   }
@@ -351,13 +325,10 @@ public class FoodDataProcessorService {
   private static class FoodBody {
     @JacksonXmlProperty(localName = "items")
     private FoodItems items;
-
     @JacksonXmlProperty(localName = "numOfRows")
     private int numOfRows;
-
     @JacksonXmlProperty(localName = "pageNo")
     private int pageNo;
-
     @JacksonXmlProperty(localName = "totalCount")
     private long totalCount;
   }

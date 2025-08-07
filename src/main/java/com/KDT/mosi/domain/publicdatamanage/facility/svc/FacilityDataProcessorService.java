@@ -14,6 +14,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -39,7 +40,6 @@ public class FacilityDataProcessorService {
   private static final Logger logger = LoggerFactory.getLogger(FacilityDataProcessorService.class);
 
   private final RestTemplate restTemplate;
-  // 인터페이스로 의존성을 주입받습니다.
   private final FacilityDataManagementSVC dataManagementService;
 
   @Value("${busan.api.facility.url}")
@@ -61,6 +61,20 @@ public class FacilityDataProcessorService {
   public FacilityDataProcessorService(RestTemplate restTemplate, FacilityDataManagementSVC dataManagementService) {
     this.restTemplate = restTemplate;
     this.dataManagementService = dataManagementService;
+  }
+
+  // 매일 6시간마다 데이터를 갱신하는 스케줄러 메서드
+  @Scheduled(cron = "0 0 */6 * * *") // cron = "초 분 시 일 월 요일" 현재: 매 6시간마다 실행(0시, 6시, 12시, 18시) * 인텔리제이가 실행중이어야만 적용됨
+  public void scheduledDataFetch() {
+    logger.info("스케줄러 시작: 부산 공공데이터 인덱스 초기화 및 갱신");
+
+    // 1. 기존 인덱스 삭제 (새로 추가한 메서드 호출)
+    dataManagementService.deleteFacilityIndex();
+
+    // 2. 새로운 데이터 가져와서 저장
+    fetchAndProcessAllFacilityData();
+
+    logger.info("스케줄러 완료: 부산 공공데이터 인덱스 초기화 및 갱신");
   }
 
   public void initializeUidCounter() {
@@ -109,20 +123,17 @@ public class FacilityDataProcessorService {
   public void fetchAndProcessAllFacilityData() {
     logger.info("Starting to fetch and process all facility data...");
 
-    // 1. Elasticsearch에 저장된 현재 도큐먼트 개수를 가져옵니다.
     long currentDocumentCount = dataManagementService.countAllFacilities();
 
-    // 2. 초기 페이지를 호출하여 전체 데이터 개수를 확인합니다.
     Optional<BusanFacilityApiResponse> initialResponseOpt = callBusanFacilityApi(1);
 
     if (initialResponseOpt.isPresent()) {
       BusanFacilityApiResponse initialResponse = initialResponseOpt.get();
       int totalCount = initialResponse.getResponse().getBody().getTotalCount();
 
-      // 3. 제약조건 확인: 기존 도큐먼트 개수와 API의 총 데이터 개수가 동일한 경우
       if (currentDocumentCount >= totalCount) {
         logger.info("Data loading skipped. Current documents count ({}) is equal to or greater than the total count ({}) from API.", currentDocumentCount, totalCount);
-        return; // 메서드 종료
+        return;
       }
     } else {
       logger.error("Failed to fetch initial page to determine total count. Stopping data fetch.");
@@ -143,7 +154,6 @@ public class FacilityDataProcessorService {
         BusanFacilityApiResponse response = responseOpt.get();
         List<FacilityItem> items = response.getResponse().getBody().getItems().getItemList();
 
-        // 데이터가 없는 페이지일 경우 반복문 종료
         if (items == null || items.isEmpty()) {
           logger.info("No more items on page {}. Ending data fetch.", pageNo);
           hasMoreData = false;
@@ -154,11 +164,8 @@ public class FacilityDataProcessorService {
         dataManagementService.saveAllFacilityDocuments(documents);
         processedCount += documents.size();
 
-        // 100개 단위로 진행 상황을 출력합니다.
-        // (facilityNumOfRows가 100이므로 이 로그가 매 페이지마다 출력됩니다)
         logger.info("Saved {} documents from page {}. Total processed: {}", documents.size(), pageNo, processedCount);
 
-        // 총 처리된 문서 수가 전체 데이터 수에 도달하면 반복문을 종료합니다.
         if (processedCount >= totalCount) {
           hasMoreData = false;
         } else {
@@ -169,7 +176,6 @@ public class FacilityDataProcessorService {
         hasMoreData = false;
       }
 
-      // 혹시 모를 무한 루프를 방지하기 위한 제약 조건 (기존 코드와 동일)
       int maxExpectedPages = (totalCount > 0) ? (totalCount / facilityNumOfRows) + 5 : 10;
       if (pageNo > maxExpectedPages) {
         logger.warn("Exceeded reasonable page limit. Forcing stop data fetch at page {}", pageNo);
@@ -179,6 +185,7 @@ public class FacilityDataProcessorService {
     logger.info("Finished fetching and processing all facility data. Total documents processed: {}", processedCount);
   }
 
+  // 이 메서드에 구/군 추출 로직을 추가하고, setter 호출 방식으로 변경합니다.
   public List<FacilityDocument> processAndConvertFacilityItems(List<FacilityItem> facilityItems) {
     if (facilityItems == null || facilityItems.isEmpty()) {
       return new ArrayList<>();
@@ -189,45 +196,76 @@ public class FacilityDataProcessorService {
           String tel = extractTel(cleanedContents);
           String addr = extractAddr(cleanedContents);
           String location = extractLocation(cleanedContents);
-          String mainMenuString = extractMainMenu(cleanedContents); // 원본 mainMenu 문자열 추출
-          List<String> mainMenu = splitAndCleanMainMenu(mainMenuString); // 새로운 헬퍼 메서드 호출
+          String mainMenuString = extractMainMenu(cleanedContents);
+          List<String> mainMenu = splitAndCleanMainMenu(mainMenuString);
           String lastUpdated = extractLastUpdated(cleanedContents);
           String tableCount = extractTableCount(cleanedContents);
           List<String> setValueNmList = splitByDelimiter(item.getSetValueNm(), "|");
           List<String> gubunList = splitByDelimiter(item.getGubun(), " ");
           LocalDate timestamp = LocalDate.now();
           GeoPoint geoPoint = getGeocodeFromKakao(addr);
+          String gugun = extractGugun(addr);
 
-          return FacilityDocument.builder()
-              .uid(uidCounter.incrementAndGet())
-              .subject(item.getSubject())
-              .tel(tel != null ? tel.trim() : null)
-              .addr(addr != null ? addr.trim() : null)
-              .location(location != null ? location.trim() : null)
-              .mainMenu(mainMenu) // 가공된 리스트 데이터 사용
-              .lastUpdated(lastUpdated != null ? lastUpdated.trim() : null)
-              .imgUrl(item.getImgUrl())
-              .registerDate(item.getRegisterDate())
-              .setValueNm(setValueNmList)
-              .gubun(gubunList)
-              .tableCount(tableCount)
-              .timestamp(timestamp)
-              .geoPoint(geoPoint)
-              .build();
+          // AllArgsConstructor가 없으므로 setter를 이용해 객체 생성
+          FacilityDocument document = new FacilityDocument();
+          document.setUid(uidCounter.incrementAndGet());
+          document.setSubject(item.getSubject());
+          document.setTel(tel != null ? tel.trim() : null);
+          document.setAddr(addr != null ? addr.trim() : null);
+          document.setLocation(location != null ? location.trim() : null);
+          document.setMainMenu(mainMenu);
+          document.setLastUpdated(lastUpdated != null ? lastUpdated.trim() : null);
+          document.setImgUrl(item.getImgUrl());
+          document.setRegisterDate(item.getRegisterDate());
+          document.setSetValueNm(setValueNmList);
+          document.setGubun(gubunList);
+          document.setTableCount(tableCount);
+          document.setTimestamp(timestamp);
+          document.setGeoPoint(geoPoint);
+          document.setGugun(gugun); // 새로 추가된 필드
+
+          return document;
         })
         .collect(Collectors.toList());
   }
 
+  // 구/군 정보를 추출하는 새로운 메서드
   /**
-   * 메뉴 문자열을 ','를 기준으로 분리하고 각 항목을 정리하는 헬퍼 메서드
-   * @param mainMenuText 원본 메뉴 문자열
-   * @return 정리된 메뉴 항목 리스트
+   * 주소(addr)에서 구/군 정보만 추출합니다.
+   * @param addr 원본 주소 문자열
+   * @return 추출된 구/군 문자열 (예: "수영구"), 없으면 null
    */
+  private String extractGugun(String addr) {
+    if (addr == null || addr.trim().isEmpty()) {
+      return null;
+    }
+
+    // '수영구', '해운대군' 등 '구' 또는 '군'으로 끝나는 한글 단어를 찾습니다.
+    Pattern pattern = Pattern.compile("[가-힣]+[구군]");
+    Matcher matcher = pattern.matcher(addr);
+
+    if (matcher.find()) {
+      return matcher.group();
+    }
+
+    return null;
+  }
+
+  // ... 나머지 헬퍼 메서드들은 그대로 유지 ...
   private List<String> splitAndCleanMainMenu(String mainMenuText) {
     if (mainMenuText == null || mainMenuText.trim().isEmpty()) {
       return new ArrayList<>();
     }
-    return Arrays.stream(mainMenuText.split(","))
+
+    String tempText = mainMenuText;
+
+    tempText = tempText.replaceAll("\\(.*", "");
+    tempText = tempText.replaceAll("(?<=\\d),(?=\\d{3})", "");
+    tempText = tempText.replaceAll("\\s*[0-9]+(?:\\s*[-/]?\\s*[0-9]+)*\\s*(?:원|만원|Won)\\s*", "");
+    tempText = tempText.replaceAll("(?i)[₩￦][\\s0-9/-]*", "");
+    tempText = tempText.replaceAll(" +", " ").trim();
+
+    return Arrays.stream(tempText.split(","))
         .map(String::trim)
         .filter(s -> !s.isEmpty())
         .collect(Collectors.toList());
@@ -303,14 +341,31 @@ public class FacilityDataProcessorService {
   }
 
   private String extractMainMenu(String contents) {
-    String mainMenu = extractData(contents, "주메뉴\\s*:\\s*(.+?)(?=\\s*<|\\s*\\d{4}년|\\s*출처|\\s*홈페이지|\\s*※)", 1);
+    if (contents == null) {
+      return null;
+    }
+
+    String regex = "주메뉴\\s*:\\s*(.+?)(?=\\s*(?:[1-9]\\.\\s*)?테이블\\s*수|\\s*(?:[1-9]\\.\\s*)?입점\\s*음식점|\\s*(?:[1-9]\\.\\s*)?이용시간|\\s*<|\\s*\\d{4}년|\\s*출처|\\s*홈페이지|\\s*※|$)";
+
+    String mainMenu = extractData(contents, regex, 1);
+
+    if (mainMenu != null) {
+      mainMenu = mainMenu.replaceAll("\\s*\\d+\\.\\s*.*", "");
+      mainMenu = mainMenu.split("※")[0].trim();
+      mainMenu = mainMenu.split("\\*")[0].trim();
+      return mainMenu;
+    }
+
+    String fallbackRegex = "주메뉴\\s*:\\s*(.+)";
+    mainMenu = extractData(contents, fallbackRegex, 1);
+
     if (mainMenu != null) {
       mainMenu = mainMenu.split("※")[0].trim();
+      mainMenu = mainMenu.split("\\*")[0].trim();
+      return mainMenu;
     }
-    if (mainMenu == null) {
-      mainMenu = extractData(contents, "주메뉴\\s*:\\s*(.+)", 1);
-    }
-    return mainMenu;
+
+    return null;
   }
 
   private String extractLastUpdated(String contents) {

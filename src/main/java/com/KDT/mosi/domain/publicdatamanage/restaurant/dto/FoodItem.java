@@ -45,8 +45,8 @@ public class FoodItem {
   private String itemcntnts;
 
   @JacksonXmlProperty(localName = "LAT")
-  private double lat;
+  private Double lat;
 
   @JacksonXmlProperty(localName = "LNG")
-  private double lng;
+  private Double lng;
 }

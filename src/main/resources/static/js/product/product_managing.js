@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     console.warn('Status filtering form elements not found. Check if #statusForm, select[name="status"], and input[name="page"] exist.');
   }
-
 });
 
 

@@ -179,10 +179,18 @@ public class ProductController {
       List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
       List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(product.getProductId());
 
+      double discountAmount = (double) product.getNormalPrice() - (double) product.getSalesPrice();
+      double salePercent = (discountAmount/product.getNormalPrice())*100;
+      long salesRate = Math.round(salePercent);
+      if (salesRate < 0) {
+        salesRate = 0;
+      }
+
       ProductManagingForm form = new ProductManagingForm();
       form.setProduct(product);
       form.setImages(images);
       form.setCoursePoints(coursePoints);
+      form.setSalesRate(salesRate);
 
       managingForms.add(form);
     }

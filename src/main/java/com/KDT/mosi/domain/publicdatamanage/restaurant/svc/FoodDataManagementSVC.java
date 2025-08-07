@@ -22,4 +22,9 @@ public interface FoodDataManagementSVC {
 
   // 여러 검색 조건을 처리하는 통합 검색 메서드
   Page<FoodDocument> searchFood(String searchType, String keyword, Pageable pageable);
+
+  /**
+   * Elasticsearch의 food_info 인덱스를 삭제합니다.
+   */
+  void deleteFoodInfoIndex();
 }

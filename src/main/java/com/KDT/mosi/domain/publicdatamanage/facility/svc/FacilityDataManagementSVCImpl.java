@@ -5,8 +5,8 @@ import com.KDT.mosi.domain.publicdatamanage.facility.repository.FacilityInfoRepo
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -19,6 +19,7 @@ import java.util.Optional;
 public class FacilityDataManagementSVCImpl implements FacilityDataManagementSVC {
 
   private final FacilityInfoRepository facilityInfoRepository;
+  private final ElasticsearchOperations elasticsearchOperations;
 
   @Override
   public FacilityDocument saveFacilityDocument(FacilityDocument document) {
@@ -92,6 +93,21 @@ public class FacilityDataManagementSVCImpl implements FacilityDataManagementSVC 
         return facilityInfoRepository.findBySetValueNmContaining(keyword, pageable);
       default:
         return facilityInfoRepository.findAll(pageable);
+    }
+  }
+
+  @Override
+  public void deleteFacilityIndex() {
+    // ElasticsearchOperations를 이용해 인덱스를 삭제합니다.
+    if (elasticsearchOperations.indexOps(FacilityDocument.class).exists()) {
+      boolean isDeleted = elasticsearchOperations.indexOps(FacilityDocument.class).delete();
+      if (isDeleted) {
+        log.info("기존 Elasticsearch 인덱스 'facility' 삭제 성공.");
+      } else {
+        log.error("기존 Elasticsearch 인덱스 'facility' 삭제 실패.");
+      }
+    } else {
+      log.info("삭제할 Elasticsearch 인덱스 'facility'가 존재하지 않습니다.");
     }
   }
 }
