@@ -1,10 +1,10 @@
-/* 페이지 컨테이너: 헤더 높이만큼 패딩 */
+/*
 .page-container {
     padding-top: 167px;
     background-color: #FFFFFF;
 }
-
-/* 마이페이지 레이아웃: 사이드바 + 콘텐츠 */
+ */
+/*
 .mypage-container {
     display: flex;
     width: 1200px;
@@ -14,14 +14,13 @@
     box-sizing: border-box;
 }
 
-/* 사이드바 */
+
 .sidebar {
-    flex: 0 0 180px; /* Figma: 180px */
-    padding-top: 59px; /* (266px - 167px) */
+    flex: 0 0 180px;
+    padding-top: 59px;
     box-sizing: border-box;
 }
 
-/* 네비게이션 제목 */
 .mypage-nav .nav-title {
     width: 180px;
     height: 40px;
@@ -41,12 +40,7 @@
     box-sizing: border-box;
 }
 
-/* active 상태 (필요시 추가 커스터마이징) */
-.mypage-nav .nav-title.active {
-    /* 현재는 기본 스타일과 동일하게 유지 */
-}
 
-/* nav 목록 spacing */
 .mypage-nav ul {
     margin: 0;
     padding: 0;
@@ -61,7 +55,7 @@
     display: flex;
     align-items: center;
     width: 180px;
-    height: 37px; /* Figma: 37px */
+    height: 37px;
     padding: 0 12px;
     background-color: #FFFFFF;
     border: 1px solid #0099AD;
@@ -79,33 +73,198 @@
 .mypage-nav ul li a:hover {
     background-color: #F4F4F4;
 }
+*/
+.page-container {
+    background-color: #FFFFFF;
+}
 
-/* 본문 영역 */
+/* 마이페이지 레이아웃: 사이드바 + 콘텐츠 */
+.mypage-container {
+    display: flex;
+    width: 1200px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+
+.mypage-nav ul li a:hover {
+    color: #80CCD6;
+}
+
+.post-section h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #414141;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #1EC4CC;
+    padding-bottom: 10px;
+    margin-top: 0px;
+}
 .content {
-    flex: 1;
-    margin-left: 18px;
+  flex: 1;
+  width: 950px;
+}
+.sidebar-card{
+    height: 200px;
+}
+
+.post-section {
+  position: relative;
 }
 
 /* 게시글 섹션 제목 */
-.post-section h2 {
-    font-family: 'Pretendard', sans-serif;
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 24px;
-    color: #17292C;
-    margin: 24px 0 0;
+
+.post-section hr {
+    border: none;
+    height:2px;
+    background-color: #1EC4CC;
+}
+
+
+/*상단 버튼 줄*/
+.post-section .location {
+    margin: 17px 0 16px 12px;
+    font-weight:500;
+    font-size:13px;
+    color: #1EC4CC;
+}
+.post-section .btnGroup{
+    display: flex;
+    justify-content: space-between;
+}
+.btnGroup button {
+    width: 66.02px;
+    height: 25.94px;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    background-color:#fff;
+    border-radius: 4px;
+    padding-inline: 0;
+}
+
+.post-section .btnGroup .btn-controll {
+  position: absolute;
+  bottom: 6px;
+  right: 1px;
+}
+
+.post-section .btnGroup #btn-reply {
+  position: absolute;
+  bottom: 6px;
+  right: 1px;
+}
+
+.btnGroup .btn-post-edit {
+    border: 1px solid #0099AD;
+}
+
+.btnGroup .btn-post-delete {
+    border: 1px solid #FF3535;
+}
+
+.post-section .btnGroup #btn-save {
+    border: 1px solid #0099AD;
+}
+
+.btnGroup #btn-cancel {
+    border: 1px solid #FF3535;
+}
+
+
+.btnGroup #btn-reply {
+    border: 1px solid #0099AD;
 }
 
 .contentAll {
     border: 1px solid #D4D4D4;
     border-radius: 5px;
+    margin-left:12px;
+    margin-bottom:18px;
+    padding:0 17px 0 17px;
 }
 
-.profile-pic {
-  width: 40px;
-  height: 40px;
+.contentAll hr {
+    margin-bottom: 9px;
+    background-color: #D5D5D5;
+}
+
+.contentAll .contentHeader {
+    padding-left: 20px;
+    padding-right:20px;
+    margin-bottom:20px;
+}
+
+.contentHeader .meta-item {
+    margin: 0;
+}
+
+.contentHeader > .meta-item:first-child {
+    font-size:11px;
+    font-weight:400;
+    margin:15px 0 1px 0;
+}
+
+.contentHeader > .meta-item:nth-child(2){
+    font-size:36px;
+    font-weight:500;
+    margin-bottom:6px;
+}
+
+.contentHeader > .meta-item:nth-child(3){
+    font-size:16px;
+    font-weight:500;
+    margin-bottom:10px;
+}
+.contentHeader .contentInfo {
+  display: flex;
+  align-items: center;  /* 세로 가운데 정렬 */
+}
+
+.contentHeader .contentInfo #btn-report {
+  margin-left: auto;    /* 남은 가로 공간을 버튼 앞으로 밀어냄 */
+  align-self: flex-end;
+}
+
+.contentInfo .profile-pic {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;      /* 동그라미 */
   object-fit: cover;        /* 잘라내기 */
+  margin-right:14px;
+}
+
+.info-text .nickname{
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:1px;
+}
+
+.info-text .hit{
+    font-size:11px;
+    font-weight:400;
+    color:#7D7D7D;
+    margin-bottom:1px;
+}
+
+
+.info-text .time-group{
+    font-size:11px;
+    font-weight:400;
+    color:#7D7D7D;
+}
+
+.contentInfo #btn-report {
+    background: none;
+    border:0;
+}
+
+.contentInfo #btn-report img{
+    height:18px;
+    weight:18px;
+    vertical-align: middle;
 }
 
 .contentInfo{
@@ -117,8 +276,440 @@
     flex-direction: column;
 
 }
+/*첨부파일 관련시작*/
+.contentAll .contentAttachment {
+    border-radius:5px;
+    border:1px solid #D5D5D5;
+    margin-bottom:10px;
+    padding:5px;
+}
+.attachment_info {
+    border-bottom:1px solid #D4D4D4;
+    padding-bottom:3px;
+}
+.contentAttachment .attachment_list {
+  display: flex;
+  flex-wrap: wrap;    /* ← 이 한 줄 추가 */
+  gap: 0.5em;         /* 항목 간격 */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.attachment-item-downloadList {
+    border:1px solid #F6FDFF;
+    border-radius:3px;
+    padding:2px;
+}
+
+.attachment-item-downloadList a:hover{
+    color:#1EC4CC;
+}
+
+.contentAll .contentText {
+    padding-left:20px;
+    padding-right:20px;
+    margin-bottom:36px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/*첨부파일 관련끝*/
+/* inline-image 컨테이너는 width 지정 빼거나 auto 로 두세요 */
+.contentText .inline-image {
+  width: 100% !important;
+  text-align: center;      /* 내부 인라인 요소 가운데 정렬 */
+}
+
+/* 이미지 자체에 최대 크기 지정 + 비율 유지 */
+.contentText .inline-image img.keep-original {
+  display: inline-block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.contentReview {
+    display:flex;
+    align-items: center;
+    margin-bottom:15px;
+}
+
+.contentReview #btn-like {
+  display: inline-flex;
+  align-items: center;
+  background-color:#fff;
+  border:0;
+  padding-inline: 0;
+}
+
+.contentReview #btn-like img {
+    width:21px;
+    height:21px;
+    margin-right:4px;
+}
+.contentReview #btn-like span {
+    font-size:14px;
+    font-weight:400px;
+}
+
+
+.contentReview .commentCnt {
+  display: inline-flex;
+  align-items: center;
+  margin-left:16px;
+}
+
+.contentReview .commentCnt img{
+    width:18px;
+    height:18px;
+    margin-right:5px;
+}
+
+.contentComment .selectComment {
+    margin-bottom:12px;
+}
+
+.contentReview .commentCnt span{
+    font-size:14px;
+    font-weight:400;
+}
+
+.comment-list {
+    background-color:#F6FDFF;
+    padding-top: 12px;
+    box-shadow: 0 17px 0 17px #F6FDFF;
+    margin-bottom:33px;
+}
+.commentContent{
+    display:flex;
+    margin-bottom:20px;
+}
+
+.commentContent .comment-info {
+  flex: 1;                   /* 남은 공간을 모두 차지 */
+  min-width: 0;              /* 내용이 길어져도 넘치지 않도록 */
+}
+
+
+.commentContent .profile-pic {
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;      /* 동그라미 */
+  object-fit: cover;        /* 잘라내기 */
+  margin-right:7px;
+}
+
+.comment-info .commentNickname {
+    font-size: 12px;
+    font-weight:600;
+    margin-right:13px;
+}
+.comment-info .commentBcontent {
+    font-size: 13px;
+    font-weight:400;
+}
+
+.commentBottom .commentUpdateTime {
+    font-size: 9px;
+    font-weight:400;
+    color: #7D7D7D;
+}
+
+.commentContent button {
+    border:0;
+    background: none;
+    text-decoration: underline;
+    font-size:11px;
+    font-weight:400;
+}
+
+.commentContent .btnReplyComment {
+    color:#0099AD;
+}
+
+.commentContent .btnEditComment {
+    color:#0099AD;
+}
+
+.commentContent .btnSaveComment {
+    color:#0099AD;
+}
+
+.commentContent .btnCancelComment {
+    color:#0099AD;
+}
+
+.commentContent .btnLikeComment img{
+    weight:12px;
+    height:10px;
+}
+
+.commentContent .comment_btns {
+  margin-left: auto;
+  margin-right:58px;
+  color:#797979;
+  transition: opacity 0.2s ease;
+}
+
+.comment_btns button {
+    margin-left:3px;
+    color:#797979;
+}
+
+.replyComment {
+    margin-bottom: 20px;
+    padding-right: 58px;
+}
+
+.reply-form > div {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.reply-form textarea{
+    flex: 1;
+    height:56px;
+    resize: none;
+    border-radius: 5px;
+}
+
+
+.btnSubmitReply {
+    width: 65px;
+    height:56px;
+    background-color: #0099AD;
+    border-radius:5px;
+    border:none;
+    color: #fff;
+    font-size:11px;
+    font-weight:600;
+    padding-inline: 0;
+}
+
+.btnCancelReply {
+    width: 65px;
+    height:56px;
+    background-color: #00AEC4;
+    border-radius:5px;
+    border:none;
+    color: #fff;
+    font-size:11px;
+    font-weight:600;
+    padding-inline: 0;
+}
+
+.commentContent .comment_btns button:hover {
+  opacity: 0.7;          /* 살짝 투명하게 */
+}
+
+#reply_pagenation .pagination {
+  display: block;            /* 기본 block 그대로 써도 되고 */
+  width: max-content;        /* 내용물만큼만 */
+  margin: 0 auto;            /* 블록 마진 자동으로 가운데 */
+  display: flex;             /* 버튼 간 간격 위해 flex 사용 */
+  gap: 4px;
+}
+
+#reply_pagenation button {
+    border:0;
+    background: none;
+    font-size:15px;
+    padding:0 5px 0 5px;
+}
+
+#reply_pagenation .active {
+    background: #0099AD;
+}
+
+#reply_pagenation button:hover {
+    background: #0caea8;
+    opacity: 0.5;
+}
+
+#reply_pagenation button:disabled {
+    cursor: default;
+      pointer-events: none;
+}
+
+.commentForm {
+    position: relative;     /* pseudo‑element 위치 기준 */
+    display: flex;
+    border-radius: 5px;
+    padding-right: 34px;
+    margin-bottom: 19px;
+    z-index: 0;             /* ::before가 -1 이라도 commentForm 위에 표시되도록 */
+}
+
+.commentForm::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -17px;            /* 좌우 확장값 */
+    right: -17px;
+    bottom: -19px;          /* 기존 margin-bottom 만큼 아래로 확장 */
+    background-color: #F6FDFF;
+    border-radius: 5px;     /* 상하좌우 모서리 모두 같이 둥글게 */
+    z-index: -1;            /* commentForm 뒤로 */
+}
+
+
+.commentForm .profile-pic {
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;      /* 동그라미 */
+    object-fit: cover;        /* 잘라내기 */
+    margin-right:14px;
+    margin-top:20px;
+}
+
+.commentForm .comment-write-label {
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:6px;
+}
+#comment-form {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+#comment-form #comment-content {
+    flex: 1;
+    height:56px;
+    resize: none;
+    border-radius: 5px;
+}
+
+#comment-form #comment-content::placeholder{
+    color:#B4B4B4;
+}
+
+#comment-form button {
+    width: 65px;
+    height:56px;
+    background-color: #0099AD;
+    border-radius:5px;
+    border:none;
+    color: #fff;
+    font-size:11px;
+    font-weight:600;
+    padding-inline: 0;
+}
+
+
+.comment-input {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.post-nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.post-nav button {
+    width: 66.02px;
+    height:25.94px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 153, 173, 1);
+    border-radius:4px;
+
+    font-size:11px;
+    font-weight:600;
+    color: #000;
+
+    padding-inline: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.post-nav button img {
+  width: 17.29px;
+  height: 18.08px;
+}
+
+
+#edit-form {
+    margin-top:20px;
+    margin-bottom:20px;
+}
+
+.form-label {
+    font-size:20px;
+    font-weight: 600;
+    margin:5px;
+}
+
+#edit-title {
+    font-size:20px;
+    height:30px;
+    padding:5px;
+    width:90%;
+    border-radius:5px;
+}
+
+.content-editor-wrapper{
+    margin-top:20px;
+    margin-bottom:20px;
+}
+
+.file-upload-buttons {
+    margin-top:10px;
+}
+
+.file-upload-buttons > button:first-of-type {
+  width: 70px;
+  height:30px;
+  padding:3px;
+  font-weight:600;
+}
+
+#file-list {
+    margin-top:5px;
+}
+
+#file-list button {
+    border:none;
+    background:none;
+    margin-left: 5px;
+
+}
+
+.file-upload-buttons .file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.file-upload-buttons .file-list .attachment-item {
+  white-space: nowrap;
+}
+
+.file-upload-buttons .file-list .attachment-item:hover .file-name,
+.file-upload-buttons .file-list .attachment-item:hover button {
+  color: #1EC4CC;
+}
+
+
+
+
+
+
+
+
+
+
+textarea {
+    resize: none;
+}
 
 .hidden {
-    border:1px solid #1EC4CC;
     display:none;
 }

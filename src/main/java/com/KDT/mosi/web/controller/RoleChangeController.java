@@ -65,6 +65,11 @@ public class RoleChangeController {
     HttpSession session = request.getSession(true);
     session.setAttribute("loginMember", loginMember);
     session.setAttribute("loginMemberId", memberId);  // ✅ ID도 세션에 저장
+
+    session.setAttribute("loginRole", "SELLER");
+    log.info("✅ 세션에 저장된 loginRole: {}", session.getAttribute("loginRole"));
+
+
     log.info("🔁 역할 전환 후 세션에 loginMember 저장됨: {}", loginMember.getEmail());
 
     // 판매자 페이지 없으면 생성 페이지로 이동
@@ -85,33 +90,38 @@ public class RoleChangeController {
    */
   @PostMapping("/mypage/role/toBuyer")
   public String changeToBuyer(HttpServletRequest request) {
-    // 현재 인증 정보 가져오기
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth == null || !auth.isAuthenticated()) {
       return "redirect:/login";
     }
 
-    // 현재 로그인한 사용자 정보 추출
     CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
     Member loginMember = userDetails.getMember();
     Long memberId = loginMember.getMemberId();
 
-    // 기존 역할 유지, 갱신된 인증 정보 설정
+    // ✅ SELLER(R02) 역할만 삭제
+    if (memberRoleDAO.hasRole(memberId, "R02")) {
+      memberRoleDAO.deleteRole(memberId, "R02");
+      log.info("🗑 판매자(R02) 역할 삭제 완료 (memberId={})", memberId);
+    }
+
+    // ✅ 최신 역할 다시 조회
     List<Role> updatedRoles = memberRoleDAO.findRolesByMemberId(memberId);
     CustomUserDetails updatedUserDetails = new CustomUserDetails(loginMember, updatedRoles);
     UsernamePasswordAuthenticationToken newAuth =
         new UsernamePasswordAuthenticationToken(updatedUserDetails, null, updatedUserDetails.getAuthorities());
 
-    SecurityContext context = SecurityContextHolder.getContext();
-    context.setAuthentication(newAuth);
+    SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-    // ✅ 세션에 loginMember 다시 저장
+    // ✅ 세션 갱신
     HttpSession session = request.getSession(true);
     session.setAttribute("loginMember", loginMember);
-    session.setAttribute("loginMemberId", memberId);  // ✅ ID도 세션에 저장
-    log.info("🔁 역할 전환 후 세션에 loginMember 저장됨: {}", loginMember.getEmail());
+    session.setAttribute("loginMemberId", memberId);
+    session.setAttribute("loginRole", "BUYER");
 
-    // 구매자 마이페이지로 이동
+    log.info("✅ SELLER → BUYER 전환 완료, 세션 업데이트");
+
     return "redirect:/mypage/buyer";
   }
+
 }

@@ -1,10 +1,12 @@
+/*createSellerPage.css*/
+
 /* ✅ 기본 설정 */
-/* body {
+body {
   background-color: #ffffff;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Pretendard', sans-serif;
   color: #414141;
   padding-top: 167px;
-} */
+}
 
 .layout-wrapper {
   width: 1200px;
@@ -41,7 +43,7 @@ h1 {
   background-color: #ffffff;
   border-radius: 12px;
   outline: 1px solid #1EC4CC;
-  margin: 60px;
+  margin: 0 60px 60px 60px;
 }
 
 .form-text {
@@ -51,13 +53,12 @@ h1 {
 }
 
 .form-text.success {
-  color: #2E7D32;  
+  color: #2E7D32;
 }
 
 .form-text.error {
-  color: #D32F2F; 
+  color: #D32F2F;
 }
-
 
 /* ✅ label */
 label {
@@ -67,26 +68,64 @@ label {
 }
 
 /* ✅ 프로필 업로드 */
-.profile-upload {
+.profile-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-preview-box {
   width: 186px;
   height: 186px;
   border-radius: 50%;
-  background-color: #ccc;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  position: relative;
+  background-color: #f0f0f0;
   display: flex;
-  justify-content: center;
   align-items: center;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: #ffffff;
-  cursor: pointer;
+  justify-content: center;
 }
 
-.profile-upload-label {
-  color: white;
-  font-size: 14px;
+.profile-placeholder-text {
+  position: absolute;
+  color: #999;
   font-weight: 600;
+  text-align: center;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.profile-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+/* ✅ 이미지 삭제 X 버튼 */
+.remove-image-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 16px;
+  display: none;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.3s ease;
+}
+
+.remove-image-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 /* ✅ 닉네임 입력 */
@@ -140,7 +179,6 @@ label {
   height: 38px;
   font-size: 14px;
   border-radius: 8px;
-  margin-top: 20px;
 }
 
 .submit-btn:hover {
@@ -189,7 +227,7 @@ label {
   align-items: center;
 }
 
-#charCountNum,.unit {
+#charCountNum, .unit {
   color: #6B6B6B;
 }
 

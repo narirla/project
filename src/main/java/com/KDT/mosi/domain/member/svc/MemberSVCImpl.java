@@ -26,6 +26,7 @@ public class MemberSVCImpl implements MemberSVC {
   private final MemberRoleDAO memberroleDAO;
   private final TermsDAO termsDAO;
   private final BuyerPageDAO buyerPageDAO;
+  private final MemberRoleDAO memberRoleDAO;
 
   /**
    * 회원 등록 (기본형)
@@ -269,6 +270,18 @@ public class MemberSVCImpl implements MemberSVC {
   @Override
   public String findPasswdById(Long memberId) {
     return memberDAO.findPasswdById(memberId);
+  }
+
+  // ✅ MemberSVCImpl.java
+  @Override
+  public List<String> findRolesByMemberId(Long memberId) {
+    return memberDAO.findRolesByMemberId(memberId);
+  }
+
+
+  @Override
+  public int deleteMemberRoles(Long memberId) {
+    return memberRoleDAO.deleteByMemberId(memberId);
   }
 
 

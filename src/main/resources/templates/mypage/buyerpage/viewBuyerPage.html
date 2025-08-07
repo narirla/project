@@ -125,9 +125,20 @@
             </div>
 
             <div class="form-button-group">
-              <a th:href="@{/mypage/buyer/{memberId}/edit(memberId=${member.memberId})}" class="btn btn-primary">회원정보 수정하기</a>
-              <a th:href="@{/members/{id}/delete(id=${member.memberId})}" class="withdraw-text" onclick="return confirm('정말 탈퇴하시겠습니까?');">모시 탈퇴</a>
+              <a th:href="@{/mypage/buyer/{memberId}/edit(memberId=${member.memberId})}" class="btn btn-primary">
+                회원정보 수정하기
+              </a>
+
+              <form method="post" th:action="@{/members/{id}/delete(id=${member.memberId})}">
+                <div th:if="${_csrf != null}">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                </div>
+                <button type="submit" class="withdraw-text" onclick="return confirm('정말 탈퇴하시겠습니까?');">
+                  모시 탈퇴
+                </button>
+              </form>
             </div>
+
           </div>
         </section>
       </main>
@@ -140,6 +151,7 @@
     </div>
     <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
+  <script th:src="@{/js/layout.js}"></script>
 </body>
 
 </html>

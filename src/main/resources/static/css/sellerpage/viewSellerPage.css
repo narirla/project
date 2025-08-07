@@ -4,7 +4,7 @@
 .page-container {
   width: 100%;
   min-height: 100vh;
-  padding: 167px 40px 60px 40px;
+  padding: 0px 40px 60px 40px;
   box-sizing: border-box;
   background-color: #fff;
 }
@@ -179,31 +179,50 @@
   line-height: 16px;
 }
 
-/* 프로필 수정하기 버튼 */
-.btn-box{
+/* ✅ 수정 / 탈퇴 버튼 그룹 */
+.form-button-group {
+  position: relative;            /* 기준점 설정 */
   display: flex;
-  justify-content: center;
-
-  margin-top: 20px;
-}
-
-.btn-box .btn-primary {
-  width: 180px;
-  height: 38px;
-  background-color: #1EC4CC;
-  color: #FFFFFF;
-  font-size: 18px;
-  font-weight: 600; /* 세미볼드 */
-  border: none;
-  border-radius: 8px;
-  display: inline-flex;
+  justify-content: center;       /* 수정 버튼 중앙 정렬 */
   align-items: center;
-  justify-content: center;
-  text-decoration: none;
+  width: 100%;
+  margin-top: 32px;
+  height: 40px;                  /* 버튼 높이 맞춤 */
+}
+
+/* ✅ 공통 버튼 스타일 */
+.btn {
+  padding: 10px 24px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
   cursor: pointer;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
 }
 
-.btn-box .btn-primary:hover {
-  background-color: #00aab8;
+/* ✅ 회원정보 수정하기 버튼 */
+.btn.btn-primary {
+  background-color: #1EC4CC !important;
+  color: #FFFFFF !important;
 }
 
+/* ✅ hover 효과 (색상 유지 원하면 제거 가능) */
+.btn-primary:hover {
+  background-color: #00b4cc;
+}
+
+/* ✅ 모시 탈퇴: 오른쪽 고정 */
+.withdraw-text {
+  position: absolute;
+  right: 0;                      /* 오른쪽 끝 정렬 */
+  font-size: 15px;
+  font-weight: 500;              /* 미디엄 */
+  color: #414141;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
