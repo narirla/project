@@ -8,26 +8,17 @@
     box-sizing: border-box;
 }
 
-/* body{
-    height: 3500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-} */
-
 .product-registration {
     font-family: 'Noto Sans KR', sans-serif;
     width: 941px;
     color: #414141;
     line-height: 1.6;
     margin-bottom: 100px;
-    
 }
 
 .page-container{
     height: 2600px;
 }
-
 
 .page-container section{
     width: 941px;
@@ -44,13 +35,12 @@
     padding-bottom: 20px;
 }
 
-
 .form-group {
     display: flex;
-    height: 54px;
+    min-height: 54px; /* 최소 높이 설정 */
     border-top: solid 2px #B2B2B2;
+    padding-bottom: 5px; /* 하단 패딩 추가 */
 }
-
 
 /* label */
 .form-group label {
@@ -60,60 +50,70 @@
     display: flex;
     align-items: center;
     font-weight: bold;
+    flex-shrink: 0;
 }
 
 .form-group b{
     color: #FF3030;
 }
 
-
-/* input 내용들 */
-.form-group div {
-    padding-left: 20px;
-    padding-top: 7px;
-    padding-bottom: 7px;
+/* input, textarea, select를 감싸는 새로운 래퍼 */
+.input-container {
+    position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 10px 0; /* 내부 패딩 */
 }
 
-.form-group div .pname {
+.form-group > .input-container {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* input 내용들 */
+.form-group .pname {
     border-radius: 5px;
     width: 480px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     padding-left: 7px;
 }
 
-.form-group div .price,
-.form-group div .transport {
+.form-group .price,
+.form-group .transport {
     border-radius: 5px;
     width: 150px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     padding-left: 7px;
 }
 
-.form-group div .span {
+.form-group .span {
     border-radius: 5px;
     width: 70px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     padding-left: 7px;
 }
 
-.form-group div .recommendation {
+.form-group .recommendation {
     border-radius: 5px;
     width: 220px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     padding-left: 7px;
 }
 
-.form-group div div {
+/* 라디오 버튼 텍스트와 간격을 위한 div */
+.input-container > div {
+    display: flex;
+    align-items: center;
     padding-left: 3px;
     padding-right: 30px;
 }
@@ -138,20 +138,18 @@ input[type='radio']:checked {
     box-shadow: 0 0 0 1.6px #80CCD6;
 }
 
-
 /* 카테고리 */
-.form-group div select {
+.form-group select {
     border-radius: 5px;
     width: 180px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
-    color:#717171
+    border: 1px solid #DEDEDE;
+    color:#717171;
 }
 
-.form-group div select:focus {
+.form-group select:focus {
     outline: none;
 }
-
 
 /* 이미지 업로드 영역*/
 .form-group.img{
@@ -160,6 +158,12 @@ input[type='radio']:checked {
 
 .form-group.img .image-upload-container {
     width: 600px;
+    display: flex;
+    position: relative;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 25px;
+    flex-grow: 1;
 }
 
 .image-upload-container .image-upload-single {
@@ -185,18 +189,18 @@ input[type='radio']:checked {
 }
 
 .fa.fa-cloud-upload-alt{
-    font-size:48px; 
-    color:#80CCD6; 
+    font-size:48px;
+    color:#80CCD6;
     margin-top: 20px;
-    margin-bottom: 10px; 
-    display: block; 
+    margin-bottom: 10px;
+    display: block;
     text-align:center;
 }
 
 .image-name-list{
     display: flex;
     flex-direction: column;
-    border: 1px solid #D9D9D9; 
+    border: 1px solid #D9D9D9;
     border-radius: 5px;
     width:250px;
     height: 250px;
@@ -213,6 +217,9 @@ input[type='radio']:checked {
     cursor: pointer;
     padding-right: 3px;
     width:100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .image-name-list .image-name-item.active {
@@ -237,60 +244,61 @@ input[type='radio']:checked {
     background-color: #414141;
 }
 
-
 /* 상품 설명 */
 .pdescription {
     height: 400px;
 }
 
-.form-group.pdescription div textarea {
+.form-group.pdescription > .input-container {
+    display: block;
+}
+
+.form-group.pdescription textarea {
     border-radius: 5px;
     width: 555px;
-    height: 380px;
-    border: 1px, solid #DEDEDE;
+    height: 300px; /* 스크린샷에 맞춰 높이 조정 */
+    border: 1px solid #DEDEDE;
     outline: none;
     resize: none;
     padding: 10px;
 }
 
-
-
-
 /* 가격 정보 상세 기입 */
-.price {
+.form-group.price {
     height: 350px;
 }
 
-.form-group div .price-box {
+.form-group .price-info {
+    display: flex;
+}
+
+.form-group .price-box {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: start;
-    margin-top: 10px;
-    margin-bottom: 15px;
     width: 270px;
-    padding-left: 0px;
-    padding-right: 0px;
+    margin-top: 10px;
+    margin-right: 20px;
+}
+
+.price-box .input-container {
+    height: auto;
 }
 
 .price-box textarea {
     border-radius: 5px;
-    width: 240px;
+    width: 100%;
     height: 280px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     resize: none;
     padding: 10px;
 }
 
-.form-group div .price-box .price-info-basic,
-.form-group div .price-box .price-info-guided {
+.price-box .price-info-basic,
+.price-box .price-info-guided {
     font-weight: bold;
-    padding-left: 0;
-    padding-right: 0;
+    margin-bottom: 5px;
 }
-
-
 
 /* 등록 취소 버튼 */
 .form-group.submit-btn {
@@ -303,17 +311,13 @@ input[type='radio']:checked {
 .form-group.submit-btn button {
     margin-left: 10px;
     margin-right: 10px;
-
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-
     text-align: center;
     text-decoration: none;
-
     width: 120px;
     height: 35px;
-
     border: none;
     border-radius: 10px;
 }
@@ -323,6 +327,7 @@ input[type='radio']:checked {
     color: #fff;
     font-size: medium;
 }
+
 .form-group.submit-btn button:first-child:hover{
     background-color: #0099AD;
     color: #fff;
@@ -341,4 +346,65 @@ input[type='radio']:checked {
     color: #fff;
     font-weight: bold;
     border: none;
+}
+
+/* ======================= */
+/* ====== 유효성 검사 ====== */
+/* ======================= */
+
+/* input, textarea를 감싸는 .input-container에 position:relative 적용 */
+.form-group > .input-container {
+    position: relative;
+    padding-bottom: 20px;
+}
+.form-group.pdescription > .input-container {
+    display: block;
+    height: auto;
+    padding-bottom: 25px; /* textarea 아래 메시지 공간 */
+}
+.form-group.price .price-box .input-container {
+    padding-bottom: 25px;
+}
+.form-group.img .image-upload-container {
+    position: relative;
+}
+
+/* 유효성 검사 메시지 스타일 */
+.validation-message {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    color: red;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    display: none; /* 기본적으로 숨김 */
+}
+
+/* 글자수 카운터 스타일 */
+.word-count-message {
+    font-size: 12px;
+    color: gray;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.form-group.pdescription .input-container .validation-message {
+    position: absolute;
+    bottom: 0;
+    left: 10px; /* textarea 패딩과 맞추기 */
+    display: block;
+}
+.form-group.pdescription .input-container .word-count-message {
+    position: absolute;
+    bottom: 0;
+    right: 10px; /* textarea 패딩과 맞추기 */
+    display: block;
+}
+
+/* 라디오 버튼 그룹처럼 텍스트가 줄바꿈되지 않는 경우 */
+.guide-yn-radios .validation-message {
+    left: 20px; /* .form-group > div의 패딩과 일치 */
 }

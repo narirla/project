@@ -27,4 +27,7 @@ public interface FoodDataManagementSVC {
    * Elasticsearch의 food_info 인덱스를 삭제합니다.
    */
   void deleteFoodInfoIndex();
+
+  // Elasticsearch에 food_data 인덱스가 존재하지 않으면 생성
+  void ensureIndexExists();
 }

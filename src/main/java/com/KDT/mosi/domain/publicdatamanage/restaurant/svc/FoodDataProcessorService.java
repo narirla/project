@@ -55,7 +55,6 @@ public class FoodDataProcessorService {
   public void scheduledDataFetch() {
     log.info("스케줄러 시작: 부산 공공데이터 인덱스 초기화 및 갱신");
     try {
-      dataManagementService.deleteFoodInfoIndex();
       fetchAndProcessAllFoodData();
     } catch (Exception e) {
       log.error("스케줄러 실행 중 오류 발생: {}", e.getMessage(), e);
@@ -65,10 +64,16 @@ public class FoodDataProcessorService {
 
   public void fetchAndProcessAllFoodData() throws Exception {
     log.info("Starting to fetch and process food data.");
+
+    // 이 시점에서 인덱스가 존재하지 않으면 생성합니다.
+    // dataManagementService.ensureIndexExists() 같은 메소드를 호출하여 인덱스를 미리 생성해주는 로직이 필요합니다.
+    dataManagementService.ensureIndexExists();
+
     Optional<FoodDocument> latestDocument = dataManagementService.findLatestFoodDocument();
     long totalCountFromApi = fetchTotalCount();
     log.info("Total count from API: {}, Latest document found: {}", totalCountFromApi, latestDocument.isPresent());
 
+    // 데이터가 최신 상태인지 확인하는 로직
     if (latestDocument.isPresent() &&
         ChronoUnit.DAYS.between(latestDocument.get().getTimestamp(), LocalDate.now()) < 1 &&
         dataManagementService.countAllFoodDocuments() == totalCountFromApi) {
@@ -77,7 +82,10 @@ public class FoodDataProcessorService {
     }
 
     log.info("Data is outdated or incomplete. Deleting all existing documents and reloading.");
-    dataManagementService.deleteAllFoodDocuments();
+
+    // 데이터가 오래되었거나 불완전할 경우에만 인덱스를 삭제하고 다시 생성합니다.
+    dataManagementService.deleteFoodInfoIndex(); // <-- 여기로 이동
+    dataManagementService.ensureIndexExists(); // 인덱스 삭제 후 다시 생성
 
     int numOfRows = 100;
     long totalPages = (long) Math.ceil((double) totalCountFromApi / numOfRows);

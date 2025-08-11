@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.NoSuchIndexException;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,16 @@ public class FoodDataManagementSVCImpl implements FoodDataManagementSVC {
 
   private final FoodDocumentRepository foodDocumentRepository;
   private final ElasticsearchOperations elasticsearchOperations;
+  private final FoodDocumentRepository repository;
+
+  public void ensureIndexExists() {
+    boolean isIndexExist = elasticsearchOperations.indexOps(FoodDocument.class).exists();
+    if (!isIndexExist) {
+      elasticsearchOperations.indexOps(FoodDocument.class).create();
+      elasticsearchOperations.indexOps(FoodDocument.class).putMapping();
+      log.info("인덱스 'food_data'가 존재하지 않아 새로 생성했습니다.");
+    }
+  }
 
   @Override
   public FoodDocument saveFoodDocument(FoodDocument document) {
@@ -49,7 +60,13 @@ public class FoodDataManagementSVCImpl implements FoodDataManagementSVC {
 
   @Override
   public Optional<FoodDocument> findLatestFoodDocument() {
-    return foodDocumentRepository.findTopByOrderByTimestampDesc();
+    try{
+      return foodDocumentRepository.findTopByOrderByTimestampDesc();
+    } catch (NoSuchIndexException e) {
+      log.warn("인덱스 'food_data'가 존재하지 않아 최신 문서를 찾을 수 없습니다. 새로운 인덱스 생성 및 데이터 처리를 시작합니다.");
+      return Optional.empty();
+    }
+
   }
 
   @Override
