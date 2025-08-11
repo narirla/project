@@ -20,12 +20,7 @@
 </head>
 
 <body th:attr="data-parent-id=${bbs.bbsId}">
-
-  <header th:replace="${loginRole} == 'SELLER' ?
-          ~{fragments/sellerHeader :: sellerHeader} :
-          ~{fragments/header :: header}">
-  </header>
-
+<header th:replace="~{fragments/header :: header}"></header>
 <!-- ========================= MAIN LAYOUT ========================= -->
 
   <div class="page-container">
@@ -41,12 +36,8 @@
             </ul>
           </nav>
         </div>
-      </aside>
 
-      <!-- ---------- 본문 영역 ---------- -->
-      <section class="content">
-        <section class="post-section">
-          <div class="board" th:id="${bbs.bbsId}"><h1>게시글</h1></div>
+      </section>
 
           <div class="btnGroup">
             <span class="location">커뮤니티 &gt; 자유 게시판</span>
@@ -106,132 +97,69 @@
               </button>
             </div>
           </div>
-          <hr>
-          <div class="contentAttachment">
-            <div class="attachment_info">
-              <span>첨부파일</span>
+
+
+          <div class="commentForm" th:attrappend="hidden=(${memberId} == null) ? 'hidden' : null">
+            <div>
+              <img id="loginProfilePic" class="profile-pic" th:src="@{${profilePic}}" th:alt="${memberId}">
             </div>
-            <div class="attachment_list">
-            </div>
-          </div>
-          <div class="contentText" th:utext="${bbs.bcontent}"></div>
-          <div class="contentReview">
-            <button id="btn-like" type="button">
-
-              <img th:if="${liked}"
-                   th:src="@{/img/bbs/bbs_detail/Icon_Heart_fill.png}"
-                   alt="좋아요 활성화 아이콘"
-                   width="21" height="21"/>
-
-              <img th:unless="${liked}"
-                   th:src="@{/img/bbs/bbs_detail/Icon_Heart.png}"
-                   alt="좋아요 비활성화 아이콘"
-                   width="21" height="21"/>
-              <span class="cntLike" th:text="${'좋아요  ' + cnt_like}">좋아요 0</span>
-            </button>
-            <div class="commentCnt">
-              <img th:src="@{/img/bbs/bbs_detail/comment.png}" alt="댓글 아이콘" width="21" height="21">
-              <span id="comment-total" th:text="${'댓글  ' + cnt_comment}">댓글 0</span>
-            </div>
-          </div>
-          <div class="contentComment">
-            <div class="selectComment"><span>등록순</span></div>
-            <div class="comment-list">
-              <!--출력 예정-->
-            </div>
-            <hr>
-            <div class="contentText" th:utext="${bbs.bcontent}"></div>
-            <div class="contentReview">
-              <button id="btn-like" type="button">
-
-                <img th:if="${liked}"
-                     th:src="@{/img/bbs/bbs_detail/Icon_Heart_fill.png}"
-                     alt="좋아요 활성화 아이콘"
-                     width="21" height="21"/>
-
-                <img th:unless="${liked}"
-                     th:src="@{/img/bbs/bbs_detail/Icon_Heart.png}"
-                     alt="좋아요 비활성화 아이콘"
-                     width="21" height="21"/>
-                <span class="cntLike" th:text="${'좋아요 ' + cnt_like}">좋아요 0</span>
-              </button>
-              <div>
-                <img th:src="@{/img/bbs/bbs_detail/comment.png}" alt="댓글 아이콘" width="21" height="21">
-                <span th:text="${'댓글' + cnt_comment}">댓글 0</span>
-              </div>
-            </div>
-            <div class="contentComment">
-              <div><span>등록순</span></div>
-              <div class="comment-list">
-                <!--출력 예정-->
-              </div>
-              <div class="commentForm" th:attrappend="hidden=(${memberId} == null) ? 'hidden' : null">
-                <div>
-                  <img id="loginProfilePic" class="profile-pic" th:src="@{${profilePic}}" th:alt="${memberId}">
-                </div>
-                <div class="comment-input">
-                  <span class="comment-write-label">댓글쓰기</span>
-                  <form id="comment-form">
-                    <textarea id="comment-content" name="content" placeholder="내용을 입력해주세요." required></textarea>
-                    <button type="submit">입력</button>
-                  </form>
-                </div>
-              </div>
-
-
+            <div class="comment-input">
+              <span class="comment-write-label">댓글쓰기</span>
+              <form id="comment-form">
+                <textarea id="comment-content" name="content" placeholder="내용을 입력해주세요." required></textarea>
+                <button type="submit">입력</button>
+              </form>
             </div>
           </div>
 
-          <!-- 편집 모드 (초기엔 숨김) -->
-          <div class="contentAll edit-mode hidden">
-            <form id="edit-form">
-              <!-- 제목 -->
-              <label for="edit-title" class="form-label">제목</label>
-              <input
-                      type="text"
-                      id="edit-title"
-                      name="title"
-                      th:value="${bbs.title}"
-                      required
-              />
-              <!-- 본문 에디터 -->
 
-              <div class="content-editor-wrapper">
-                <div id="toolbar">
-                  <select class="ql-font"></select>
-                  <select class="ql-size">
-                    <option value="small"></option>
-                    <option selected></option>
-                    <option value="large"></option>
-                    <option value="huge"></option>
-                  </select>
-                  <button class="ql-bold"></button>
-                  <button class="ql-italic"></button>
-                  <button class="ql-underline"></button>
-                  <button class="ql-strike"></button>
-                  <select class="ql-color"></select>
-                  <select class="ql-background"></select>
-                  <button class="ql-script" value="sub"></button>
-                  <button class="ql-script" value="super"></button>
-                  <select class="ql-header">
-                    <option value="1"></option>
-                    <option value="2"></option>
-                    <option selected></option>
-                  </select>
-                  <button class="ql-align" value=""></button>
-                  <button class="ql-align" value="center"></button>
-                  <button class="ql-align" value="right"></button>
-                  <button class="ql-align" value="justify"></button>
-                  <button class="ql-list" value="ordered"></button>
-                  <button class="ql-list" value="bullet"></button>
-                  <button class="ql-indent" value="-1"></button>
-                  <button class="ql-indent" value="+1"></button>
-                </div>
-                <div id="editor" style="height: 300px;" th:utext="${bbs.bcontent}"></div>
-                <input type="hidden" name="bcontent" id="editorContent">
-              </div>
-              <div id="editor" style="height: 740px;" th:utext="${bbs.bcontent}"></div>
-              <input type="hidden" name="bcontent" id="editorContent">
+        </div>
+      </div>
+
+      <!-- 편집 모드 (초기엔 숨김) -->
+      <div class="contentAll edit-mode hidden">
+        <form id="edit-form">
+          <!-- 제목 -->
+          <label for="edit-title" class="form-label">제목</label>
+          <input
+              type="text"
+              id="edit-title"
+              name="title"
+              th:value="${bbs.title}"
+              required
+          />
+          <!-- 본문 에디터 -->
+
+          <div class="content-editor-wrapper">
+            <div id="toolbar">
+              <select class="ql-font"></select>
+              <select class="ql-size">
+                <option value="small"></option>
+                <option selected></option>
+                <option value="large"></option>
+                <option value="huge"></option>
+              </select>
+              <button class="ql-bold"></button>
+              <button class="ql-italic"></button>
+              <button class="ql-underline"></button>
+              <button class="ql-strike"></button>
+              <select class="ql-color"></select>
+              <select class="ql-background"></select>
+              <button class="ql-script" value="sub"></button>
+              <button class="ql-script" value="super"></button>
+              <select class="ql-header">
+                <option value="1"></option>
+                <option value="2"></option>
+                <option selected></option>
+              </select>
+              <button class="ql-align" value=""></button>
+              <button class="ql-align" value="center"></button>
+              <button class="ql-align" value="right"></button>
+              <button class="ql-align" value="justify"></button>
+              <button class="ql-list" value="ordered"></button>
+              <button class="ql-list" value="bullet"></button>
+              <button class="ql-indent" value="-1"></button>
+              <button class="ql-indent" value="+1"></button>
             </div>
             <div class="file-upload-section">
               <input type="hidden" id="upload-group" name="uploadGroup">
@@ -256,19 +184,18 @@
     </main>
   </div>
 
-  <footer th:replace="~{fragments/footer :: footer}"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 
-  <!-- ========================= SCRIPTS ========================= -->
-  <!-- 1) Quill UMD (로컬) -->
-  <script th:src="@{/js/community/vendor/quill.min.js}"></script>
+<!-- ========================= SCRIPTS ========================= -->
+<!-- 1) Quill UMD (로컬) -->
+<script th:src="@{/js/community/vendor/quill.min.js}"></script>
 
-  <!-- 2) ImageDrop UMD (로컬, 파일명은 image-drop.min.js) -->
-  <script th:src="@{/js/community/vendor/image-drop.min.js}"></script>
+<!-- 2) ImageDrop UMD (로컬, 파일명은 image-drop.min.js) -->
+<script th:src="@{/js/community/vendor/image-drop.min.js}"></script>
 
-  <!-- 3) ImageResize UMD (로컬) -->
-  <script th:src="@{/js/community/vendor/image-resize.min.js}"></script>
-
-  <script type="module" src="/js/community/bbs/csr/community_detail.js"></script>
-  <script th:src="@{/js/layout.js}"></script>
+<!-- 3) ImageResize UMD (로컬) -->
+<script th:src="@{/js/community/vendor/image-resize.min.js}"></script>
+<script type="module" src="/js/community/bbs/csr/community_detail.js"></script>
+<script th:src="@{/js/layout.js}"></script>
 </body>
 </html>
