@@ -59,6 +59,7 @@ h2 {
   gap: 16px;
   align-items: flex-start;
 }
+
 .form-group.row > div {
   flex: 1;
   max-width: 240px;
@@ -80,6 +81,7 @@ h2 {
   transition: border 0.2s;
   margin: 0 auto;
   display: block;
+  margin-top: 10px;
 }
 
 /* 포커스 스타일 */
@@ -141,6 +143,9 @@ select.input-mosi, .select-mosi {
   font-size: 10px;
   padding: 0 8px;
   border-radius: 12px !important;
+}
+#tel {
+  margin-bottom: 50px;
 }
 
 /* 버튼 래퍼 */
@@ -214,7 +219,7 @@ select.input-mosi, .select-mosi {
 .form-group label {
   font-size: 0.95em;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 15px;
   margin-left: 10px;
   color: #17292C;
 }
