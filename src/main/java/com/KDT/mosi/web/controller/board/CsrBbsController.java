@@ -31,7 +31,14 @@ public class CsrBbsController {
   final private MemberRoleDAO memberRoleDAO;
 
   @GetMapping
-  public String bbs() {
+  public String bbs(HttpSession session, Model model) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+
+    if (loginMember != null){
+      List<Role> roles = memberRoleDAO.findRolesByMemberId(loginMember.getMemberId());
+      boolean isSeller = roles.stream().anyMatch(role -> "R02".equals(role.getRoleId()));
+      model.addAttribute("loginRole", isSeller ? "SELLER" : "BUYER");
+    }
     return "/postBoards/bbsHome";
   }
 

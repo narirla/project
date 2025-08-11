@@ -24,7 +24,7 @@
   border-radius: 12px;
   padding: 32px;
   background-color: #fff;
-  max-width: 932px;
+  max-width: 874px;
   max-height: 500px;
   margin: 40px auto 0 auto;
   text-align: center;
@@ -32,7 +32,7 @@
 
 /* 제목 "나의 프로필" */
 .info-summary-card h2 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   margin-bottom: 24px;
   color: #000;
@@ -47,17 +47,15 @@
   gap: 16px;
 }
 
-.profile-left{
-
+.profile-left {
   width: 300px;
   height: 320px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
 }
+
 /* 프로필 이미지 박스 */
 .profile-image-box {
   width: 150px;
@@ -143,17 +141,20 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  margin-top: 10px;
 }
 
 .contact-info .nickname {
   font-weight: bold;
   font-size: large;
+  margin-top: 10px;
 }
 
 .contact-info .email {
   font-size: 16px;
   font-weight: 500; /* 미디움 */
   color: #6B6B6B;
+  margin-top: 10px;
 }
 
 .contact-info .tel {
@@ -163,6 +164,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 10px;
 }
 
 /* 인증완료 배지 */

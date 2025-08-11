@@ -1,18 +1,14 @@
+/* community_list.css */
 /* ---------- 사이드바 높이 조절 ---------*/
 .sidebar-card{
     height: 200px;
 }
 
-<<<<<<< HEAD
-
-/* community_list.css */
 .content {
   width: 950px;
   margin-top: 10px;
 }
 
-=======
->>>>>>> origin/main
 /* 페이지 컨테이너: 헤더 높이만큼 패딩 */
 .page-container {
     background-color: #FFFFFF;
