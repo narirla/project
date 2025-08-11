@@ -11,7 +11,7 @@ html, body {
   background-color: #ffffff;
 }
 body {
-    padding-top: 167px;
+    /*padding-top: 167px;*/
 }
 
 .layout-wrapper {
@@ -25,7 +25,7 @@ body {
 /* ============================= */
 
 header {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
@@ -101,6 +101,7 @@ header {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  background-color: #fff;
 }
 
 .logo {
@@ -181,6 +182,7 @@ header {
   justify-content: center;
   border-bottom: 1px solid #eee;
   box-sizing: border-box;
+  position: relative;
 }
 
 .header-nav ul {
@@ -200,21 +202,33 @@ header {
 }
 
 .header-nav a {
-  width: 100%;
-  height: 100%;
+  height: 47px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   font-size: 16px;
   font-weight: 500;
   text-decoration: none;
   color: #000;
-  white-space: nowrap;
+  width: 100%;
 }
 
-.header-nav ul li a:hover {
-  border-bottom: 2px solid #0099AD;
-  color: #0099AD;
+.header-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 8px; /* 테스트 결과 가장 자연스러운 위치 */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #0099AD;
+  transform: scaleX(0);
+  transition: transform 0.25s ease-in-out;
+}
+
+.header-nav a:hover::after {
+  transform: scaleX(1);
+  transform-origin: center;
 }
 
 /* ============================= */
@@ -314,41 +328,39 @@ footer {
 
 .menu-item {
   position: relative;
+  text-align: center;
 }
 
 .menu-item a {
   text-decoration: none;
   color: #333;
   font-weight: 600;
-  padding: 0px 10px;
+  padding: 10px 10px;
 }
 
 /*===============드롭다운 메뉴 스타일==================*/
 /* ✅ 드롭다운 기준점 wrapper 추가 */
 .dropdown-wrapper {
-  position: relative;       /* ✅ 드롭다운 기준점 */
+  /*position: relative;*/       /* ✅ 드롭다운 기준점 */
   display: inline-block;    /* ✅ 크기 맞춰 기준점 잡기 */
+  /*width: 1200px;*/
 }
 
 .dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 47px;                /* ✅ 메뉴 아래쪽으로 내림 */
-  left: 34%;                /* ✅ wrapper 중앙을 기준점으로 */
-  transform: translateX(-25%); /* ✅ 정확히 가운데 정렬 */
+  position: fixed;
+  top: 167px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 1013px;
   height: 350px;
   background: #fff;
-  border: 1px solid #fff;
-  padding: 0px 20px;
-  /*box-shadow: 0 4px 10px rgba(0,0,0,0.1);*/
-  flex-direction: row;
+  z-index: 2000;
+  padding: 0 20px 0 167px;
+  display: flex;
   justify-content: center;
   gap: 20px;
-  z-index: 2000;
-  padding-left: 167px;
+  border: 1px solid #D4D4D4;
 }
-
 
 /* ✅ 카테고리 하나 (테마여행 / 커뮤니티 / 관광정보) */
 .dropdown-section {
@@ -367,6 +379,7 @@ footer {
   color: #0099AD;
   border-bottom: 1px solid #ddd;
   padding-bottom: 5px;
+  margin-top: 12px;
   text-align: center;
 }
 
@@ -398,7 +411,7 @@ footer {
   transition: color 0.2s ease;
   line-height: 1.3;     /* ✅ 글자 줄 간격도 살짝 줄임 */
   height: 25px;
-  padding: 0;
+  padding: 0px 0px 10px 0px;
 }
 
 .dropdown-section li a:hover {

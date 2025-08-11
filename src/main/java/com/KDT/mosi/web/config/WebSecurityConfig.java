@@ -38,7 +38,9 @@ public class WebSecurityConfig {
                 "/api/image-proxy", // ✅ 이미지 프록시 URL을 허용하도록 추가
                 "/api/food/**", // 혹시 몰라 food API도 추가
                 "/members/goodbye",
-                "/find/**", "/css/**", "/js/**", "/img/**"
+                "/find/**", "/css/**", "/js/**", "/img/**",
+                "/info/**",
+                "/api/**"
             ).permitAll()
             .requestMatchers("/mypage/seller/**").authenticated()
             .requestMatchers("/mypage/role/**").authenticated()
