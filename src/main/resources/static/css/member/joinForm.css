@@ -182,6 +182,7 @@ select.input-mosi, .select-mosi {
   border: none;
   transition: background 0.2s, color 0.2s;
   padding: 0 8px;
+  margin-top: 15px;
 }
 
 /* 호버 공통 */
