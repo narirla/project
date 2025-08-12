@@ -1,5 +1,6 @@
 package com.KDT.mosi.web.form.mypage.sellerpage;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +22,11 @@ public class SellerPageCreateForm {
   private String intro;
 
   // 별명
+  @NotBlank(message = "닉네임은 필수 입력 항목입니다.")
   @Size(max = 10, message = "닉네임은 10자 이내로 입력해주세요.")
   private String nickname;
+
+
 
 
 }

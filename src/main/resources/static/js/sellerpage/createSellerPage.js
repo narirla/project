@@ -1,4 +1,4 @@
-/*createSellerPage.js*/
+/* createSellerPage.js */
 document.addEventListener('DOMContentLoaded', function () {
   const nicknameInput = document.getElementById('nickname');
   const checkBtn = document.getElementById('nicknameToggleBtn');
@@ -14,12 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
   const maxLength = 150;
   let isNicknameAvailable = false;
 
-  // 닉네임 입력 시 상태 초기화
+  // ---------- 닉네임 입력 관련 ----------
   if (nicknameInput && msg) {
+    // 입력 시 상태 초기화 + 커스텀 에러 해제
     nicknameInput.addEventListener('input', () => {
       isNicknameAvailable = false;
       msg.textContent = '';
       msg.classList.remove('success', 'error');
+      nicknameInput.setCustomValidity('');
     });
   }
 
@@ -44,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
             msg.textContent = '사용 가능한 닉네임입니다.';
             msg.classList.add('form-text', 'success');
             isNicknameAvailable = true;
+            nicknameInput.setCustomValidity(''); // 성공 시 에러 해제
           } else {
             msg.textContent = '이미 사용 중인 닉네임입니다.';
             msg.classList.add('form-text', 'error');
@@ -60,20 +63,38 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // form 제출 시 닉네임 확인 검사
-  if (form) {
+  // ---------- 제출 검증(공백 → 중복확인 순) ----------
+  if (form && nicknameInput && msg) {
     form.addEventListener('submit', function (e) {
+      const nickname = nicknameInput.value.trim();
+
+      // 1) 미입력
+      if (!nickname) {
+        e.preventDefault();
+        msg.textContent = '닉네임을 입력해주세요.';
+        msg.classList.remove('success');
+        msg.classList.add('form-text', 'error');
+        nicknameInput.setCustomValidity('닉네임을 입력해주세요.');
+        nicknameInput.reportValidity();  // 즉시 표시 (오타 수정)
+        nicknameInput.focus();
+        return;                          // 즉시 종료
+      } else {
+        nicknameInput.setCustomValidity(''); // 값 있으면 에러 해제
+      }
+
+      // 2) 중복확인 미실행/실패
       if (!isNicknameAvailable) {
         e.preventDefault();
         msg.textContent = '닉네임 중복 확인을 먼저 해주세요.';
-        msg.classList.remove('success', 'error');
+        msg.classList.remove('success');
         msg.classList.add('form-text', 'error');
         nicknameInput.focus();
+        return;
       }
     });
   }
 
-  // 소개글 글자 수 실시간 표시
+  // ---------- 소개글 글자 수 ----------
   if (introTextarea && charCountNum) {
     introTextarea.addEventListener('input', function () {
       const currentLength = introTextarea.value.length;
@@ -82,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 이미지 업로드 처리
+  // ---------- 이미지 업로드/삭제 ----------
   if (imageInput && previewImg && removeBtn && placeholderText) {
     imageInput.addEventListener('change', function () {
       const file = imageInput.files[0];
@@ -100,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function () {
         resetImage();
         return;
       }
-
       if (!isValidSize) {
         alert('이미지 파일 크기는 2MB 이하만 허용됩니다.');
         resetImage();
@@ -117,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function () {
       reader.readAsDataURL(file);
     });
 
-    // X 버튼 클릭 시 이미지 제거
     removeBtn.addEventListener('click', function () {
       resetImage();
     });
@@ -131,4 +150,3 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 });
-
