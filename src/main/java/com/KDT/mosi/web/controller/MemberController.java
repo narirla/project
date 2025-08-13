@@ -5,6 +5,7 @@ import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.member.dao.RoleDAO;
 import com.KDT.mosi.domain.member.svc.MemberSVC;
 import com.KDT.mosi.domain.mypage.buyer.svc.BuyerPageSVC;
+import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.terms.svc.TermsSVC;
 import com.KDT.mosi.web.form.member.MemberEditForm;
 import com.KDT.mosi.web.form.member.MemberJoinForm;
@@ -49,6 +50,7 @@ public class MemberController {
   private final TermsSVC termsSVC;
   private final BCryptPasswordEncoder passwordEncoder;
   private final BuyerPageSVC buyerPageSVC;
+  private final SellerPageSVC sellerPageSVC;
 
 
   /**
@@ -345,7 +347,6 @@ public class MemberController {
       throw e;  // 개발 단계에서는 그대로 다시 던져도 됨
     }
   }
-
 
 
   /**

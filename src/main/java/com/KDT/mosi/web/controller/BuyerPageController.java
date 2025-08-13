@@ -5,6 +5,7 @@ import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.member.svc.MemberSVC;
 import com.KDT.mosi.domain.mypage.buyer.svc.BuyerPageSVC;
 import com.KDT.mosi.web.form.mypage.buyerpage.BuyerPageUpdateForm;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,9 @@ public class  BuyerPageController {
 
   // ✅ 마이페이지 조회
   @GetMapping("/{memberId}")
-  public String view(@PathVariable("memberId") Long memberId, Model model) {
+  public String view(@PathVariable("memberId") Long memberId,
+                     Model model,
+                     HttpServletRequest request) {
     if (!getLoginMemberId().equals(memberId)) return "error/403";
 
 
@@ -59,6 +62,7 @@ public class  BuyerPageController {
 
     Member member = om.get();
     model.addAttribute("member", member);
+    model.addAttribute("currentPath", request.getRequestURI());
 
     if (ob.isPresent()) {
       BuyerPage page = ob.get();
@@ -121,7 +125,8 @@ public class  BuyerPageController {
 
   // ✅ 수정 폼
   @GetMapping("/{memberId}/edit")
-  public String editForm(@PathVariable("memberId") Long memberId, Model model) {
+  public String editForm(@PathVariable("memberId") Long memberId,
+                         Model model, HttpServletRequest request) {
     if (!getLoginMemberId().equals(memberId)) {
       return "error/403";
     }
@@ -135,6 +140,7 @@ public class  BuyerPageController {
 
     // ✅ 핵심 포인트: 먼저 등록 (템플릿 파싱 전에 반드시 model에 존재해야 함)
     model.addAttribute("member", member);
+    model.addAttribute("currentPath", request.getRequestURI());
 
     // 2. buyerPage 있으면 form 구성
     return buyerPageSVC.findByMemberId(memberId)
@@ -338,17 +344,17 @@ public class  BuyerPageController {
 
 
   @GetMapping
-  public String buyerMypageHome(Model model) {
+  public String buyerMypageHome(Model model, HttpServletRequest request) {
     Long loginMemberId = getLoginMemberId();
 
     Optional<Member> optionalMember = memberSVC.findById(loginMemberId);
-    if (optionalMember.isEmpty()) {
-      return "error/403"; // 로그인 정보 없음
-    }
+    if (optionalMember.isEmpty()) return "error/403";
 
     Member member = optionalMember.get();
     model.addAttribute("memberId", loginMemberId);
     model.addAttribute("member", member);
+
+    model.addAttribute("currentPath", request.getRequestURI()); // ✅ 추가
 
     return "mypage/buyerpage/buyerMypageHome";
   }

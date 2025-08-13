@@ -15,74 +15,12 @@
 
 <body>
   <div class="layout-wrapper">
-    <header th:replace="~{fragments/header :: header}"></header>
+    <header th:replace="~{fragments/header :: header(activeUri=${currentPath})}"></header>
 
     <div class="page-container">
       <main class="mypage-container">
-        <aside class="sidebar">
-          <div class="sidebar-card">
-            <div class="profile-box">
-              <div class="profile-image">
-                <img id="asideProfileImage" th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
-              </div>
-              <div class="profile-info">
-                <a href="#" class="profile-badge">프로여행러 ></a>
-                <div class="profile-name" th:text="${member.name}"></div>
-                <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top: 10px;">
-                  <button type="submit" class="btn-role-switch">판매자 전환</button>
-                </form>
-              </div>
-            </div>
-            <nav class="mypage-nav">
-              <div class="nav-title active">MY PAGE</div>
-              <ul>
-                <li><a href="#">주문 배송</a>
-                  <ul>
-                    <li><a href="#">주문/배송 내역</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">알림 및 메시지</a>
-                  <ul>
-                    <li><a href="#">알림</a></li>
-                    <li><a href="#">메시지</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">나의 활동</a>
-                  <ul>
-                    <li><a href="#">후기</a></li>
-                    <li><a href="#">게시글</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">관심</a>
-                  <ul>
-                    <li><a href="#">찜한 상품</a></li>
-                    <li><a href="#">팔로잉 가이드</a></li>
-                    <li><a href="#">최근 본 상품</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">내 정보</a>
-                  <ul>
-                    <li><a href="#">회원 등급</a></li>
-                    <li><a th:href="@{'/mypage/buyer/' + ${member.memberId}}">회원 정보 관리</a></li>
-                    <li><a th:href="@{/members/password}">비밀번호 변경</a></li>
-                    <li><a href="#">배송지 관리</a></li>
-                    <li><a href="#">본인 인증</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">고객센터</a>
-                  <ul>
-                    <li><a href="#">1:1 문의</a></li>
-                    <li><a href="#">상품 Q&A 내역</a></li>
-                    <li><a href="#">공지사항</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">고객의 소리</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </aside>
-
+        <!-- 사이드 바 분리 -->
+        <aside th:replace="~{fragments/buyerSidebar :: buyerSidebar(activePath=${currentPath}, member=${member})}"></aside>
         <section class="content">
           <h2>내 정보</h2>
           <!-- 내 정보 -->

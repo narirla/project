@@ -17,12 +17,14 @@ public class PasswordVerifyInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) throws Exception {
     final String uri = req.getRequestURI();
+    log.debug("🔎 Interceptor preHandle uri={}, method={}", uri, req.getMethod());
 
     // 보호 대상 URL 검사
     final boolean needsAuth =
-        uri.matches("^/members/\\d+/edit.*$") ||
-            uri.matches("^/mypage/buyer/\\d+/edit.*$") ||
-            uri.matches("^/mypage/seller/\\d+/edit.*$");
+        "/members/password".equals(uri) ||                                   // ✅ 비밀번호 변경 페이지
+            uri.matches("^/mypage/buyer/\\d+/edit(?:/.*)?$") ||                  // 구매자 수정
+            uri.matches("^/mypage/seller/\\d+/edit(?:/.*)?$") ||                 // 판매자 수정
+            uri.matches("^/members/\\d+/edit(?:/.*)?$");                         // (있으면) 일반 회원 수정
 
     if (!needsAuth) return true;
 
@@ -46,14 +48,17 @@ public class PasswordVerifyInterceptor implements HandlerInterceptor {
         log.info("비밀번호 인증 미실시: uri={}", uri);
       }
 
-      // 원래 가려던 경로 저장
-      String q = req.getQueryString();
-      String intended = (q == null) ? uri : uri + "?" + q;
-      session.setAttribute("INTENDED_URI", intended);
+      //  GET일 때만 의도 경로 저장(POST 재전송 방지)
+      if ("GET".equalsIgnoreCase(req.getMethod())) {
+        String q = req.getQueryString();
+        String intended = (q == null) ? uri : uri + "?" + q;
+        session.setAttribute("INTENDED_URI", intended);
+      }
 
       res.sendRedirect("/members/verify-password");
       return false;
     }
+    log.info("✅ 비밀번호 재인증 통과: uri={}", uri);
     return true;
   }
 

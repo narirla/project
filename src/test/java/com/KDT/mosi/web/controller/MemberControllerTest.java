@@ -37,6 +37,7 @@ class MemberControllerTest {
   private TermsSVC termsSVC;
   private BCryptPasswordEncoder encoder;
   private BuyerPageSVC buyerPageSVC;
+  private sellerPageSVC sellerPageSVC;
   private MemberController memberController;
 
   @BeforeEach
@@ -48,7 +49,7 @@ class MemberControllerTest {
     buyerPageSVC = Mockito.mock(BuyerPageSVC.class);
 
     memberController = new MemberController(
-        memberSVC, roleDAO, termsSVC, encoder, buyerPageSVC); // ✅ 생성자에 추가
+        memberSVC, roleDAO, termsSVC, encoder, buyerPageSVC, sellerPageSVC); // ✅ 생성자에 추가
 
     // SecurityContext 인증 주입
     String testEmail = "test@mosi.com";
