@@ -21,7 +21,7 @@
   <div class="page-container">
     <main class="mypage-container">
       <!-- 사이드 바 분리 -->
-      <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${#httpServletRequest.requestURI}, ${sellerPage})}"></aside>
+      <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${activePath}, ${member})}"></aside>
 
       <section class="content">
         <div class="product-registration">

@@ -18,12 +18,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(passwordVerifyInterceptor)
         .addPathPatterns(
-            "/mypage/buyer/*/edit/**",
-            "/mypage/seller/*/edit/**",
-            "/members/password"          // ✅ 비밀번호 변경 진입도 보호
+            "/members/password",
+            "/mypage/buyer/*/edit", "/mypage/buyer/*/edit/**",
+            "/mypage/seller/*/edit", "/mypage/seller/*/edit/**",
+            "/members/*/edit", "/members/*/edit/**"
+        )
+        .excludePathPatterns(
+            "/members/verify-password",
+            "/members/password/check", "/members/passwordCheck",
+            "/css/**", "/js/**", "/img/**", "/images/**", "/webjars/**",
+            "/favicon.ico", "/.well-known/**"
         );
     log.info("PasswordVerifyInterceptor 등록 완료");
   }
-
-
 }

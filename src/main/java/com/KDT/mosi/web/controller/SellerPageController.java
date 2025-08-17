@@ -7,6 +7,7 @@ import com.KDT.mosi.domain.mypage.seller.dao.SellerPageDAO;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.web.form.mypage.sellerpage.SellerPageCreateForm;
 import com.KDT.mosi.web.form.mypage.sellerpage.SellerPageUpdateForm;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +83,10 @@ public class SellerPageController {
     loginMember.setNickname(sellerPage.getNickname());
     session.setAttribute("loginMember", loginMember);
 
+    // ✅ 사이드바/템플릿 보조 속성
+    model.addAttribute("activePath", "/mypage/seller/home");
+    model.addAttribute("hasSellerImg", sellerPage.getImage() != null);
+
     model.addAttribute("member", loginMember);
     model.addAttribute("sellerPage", optional.get());
     model.addAttribute("orders", mockOrders());     // 개발용 모의 데이터
@@ -94,7 +99,8 @@ public class SellerPageController {
    * ✅ 판매자 상세 페이지 보기
    */
   @GetMapping("/view")
-  public String viewSellerPage(HttpSession session, Model model) {
+  public String viewSellerPage(HttpServletRequest request,
+                               HttpSession session, Model model) {
     log.info("판매자 상세 페이지 진입 확인");
 
     Member loginMember = (Member) session.getAttribute("loginMember");
@@ -109,6 +115,8 @@ public class SellerPageController {
 
     model.addAttribute("member", loginMember);
     model.addAttribute("sellerPage", optional.get());
+
+    model.addAttribute("activePath", request.getRequestURI());
 
     return "mypage/sellerpage/viewSellerPage";
   }

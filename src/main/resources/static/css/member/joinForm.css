@@ -1,3 +1,5 @@
+/*joinForm.css*/
+
 /* 전체 body 스타일 */
 body {
   font-family: 'Pretendard', sans-serif;
@@ -102,7 +104,8 @@ select.input-mosi, .select-mosi {
   align-items: center;
   gap: 16px;
   font-size: 1em;
-  margin-top: 6px;
+  margin-top: 25px;
+  margin-right: 20px;
 }
 .gender-options input[type="radio"] {
   margin-right: 4px;

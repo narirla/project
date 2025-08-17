@@ -1,5 +1,7 @@
 <!-- sellerHeader.html -->
-<header th:fragment="sellerHeader">
+<header th:fragment="sellerHeader"
+        th:if="${session.loginRole} == 'SELLER'"
+        id="SELLER_HEADER" data-frag="SELLER-HEADER">
   <div class="header-inner">
     <!-- 최상단 로그인/회원가입 or 사용자 정보 -->
     <div class="header-top-bar">
@@ -14,6 +16,7 @@
         <th:block th:if="${#authorization.expression('isAuthenticated()')}">
           <div class="user-logged-in">
             <form th:action="@{/login/logout}" method="post" class="logout-form">
+              <input type="hidden" sec:csrf/>
               <button type="submit" class="logout-button" aria-label="로그아웃">로그아웃</button>
             </form>
             <a th:href="@{/notifications}" class="notification-link" aria-label="알림">
@@ -96,7 +99,7 @@
             <h4>관광 정보</h4>
             <ul>
               <li><a th:href="@{/information/restaurant}">맛집</a></li>
-              <li><a th:href="@{/info/accessibility}">교통약자 편의시설</a></li>
+              <li><a th:href="@{/information/accessibility}">교통약자 편의시설</a></li>
             </ul>
           </div>
         </div>

@@ -62,7 +62,7 @@ public class  BuyerPageController {
 
     Member member = om.get();
     model.addAttribute("member", member);
-    model.addAttribute("currentPath", request.getRequestURI());
+    model.addAttribute("activePath", request.getRequestURI());
 
     if (ob.isPresent()) {
       BuyerPage page = ob.get();
@@ -83,39 +83,37 @@ public class  BuyerPageController {
   }
 
 
-  // ✅ 프로필 이미지 조회
-  @GetMapping("/{memberId}/image")
+  // ✅ 프로필 이미지 조회(기본 이미지: /static/img/default-profile.png)
+  @GetMapping(value = "/{memberId}/image")
   @ResponseBody
-  public ResponseEntity<byte[]> image(@PathVariable("memberId") Long memberId) {
-    Optional<BuyerPage> optional = buyerPageSVC.findByMemberId(memberId);
+  public ResponseEntity<byte[]> image(@PathVariable Long memberId) {
+    Optional<BuyerPage> ob = buyerPageSVC.findByMemberId(memberId);
 
-    if (optional.isPresent() && optional.get().getImage() != null) {
-      byte[] image = optional.get().getImage();
-      MediaType mediaType = MediaType.IMAGE_JPEG;
+    // 1) DB에 이미지가 있으면 그대로 반환(콘텐츠 타입 추정)
+    if (ob.isPresent() && ob.get().getImage() != null) {
+      byte[] bytes = ob.get().getImage();
+      MediaType mediaType = MediaType.IMAGE_JPEG; // 기본값
 
       try {
-        String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(image));
-        if (contentType != null) {
-          mediaType = MediaType.parseMediaType(contentType);
-        }
+        String ct = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(bytes));
+        if (ct != null) mediaType = MediaType.parseMediaType(ct);
       } catch (IOException e) {
         log.warn("이미지 content type 분석 실패, 기본 JPEG 사용");
       }
 
       return ResponseEntity.ok()
           .contentType(mediaType)
-          .body(image);
+          .cacheControl(org.springframework.http.CacheControl.noCache()) // ♻ 변경 즉시 반영
+          .body(bytes);
     }
 
-    // ✅ 이미지가 없을 경우 기본 이미지 파일을 바이트 배열로 반환
-    try {
-      ClassPathResource defaultImage = new ClassPathResource("static/img/default-profile.png");
-      byte[] imageBytes = defaultImage.getInputStream().readAllBytes();
-
+    // 2) 없으면 기본 이미지 반환 (classpath: static/img/default-profile.png)
+    try (var is = new ClassPathResource("static/img/default-profile.png").getInputStream()) {
+      byte[] bytes = is.readAllBytes();
       return ResponseEntity.ok()
           .contentType(MediaType.IMAGE_PNG)
-          .body(imageBytes);
-
+          .cacheControl(org.springframework.http.CacheControl.noCache())
+          .body(bytes);
     } catch (IOException e) {
       log.error("기본 이미지 로드 실패", e);
       return ResponseEntity.notFound().build();
@@ -140,8 +138,7 @@ public class  BuyerPageController {
 
     // ✅ 핵심 포인트: 먼저 등록 (템플릿 파싱 전에 반드시 model에 존재해야 함)
     model.addAttribute("member", member);
-    model.addAttribute("currentPath", request.getRequestURI());
-
+    model.addAttribute("activePath", request.getRequestURI());
     // 2. buyerPage 있으면 form 구성
     return buyerPageSVC.findByMemberId(memberId)
         .map(entity -> {
@@ -354,7 +351,7 @@ public class  BuyerPageController {
     model.addAttribute("memberId", loginMemberId);
     model.addAttribute("member", member);
 
-    model.addAttribute("currentPath", request.getRequestURI()); // ✅ 추가
+    model.addAttribute("activePath", request.getRequestURI()); // ✅ 추가
 
     return "mypage/buyerpage/buyerMypageHome";
   }

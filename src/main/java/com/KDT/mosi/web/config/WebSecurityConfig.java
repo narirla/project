@@ -13,21 +13,23 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
   private final UserDetailsService userDetailsService;
-  private final LoginSuccessHandler loginSuccessHandler; // ✅ 커스텀 로그인 성공 핸들러 주입
+  private final LoginSuccessHandler loginSuccessHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .csrf(csrf -> csrf.disable())
+        // (선택) AJAX를 POST로 보낼 때 CSRF를 무시하려면 아래 주석 해제
+        // .csrf(csrf -> csrf.ignoringRequestMatchers("/members/password/check"))  // [변경] 단일 경로만
+
         .formLogin(form -> form
-            .loginPage("/login")                      // 로그인 폼 경로
-            .loginProcessingUrl("/login")             // 로그인 처리 경로
-            .successHandler(loginSuccessHandler)      // 로그인 성공 핸들러 등록
+            .loginPage("/login")
+            .loginProcessingUrl("/login")
+            .successHandler(loginSuccessHandler)
             .permitAll()
         )
         .logout(logout -> logout
-            .logoutUrl("/login/logout")               // 로그아웃 처리 경로
-            .logoutSuccessUrl("/")                    // 로그아웃 후 이동 경로
+            .logoutUrl("/logout")
+            .logoutSuccessUrl("/login?logout")
         )
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
@@ -35,19 +37,26 @@ public class WebSecurityConfig {
                 "/members/join", "/members/join/**",
                 "/members/emailCheck", "/members/nicknameCheck",
                 "/members/goodbye",
-                "/find/**", "/css/**", "/js/**", "/img/**",
+                "/find/**",
+                "/css/**", "/js/**", "/img/**", "/images/**", "/webjars/**",
+                "/favicon.ico", "/.well-known/**",
                 "/info/**",
-                "/api/**"
+                "/api/**",
+                // 현재 비밀번호 확인 API (AJAX)
+                "/members/password/check"                        // [변경] 레거시(/members/passwordCheck) 제거
             ).permitAll()
-            .requestMatchers("/mypage/seller/**").authenticated()   // ✅ 판매자 마이페이지 허용
+            // 보호 자원
+            .requestMatchers("/members/verify-password").authenticated()
+            .requestMatchers("/members/password").authenticated()
+            .requestMatchers("/mypage/seller/**").authenticated()
             .requestMatchers("/mypage/role/**").authenticated()
             .requestMatchers("/members/*/delete").authenticated()
             .anyRequest().authenticated()
         )
         .exceptionHandling(ex -> ex
-            .accessDeniedPage("/error/403")           // 권한 오류 페이지 지정
+            .accessDeniedPage("/error/403")
         )
-        .userDetailsService(userDetailsService);      // 사용자 정보 제공자
+        .userDetailsService(userDetailsService);
 
     return http.build();
   }

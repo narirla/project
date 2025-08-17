@@ -7,27 +7,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Component
 public class PasswordVerifyInterceptor implements HandlerInterceptor {
 
-  // 비밀번호 재인증 유효시간(5분)
-  private static final long TTL = 5 * 60 * 1000L;
+  private static final long TTL = 5 * 60 * 1000L; // 5분
 
   @Override
   public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) throws Exception {
     final String uri = req.getRequestURI();
     log.debug("🔎 Interceptor preHandle uri={}, method={}", uri, req.getMethod());
 
-    // 보호 대상 URL 검사
-    final boolean needsAuth =
-        "/members/password".equals(uri) ||                                   // ✅ 비밀번호 변경 페이지
-            uri.matches("^/mypage/buyer/\\d+/edit(?:/.*)?$") ||                  // 구매자 수정
-            uri.matches("^/mypage/seller/\\d+/edit(?:/.*)?$") ||                 // 판매자 수정
-            uri.matches("^/members/\\d+/edit(?:/.*)?$");                         // (있으면) 일반 회원 수정
-
-    if (!needsAuth) return true;
-
+    // 보호 경로 선택은 WebMvcConfig에서 관리하므로 여기선 신선도만 판단
     HttpSession session = req.getSession(false);
     if (session == null) {
       log.warn("접근 차단: 세션 없음 uri={}", uri);
@@ -48,18 +42,15 @@ public class PasswordVerifyInterceptor implements HandlerInterceptor {
         log.info("비밀번호 인증 미실시: uri={}", uri);
       }
 
-      //  GET일 때만 의도 경로 저장(POST 재전송 방지)
-      if ("GET".equalsIgnoreCase(req.getMethod())) {
-        String q = req.getQueryString();
-        String intended = (q == null) ? uri : uri + "?" + q;
-        session.setAttribute("INTENDED_URI", intended);
-      }
-
-      res.sendRedirect("/members/verify-password");
+      // next 쿼리로 원래 경로 전달
+      String q = req.getQueryString();
+      String intended = (q == null) ? uri : (uri + "?" + q);
+      String next = URLEncoder.encode(intended, StandardCharsets.UTF_8);
+      res.sendRedirect("/members/verify-password?next=" + next);
       return false;
     }
+
     log.info("✅ 비밀번호 재인증 통과: uri={}", uri);
     return true;
   }
-
 }

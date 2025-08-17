@@ -1,18 +1,37 @@
-<!-- templates/fragments/mypage/sellerSidebar.html -->
-<aside class="sidebar" th:fragment="sellerSidebar(activePath, sellerPage)">
+<!-- templates/fragments/sellerSidebar.html -->
+<aside th:fragment="sellerSidebar(activePath, sp)"
+       xmlns:th="http://www.thymeleaf.org"
+       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+       th:if="${session.loginRole == 'SELLER'}"
+       id="SELLER_SIDEBAR" data-frag="SELLER-SIDEBAR">
+
   <div class="sidebar-card">
     <div class="profile-box">
       <div class="profile-image">
-        <img th:if="${sellerPage != null and sellerPage.image != null}"
-             th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}"
+        <!-- ✅ 타입 가드 후 프로퍼티 접근 -->
+        <img th:if="${sp instanceof T(com.KDT.mosi.domain.entity.SellerPage) and sp.image != null}"
+             th:src="@{/mypage/seller/images/profile/{id}(id=${sp.pageId})}"
              alt="프로필 이미지">
-        <img th:if="${sellerPage == null or sellerPage.image == null}"
-             th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
+
+        <img th:unless="${sp instanceof T(com.KDT.mosi.domain.entity.SellerPage) and sp.image != null}"
+             th:src="@{/img/default-profile.png}"
+             alt="기본 프로필 이미지">
       </div>
+
       <div class="profile-info">
-        <a href="#" class="profile-badge"> 프로가이드 ></a>
-        <div class="profile-name" th:text="${sellerPage != null ? sellerPage.nickname : '닉네임'}">닉네임</div>
-        <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
+        <a href="#" class="profile-badge">프로가이드 ></a>
+
+        <!-- ✅ 닉네임도 타입 가드 포함 -->
+        <div class="profile-name"
+             th:text="${sp instanceof T(com.KDT.mosi.domain.entity.SellerPage) and sp.nickname != null
+                        ? sp.nickname
+                        : (session.loginMember != null ? session.loginMember.nickname : '닉네임')}">
+          닉네임
+        </div>
+
+        <!-- 역할 전환: POST + CSRF -->
+        <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top:10px;" sec:authorize="isAuthenticated()">
+          <input type="hidden" sec:csrf/>
           <button type="submit" class="btn-role-switch">구매자 전환</button>
         </form>
       </div>
@@ -50,13 +69,13 @@
           <ul>
             <li>
               <a th:href="@{/mypage/seller/view}"
-                 th:classappend="${activePath.startsWith('/mypage/seller/view')} ? ' is-active'">
+                 th:classappend="${(activePath != null and #strings.startsWith(activePath, '/mypage/seller/view')) ? ' is-active' : ''}">
                 프로필
               </a>
             </li>
             <li>
-              <a th:href="@{/members/password}"
-                 th:classappend="${activePath.startsWith('/members/password')} ? ' is-active'">
+              <a th:href="@{/members/verify-password(next='/members/password')}"
+                 th:classappend="${(activePath != null and #strings.startsWith(activePath, '/members/password')) ? ' is-active' : ''}">
                 비밀번호 변경
               </a>
             </li>

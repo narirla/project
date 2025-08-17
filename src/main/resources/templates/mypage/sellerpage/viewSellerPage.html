@@ -20,7 +20,7 @@
       <main class="mypage-container">
         <!-- ✅ 좌측 사이드바 -->
         <!-- 사이드 바 분리 -->
-        <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${#httpServletRequest.requestURI}, ${sellerPage})}"></aside>
+        <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${activePath}, ${sellerPage})}"></aside>
 
         <!-- ✅ 우측 본문 -->
         <section class="content">
@@ -31,8 +31,7 @@
               <!-- 왼쪽: 프로필 이미지 -->
               <div class="profile-left">
                 <div class="profile-image-box">
-                  <img th:src="${sellerPage.image != null}? @{/mypage/seller/images/profile/{id}(id=${sellerPage.pageId})}
-                  : @{/img/default-profile.png}" alt="프로필 이미지">
+                  <img th:src="${sellerPage != null and sellerPage.image != null} ? @{/mypage/seller/images/profile/{id}(id=${sellerPage.pageId})} : @{/img/default-profile.png}" alt="프로필 이미지">
                 </div>
                 <div class="contact-info">
                   <div class="nickname" th:text="${sellerPage.nickname}">최준</div>

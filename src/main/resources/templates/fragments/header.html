@@ -1,5 +1,7 @@
 <!-- header.html -->
-<header th:fragment="header">
+<header th:fragment="header"
+        th:if="${session.loginRole} != 'SELLER'"
+        id="BUYER_HEADER" data-frag="BUYER-HEADER">
   <div class="header-inner">
     <!-- 최상단 로그인/회원가입 or 사용자 정보 -->
     <div class="header-top-bar">
@@ -14,6 +16,7 @@
         <th:block th:if="${#authorization.expression('isAuthenticated()')}">
           <div class="user-logged-in">
             <form th:action="@{/login/logout}" method="post" class="logout-form">
+              <input type="hidden" sec:csrf/>
               <button type="submit" class="logout-button" aria-label="로그아웃">로그아웃</button>
             </form>
             <a th:href="@{/notifications}" class="notification-link" aria-label="알림">
