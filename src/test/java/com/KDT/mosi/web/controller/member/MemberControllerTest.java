@@ -1,9 +1,10 @@
-package com.KDT.mosi.web.controller;
+package com.KDT.mosi.web.controller.member;
 
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.member.dao.RoleDAO;
 import com.KDT.mosi.domain.member.svc.MemberSVC;
 import com.KDT.mosi.domain.mypage.buyer.svc.BuyerPageSVC;
+import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.terms.svc.TermsSVC;
 import com.KDT.mosi.web.form.member.MemberEditForm;
 import com.KDT.mosi.web.form.member.MemberJoinForm;
@@ -37,7 +38,7 @@ class MemberControllerTest {
   private TermsSVC termsSVC;
   private BCryptPasswordEncoder encoder;
   private BuyerPageSVC buyerPageSVC;
-  private sellerPageSVC sellerPageSVC;
+  private SellerPageSVC sellerPageSVC;
   private MemberController memberController;
 
   @BeforeEach
