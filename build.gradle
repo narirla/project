@@ -48,6 +48,15 @@ dependencies {
 	/******************************************/
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+	// 1) WebSocket(STOMP) 서버
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// 2) Spring JDBC (JdbcTemplate 사용)
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+	// 3) Oracle JDBC 드라이버 - ★버전 명시 필수
+	runtimeOnly 'com.oracle.database.jdbc:ojdbc11:23.5.0.24.07'
 }
 
 dependencyManagement {
