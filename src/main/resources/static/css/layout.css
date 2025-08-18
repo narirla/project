@@ -241,6 +241,7 @@ footer {
   padding: 40px;
   min-height: 300px;          /* 300px 보장, 넘치면 확장 */
   box-sizing: border-box;
+  margin-top: 40px;
 }
 
 .footer-container {

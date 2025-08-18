@@ -17,7 +17,7 @@ public class MemberApiController {
   // 📌 이메일 중복 확인
   @GetMapping("/check-email")
   public Map<String, Boolean> checkEmail(@RequestParam("email") String email) {
-    boolean exists = memberSVC.existsByEmail(email);
+    boolean exists = memberSVC.isExistEmail(email);
     Map<String, Boolean> response = new HashMap<>();
     response.put("exists", exists);
     return response;
