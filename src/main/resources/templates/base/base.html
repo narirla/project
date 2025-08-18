@@ -22,11 +22,28 @@
     </th:block>
 
     <div class="page-container">
-      <main class="mypage-container">
+      <main class="main-container">
+        <!-- 사이드바 분리-->
+        <th:block th:switch="${session.loginRole ?: 'BUYER'}">
+          <aside th:case="'SELLER'"
+                 th:replace="~{fragments/sellerSidebar ::
+           sellerSidebar(activePath=${'/members/password'}, sp=${sellerPage} ?: null)}">
+          </aside>
+          <aside th:case="*"
+                 th:replace="~{fragments/buyerSidebar ::
+           buyerSidebar(activePath=${'/members/password'}, member=${member ?: session.loginMember})}">
+          </aside>
+        </th:block>
 
+        <section class="content">
+
+        </section>
       </main>
-
     </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
+
+  <!-- script 영역 -->
+  <script th:src="@{/js/layout.js}"></script>
 </body>
 </html>
