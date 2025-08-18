@@ -234,3 +234,9 @@ label {
 .maxCount {
   color: #B2B2B2;
 }
+
+.required {
+  color: red;
+  margin-left: 3px; /* 텍스트와 간격 */
+  font-weight: bold;
+}

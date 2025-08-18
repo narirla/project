@@ -23,13 +23,24 @@
         이메일 또는 비밀번호가 올바르지 않습니다.
       </div>
 
+      <!-- ✅ 비밀번호 변경 성공 -->
+      <div th:if="${param.pwChanged}" class="alert alert-success global-msg">
+        비밀번호가 변경되었습니다. 새 비밀번호로 로그인해 주세요.
+      </div>
+
+      <!-- (선택) 로그아웃 완료 메시지. logoutSuccessUrl('/login?logout')일 때만 동작 -->
+      <div th:if="${param.logout}" class="alert alert-info global-msg">
+        로그아웃 되었습니다.
+      </div>
+
+
       <!-- ✅ 리다이렉트 경로 (선택사항) -->
-      <input type="hidden" name="redirect" th:value="${redirect}">
+      <input type="hidden" name="redirect" th:value="${param.redirect}">
 
       <!-- ✅ 이메일 (username) 입력 -->
       <div class="input-item">
         <input type="email" id="email" name="username" placeholder="이메일" th:value="${param.username}" required class="input-item"
-               autocomplete="email">
+               autocomplete="username">
 
         <!-- ✅ 이메일 지우기 버튼 추가 -->
         <button type="button" class="btn-clear email-clear" aria-label="입력 삭제">

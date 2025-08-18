@@ -14,333 +14,270 @@
 </head>
 
 <body>
-  <div class="layout-wrapper">
-    <header th:replace="~{fragments/header :: header}"></header>
+<div class="layout-wrapper">
+  <header th:replace="~{fragments/header :: header(activeUri=${currentPath})}"></header>
 
-    <div class="page-container">
-      <main class="mypage-container">
-        <aside class="sidebar">
-          <div class="sidebar-card">
-            <div class="profile-box">
-              <div class="profile-image">
-                <img id="asideProfileImage" th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
-              </div>
-              <div class="profile-info">
-                <a href="#" class="profile-badge">프로여행러 ></a>
-                <div class="profile-name" th:text="${member.name}"></div>
-                <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top: 10px;">
-                  <button type="submit" class="btn-role-switch">판매자 전환</button>
-                </form>
-              </div>
+  <div class="page-container">
+    <main class="mypage-container">
+      <!-- 사이드 바 분리 -->
+      <aside th:replace="~{fragments/buyerSidebar :: buyerSidebar(${activePath}, ${member})}"></aside>
+      <section class="content">
+        <h2>내 정보</h2>
+        <!-- 내 정보 -->
+        <div class="info-summary-card">
+          <div class="info-grid">
+            <div class="info-item info-main">
+              <span class="title">마일리지</span>
+              <span class="value"> 16,800</span>
             </div>
-            <nav class="mypage-nav">
-              <div class="nav-title active">MY PAGE</div>
-              <ul>
-                <li><a href="#">주문 배송</a>
-                  <ul>
-                    <li><a href="#">주문/배송 내역</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">알림 및 메시지</a>
-                  <ul>
-                    <li><a href="#">알림</a></li>
-                    <li><a href="#">메시지</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">나의 활동</a>
-                  <ul>
-                    <li><a href="#">후기</a></li>
-                    <li><a href="#">게시글</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">관심</a>
-                  <ul>
-                    <li><a href="#">찜한 상품</a></li>
-                    <li><a href="#">팔로잉 가이드</a></li>
-                    <li><a href="#">최근 본 상품</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">내 정보</a>
-                  <ul>
-                    <li><a href="#">회원 등급</a></li>
-                    <li><a th:href="@{'/mypage/buyer/' + ${member.memberId}}">회원 정보 관리</a></li>
-                    <li><a href="#">신용 카드 및 환불계좌 관리</a></li>
-                    <li><a href="#">배송지 관리</a></li>
-                    <li><a href="#">본인 인증</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">고객센터</a>
-                  <ul>
-                    <li><a href="#">1:1 문의</a></li>
-                    <li><a href="#">상품 Q&A 내역</a></li>
-                    <li><a href="#">공지사항</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">고객의 소리</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </aside>
-
-        <section class="content">
-          <h2>내 정보</h2>
-          <!-- 내 정보 -->
-          <div class="info-summary-card">
-            <div class="info-grid">
-              <div class="info-item info-main">
-                <span class="title">마일리지</span>
-                <span class="value"> 16,800</span>
-              </div>
-              <div class="info-item info-main">
-                <span class="title">포인트</span>
-                <span class="value"> 3000P</span>
-              </div>
-            </div>
-            <div class="info-grid-bottom">
-              <div class="info-item"><span class="title">작성 가능 리뷰</span><span class="value"> 2</span></div>
-              <div class="info-item"><span class="title">작성한 리뷰</span><span class="value"> 11</span></div>
-              <div class="info-item"><span class="title">쿠폰</span><span class="value"> 5</span></div>
+            <div class="info-item info-main">
+              <span class="title">포인트</span>
+              <span class="value"> 3000P</span>
             </div>
           </div>
-
-          <!-- 최근 주문 -->
-          <div class="section-card recent-orders">
-            <div class="section-header">
-              <h3>최근 주문</h3>
-              <a href="#" class="view-all">전체보기 ></a>
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>주문일</th>
-                  <th>주문내역</th>
-                  <th>주문번호</th>
-                  <th>결제금액</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Sample Order Row -->
-                <tr>
-                  <td>2025.06.18</td>
-                  <td class="order-item">
-                    <div class="order-item-image"></div>
-                    <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
-                  </td>
-                  <td>ORD20250525-9018706</td>
-                  <td class="price">5,000원</td>
-                </tr>
-                <tr>
-                  <td>2025.06.18</td>
-                  <td class="order-item">
-                    <div class="order-item-image"></div>
-                    <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
-                  </td>
-                  <td>ORD20250525-9018706</td>
-                  <td class="price">5,000원</td>
-                </tr>
-                <tr>
-                  <td>2025.06.18</td>
-                  <td class="order-item">
-                    <div class="order-item-image"></div>
-                    <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
-                  </td>
-                  <td>ORD20250525-9018706</td>
-                  <td class="price">5,000원</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="info-grid-bottom">
+            <div class="info-item"><span class="title">작성 가능 리뷰</span><span class="value"> 2</span></div>
+            <div class="info-item"><span class="title">작성한 리뷰</span><span class="value"> 11</span></div>
+            <div class="info-item"><span class="title">쿠폰</span><span class="value"> 5</span></div>
           </div>
+        </div>
 
-
-          <!-- 광고 슬라이드 -->
-          <div class="ad-banner">
-            <button class="ad-arrow prev">&lt;</button>
-            <span>광고 슬라이드</span>
-            <button class="ad-arrow next">&gt;</button>
+        <!-- 최근 주문 -->
+        <div class="section-card recent-orders">
+          <div class="section-header">
+            <h3>최근 주문</h3>
+            <a href="#" class="view-all">전체보기 ></a>
           </div>
+          <table>
+            <thead>
+            <tr>
+              <th>주문일</th>
+              <th>주문내역</th>
+              <th>주문번호</th>
+              <th>결제금액</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Sample Order Row -->
+            <tr>
+              <td>2025.06.18</td>
+              <td class="order-item">
+                <div class="order-item-image"></div>
+                <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
+              </td>
+              <td>ORD20250525-9018706</td>
+              <td class="price">5,000원</td>
+            </tr>
+            <tr>
+              <td>2025.06.18</td>
+              <td class="order-item">
+                <div class="order-item-image"></div>
+                <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
+              </td>
+              <td>ORD20250525-9018706</td>
+              <td class="price">5,000원</td>
+            </tr>
+            <tr>
+              <td>2025.06.18</td>
+              <td class="order-item">
+                <div class="order-item-image"></div>
+                <span>[MO:SI Pick] 황령산 투어 (1박 2일)</span>
+              </td>
+              <td>ORD20250525-9018706</td>
+              <td class="price">5,000원</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <!-- 찜한 코스 -->
-          <div class="section-card">
-            <div class="section-header">
-              <h3>찜한 코스</h3>
-              <a href="#" class="view-all">전체보기 ></a>
-            </div>
-            <div class="card-wrapper">
-              <div class="card-list">
-                <div class="tour-card">
-                  <div class="card-image">
-                    <img th:src="@{/img/8.png}" alt="황령산 투어">
-                    <i class="fa-solid fa-heart heart-icon"></i>
-                  </div>
-                  <div class="card-content">
-                    <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                    <p class="card-price">
-                      <span class="amount">5,000</span><span class="unit">원</span>
-                    </p>
-                    <p class="card-hint">가이드 구독시 10% 추가할인</p>
-                    <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
-                  </div>
+        <!-- 광고 슬라이드 -->
+        <div class="ad-banner">
+          <button class="ad-arrow prev">&lt;</button>
+          <span>광고 슬라이드</span>
+          <button class="ad-arrow next">&gt;</button>
+        </div>
+
+        <!-- 찜한 코스 -->
+        <div class="section-card">
+          <div class="section-header">
+            <h3>찜한 코스</h3>
+            <a href="#" class="view-all">전체보기 ></a>
+          </div>
+          <div class="card-wrapper">
+            <div class="card-list">
+              <div class="tour-card">
+                <div class="card-image">
+                  <img th:src="@{/img/8.png}" alt="황령산 투어">
+                  <i class="fa-solid fa-heart heart-icon"></i>
                 </div>
-                <div class="tour-card">
-                  <div class="card-image">
-                    <img th:src="@{/img/7.png}" alt="황령산 투어">
-                    <i class="fa-solid fa-heart heart-icon"></i>
-                  </div>
-                  <div class="card-content">
-                    <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                    <p class="card-price">
-                      <span class="amount">5,000</span><span class="unit">원</span>
-                    </p>
-                    <p class="card-hint">가이드 구독시 10% 추가할인</p>
-                    <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
-                  </div>
+                <div class="card-content">
+                  <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                  <p class="card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="card-hint">가이드 구독시 10% 추가할인</p>
+                  <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
                 </div>
-                <div class="tour-card">
-                  <div class="card-image">
-                    <img th:src="@{/img/10.png}" alt="황령산 투어">
-                    <i class="fa-solid fa-heart heart-icon"></i>
-                  </div>
-                  <div class="card-content">
-                    <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                    <p class="card-price">
-                      <span class="amount">5,000</span><span class="unit">원</span>
-                    </p>
-                    <p class="card-hint">가이드 구독시 10% 추가할인</p>
-                    <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
-                  </div>
+              </div>
+              <div class="tour-card">
+                <div class="card-image">
+                  <img th:src="@{/img/2.png}" alt="황령산 투어">
+                  <i class="fa-solid fa-heart heart-icon"></i>
+                </div>
+                <div class="card-content">
+                  <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                  <p class="card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="card-hint">가이드 구독시 10% 추가할인</p>
+                  <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
+                </div>
+              </div>
+              <div class="tour-card">
+                <div class="card-image">
+                  <img th:src="@{/img/10.png}" alt="황령산 투어">
+                  <i class="fa-solid fa-heart heart-icon"></i>
+                </div>
+                <div class="card-content">
+                  <p class="card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                  <p class="card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="card-hint">가이드 구독시 10% 추가할인</p>
+                  <p class="card-discount">4,500 원 <span class="discount-badge">MO:SI 할인가</span></p>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- 팔로우 하는 가이드 -->
-          <div class="section-card">
-            <div class="section-header">
-              <h3>팔로우 하는 가이드</h3>
-              <a href="#" class="view-all">전체보기 ></a>
+        <!-- 팔로우 하는 가이드 -->
+        <div class="section-card">
+          <div class="section-header">
+            <h3>팔로우 하는 가이드</h3>
+            <a href="#" class="view-all">전체보기 ></a>
+          </div>
+          <div class="guide-list">
+            <div class="guide-card">
+              <div class="guide-image">
+                <img th:src="@{/img/guide5.png}" alt="">
+              </div>
+              <p class="guide-name">빠니보틀</p>
             </div>
-            <div class="guide-list">
-              <div class="guide-card">
-                <div class="guide-image">
-                  <img th:src="@{/img/guide5.png}" alt="">
-                </div>
-                <p class="guide-name">빠니보틀</p>
+            <div class="guide-card">
+              <div class="guide-image">
+                <img th:src="@{/img/guide2.png}" alt="">
               </div>
-              <div class="guide-card">
-                <div class="guide-image">
-                  <img th:src="@{/img/guide2.png}" alt="">
-                </div>
-                <p class="guide-name">소련여자</p>
+              <p class="guide-name">소련여자</p>
+            </div>
+            <div class="guide-card">
+              <div class="guide-image">
+                <img th:src="@{/img/guide8.png}" alt="">
               </div>
-              <div class="guide-card">
-                <div class="guide-image">
-                  <img th:src="@{/img/guide8.png}" alt="">
-                </div>
-                <p class="guide-name">김원훈</p>
+              <p class="guide-name">김원훈</p>
+            </div>
+            <div class="guide-card">
+              <div class="guide-image">
+                <img th:src="@{/img/guide7.png}" alt="">
               </div>
-              <div class="guide-card">
-                <div class="guide-image">
-                  <img th:src="@{/img/guide7.png}" alt="">
-                </div>
-                <p class="guide-name">곽튜브</p>
-              </div>
+              <p class="guide-name">곽튜브</p>
             </div>
           </div>
+        </div>
 
-          <!-- 최근 본 코스 -->
-          <div class="section-card">
-            <div class="section-header">
-              <h3>최근 본 코스</h3>
-              <a href="#" class="view-all">전체보기 ></a>
-            </div>
-
-            <div class="recent-course-wrapper">
-
-              <!-- ◀ 왼쪽 버튼 -->
-              <button class="slide-btn prev-btn">❮</button>
-
-              <div class="recent-course-list">
-                <!-- 1번째 카드 -->
-                <div class="recent-course-card">
-                  <div class="recent-course-image">
-                    <img th:src="@{/img/8.png}" alt="황령산 투어">
-                    <i class="fa-solid fa-heart heart-icon"></i>
-                  </div>
-                  <div class="recent-course-content">
-                    <p class="recent-course-card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                    <p class="recent-course-card-price">
-                      <span class="amount">5,000</span><span class="unit">원</span>
-                    </p>
-                    <p class="recent-course-card-hint">가이드 구독시 10% 추가할인</p>
-                    <p class="recent-course-card-discount">4,500 원 <span class="recent-discount-badge">MO:SI 할인가</span></p>
-                  </div>
-                </div>
-                <!-- 2번째 카드 -->
-                <div class="recent-course-card">
-                  <div class="recent-course-image">
-                    <img th:src="@{/img/7.png}" alt="황령산 투어">
-                    <i class="fa-solid fa-heart heart-icon"></i>
-                  </div>
-                  <div class="recent-course-content">
-                    <p class="recent-course-card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                    <p class="recent-course-card-price">
-                      <span class="amount">5,000</span><span class="unit">원</span>
-                    </p>
-                    <p class="recent-course-card-hint">가이드 구독시 10% 추가할인</p>
-                    <p class="recent-course-card-discount">4,500 원 <span class="recent-discount-badge">MO:SI 할인가</span></p>
-                  </div>
-                </div>
-                <!-- 3번째 카드 -->
-                <div class="recent-course-card">
-                  <div class="recent-course-image">
-                    <img th:src="@{/img/3.png}" alt="황령산 투어">
-                    <i class="fa-solid fa-heart heart-icon"></i>
-                  </div>
-                  <div class="recent-course-content">
-                    <p class="recent-course-card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                    <p class="recent-course-card-price">
-                      <span class="amount">5,000</span><span class="unit">원</span>
-                    </p>
-                    <p class="recent-course-card-hint">가이드 구독시 10% 추가할인</p>
-                    <p class="recent-course-card-discount">4,500 원 <span class="recent-discount-badge">MO:SI 할인가</span></p>
-                  </div>
-                </div>
-                <!-- ✅ 4번째 카드 추가 -->
-                <div class="recent-course-card">
-                  <div class="recent-course-image">
-                    <img th:src="@{/img/10.png}" alt="황령산 투어">
-                    <i class="fa-solid fa-heart heart-icon"></i>
-                  </div>
-                  <div class="recent-course-content">
-                    <p class="recent-course-card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
-                    <p class="recent-course-card-price">
-                      <span class="amount">5,000</span><span class="unit">원</span>
-                    </p>
-                    <p class="recent-course-card-hint">가이드 구독시 10% 추가할인</p>
-                    <p class="recent-course-card-discount">4,500 원 <span class="recent-discount-badge">MO:SI 할인가</span></p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- ▶ 오른쪽 버튼 -->
-              <button class="slide-btn next-btn">❯</button>
-            </div>
+        <!-- 최근 본 코스 -->
+        <div class="section-card">
+          <div class="section-header">
+            <h3>최근 본 코스</h3>
+            <a href="#" class="view-all">전체보기 ></a>
           </div>
 
+          <div class="recent-course-wrapper">
 
-        </section>
-      </main>
-      <!-- 공지 -->
-      <div class="notice-bar">
-        <div class="notice-label">공지</div>
-        <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
-        <a href="#" class="more-link">+ 더보기</a>
-      </div>
+            <!-- ◀ 왼쪽 버튼 -->
+            <button class="slide-btn prev-btn">❮</button>
+
+            <div class="recent-course-list">
+              <!-- 1번째 카드 -->
+              <div class="recent-course-card">
+                <div class="recent-course-image">
+                  <img th:src="@{/img/8.png}" alt="황령산 투어">
+                  <i class="fa-solid fa-heart heart-icon"></i>
+                </div>
+                <div class="recent-course-content">
+                  <p class="recent-course-card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                  <p class="recent-course-card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="recent-course-card-hint">가이드 구독시 10% 추가할인</p>
+                  <p class="recent-course-card-discount">4,500 원 <span class="recent-discount-badge">MO:SI 할인가</span></p>
+                </div>
+              </div>
+              <!-- 2번째 카드 -->
+              <div class="recent-course-card">
+                <div class="recent-course-image">
+                  <img th:src="@{/img/7.png}" alt="황령산 투어">
+                  <i class="fa-solid fa-heart heart-icon"></i>
+                </div>
+                <div class="recent-course-content">
+                  <p class="recent-course-card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                  <p class="recent-course-card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="recent-course-card-hint">가이드 구독시 10% 추가할인</p>
+                  <p class="recent-course-card-discount">4,500 원 <span class="recent-discount-badge">MO:SI 할인가</span></p>
+                </div>
+              </div>
+              <!-- 3번째 카드 -->
+              <div class="recent-course-card">
+                <div class="recent-course-image">
+                  <img th:src="@{/img/3.png}" alt="황령산 투어">
+                  <i class="fa-solid fa-heart heart-icon"></i>
+                </div>
+                <div class="recent-course-content">
+                  <p class="recent-course-card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                  <p class="recent-course-card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="recent-course-card-hint">가이드 구독시 10% 추가할인</p>
+                  <p class="recent-course-card-discount">4,500 원 <span class="recent-discount-badge">MO:SI 할인가</span></p>
+                </div>
+              </div>
+              <!-- ✅ 4번째 카드 추가 -->
+              <div class="recent-course-card">
+                <div class="recent-course-image">
+                  <img th:src="@{/img/10.png}" alt="황령산 투어">
+                  <i class="fa-solid fa-heart heart-icon"></i>
+                </div>
+                <div class="recent-course-content">
+                  <p class="recent-course-card-title">[MO:SI Pick] 황령산 투어 (1박 2일)</p>
+                  <p class="recent-course-card-price">
+                    <span class="amount">5,000</span><span class="unit">원</span>
+                  </p>
+                  <p class="recent-course-card-hint">가이드 구독시 10% 추가할인</p>
+                  <p class="recent-course-card-discount">4,500 원 <span class="recent-discount-badge">MO:SI 할인가</span></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ▶ 오른쪽 버튼 -->
+            <button class="slide-btn next-btn">❯</button>
+          </div>
+        </div>
+
+
+      </section>
+    </main>
+    <!-- 공지 -->
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
     </div>
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
-  <script th:src="@{/js/layout.js}"></script>
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+<script th:src="@{/js/layout.js}"></script>
 </body>
 
 </html>

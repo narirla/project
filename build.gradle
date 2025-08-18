@@ -53,6 +53,7 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+        mavenBom "com.oracle.database.jdbc:ojdbc-bom:23.4.0.24.05"
 	}
 }
 

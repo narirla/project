@@ -1,0 +1,96 @@
+<!-- templates/fragments/mypage/buyerSidebar.html -->
+<aside th:fragment="buyerSidebar(activePath, member)"
+       xmlns:th="http://www.thymeleaf.org"
+       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+       th:if="${(session.loginRole ?: 'BUYER') != 'SELLER'}"
+       id="BUYER_SIDEBAR" data-frag="BUYER-SIDEBAR">
+
+  <div class="sidebar-card">
+
+    <div class="profile-box">
+      <div class="profile-image">
+        <!-- 분기 태그 2개 유지 -->
+        <img th:if="${member != null}"
+             id="asideProfileImage"
+             th:src="@{/mypage/buyer/{id}/image(id=${member.memberId})}"
+             alt="프로필 이미지">
+        <img th:unless="${member != null}"
+             id="asideProfileImage"
+             th:src="@{/img/default-profile.png}"
+             alt="기본 프로필">
+      </div>
+
+      <div class="profile-info">
+        <a href="#" class="profile-badge">프로여행러 ></a>
+
+        <!-- 이름 분기 -->
+        <div class="profile-name" th:if="${member != null}" th:text="${member.name}">회원명</div>
+        <div class="profile-name" th:unless="${member != null}">회원명</div>
+
+        <!-- 역할 전환 : POST + CSRF -->
+        <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top:10px;" sec:authorize="isAuthenticated()">
+          <input type="hidden" sec:csrf/>
+          <button type="submit" class="btn-role-switch">판매자 전환</button>
+        </form>
+      </div>
+    </div>
+
+    <nav class="mypage-nav">
+      <div class="nav-title active">MY PAGE</div>
+      <ul>
+        <li><a href="#">주문 배송</a>
+          <ul><li><a href="#">주문/배송 내역</a></li></ul>
+        </li>
+        <li><a href="#">알림 및 메시지</a>
+          <ul><li><a href="#">알림</a></li><li><a href="#">메시지</a></li></ul>
+        </li>
+        <li><a href="#">나의 활동</a>
+          <ul><li><a href="#">후기</a></li><li><a href="#">게시글</a></li></ul>
+        </li>
+        <li><a href="#">관심</a>
+          <ul>
+            <li><a href="#">찜한 상품</a></li>
+            <li><a href="#">팔로잉 가이드</a></li>
+            <li><a href="#">최근 본 상품</a></li>
+          </ul>
+        </li>
+
+        <li><a href="#">내 정보</a>
+          <ul>
+            <li><a href="#">회원 등급</a></li>
+
+            <!-- member null 접근 방지: 항목 자체 분기 -->
+            <li th:if="${member != null}">
+              <a th:href="@{/mypage/buyer/{id}(id=${member.memberId})}"
+                 th:classappend="${(activePath != null and #strings.startsWith(activePath, '/mypage/buyer/')) ? ' is-active' : ''}">
+                회원 정보 관리
+              </a>
+            </li>
+            <li th:unless="${member != null}">
+              <a th:href="@{/login}">회원 정보 관리</a>
+            </li>
+
+            <li>
+              <a th:href="@{/members/verify-password(next='/members/password')}"
+                 th:classappend="${(activePath != null and #strings.startsWith(activePath, '/members/password')) ? ' is-active' : ''}">
+                비밀번호 변경
+              </a>
+            </li>
+            <li><a href="#">배송지 관리</a></li>
+            <li><a href="#">본인 인증</a></li>
+          </ul>
+        </li>
+
+        <li><a href="#">고객센터</a>
+          <ul>
+            <li><a href="#">1:1 문의</a></li>
+            <li><a href="#">상품 Q&amp;A 내역</a></li>
+            <li><a href="#">공지사항</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">고객의 소리</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</aside>

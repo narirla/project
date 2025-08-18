@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기본틀</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
+</head>
+<body>
+  <div class="layout-wrapper">
+
+    <!--헤더 -->
+    <th:block th:switch="${session.loginRole ?: 'BUYER'}">
+      <header th:case="'SELLER'" th:replace="~{fragments/sellerHeader :: sellerHeader(activeUri=${currentPath ?: ''})}">
+      </header>
+      <header th:case="*" th:replace="~{fragments/header :: header(activeUri=${currentPath ?: ''})}">
+      </header>
+    </th:block>
+
+    <div class="page-container">
+      <main class="mypage-container">
+
+      </main>
+
+    </div>
+  </div>
+</body>
+</html>

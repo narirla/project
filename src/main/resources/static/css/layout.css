@@ -35,7 +35,6 @@ header {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /*overflow: hidden;*/
   box-sizing: border-box;
 }
 
@@ -242,6 +241,7 @@ footer {
   padding: 40px;
   min-height: 300px;          /* 300px 보장, 넘치면 확장 */
   box-sizing: border-box;
+  margin-top: 40px;
 }
 
 .footer-container {
@@ -337,8 +337,10 @@ footer {
   font-weight: 600;
   padding: 10px 10px;
 }
+/*==================================================*/
+/*               드롭다운 메뉴 스타일                  */
+/*==================================================*/
 
-/*===============드롭다운 메뉴 스타일==================*/
 /* ✅ 드롭다운 기준점 wrapper 추가 */
 .dropdown-wrapper {
   /*position: relative;*/       /* ✅ 드롭다운 기준점 */
@@ -356,10 +358,15 @@ footer {
   background: #fff;
   z-index: 2000;
   padding: 0 20px 0 167px;
-  display: flex;
+  display: none;
   justify-content: center;
   gap: 20px;
   border: 1px solid #D4D4D4;
+}
+
+/* ✅ 열릴 때만 표시 */
+.dropdown-menu.open {
+  display: flex;      /* 🔥 open일 때만 보이기 */
 }
 
 /* ✅ 카테고리 하나 (테마여행 / 커뮤니티 / 관광정보) */

@@ -31,13 +31,31 @@
         <p th:each="err : ${#fields.globalErrors()}" th:text="${err.defaultMessage}"></p>
       </div>
 
-      <!-- ✅ 이메일 -->
+      <!-- ✅ 이메일 (아이디/도메인 분리) -->
       <div class="form-group">
-        <label for="email">이메일<span class="required">*</span></label>
-        <div style="display:flex; gap:8px;">
-          <input type="email" th:field="*{email}" id="email" class="input-mosi" required placeholder="example@domain.com" autocomplete="email">
-          <button type="button" class="btn-small" onclick="checkEmail()">중복 확인</button>
+        <label for="emailId">이메일<span class="required">*</span></label>
+        <div class="input-row" style="align-items:center;">
+          <input type="text" id="emailId" class="input-mosi" placeholder="example" autocomplete="username">
+          <span style="padding:10px 4px; font-size:26px; margin-top: 10px; font-weight:400; line-height:1; display:flex; align-items:center; flex:0 0 auto;">@</span>
+
+          <select id="emailDomainSelect" class="input-mosi select-mosi" style="flex:2">
+            <option value="">도메인 선택</option>
+            <option value="gmail.com">gmail.com</option>
+            <option value="naver.com">naver.com</option>
+            <option value="daum.net">daum.net</option>
+            <option value="kakao.com">kakao.com</option>
+            <option value="직접입력">직접입력</option>
+          </select>
+
+          <input type="text" id="emailDomainInput" class="input-mosi"
+                 placeholder="직접 입력 (ESC로 목록 복귀)" style="display:none;flex:2">
+
+          <button type="button" class="btn-small" id="emailCheckBtn" onclick="checkEmail()">중복 확인</button>
         </div>
+
+        <!-- 서버 바인딩은 기존 그대로 유지: 최종 이메일을 여기에 합쳐 넣음 -->
+        <input type="hidden" th:field="*{email}" id="emailFull">
+
         <div id="emailCheckResult" class="email-result"></div>
       </div>
 
@@ -73,14 +91,15 @@
       <div class="form-group row">
         <div>
           <label for="name">이름<span class="required">*</span></label>
-          <input type="text" th:field="*{name}" id="name" class="input-mosi" required autocomplete="name">
+          <input type="text" th:field="*{name}" id="name" class="input-mosi" placeholder="이름을 입력해주세요." required autocomplete="name">
           <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></div>
         </div>
         <div>
-          <label>성별</label>
+          <label for="gender">성별</label>
           <div class="gender-options">
             <label for="gender-male"><input type="radio" th:field="*{gender}" id="gender-male" value="남자"> 남</label>
             <label for="gender-female"><input type="radio" th:field="*{gender}" id="gender-female" value="여자"> 여</label>
+            <label for="gender-private"><input type="radio" th:field="*{gender}" id="gender-private" value="비공개"> 비공개</label>
           </div>
           <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" class="error"></div>
         </div>
@@ -90,19 +109,25 @@
       <div class="form-group">
         <label for="nickname">닉네임<span class="required">*</span></label>
         <div style="display: flex; gap: 8px;">
-          <input type="text" id="nickname" name="nickname" th:field="*{nickname}" class="input-mosi" required autocomplete="nickname">
+          <input type="text" id="nickname" name="nickname" th:field="*{nickname}" class="input-mosi" placeholder="닉네임을 입력해주세요." required autocomplete="nickname">
           <button type="button" class="btn-small" onclick="checkNickname()">중복 확인</button>
         </div>
         <div id="nicknameCheckResult" class="check-msg"></div>
         <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="error"></div>
       </div>
 
-      <!-- ✅ 전화번호 -->
+      <!-- ✅ 전화번호 (자동 하이픈 + 즉시 검증) -->
       <div class="form-group">
-        <label for="tel">전화번호<span class="required">*</span></label>
-        <input type="tel" th:field="*{tel}" id="tel" class="input-mosi" required placeholder="010-0000-0000" autocomplete="tel">
-        <div th:if="${#fields.hasErrors('tel')}" th:errors="*{tel}" class="error"></div>
+        <label for="tel">전화번호 <span class="required">*</span></label>
+        <input type="tel" th:field="*{tel}" id="tel" class="input-mosi" placeholder="010-0000-0000"
+               autocomplete="tel" inputmode="numeric" maxlength="13" required
+               pattern="^01[016789]-\d{3,4}-\d{4}$" title="010-1234-5678 형식으로 입력하세요" aria-describedby="telError"
+               oninput="autoHyphenTel(this)">
+        <!-- 클라이언트 에러 메시지 -->
+        <div id="telError" class="error"></div>
       </div>
+
+
 
       <hr class="section-divider">
 
@@ -129,6 +154,7 @@
       <div class="form-group">
         <label for="birthDate">생년월일</label>
         <input type="date" th:field="*{birthDate}" id="birthDate" class="input-mosi" autocomplete="bday">
+        <div id="birthError" class="error"></div>
       </div>
 
       <!-- ✅ 제출 -->

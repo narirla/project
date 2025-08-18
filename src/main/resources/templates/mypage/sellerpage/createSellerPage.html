@@ -37,15 +37,26 @@
 
             <!-- 닉네임 입력 -->
             <div>
-              <label for="nickname" class="sr-only">닉네임</label>
+              <label for="nickname" class="sr-only">닉네임<span class="required">*</span></label>
               <div class="nickname-box">
-                <input type="text" th:field="*{nickname}" id="nickname" name="nickname" placeholder="닉네임을 입력해주세요."
-                  autocomplete="off">
+                <input type="text"
+                       th:field="*{nickname}"
+                       id="nickname"
+                       name="nickname"
+                       placeholder="닉네임을 입력해주세요."
+                       autocomplete="off"
+                       required>
                 <button type="button" class="btn-small" id="nicknameToggleBtn">중복확인</button>
               </div>
-              <!-- ✅ 메시지 표시 영역 -->
-              <span id="nicknameCheckMsg" class="form-text"></span>
+
+              <!-- ✅ 서버 유효성 검증 실패 시 메시지 -->
+              <div class="error-message" th:if="${#fields.hasErrors('nickname')}"
+                   th:errors="*{nickname}"></div>
+
+              <!-- ✅ JS 중복확인/필수값 메시지 -->
+              <span id="nicknameCheckMsg" class="form-text" style="margin-left: 50px;"></span>
             </div>
+
 
             <!-- 소개글 입력 -->
             <div class="textarea-wrapper">
