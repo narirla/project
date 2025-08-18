@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>구매자 기본틀</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
+</head>
+<body>
+  <div class="layout-wrapper">
+
+    <!--헤더 -->
+    <header th:replace="~{fragments/header :: header(activeUri=${currentPath})}"></header>
+
+    <div class="page-container">
+      <main class="main-container">
+
+        <!-- 사이드 바 분리 -->
+        <aside th:replace="~{fragments/buyerSidebar :: buyerSidebar(${activePath}, ${member})}"></aside>
+
+        <section class="content">
+
+        </section>
+      </main>
+    </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+
+  <!-- script 영역 -->
+  <script th:src="@{/js/layout.js}"></script>
+</body>
+</html>
