@@ -1,0 +1,73 @@
+<!-- seller_mypage_community.html (header/footer fragments are included via Thymeleaf but their internal markup is *not* duplicated here) -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MO:SI 판매자 마이페이지 – 커뮤니티</title>
+
+  <!-- 페이지 전용 스타일 -->
+  <link rel="stylesheet" href="/static/css/community/community_list.css" />
+  <link rel="stylesheet" href="/static/css/chat/chat_list_buyer.css" />
+</head>
+
+<body>
+<div class="layout-wrapper">
+  <!-- ========================= MAIN LAYOUT ========================= -->
+  <div class="page-container">
+    <!-- ---------- 본문 영역 ---------- -->
+    <section class="content">
+      <div class="community-wrapper">
+        <section class="post-section">
+          <h1>1:1 문의 내역</h1>
+
+          <div class="inquiry-container">
+            <!-- 탭 메뉴 -->
+            <div class="tab-menu">
+              <button class="tab-button active" data-tab="progress">
+                진행중인 문의
+              </button>
+              <button class="tab-button" data-tab="closed">
+                종료된 문의
+              </button>
+            </div>
+
+            <!-- 진행중 문의 리스트 -->
+            <div id="progress" class="tab-content active">
+              <div class="inquiry-list" id="inquiry_list">
+                <!-- JS 가 채움 -->
+              </div>
+              <!-- 페이징 -->
+              <div class="pagination"></div>
+            </div>
+
+            <!-- 종료된 문의 리스트 -->
+            <div id="closed" class="tab-content">
+              <ul class="inquiry-list">
+                <li>종료된 문의 1</li>
+                <li>종료된 문의 2</li>
+                <li>종료된 문의 3</li>
+                <li>종료된 문의 4</li>
+                <li>종료된 문의 5</li>
+              </ul>
+              <!-- 페이징 -->
+              <div class="pagination">
+                <a href="#">«</a>
+                <a href="#">1</a>
+                <a href="#" class="active">2</a>
+                <a href="#">3</a>
+                <a href="#">4</a>
+                <a href="#">5</a>
+                <a href="#">»</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="/static/js/chat/chat_list_buyer.js"></script>
+</body>
+</html>
