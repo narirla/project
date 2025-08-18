@@ -28,7 +28,8 @@
               <label for="imageFile" class="profile-preview-box">
                 <img id="profilePreview" class="profile-preview" alt="미리보기" style="display: none;">
                 <span class="profile-placeholder-text" id="placeholderText">프로필 사진 등록</span>
-                <button type="button" id="removeImageBtn" class="remove-image-btn" style="display: none;" aria-label="이미지 삭제">
+                <button type="button" id="removeImageBtn" class="remove-image-btn" style="display: none;"
+                  aria-label="이미지 삭제">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </label>
@@ -39,19 +40,13 @@
             <div>
               <label for="nickname" class="sr-only">닉네임<span class="required">*</span></label>
               <div class="nickname-box">
-                <input type="text"
-                       th:field="*{nickname}"
-                       id="nickname"
-                       name="nickname"
-                       placeholder="닉네임을 입력해주세요."
-                       autocomplete="off"
-                       required>
+                <input type="text" th:field="*{nickname}" id="nickname" name="nickname" placeholder="닉네임을 입력해주세요."
+                  autocomplete="off" required>
                 <button type="button" class="btn-small" id="nicknameToggleBtn">중복확인</button>
               </div>
 
               <!-- ✅ 서버 유효성 검증 실패 시 메시지 -->
-              <div class="error-message" th:if="${#fields.hasErrors('nickname')}"
-                   th:errors="*{nickname}"></div>
+              <div class="error-message" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></div>
 
               <!-- ✅ JS 중복확인/필수값 메시지 -->
               <span id="nicknameCheckMsg" class="form-text" style="margin-left: 50px;"></span>

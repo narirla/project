@@ -1,4 +1,4 @@
-package com.KDT.mosi.web.controller;
+package com.KDT.mosi.web.controller.main;
 
 import com.KDT.mosi.domain.member.svc.MemberSVC;
 import com.KDT.mosi.web.form.member.LoginForm;
