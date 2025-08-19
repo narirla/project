@@ -373,6 +373,7 @@ hr.top-line, hr.bottom-line {
   transform: translate(-50%, -25%);
   background: white;
   padding: 20px 30px;
+  margin-left: 120px;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);

@@ -51,12 +51,6 @@ public interface MemberSVC {
    */
   boolean isExistEmail(String email);
 
-  /**
-   * 이메일 중복 여부 확인 (중복 구현 주의)
-   * @param email 확인할 이메일
-   * @return true: 존재함, false: 사용 가능
-   */
-  boolean existsByEmail(String email);
 
   /**
    * 회원 정보 수정
@@ -150,10 +144,18 @@ public interface MemberSVC {
    */
   int updatePasswd(Long memberId, String passwd);
 
-
+  /**
+   *
+   * @param memberId
+   * @return
+   */
   String findPasswdById(Long memberId);
 
-  // ✅ MemberSVC.java
+  /**
+   *
+   * @param memberId
+   * @return
+   */
   List<String> findRolesByMemberId(Long memberId);
 
 

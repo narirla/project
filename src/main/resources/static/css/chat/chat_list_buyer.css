@@ -1,0 +1,67 @@
+.inquiry-container{
+    margin-top: 80px;
+}
+
+
+/* tap 메뉴 */
+.tab-menu {
+    display: flex;
+    height: 61px;
+    border-bottom: 1px solid #BFBFBF;
+}
+
+
+.tab-button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: large;
+    font-weight: bold;
+    color: #6B6B6B;
+}
+
+.tab-button.active {
+    font-size: large;
+    font-weight: bold;
+    color: #1EC4CC;
+}
+
+
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+
+
+.inquiry-list {
+    list-style: none;
+    padding: 0;
+}
+.inquiry-list li {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+
+
+/* 페이지네이션 */
+.pagination {
+    text-align: center;
+    margin-top: 10px;
+}
+.pagination a {
+    display: inline-block;
+    margin: 0 5px;
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #333;
+}
+.pagination a.active {
+    background: #007bff;
+    color: #fff;
+}

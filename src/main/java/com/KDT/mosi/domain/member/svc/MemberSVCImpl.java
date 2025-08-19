@@ -120,17 +120,6 @@ public class MemberSVCImpl implements MemberSVC {
   }
 
   /**
-   * 이메일 존재 여부 확인 (비밀번호 재설정 등에서 사용)
-   *
-   * @param email 확인할 이메일
-   * @return true: 존재함, false: 없음
-   */
-  @Override
-  public boolean existsByEmail(String email) {
-    return memberDAO.findByEmail(email).isPresent();
-  }
-
-  /**
    * 회원 정보 수정
    * - 이름, 전화번호, 닉네임, 주소 등 전체 필드 갱신
    *
@@ -271,7 +260,7 @@ public class MemberSVCImpl implements MemberSVC {
     return memberDAO.findPasswdById(memberId);
   }
 
-  // ✅ MemberSVCImpl.java
+
   @Override
   public List<String> findRolesByMemberId(Long memberId) {
     return memberDAO.findRolesByMemberId(memberId);

@@ -19,20 +19,15 @@ function isValidEmail(email) {
 // 전화번호 자동 하이픈(단일 입력)
 function autoHyphenTel(el) {
   const digits = el.value.replace(/\D/g, '').slice(0, 11);
-  let out = '';
-
-  if (digits.startsWith('02')) { // 서울 국번
-    if (digits.length < 3) out = digits;
-    else if (digits.length < 6) out = `${digits.slice(0,2)}-${digits.slice(2)}`;
-    else if (digits.length < 10) out = `${digits.slice(0,2)}-${digits.slice(2,5)}-${digits.slice(5)}`;
-    else out = `${digits.slice(0,2)}-${digits.slice(2,6)}-${digits.slice(6,10)}`;
-  } else { // 휴대폰
-    if (digits.length < 4) out = digits;
-    else if (digits.length < 8) out = `${digits.slice(0,3)}-${digits.slice(3)}`;
-    else out = `${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7,11)}`;
+  if (digits.length < 4) {
+    el.value = digits;
+  } else if (digits.length < 8) {
+    el.value = `${digits.slice(0,3)}-${digits.slice(3)}`;
+  } else {
+    el.value = `${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7,11)}`;
   }
-  el.value = out;
 }
+
 
 // 이메일 분리 입력 → 합치기
 function composeEmail() {
@@ -295,15 +290,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 전화번호 blur 시 인라인 에러
-  const tel = document.getElementById('tel');
-  tel?.addEventListener('blur', () => {
-    const msg = document.getElementById('telError');
-    const v = (tel.value || '').trim();
-    const telPattern = /^01[016789]-\d{3,4}-\d{4}$/;
-    if (!v) msg.textContent = '전화번호를 입력해주세요.';
-    else if (!telPattern.test(v)) msg.textContent = '형식: 010-1234-5678';
-    else msg.textContent = '';
+  // blur 시 인라인 에러
+  const telEl   = document.getElementById('tel');
+  const telErr  = document.getElementById('telError');
+
+  const telRe   = /^01[016789]-\d{3,4}-\d{4}$/;
+
+
+  telEl?.addEventListener('input', () => { telErr.textContent = ''; });
+  telEl?.addEventListener('blur', () => {
+    const v = telEl.value.trim();
+    if (!v)            telErr.textContent = '전화번호를 입력해주세요.';
+    else if (!telRe.test(v)) telErr.textContent = '형식: 010-1234-5678';
+    else               telErr.textContent = '';
   });
+
 
   // 생년월일 범위 제약 및 인라인 검증
   setBirthDateBounds(14, 120); // 필요 시 minAge 변경
@@ -389,13 +390,22 @@ function validateForm() {
   }
 
   // 전화번호 형식 검사
-  const tel = document.getElementById("tel").value.trim();
-  const telPattern = /^01[016789]-\d{3,4}-\d{4}$/;
-  if (!telPattern.test(tel)) {
-    alert("전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678");
-    document.getElementById("tel").focus();
-    return false;
-  }
+  const telEl  = document.getElementById("tel");
+    const telErr = document.getElementById("telError");
+    const telVal = telEl.value.trim();
+    // 휴대폰만: const telRe = /^01[016789]-\d{3,4}-\d{4}$/;
+    // 02 허용:
+    const telRe  = /^(01[016789]-\d{3,4}-\d{4}|02-\d{3,4}-\d{4})$/;
+
+    if (!telVal) {
+      telErr.textContent = '전화번호를 입력해주세요.';
+      telEl.focus(); return false;
+    }
+    if (!telRe.test(telVal)) {
+      telErr.textContent = '형식: 010-1234-5678';
+      telEl.focus(); return false;
+    }
+    telErr.textContent = '';
 
   // 비밀번호 일치 검사
   const pw = document.getElementById("passwd").value.trim();
