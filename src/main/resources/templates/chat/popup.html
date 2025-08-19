@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<div id="chat">
+  <header class="chat-header">
+    <span id="room-title">문의 채팅</span>
+  </header>
+
+  <div id="msgs" class="msgs"></div>
+
+  <form id="sendForm" autocomplete="off">
+    <input id="msg" type="text" placeholder="메시지를 입력하세요" />
+    <button id="sendBtn" type="submit">보내기</button>
+  </form>
+</div>
+
+<script src="/webjars/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+
+<!--<script src="/webjars/sockjs-client/sockjs.min.js"></script>-->
+<!--<script src="/webjars/stomp-websocket/stomp.min.js"></script>-->
+<script src="/js/chat/popup.js"></script>
+
+
+
+</body>
+</html>

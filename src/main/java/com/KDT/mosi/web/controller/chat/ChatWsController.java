@@ -1,16 +1,17 @@
 package com.KDT.mosi.web.controller.chat;
 
-
 import com.KDT.mosi.domain.chat.svc.ChatService;
-import com.KDT.mosi.domain.dto.ChatSendReq;
-import com.KDT.mosi.domain.dto.ChatSendRes;
+import com.KDT.mosi.domain.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ChatWsController {
@@ -19,25 +20,33 @@ public class ChatWsController {
   private final SimpMessagingTemplate messaging;
 
   /**
-   * 클라가 stomp.send("/app/chat.send", {}, JSON) 하면 이 메서드가 "수신"한다.
-   * 여기서 DB 저장 → 브로드캐스트 순서로 처리.
+   * 클라이언트가 stompClient.send("/app/chat/rooms/{roomId}", {}, JSON) 호출하면
+   * 이 메서드가 수신해서 DB 저장 → 브로드캐스트 처리.
    */
-  @MessageMapping("/chat.send")
-  public void onMessage(ChatSendReq req){
-    // ★ 데모 편의를 위해 senderId를 payload에서 받지만,
-    // 실제 운영에선 인증(Principal)으로 식별해야 안전합니다.
-    long msgId = chatService.saveMessage(req.roomId(), req.senderId(), req.content(), req.clientMsgId());
+  @MessageMapping("/chat/rooms/{roomId}")
+  public void onMessage(@DestinationVariable("roomId") Long roomId, ChatMessageDto req) {
+    log.info("📩 onMessage called, roomId={}, senderId={}, content={}",
+        roomId, req.senderId(), req.content());
 
-    var res = new ChatSendRes(
-        msgId,
-        req.roomId(),
+    // (1) DB 저장
+    long msgId = chatService.saveMessage(
+        roomId,
         req.senderId(),
         req.content(),
-        OffsetDateTime.now().toString(),
-        req.clientMsgId()
+        "client-" + System.currentTimeMillis() // 임시 clientMsgId
     );
 
-    // 같은 방(roomId)을 구독 중인 모든 클라이언트에게 전송
-    messaging.convertAndSend("/topic/room/" + req.roomId(), res);
+    // (2) 응답 객체 생성 (DB 저장 결과 반영)
+    ChatMessageDto res = new ChatMessageDto(
+        msgId,
+        roomId,
+        req.senderId(),
+        req.content(),
+        LocalDateTime.now(), // 서버 기준 생성 시각
+        false                 // 읽음 여부 기본값
+    );
+
+    // (3) 같은 방 구독 중인 모든 클라이언트에게 메시지 전송
+    messaging.convertAndSend("/topic/chat/rooms/" + roomId, res);
   }
 }

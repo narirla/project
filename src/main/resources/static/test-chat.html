@@ -40,7 +40,7 @@
   };
 
   async function ensureRoom(productId, buyerId, sellerId){
-    const res = await fetch(`/api/rooms/ensure?productId=${productId}&buyerId=${buyerId}&sellerId=${sellerId}`, { method:'POST' });
+    const res = await fetch(`/api/rooms/ensure?productId="1"&buyerId="8"&sellerId="7"`, { method:'POST' });
     if(!res.ok){
       const t = await res.text();
       throw new Error(`ensure failed: ${res.status} ${t}`);
@@ -52,9 +52,9 @@
     try{
       // 1) 먼저 방 보장 (필요시 productId/buyerId/sellerId 값을 UI에서 받도록 수정)
 <!--      const buyerId = Number($('#senderId').value); // 데모: 나를 구매자로 가정-->
-      const buyerId = 21; // 데모: 나를 구매자로 가정
-      const productId = 2;                          // 데모 값
-      const sellerId = 22;                          // 데모 값
+      const buyerId = 8; // 데모: 나를 구매자로 가정
+      const productId = 1;                          // 데모 값
+      const sellerId = 7;                          // 데모 값
       const ensured = await ensureRoom(productId, buyerId, sellerId);
       const roomId = ensured.roomId;
       $('#roomId').value = roomId; // UI에도 반영

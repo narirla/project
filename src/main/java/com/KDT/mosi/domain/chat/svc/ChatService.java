@@ -20,4 +20,5 @@ public class ChatService {
     // roomDao.updateLastMsgId(roomId, msgId); // 필요 시 활성화
     return msgId;
   }
+
 }

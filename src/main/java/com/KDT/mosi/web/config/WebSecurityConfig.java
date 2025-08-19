@@ -53,6 +53,7 @@ public class WebSecurityConfig {
             .requestMatchers("/members/*/delete").authenticated()
             .anyRequest().authenticated()
         )
+        .csrf(csrf -> csrf.disable())  // CSRF 비활성화 (테스트용)
         .exceptionHandling(ex -> ex
             .accessDeniedPage("/error/403")
         )
@@ -60,4 +61,16 @@ public class WebSecurityConfig {
 
     return http.build();
   }
+
+//  @Bean
+//  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//    http
+//        .authorizeHttpRequests(authz -> authz
+//            .requestMatchers("/api/**").permitAll()  // 테스트용 경로 인증 제외
+//            .anyRequest().authenticated()
+//        )
+//        .csrf(csrf -> csrf.disable());  // CSRF 비활성화 (테스트용)
+//
+//    return http.build();
+//  }
 }
