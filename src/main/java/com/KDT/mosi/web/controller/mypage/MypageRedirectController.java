@@ -1,4 +1,4 @@
-package com.KDT.mosi.web.controller;
+package com.KDT.mosi.web.controller.mypage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -50,13 +50,13 @@ class MemberSVCImplTest {
 
   @Test
   @DisplayName("이메일 중복 확인")
-  void existsByEmail() {
+  void isExistEmail() {
     // given
     given(memberDAO.findByEmail("dup@mosi.com"))
         .willReturn(Optional.of(new Member()));
 
     // when
-    boolean exists = memberSVC.existsByEmail("dup@mosi.com");
+    boolean exists = memberSVC.isExistEmail("dup@mosi.com");
 
     // then
     assertThat(exists).isTrue();

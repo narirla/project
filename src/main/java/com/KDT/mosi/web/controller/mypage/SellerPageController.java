@@ -1,4 +1,4 @@
-package com.KDT.mosi.web.controller;
+package com.KDT.mosi.web.controller.mypage;
 
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.SellerPage;
@@ -143,18 +143,31 @@ public class SellerPageController {
     return "mypage/sellerpage/createSellerPage";
   }
 
-
-
   /**
    * ✅ 판매자 마이페이지 생성 처리
    */
-  @PostMapping("/create")
+  @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public String create(@ModelAttribute("form") SellerPageCreateForm form,
                        BindingResult bindingResult,
+                       HttpSession session,
                        RedirectAttributes redirectAttributes) {
 
+    // 1) 로그인 체크
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
+      return "redirect:/login";
+    }
+    Long memberId = loginMember.getMemberId();
+
+    // 2) 중복 생성 방지 (GET 우회 방지)  ➜ [추가]
+    if (sellerPageSVC.existByMemberId(memberId)) {
+      redirectAttributes.addFlashAttribute("error", "이미 판매자 페이지가 존재합니다.");
+      return "redirect:/mypage/seller/home";
+    }
+
+    // 3) 엔티티에 서버에서 memberId 주입 (폼 값 무시)  ➜ [핵심 변경]
     SellerPage sellerPage = new SellerPage();
-    sellerPage.setMemberId(form.getMemberId());
+    sellerPage.setMemberId(memberId);
     sellerPage.setIntro(form.getIntro());
     sellerPage.setNickname(form.getNickname());
 
@@ -168,10 +181,16 @@ public class SellerPageController {
       redirectAttributes.addFlashAttribute("error", "이미지 업로드에 실패했습니다.");
     }
 
+    // 4) 디폴트 값 보정(컬럼이 NOT NULL이면 필수)  ➜ [추가 권장]
+    if (sellerPage.getSalesCount() == null) sellerPage.setSalesCount(0);
+    if (sellerPage.getReviewAvg() == null)  sellerPage.setReviewAvg(0.0);
+
     sellerPageSVC.save(sellerPage);
+
     redirectAttributes.addFlashAttribute("msg", "판매자 마이페이지가 생성되었습니다.");
-    return "redirect:/mypage/seller";
+    return "redirect:/mypage/seller/home";
   }
+
 
 
   /**

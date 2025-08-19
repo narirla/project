@@ -4,17 +4,12 @@ import com.KDT.mosi.domain.entity.SellerPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,64 +23,81 @@ public class SellerPageDAOImpl implements SellerPageDAO {
   private final NamedParameterJdbcTemplate template;
 
   /**
-   * 결과셋을 SellerPage 객체로 매핑하는 RowMapper 정의
+   * 결과셋 → SellerPage 매핑(RowMapper)
+   * - 숫자 컬럼은 getObject로 받아 NULL 보존
    */
   private RowMapper<SellerPage> sellerPageRowMapper() {
     return (rs, rowNum) -> {
-      SellerPage sellerpage = new SellerPage();
-      sellerpage.setPageId(rs.getLong("page_id"));
-      sellerpage.setMemberId(rs.getLong("member_id"));
-      sellerpage.setNickname(rs.getString("nickname"));
-      sellerpage.setImage(rs.getBytes("image"));
-      sellerpage.setIntro(rs.getString("intro"));
-      sellerpage.setNickname(rs.getString("nickname"));
-      sellerpage.setSalesCount(rs.getInt("sales_count"));
-      sellerpage.setReviewAvg(rs.getDouble("review_avg"));
-      sellerpage.setZonecode(rs.getString("zonecode"));
-      sellerpage.setAddress(rs.getString("address"));
-      sellerpage.setDetailAddress(rs.getString("detail_address"));
+      SellerPage sp = new SellerPage();
+      sp.setPageId(rs.getLong("page_id"));
+      sp.setMemberId(rs.getLong("member_id"));
+      sp.setNickname(rs.getString("nickname"));
+      sp.setImage(rs.getBytes("image"));
+      sp.setIntro(rs.getString("intro"));
 
-      if (rs.getTimestamp("create_date") != null) {
-        sellerpage.setCreateDate(rs.getTimestamp("create_date"));
-      }
-      if (rs.getTimestamp("update_date") != null) {
-        sellerpage.setUpdateDate(rs.getTimestamp("update_date"));
-      }
+      // NULL 보존
+      sp.setSalesCount((Integer) rs.getObject("sales_count", Integer.class));
+      sp.setReviewAvg((Double) rs.getObject("review_avg", Double.class));
 
-      return sellerpage;
+      sp.setZonecode(rs.getString("zonecode"));
+      sp.setAddress(rs.getString("address"));
+      sp.setDetailAddress(rs.getString("detail_address"));
+      sp.setCreateDate(rs.getTimestamp("create_date"));
+      sp.setUpdateDate(rs.getTimestamp("update_date"));
+      return sp;
     };
   }
 
   /**
    * 판매자 마이페이지 등록
-   * - page_id는 시퀀스로 자동 생성
+   * - Oracle: 시퀀스 선조회 후 명시 바인딩
    */
   @Override
   public Long save(SellerPage sellerpage) {
-    StringBuffer sql = new StringBuffer();
-    sql.append("INSERT INTO SELLER_PAGE ");
-    sql.append("(PAGE_ID, MEMBER_ID, IMAGE, INTRO, NICKNAME, SALES_COUNT, REVIEW_AVG, CREATE_DATE, UPDATE_DATE) ");
-    sql.append("VALUES (SELLER_PAGE_SEQ.NEXTVAL, :memberId, :image, :intro, :nickname, :salesCount, :reviewAvg, systimestamp, systimestamp) ");
 
-    SqlParameterSource param = new BeanPropertySqlParameterSource(sellerpage);
-    KeyHolder keyHolder = new GeneratedKeyHolder();
+    // 0) 널 방어
+    if (sellerpage == null || sellerpage.getMemberId() == null) {
+      throw new IllegalArgumentException("memberId must not be null");
+    }
 
-    template.update(sql.toString(), param, keyHolder, new String[]{"page_id"});
-    return ((Number) keyHolder.getKeys().get("page_id")).longValue();
+    // 1) 시퀀스 선조회(안정 패턴)
+    Long pageId = template.queryForObject(
+        "SELECT SELLER_PAGE_SEQ.NEXTVAL FROM DUAL",
+        new MapSqlParameterSource(),
+        Long.class
+    );
+
+    // 2) INSERT
+    String sql =
+        "INSERT INTO SELLER_PAGE (" +
+            "  PAGE_ID, MEMBER_ID, IMAGE, INTRO, NICKNAME, SALES_COUNT, REVIEW_AVG, CREATE_DATE, UPDATE_DATE" +
+            ") VALUES (" +
+            "  :pageId, :memberId, :image, :intro, :nickname, :salesCount, :reviewAvg, SYSTIMESTAMP, SYSTIMESTAMP" +
+            ")";
+
+    MapSqlParameterSource param = new MapSqlParameterSource()
+        .addValue("pageId", pageId)
+        .addValue("memberId", sellerpage.getMemberId())
+        .addValue("image", sellerpage.getImage())
+        .addValue("intro", sellerpage.getIntro())
+        .addValue("nickname", sellerpage.getNickname())
+        .addValue("salesCount", sellerpage.getSalesCount() == null ? 0 : sellerpage.getSalesCount())
+        .addValue("reviewAvg", sellerpage.getReviewAvg() == null ? 0.0 : sellerpage.getReviewAvg());
+
+    template.update(sql, param);
+    return pageId;
   }
 
   /**
    * 회원 ID로 마이페이지 조회
-   * - 존재하지 않으면 Optional.empty 반환
    */
   @Override
   public Optional<SellerPage> findByMemberId(Long memberId) {
     String sql = "SELECT * FROM SELLER_PAGE WHERE MEMBER_ID = :memberId";
     SqlParameterSource param = new MapSqlParameterSource("memberId", memberId);
-
     try {
       SellerPage sellerpage = template.queryForObject(sql, param, sellerPageRowMapper());
-      return Optional.of(sellerpage);
+      return Optional.ofNullable(sellerpage);
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
@@ -98,83 +110,69 @@ public class SellerPageDAOImpl implements SellerPageDAO {
   public Optional<SellerPage> findById(Long pageId) {
     String sql = "SELECT * FROM SELLER_PAGE WHERE PAGE_ID = :pageId";
     SqlParameterSource param = new MapSqlParameterSource("pageId", pageId);
-
     try {
-      SellerPage sellerpage = template.queryForObject(
-          sql, param, BeanPropertyRowMapper.newInstance(SellerPage.class)
-      );
-      return Optional.of(sellerpage);
+      SellerPage sellerpage = template.queryForObject(sql, param, sellerPageRowMapper());
+      return Optional.ofNullable(sellerpage);
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
   }
 
   /**
-   * 회원 ID로 마이페이지 존재 여부 확인
-   * - COUNT(*) > 0이면 true
+   * 회원 ID로 마이페이지 존재 여부
    */
   @Override
   public boolean existByMemberId(Long memberId) {
-    String sql = "SELECT COUNT(*) FROM seller_page WHERE member_id = :memberId";
-    SqlParameterSource param = new MapSqlParameterSource("memberId", memberId);
-    Integer count = template.queryForObject(sql, param, Integer.class);
-    return count != null && count > 0;
+    String sql =
+        "SELECT CASE WHEN EXISTS(SELECT 1 FROM SELLER_PAGE WHERE MEMBER_ID = :memberId) " +
+            "THEN 1 ELSE 0 END FROM DUAL";
+    Integer v = template.queryForObject(sql, new MapSqlParameterSource("memberId", memberId), Integer.class);
+    return v != null && v == 1;
   }
 
   /**
-   * 닉네임 중복 여부 확인
-   *
-   * @param nickname 확인할 닉네임
-   * @return true: 이미 존재하는 닉네임, false: 사용 가능한 닉네임
+   * 닉네임 중복 여부
    */
   @Override
   public boolean existByNickname(String nickname) {
-    // ✅ SQL: 닉네임으로 중복 여부 확인
-    String sql = "SELECT COUNT(*) FROM seller_page WHERE nickname = :nickname";
-
-    // ✅ 파라미터 바인딩용 Map (NamedParameter 방식)
-    Map<String, Object> param = Map.of("nickname", nickname);
-
-    // ✅ 쿼리 실행 → 결과는 Integer 타입으로 반환
-    Integer count = template.queryForObject(sql, param, Integer.class);
-
-    // ✅ 결과 해석: 1개 이상이면 true (중복), 아니면 false
-    return count != null && count > 0;
+    String sql =
+        "SELECT CASE WHEN EXISTS(SELECT 1 FROM SELLER_PAGE WHERE NICKNAME = :nickname) " +
+            "THEN 1 ELSE 0 END FROM DUAL";
+    Integer v = template.queryForObject(sql, new MapSqlParameterSource("nickname", nickname), Integer.class);
+    return v != null && v == 1;
   }
-
 
   /**
    * 마이페이지 정보 수정
-   * - pageId 기준으로 image, intro, salesCount, reviewAvg, updateDate 갱신
    */
   @Override
   public int updateById(Long pageId, SellerPage sellerpage) {
-    StringBuffer sql = new StringBuffer();
-    sql.append("UPDATE SELLER_PAGE ");
-    sql.append("SET IMAGE = :image, ");
-    sql.append("    INTRO = :intro, ");
-    sql.append("    NICKNAME = :nickname, ");
-    sql.append("    SALES_COUNT = :salesCount, ");
-    sql.append("    REVIEW_AVG = :reviewAvg, ");
-    sql.append("    ZONECODE = :zonecode, ");
-    sql.append("    ADDRESS = :address, ");
-    sql.append("    DETAIL_ADDRESS = :detailAddress, ");
-    sql.append("    UPDATE_DATE = systimestamp ");
-    sql.append("WHERE PAGE_ID = :pageId");
+    String sql =
+        "UPDATE SELLER_PAGE SET " +
+            "  IMAGE = :image, " +
+            "  INTRO = :intro, " +
+            "  NICKNAME = :nickname, " +
+            "  SALES_COUNT = :salesCount, " +
+            "  REVIEW_AVG = :reviewAvg, " +
+            "  ZONECODE = :zonecode, " +
+            "  ADDRESS = :address, " +
+            "  DETAIL_ADDRESS = :detailAddress, " +
+            "  UPDATE_DATE = SYSTIMESTAMP " +
+            "WHERE PAGE_ID = :pageId";
 
-
-    SqlParameterSource param = new MapSqlParameterSource()
+    MapSqlParameterSource param = new MapSqlParameterSource()
         .addValue("image", sellerpage.getImage())
         .addValue("intro", sellerpage.getIntro())
         .addValue("nickname", sellerpage.getNickname())
-        .addValue("salesCount", sellerpage.getSalesCount())
-        .addValue("reviewAvg", sellerpage.getReviewAvg())
+        // NOT NULL 컬럼 보정(필요 시)
+        .addValue("salesCount", sellerpage.getSalesCount() == null ? 0 : sellerpage.getSalesCount())
+        .addValue("reviewAvg", sellerpage.getReviewAvg() == null ? 0.0 : sellerpage.getReviewAvg())
         .addValue("zonecode", sellerpage.getZonecode())
         .addValue("address", sellerpage.getAddress())
         .addValue("detailAddress", sellerpage.getDetailAddress())
         .addValue("pageId", pageId);
 
-    return template.update(sql.toString(), param);
+    return template.update(sql, param);
   }
 
   /**
@@ -183,7 +181,6 @@ public class SellerPageDAOImpl implements SellerPageDAO {
   @Override
   public int deleteByMemberId(Long memberId) {
     String sql = "DELETE FROM SELLER_PAGE WHERE MEMBER_ID = :memberId";
-    SqlParameterSource param = new MapSqlParameterSource("memberId", memberId);
-    return template.update(sql, param);
+    return template.update(sql, new MapSqlParameterSource("memberId", memberId));
   }
 }

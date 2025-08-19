@@ -1,4 +1,4 @@
-package com.KDT.mosi.web.controller;
+package com.KDT.mosi.web.controller.member;
 
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.member.dao.RoleDAO;

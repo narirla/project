@@ -1,14 +1,17 @@
-/*popup.css*/
 :root {
-  --me: #22c8e5;
-  --them: #f1f3f5;
-  --bg: #fff;
-  --line: #e9ecef;
-  --text: #222;
+  /* 공통 색상 변수 */
+  --me: #22C5CD;     /* 내가 보낸 말풍선 */
+  --them: #F8F8F8;   /* 상대방 말풍선 */
+  --bg: #fff;        /* 배경색 */
+  --line: #e9ecef;   /* 구분선 */
+  --text: #222;      /* 기본 글자색 */
 }
 
+/* ========================= */
+/* 공통 기본 스타일           */
+/* ========================= */
 * {
-  box-sizing: border-box;
+  box-sizing: border-box; /* 패딩/보더 포함한 크기 계산 */
 }
 
 html,
@@ -19,20 +22,24 @@ body {
   color: var(--text);
   background: var(--bg);
 }
-body{
-  width: 486px;
-  height: 745px;
+
+body {
+  display: flex;
+  width: 405px;          /* 채팅창 가로 고정 */
+  height: 630px;         /* 채팅창 세로 고정 */
+  flex-direction: column; /* 헤더-본문-입력창 세로 배치 */
 }
 
-
-/* 상단 */
+/* ========================= */
+/* 상단 헤더                  */
+/* ========================= */
 .header {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
-  position: sticky;
+  position: sticky;   /* 스크롤 내려도 상단 고정 */
   top: 0;
   background: #fff;
   z-index: 10;
@@ -41,11 +48,13 @@ body{
 .header .title {
   flex: 1;
   text-align: center;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 500;
+  padding-left: 40px; /* 신고 버튼 공간 확보 */
 }
 
 .header .icon-btn {
-  width: 36px;
+  width: 70px;
   height: 36px;
   display: flex;
   align-items: center;
@@ -53,19 +62,49 @@ body{
   color: #666;
 }
 
-/* 상품 카드 */
+/* 신고 버튼 (아이콘+텍스트 가로 배치) */
+.header .icon-btn.report-btn {
+  width: 44px;      /* 아이콘+텍스트 크기 */
+  min-width: 0;     /* 기존 70px 무효화 */
+  height: 44px;
+  margin-left: 15px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;         /* 아이콘-라벨 간격 */
+}
+
+.header .icon-btn.report-btn i {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.header .icon-btn.report-btn .label {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  user-select: none;
+  color: #6B6B6B;
+}
+
+/* ========================= */
+/* 상품 카드                  */
+/* ========================= */
 .product-card {
   display: flex;
+  width: 405px;
+  height: 100px;
   gap: 10px;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
+  border: 1px solid var(--line);
 }
 
 .product-thumb {
-  width: 48px;
-  height: 48px;
+  width: 75px;
+  height: 75px;
   border-radius: 6px;
-  object-fit: cover;
+  object-fit: cover; /* 이미지 비율 유지 */
   background: #ddd;
 }
 
@@ -73,75 +112,116 @@ body{
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-width: 0;
+  min-width: 0; /* 텍스트 영역 줄바꿈 대비 */
 }
 
 .product-meta b {
-  font-size: 14px;
+  width: 240px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; /* 긴 상품명 말줄임 처리 */
   max-width: 240px;
   display: block;
 }
 
 .product-meta span {
-  font-size: 12px;
+  height: 20px;
+  font-size: 16px;
+  font-weight: 500;
   color: #666;
 }
 
-/* 메시지 영역 */
+/* ========================= */
+/* 메시지 영역                */
+/* ========================= */
 .scroll {
-  height: calc(100% - 164px);
-  overflow: auto;
+  flex: 1;
+  overflow-y: auto;   /* 스크롤 생성 */
   padding: 12px;
   background: #f8f9fa;
 }
 
+/* 메시지 아이템 공통 */
 .item {
-  max-width: 78%;
-  margin: 6px 0;
   display: flex;
-  gap: 8px;
+  margin: 6px 0;
+  gap: 6px;
+  max-width: 78%; /* 채팅 버블 최대 너비 */
 }
 
-.me {
+/* 상대방 메시지 (왼쪽 정렬) */
+.item.them {
+  align-items: flex-start;
+  margin-right: auto;
+}
+
+.item.them .profile {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%; /* 동그란 프로필 */
+  object-fit: cover;
+}
+
+.item.them .nickname {
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+/* 내 메시지 (오른쪽 정렬) */
+.item.me {
   margin-left: auto;
   justify-content: flex-end;
 }
 
-.them {
-  margin-right: auto;
+/* 내 메시지 시간 */
+.item.me .time {
+  font-size: 11px;
+  color: #8b8b8b;
+  margin-top: 3px;
+  text-align: right;
 }
 
+/* 내 메시지 읽음 표시 (시간 아래) */
+.item.me .read {
+  font-size: 11px;
+  color: #8b8b8b;   /* ✅ 회색 */
+  margin-top: 2px;
+  text-align: right;
+}
+
+/* 메시지 박스 (닉네임+버블+시간 묶음) */
+.msg-box {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 말풍선 공통 */
 .bubble {
   padding: 10px 12px;
   border-radius: 16px;
   position: relative;
   line-height: 1.4;
-  word-break: break-word;
+  word-break: break-word; /* 긴 단어 줄바꿈 */
 }
 
+/* 내가 보낸 말풍선 */
 .me .bubble {
   background: var(--me);
   color: #fff;
   border-bottom-right-radius: 6px;
 }
 
+/* 상대방 말풍선 */
 .them .bubble {
   background: var(--them);
+  color: #414141;
   border-bottom-left-radius: 6px;
-}
-
-.time {
-  font-size: 11px;
-  color: #8b8b8b;
-  margin-top: 3px;
-}
-
-.me .time {
-  text-align: right;
 }
 
 /* 이미지 메시지 */
@@ -152,7 +232,9 @@ body{
   border-radius: 12px;
 }
 
-/* 입력영역 */
+/* ========================= */
+/* 입력창                     */
+/* ========================= */
 .input {
   display: flex;
   align-items: center;
@@ -160,7 +242,7 @@ body{
   padding: 10px 12px;
   border-top: 1px solid var(--line);
   background: #fff;
-  position: sticky;
+  position: sticky; /* 스크롤 내려도 하단 고정 */
   bottom: 0;
 }
 
