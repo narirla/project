@@ -3,7 +3,10 @@ package com.KDT.mosi.domain.product.dao;
 import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.entity.ProductImage;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -49,23 +52,25 @@ public class ProductImageDAOImpl implements ProductImageDAO {
 
   @Override
   public int insert(ProductImage productImage) {
-    String sql = "INSERT INTO PRODUCT_IMAGE " +
-        "(IMAGE_ID, PRODUCT_ID, IMAGE_DATA, IMAGE_ORDER, FILE_NAME, FILE_SIZE, MIME_TYPE, UPLOAD_TIME) VALUES " +
-        "(IMAGE_IMAGE_ID_SEQ.NEXTVAL, :productId, :imageData, :imageOrder, :fileName, :fileSize, :mimeType, SYSDATE)";
-    Map<String, Object> params = new HashMap<>();
+    String sql = "INSERT INTO product_image (" +
+        "image_id, product_id, image_data, image_order, file_name, file_size, mime_type, upload_time) " +
+        "VALUES (PRODUCT_IMAGE_IMAGE_ID_SEQ.NEXTVAL, :productId, :imageData, :imageOrder, :fileName, :fileSize, :mimeType, SYSDATE)";
 
-    // productId를 Product 객체에서 얻어야 함
-    if (productImage.getProduct() == null || productImage.getProduct().getProductId() == null) {
-      throw new IllegalArgumentException("Product object or productId is null in ProductImage");
-    }
-    params.put("productId", productImage.getProduct().getProductId());
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+    MapSqlParameterSource params = new MapSqlParameterSource();
 
-    params.put("imageData", productImage.getImageData());
-    params.put("imageOrder", productImage.getImageOrder());
-    params.put("fileName", productImage.getFileName());
-    params.put("fileSize", productImage.getFileSize());
-    params.put("mimeType", productImage.getMimeType());
-    return jdbcTemplate.update(sql, params);
+    // ⭐⭐⭐ 최종 해결책: MapSqlParameterSource로 수동 매핑 및 NULL 값 처리 ⭐⭐⭐
+    // product 객체에서 productId를 직접 가져와서 설정합니다.
+    params.addValue("productId", productImage.getProduct().getProductId());
+
+    // NOT NULL 컬럼들에 NULL이 삽입되지 않도록 처리합니다.
+    params.addValue("imageData", productImage.getImageData());
+    params.addValue("imageOrder", productImage.getImageOrder());
+    params.addValue("fileName", productImage.getFileName() != null ? productImage.getFileName() : "");
+    params.addValue("fileSize", productImage.getFileSize() != null ? productImage.getFileSize() : 0L);
+    params.addValue("mimeType", productImage.getMimeType() != null ? productImage.getMimeType() : "");
+
+    return jdbcTemplate.update(sql, params, keyHolder, new String[]{"image_id"});
   }
 
   @Override

@@ -151,4 +151,68 @@ document.addEventListener('DOMContentLoaded', function () {
         filesArr.forEach(f => dt.items.add(f));
         input.files = dt.files;
     }
+
+    // 임시저장 버튼 이벤트 리스너 추가
+    const tempSaveBtn = document.getElementById('tempSaveBtn');
+    if (tempSaveBtn) {
+        tempSaveBtn.addEventListener('click', function(event) {
+            handleTempSave();
+        });
+    }
+
+    // 임시저장 버튼 클릭 핸들러
+    async function handleTempSave() {
+        const form = document.getElementById('productForm');
+        const formData = new FormData(form);
+
+        // DTO에 '임시저장' 상태 값 추가
+        formData.append('status', '임시저장');
+
+        // 이미지 및 파일 데이터 추가
+        const productImages = document.getElementById('productImage').files;
+        for (const file of productImages) {
+            formData.append('productImages', file);
+        }
+
+        const documentFile = document.querySelector('input[name="documentFile"]').files[0];
+        if (documentFile) {
+            formData.append('documentFile', documentFile);
+        }
+
+//        // 코스 포인트 데이터 추가 (만약 있다면)
+//        const coursePoints = getCoursePointsFromForm(); // ⭐ 이 함수는 기존에 구현되어 있어야 합니다.
+//        if (coursePoints.length > 0) {
+//            // FormData에 배열을 추가하는 방법
+//            coursePoints.forEach((point, index) => {
+//                formData.append(`coursePoints[${index}].latitude`, point.latitude);
+//                formData.append(`coursePoints[${index}].longitude`, point.longitude);
+//                formData.append(`coursePoints[${index}].description`, point.description);
+//            });
+//        }
+
+        try {
+            const response = await fetch('/product/temp-save', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                const result = await response.json();
+                // 에러 처리 또는 성공 메시지 표시
+                if (result.error) {
+                    alert(result.error);
+                } else {
+                    alert('상품이 임시저장되었습니다.');
+                    // 성공적으로 임시저장되면 상품 관리 페이지로 리다이렉트
+                    window.location.href = '/product/manage?status=임시저장';
+                }
+            }
+
+        } catch (error) {
+            console.error('임시저장 중 오류 발생:', error);
+            alert('임시저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+    }
 });

@@ -2,16 +2,24 @@ package com.KDT.mosi.domain.product.svc;
 
 import com.KDT.mosi.domain.entity.Product;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public interface ProductSVC {
-  // 상품 등록 (insert)
+  // 상품 등록 (insert) - 기존 메서드
   Product registerProduct(Product product);
 
-  // 상품 수정 (update)
+  // ⭐⭐ 상품 등록 (신규 추가) - 파일 및 코스포인트 포함
+  Product saveNewProduct(Product product, MultipartFile[] uploadFiles);
+
+  // ⭐⭐ 상품 수정 (신규 추가) - 파일 및 삭제할 이미지 ID 포함
+  void updateProduct(Product product, MultipartFile[] uploadImages, String deleteImageIds) throws IOException;
+
+  // 상품 수정 (update) - 기존 메서드
   Product updateProduct(Product product);
 
   // 상품 삭제

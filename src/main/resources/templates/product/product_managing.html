@@ -93,59 +93,24 @@
             <h2>내 상품 목록</h2>
             <hr>
             <div class="product-managing-main">
-              <!-- 검색박스 -->
               <div class="product-search-box">
                 <input class="search-box-input" type="text" placeholder="상품명을 입력해주세요.">
               </div>
+
               <div class="overall-info">
                 <div th:text="|총 ${totalCount}개 상품|"></div>
-                
-                      <select class="status-select" th:data-product-id="${form.product.productId}"
-                              th:value="${form.product.status}">
-                        <option value="판매중" th:selected="${form.product.status == '판매중'}">판매중</option>
-                        <option value="판매대기" th:selected="${form.product.status == '판매대기'}">판매대기</option>
-                      </select>
-
-                      <div class="product-info-left-detail-details">
-                        <div
-                            th:if="${form.product.updateDate == null or form.product.createDate == form.product.updateDate}"
-                            th:text="${#dates.format(form.product.createDate, 'yyyy-MM-dd')}">
-                        </div>
-                        <div
-                            th:if="${form.product.updateDate != null and form.product.createDate != form.product.updateDate}"
-                            th:text="${#dates.format(form.product.updateDate, 'yyyy-MM-dd')}">
-                        </div>
-                        <div>조회수</div>
-                        <div>좋아요</div>
-                        <div>댓글수</div>
-                      </div>
-                    </div>
-                    <span class="text-trim" th:text="${form.product.description}"></span>
-                  </div>
-                </div>
-                <div class="product-info-right">
-                  <div class="product-info-right-detail">
-                    <div th:text="|${form.salesRate}% 저렴|"></div>
-                    <div class="price">
-                      <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|"></h1>
-                      <div>원</div>
-                    </div>
-                    <div
-                        th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
-                  </div>
-                  <div class="btn-group">
-                    <button class="btn-group-edit"
-                            th:onclick="|location.href='@{/product/edit/{id}(id=${form.product.productId})}'|">수정</button>
-                    <button class="btn-group-delete"
-                            th:onclick="|if(confirm('해당 상품을 삭제하시겠습니까?')) location.href='@{/product/delete/{id}(id=${form.product.productId})}'|">삭제</button>
-                  </div>
-                </div>
+                <select class="status-filter-select">
+                  <option value="all" th:selected="${selectedStatus == 'all'}">전체</option>
+                  <option value="판매중" th:selected="${selectedStatus == '판매중'}">판매중</option>
+                  <option value="판매대기" th:selected="${selectedStatus == '판매대기'}">판매대기</option>
+                  <option value="임시저장" th:selected="${selectedStatus == '임시저장'}">임시저장</option>
+                </select>
               </div>
+
               <hr>
-              <!-- 상품목록 -->
+
               <div class="product-list">
                 <div class="product-item" th:each="form : ${productManagingForms}">
-                  <!-- 썸네일 이미지 -->
                   <img th:if="${form.images != null and #lists.size(form.images) > 0}"
                        th:src="${form.images[0].base64ImageData}"
                        th:alt="${form.images[0].fileName}"/>
@@ -156,13 +121,19 @@
                       <h2><a th:href="@{/product/view/{id}(id=${form.product.productId})}"
                              th:text="${form.product.title}">상품명</a></h2>
                       <div class="product-info-left-detail">
-
-                        <select class="status-select" th:data-product-id="${form.product.productId}"
-                                th:value="${form.product.status}">
+                        <select class="status-select"
+                                th:data-product-id="${form.product.productId}"
+                                th:value="${form.product.status}"
+                                th:disabled="${form.product.status == '임시저장'}">
                           <option value="판매중" th:selected="${form.product.status == '판매중'}">판매중</option>
                           <option value="판매대기" th:selected="${form.product.status == '판매대기'}">판매대기</option>
-                        </select>
 
+                          <option th:if="${form.product.status == '임시저장'}"
+                                  value="임시저장"
+                                  th:selected="${form.product.status == '임시저장'}">
+                            임시저장
+                          </option>
+                        </select>
                         <div class="product-info-left-detail-details">
                           <div
                               th:if="${form.product.updateDate == null or form.product.createDate == form.product.updateDate}"
@@ -179,31 +150,32 @@
                       </div>
                       <span class="text-trim" th:text="${form.product.description}"></span>
                     </div>
-                  </div>
-                  <div class="product-info-right">
-                    <div class="product-info-right-detail">
-                      <div th:text="|${form.salesRate}% 저렴|"></div>
-                      <div class="price">
-                        <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|"></h1>
-                        <div>원</div>
+                    <div class="product-info-right">
+                      <div class="product-info-right-detail">
+                        <div th:text="|${form.salesRate}% 저렴|"></div>
+                        <div class="price">
+                          <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|"></h1>
+                          <div>원</div>
+                        </div>
+                        <div
+                            th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
                       </div>
-                      <div
-                          th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
-                    </div>
-                    <div class="btn-group">
-                      <button class="btn-group-edit"
-                              th:onclick="|location.href='@{/product/edit/{id}(id=${form.product.productId})}'|">수정</button>
-                      <button class="btn-group-delete"
-                              th:onclick="|if(confirm('해당 상품을 삭제하시겠습니까?')) location.href='@{/product/delete/{id}(id=${form.product.productId})}'|">삭제</button>
+                      <div class="btn-group">
+                        <button class="btn-group-edit"
+                                th:onclick="|location.href='@{/product/edit/{id}(id=${form.product.productId})}'|">수정</button>
+                        <button class="btn-group-delete"
+                                th:onclick="|if(confirm('해당 상품을 삭제하시겠습니까?')) location.href='@{/product/delete/{id}(id=${form.product.productId})}'|">삭제</button>
+                      </div>
                     </div>
                   </div>
                 </div>
                 <hr>
               </div>
-              <!-- 페이지네이션 -->
-              <div class="pagination" th:if="${totalCount > 0}"><a th:if="${currentPage > 1}"
-                                                                   th:href="@{/product/manage(page=1, size=5, category=${selectedStatus})}"
-                                                                   class="page-link">&lt;&lt;</a>
+
+              <div class="pagination" th:if="${totalCount > 0}">
+                <a th:if="${currentPage > 1}"
+                   th:href="@{/product/manage(page=1, size=5, category=${selectedStatus})}"
+                   class="page-link">&lt;&lt;</a>
                 <span th:unless="${currentPage > 1}" class="page-link-spacer">&lt;&lt;</span>
                 <a th:if="${currentPage > 1}"
                    th:with="prevPageTarget = (${currentPage == startPage and startPage > 1} ? ${startPage - 1} : ${currentPage - 1})"
