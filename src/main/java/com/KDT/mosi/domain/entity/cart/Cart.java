@@ -16,9 +16,8 @@ public class Cart {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_seq")
   @SequenceGenerator(name = "cart_seq", sequenceName = "CART_SEQ", allocationSize = 1)
   private Long cartId;
-
   private Long buyerId;
-  private Integer totalPrice = 0;
+  private Long totalPrice = 0L;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 }

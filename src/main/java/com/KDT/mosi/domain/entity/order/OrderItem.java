@@ -15,15 +15,14 @@ public class OrderItem {
   @SequenceGenerator(name = "order_items_seq", sequenceName = "ORDER_ITEMS_SEQ", allocationSize = 1)
   private Long orderItemId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ORDER_ID")
-  private Order order;
+  private Long orderId;
 
   private Long productId;
   private Long sellerId;
-  private Integer quantity;
-  private Integer originalPrice;
-  private Integer salePrice;
+  private Long quantity;
+  private Long originalPrice;
+  private Long salePrice;
   private String request;
   private String optionType;
   private String reviewed;

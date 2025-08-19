@@ -1,12 +1,12 @@
 package com.KDT.mosi.domain.order.svc;
 
-import com.KDT.mosi.domain.cart.svc.CartSVC;
+import com.KDT.mosi.domain.cart.repository.CartItemRepository;
 import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.entity.cart.CartItem;
 import com.KDT.mosi.domain.entity.order.Order;
 import com.KDT.mosi.domain.entity.order.OrderItem;
-import com.KDT.mosi.domain.order.dao.OrderDAO;
-import com.KDT.mosi.domain.order.dao.OrderItemDAO;
+import com.KDT.mosi.domain.order.dao.OrderItemRepository;
+import com.KDT.mosi.domain.order.dao.OrderRepository;
 import com.KDT.mosi.domain.product.svc.ProductSVC;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,99 +15,85 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
+@Service
+@Transactional
+@RequiredArgsConstructor
 public class OrderSVCImpl implements OrderSVC {
 
-  private final OrderDAO orderDAO;
-  private final OrderItemDAO orderItemDAO;
-  private final CartSVC cartSVC;
+  private final OrderRepository orderRepository;
+  private final OrderItemRepository orderItemRepository;
+  private final CartItemRepository cartItemRepository;
   private final ProductSVC productSVC;
 
   @Override
-  @Transactional
   public Map<String, Object> createOrder(Long buyerId, List<Long> cartItemIds, String specialRequest) {
     Map<String, Object> result = new HashMap<>();
 
     try {
-      // 1. 장바구니 아이템 조회
-      List<CartItem> cartItems = cartSVC.getSelectedCartItems(buyerId, cartItemIds);
-      if (cartItems.isEmpty()) {
+      // 장바구니 아이템 조회 및 검증
+      List<CartItem> cartItems = cartItemRepository.findByCartItemIdIn(cartItemIds);
+      List<CartItem> validItems = new ArrayList<>();
+
+      for (CartItem item : cartItems) {
+        if (item.getBuyerId().equals(buyerId)) {
+          // 상품 상태 확인 (판매중만)
+          Optional<Product> productOpt = productSVC.getProduct(item.getProductId());
+          if (productOpt.isPresent() && "판매중".equals(productOpt.get().getStatus())) {
+            validItems.add(item);
+          }
+        }
+      }
+
+      if (validItems.isEmpty()) {
         result.put("success", false);
-        result.put("message", "주문할 상품이 없습니다");
+        result.put("message", "주문 가능한 상품이 없습니다");
         return result;
       }
 
-      // 2. 상품 상태 및 가격 검증
-      for (CartItem cartItem : cartItems) {
-        Product product = productSVC.getProduct(cartItem.getProductId()).orElse(null);
-        if (product == null) {
-          result.put("success", false);
-          result.put("message", "삭제된 상품이 포함되어 있습니다");
-          return result;
-        }
-        if (!"판매중".equals(product.getStatus())) {
-          result.put("success", false);
-          result.put("message", "판매 중단된 상품이 포함되어 있습니다: " + product.getTitle());
-          return result;
-        }
-
-        // 가격 변동 체크
-        Integer currentPrice = getCurrentPrice(product, cartItem.getOptionType());
-        if (!cartItem.getSalePrice().equals(currentPrice)) {
-          result.put("success", false);
-          result.put("message", "가격이 변경된 상품이 있습니다: " + product.getTitle());
-          return result;
-        }
-      }
-
-      // 3. 주문 생성 (서비스에서 객체 생성 및 초기화)
+      // 주문 생성
       Order order = new Order();
-      order.setBuyerId(buyerId);
       order.setOrderCode(generateOrderCode());
+      order.setBuyerId(buyerId);
       order.setSpecialRequest(specialRequest);
-      order.setStatus("결제완료"); // 임시결제는 바로 완료
-      order.setOrderDate(LocalDateTime.now()); // 서비스에서 시간 설정
+      order.setOrderDate(LocalDateTime.now());
+      order.setStatus("결제대기");
 
-      // 총액 계산 (서비스 로직)
-      int totalPrice = cartItems.stream()
-          .mapToInt(this::calculateCartItemTotalPrice)
-          .sum();
+      // 총액 계산
+      long totalPrice = 0;
+      for (CartItem cartItem : validItems) {
+        totalPrice += cartItem.getSalePrice() * cartItem.getQuantity();
+      }
       order.setTotalPrice(totalPrice);
 
-      Order savedOrder = orderDAO.insert(order);
+      // 주문 저장
+      Order savedOrder = orderRepository.save(order);
 
-      // 4. 주문 아이템 생성 (서비스에서 객체 생성)
-      for (CartItem cartItem : cartItems) {
+      // 주문 상세 저장
+      for (CartItem cartItem : validItems) {
         OrderItem orderItem = new OrderItem();
-        orderItem.setOrder(savedOrder);
+        orderItem.setOrderId(savedOrder.getOrderId());  // FK 방식
         orderItem.setProductId(cartItem.getProductId());
         orderItem.setSellerId(cartItem.getSellerId());
         orderItem.setQuantity(cartItem.getQuantity());
         orderItem.setOriginalPrice(cartItem.getOriginalPrice());
         orderItem.setSalePrice(cartItem.getSalePrice());
         orderItem.setOptionType(cartItem.getOptionType());
-        orderItem.setReviewed("N"); // 기본값 설정
-
-        orderItemDAO.insert(orderItem);
+        orderItem.setReviewed("N");
+        orderItemRepository.save(orderItem);
       }
 
-      // 5. 장바구니 비우기
-      cartSVC.clearCart(buyerId);
+      // 장바구니에서 주문 완료된 아이템 삭제
+      cartItemRepository.deleteAllById(cartItemIds);
 
       result.put("success", true);
-      result.put("message", "주문이 완료되었습니다");
+      result.put("data", savedOrder);
       result.put("orderCode", savedOrder.getOrderCode());
-      result.put("totalPrice", totalPrice);
 
     } catch (Exception e) {
-      log.error("주문 생성 오류: ", e);
+      log.error("주문 생성 실패", e);
       result.put("success", false);
       result.put("message", "주문 처리 중 오류가 발생했습니다");
     }
@@ -116,21 +102,40 @@ public class OrderSVCImpl implements OrderSVC {
   }
 
   @Override
-  public Map<String, Object> getOrderDetail(String orderCode, Long buyerId) {
+  @Transactional(readOnly = true)
+  public Map<String, Object> getOrderByCode(String orderCode, Long buyerId) {
     Map<String, Object> result = new HashMap<>();
 
     try {
-      Order order = orderDAO.findByOrderCodeAndBuyerId(orderCode, buyerId)
-          .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다"));
+      Optional<Order> orderOpt = orderRepository.findByOrderCodeAndBuyerId(orderCode, buyerId);
+      if (orderOpt.isEmpty()) {
+        result.put("success", false);
+        result.put("message", "주문을 찾을 수 없습니다");
+        return result;
+      }
 
-      List<OrderItem> orderItems = orderItemDAO.findByOrderId(order.getOrderId());
+      Order order = orderOpt.get();
+      List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getOrderId());
+
+      // 상품 정보와 함께 응답
+      List<Map<String, Object>> itemsWithProduct = new ArrayList<>();
+      for (OrderItem item : orderItems) {
+        Optional<Product> productOpt = productSVC.getProduct(item.getProductId());
+        Map<String, Object> itemData = new HashMap<>();
+        itemData.put("orderItem", item);
+        itemData.put("product", productOpt.orElse(null));
+        itemsWithProduct.add(itemData);
+      }
+
+      Map<String, Object> orderData = new HashMap<>();
+      orderData.put("order", order);
+      orderData.put("items", itemsWithProduct);
 
       result.put("success", true);
-      result.put("order", order);
-      result.put("orderItems", orderItems);
+      result.put("data", orderData);
 
     } catch (Exception e) {
-      log.error("주문 조회 오류: ", e);
+      log.error("주문 코드 조회 실패", e);
       result.put("success", false);
       result.put("message", "주문 조회 중 오류가 발생했습니다");
     }
@@ -139,17 +144,36 @@ public class OrderSVCImpl implements OrderSVC {
   }
 
   @Override
-  public Map<String, Object> getMyOrders(Long buyerId) {
+  @Transactional(readOnly = true)
+  public Map<String, Object> getBuyerOrders(Long buyerId) {
     Map<String, Object> result = new HashMap<>();
 
     try {
-      List<Order> orders = orderDAO.findByBuyerIdOrderByOrderDateDesc(buyerId);
+      List<Order> orders = orderRepository.findByBuyerId(buyerId);
+
+      if (orders.isEmpty()) {
+        result.put("success", true);
+        result.put("data", new ArrayList<>());
+        return result;
+      }
+
+      List<Map<String, Object>> orderList = new ArrayList<>();
+      for (Order order : orders) {
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getOrderId());
+
+        Map<String, Object> orderData = new HashMap<>();
+        orderData.put("order", order);
+        orderData.put("items", orderItems);
+        orderData.put("itemCount", orderItems.size());
+
+        orderList.add(orderData);
+      }
 
       result.put("success", true);
-      result.put("orders", orders);
+      result.put("data", orderList);
 
     } catch (Exception e) {
-      log.error("주문 목록 조회 오류: ", e);
+      log.error("주문 목록 조회 실패", e);
       result.put("success", false);
       result.put("message", "주문 목록 조회 중 오류가 발생했습니다");
     }
@@ -158,28 +182,83 @@ public class OrderSVCImpl implements OrderSVC {
   }
 
   @Override
-  @Transactional
-  public Map<String, Object> cancelOrder(String orderCode, Long buyerId) {
+  @Transactional(readOnly = true)
+  public Map<String, Object> getOrderDetail(Long orderId, Long buyerId) {
     Map<String, Object> result = new HashMap<>();
 
     try {
-      Order order = orderDAO.findByOrderCodeAndBuyerId(orderCode, buyerId)
-          .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다"));
-
-      if ("취소".equals(order.getStatus())) {
+      Optional<Order> orderOpt = orderRepository.findById(orderId);
+      if (orderOpt.isEmpty() || !orderOpt.get().getBuyerId().equals(buyerId)) {
         result.put("success", false);
-        result.put("message", "이미 취소된 주문입니다");
+        result.put("message", "주문을 찾을 수 없습니다");
+        return result;
+      }
+
+      Order order = orderOpt.get();
+      List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+
+      // 상품 정보와 함께 응답
+      List<Map<String, Object>> itemsWithProduct = new ArrayList<>();
+      for (OrderItem item : orderItems) {
+        Optional<Product> productOpt = productSVC.getProduct(item.getProductId());
+        Map<String, Object> itemData = new HashMap<>();
+        itemData.put("orderItem", item);
+        itemData.put("product", productOpt.orElse(null));
+        itemsWithProduct.add(itemData);
+      }
+
+      Map<String, Object> orderData = new HashMap<>();
+      orderData.put("order", order);
+      orderData.put("items", itemsWithProduct);
+
+      result.put("success", true);
+      result.put("data", orderData);
+
+    } catch (Exception e) {
+      log.error("주문 상세 조회 실패", e);
+      result.put("success", false);
+      result.put("message", "주문 조회 중 오류가 발생했습니다");
+    }
+
+    return result;
+  }
+
+  @Override
+  public Map<String, Object> cancelOrder(Long orderId, Long buyerId) {
+    Map<String, Object> result = new HashMap<>();
+
+    try {
+      Optional<Order> orderOpt = orderRepository.findById(orderId);
+      if (orderOpt.isEmpty()) {
+        result.put("success", false);
+        result.put("message", "주문을 찾을 수 없습니다");
+        return result;
+      }
+
+      Order order = orderOpt.get();
+
+      // 권한 확인
+      if (!order.getBuyerId().equals(buyerId)) {
+        result.put("success", false);
+        result.put("message", "권한이 없습니다");
+        return result;
+      }
+
+      // 취소 가능 상태 확인
+      if (!"결제대기".equals(order.getStatus()) && !"결제완료".equals(order.getStatus())) {
+        result.put("success", false);
+        result.put("message", "취소할 수 없는 주문 상태입니다");
         return result;
       }
 
       order.setStatus("취소");
-      orderDAO.update(order);
+      orderRepository.save(order);
 
       result.put("success", true);
-      result.put("message", "주문이 취소되었습니다");
+      result.put("data", order);
 
     } catch (Exception e) {
-      log.error("주문 취소 오류: ", e);
+      log.error("주문 취소 실패", e);
       result.put("success", false);
       result.put("message", "주문 취소 중 오류가 발생했습니다");
     }
@@ -187,28 +266,21 @@ public class OrderSVCImpl implements OrderSVC {
     return result;
   }
 
-  // Private 메서드들
+  @Override
+  @Transactional(readOnly = true)
+  public int getOrderCount(Long buyerId) {
+    return orderRepository.countByBuyerId(buyerId);
+  }
+
+  // 주문 코드 생성 (MOSI-20250818-001 형태)
   private String generateOrderCode() {
-    LocalDateTime now = LocalDateTime.now();
-    String dateStr = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-    String timeStr = String.valueOf(System.currentTimeMillis() % 1000000);
+    String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    String timeStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
     return "MOSI-" + dateStr + "-" + timeStr;
   }
 
-  private Integer getCurrentPrice(Product product, String optionType) {
-    if ("기본코스".equals(optionType)) {
-      return product.getSalesPrice();
-    } else if ("가이드포함".equals(optionType)) {
-      return product.getSalesGuidePrice();
-    }
-    throw new IllegalArgumentException("잘못된 옵션 타입입니다");
-  }
-
-  // 서비스에서 장바구니 아이템 총 가격 계산
-  private Integer calculateCartItemTotalPrice(CartItem cartItem) {
-    if (cartItem.getSalePrice() == null || cartItem.getQuantity() == null) {
-      return 0;
-    }
-    return cartItem.getSalePrice() * cartItem.getQuantity();
+  // 주문 상태 검증
+  private boolean isValidStatus(String status) {
+    return Arrays.asList("결제대기", "결제완료", "취소").contains(status);
   }
 }

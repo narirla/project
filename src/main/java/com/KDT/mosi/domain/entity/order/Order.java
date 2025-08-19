@@ -18,7 +18,7 @@ public class Order {
 
   private String orderCode;
   private Long buyerId;
-  private Integer totalPrice;
+  private Long totalPrice;
   private String specialRequest;
   private LocalDateTime orderDate;
   private String status;

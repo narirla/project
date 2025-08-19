@@ -1,4 +1,4 @@
-// CartController.java
+
 package com.KDT.mosi.web.controller;
 
 import com.KDT.mosi.domain.cart.svc.CartSVC;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -30,10 +29,7 @@ public class CartController {
       return "redirect:/login";
     }
 
-    // ✅ buyerId 통일: Member에서 buyerId 추출
-    Long buyerId = getBuyerIdFromMember(loginMember);
-
-    Map<String, Object> cartSummary = cartSVC.getCartSummary(buyerId);
+    Map<String, Object> cartSummary = cartSVC.getCartSummary(loginMember.getMemberId());
     model.addAttribute("cartSummary", cartSummary);
     model.addAttribute("memberNickname", loginMember.getNickname());
 
@@ -56,16 +52,31 @@ public class CartController {
     }
 
     try {
-      Long productId = Long.valueOf(request.get("productId").toString());
-      String optionType = request.get("optionType").toString();
-      Integer quantity = Integer.valueOf(request.getOrDefault("quantity", 1).toString());
+      // 필수 파라미터 검증
+      Object productIdObj = request.get("productId");
+      Object optionTypeObj = request.get("optionType");
 
-      // ✅ buyerId 통일
-      Long buyerId = getBuyerIdFromMember(loginMember);
+      if (productIdObj == null || optionTypeObj == null) {
+        return ResponseEntity.badRequest().body(Map.of(
+            "success", false,
+            "message", "필수 파라미터가 누락되었습니다"
+        ));
+      }
 
-      Map<String, Object> result = cartSVC.addToCart(buyerId, productId, optionType, quantity);
+      Long productId = Long.valueOf(productIdObj.toString());
+      String optionType = optionTypeObj.toString();
+      Long quantity = Long.valueOf(request.getOrDefault("quantity", 1).toString());
+
+      Map<String, Object> result = cartSVC.addToCart(loginMember.getMemberId(), productId, optionType, quantity);
 
       return ResponseEntity.ok(result);
+
+    } catch (NumberFormatException e) {
+      log.error("잘못된 숫자 형식", e);
+      return ResponseEntity.badRequest().body(Map.of(
+          "success", false,
+          "message", "잘못된 데이터 형식입니다"
+      ));
 
     } catch (Exception e) {
       log.error("장바구니 추가 오류", e);
@@ -88,9 +99,7 @@ public class CartController {
       ));
     }
 
-    // ✅ buyerId 통일
-    Long buyerId = getBuyerIdFromMember(loginMember);
-    Map<String, Object> result = cartSVC.getCartSummary(buyerId);
+    Map<String, Object> result = cartSVC.getCartSummary(loginMember.getMemberId());
     return ResponseEntity.ok(result);
   }
 
@@ -110,16 +119,34 @@ public class CartController {
     }
 
     try {
-      Long productId = Long.valueOf(request.get("productId").toString());
-      String optionType = request.get("optionType").toString();
-      Integer quantity = Integer.valueOf(request.get("quantity").toString());
+      // 필수 파라미터 검증
+      Object productIdObj = request.get("productId");
+      Object optionTypeObj = request.get("optionType");
+      Object quantityObj = request.get("quantity");
 
-      // ✅ buyerId 통일
-      Long buyerId = getBuyerIdFromMember(loginMember);
+      if (productIdObj == null || optionTypeObj == null || quantityObj == null) {
+        return ResponseEntity.badRequest().body(Map.of(
+            "success", false,
+            "message", "필수 파라미터가 누락되었습니다"
+        ));
+      }
+
+      Long productId = Long.valueOf(productIdObj.toString());
+      String optionType = optionTypeObj.toString();
+      Long quantity = Long.valueOf(quantityObj.toString());
+
+      Long buyerId = loginMember.getMemberId();
 
       Map<String, Object> result = cartSVC.updateQuantity(buyerId, productId, optionType, quantity);
 
       return ResponseEntity.ok(result);
+
+    } catch (NumberFormatException e) {
+      log.error("잘못된 숫자 형식", e);
+      return ResponseEntity.badRequest().body(Map.of(
+          "success", false,
+          "message", "잘못된 데이터 형식입니다"
+      ));
 
     } catch (Exception e) {
       log.error("수량 변경 오류", e);
@@ -146,15 +173,30 @@ public class CartController {
     }
 
     try {
-      Long productId = Long.valueOf(request.get("productId").toString());
-      String optionType = request.get("optionType").toString();
+      // 필수 파라미터 검증
+      Object productIdObj = request.get("productId");
+      Object optionTypeObj = request.get("optionType");
 
-      // ✅ buyerId 통일
-      Long buyerId = getBuyerIdFromMember(loginMember);
+      if (productIdObj == null || optionTypeObj == null) {
+        return ResponseEntity.badRequest().body(Map.of(
+            "success", false,
+            "message", "필수 파라미터가 누락되었습니다"
+        ));
+      }
 
-      Map<String, Object> result = cartSVC.removeFromCart(buyerId, productId, optionType);
+      Long productId = Long.valueOf(productIdObj.toString());
+      String optionType = optionTypeObj.toString();
+
+      Map<String, Object> result = cartSVC.removeFromCart(loginMember.getMemberId(), productId, optionType);
 
       return ResponseEntity.ok(result);
+
+    } catch (NumberFormatException e) {
+      log.error("잘못된 숫자 형식", e);
+      return ResponseEntity.badRequest().body(Map.of(
+          "success", false,
+          "message", "잘못된 데이터 형식입니다"
+      ));
 
     } catch (Exception e) {
       log.error("상품 삭제 오류", e);
@@ -174,30 +216,14 @@ public class CartController {
       return ResponseEntity.ok(Map.of("count", 0));
     }
 
-    // ✅ buyerId 통일
-    Long buyerId = getBuyerIdFromMember(loginMember);
-    int count = cartSVC.getCartItemCount(buyerId);
+    long count = cartSVC.getCartItemCount(loginMember.getMemberId());
     return ResponseEntity.ok(Map.of("count", count));
   }
 
-  /**
-   * ✅ 간단한 방식: memberId = buyerId
-   */
-  private Long getBuyerIdFromMember(Member member) {
-    return member.getMemberId();
-  }
-
-// ========================================
-// 주문서 연동을 위한 회원정보 조회 메소드
-// ========================================
-
-  /**
-   * 주문서 작성용 회원정보 조회 (buyerId 기반)
-   * 장바구니 → 주문서 이동 시 회원정보 자동입력
-   */
-  @GetMapping("/member-info")
+  // 장바구니 전체 비우기 (추가)
+  @DeleteMapping("/clear")
   @ResponseBody
-  public ResponseEntity<Map<String, Object>> getMemberInfoForOrder(HttpSession session) {
+  public ResponseEntity<Map<String, Object>> clearCart(HttpSession session) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       return ResponseEntity.status(401).body(Map.of(
@@ -207,26 +233,16 @@ public class CartController {
     }
 
     try {
-      // 주문서에 필요한 회원정보 반환
-      Map<String, Object> memberInfo = new HashMap<>();
-      memberInfo.put("buyerId", getBuyerIdFromMember(loginMember));
-      memberInfo.put("name", loginMember.getName());
-      memberInfo.put("email", loginMember.getEmail());
-      memberInfo.put("tel", loginMember.getTel());
-      memberInfo.put("address", loginMember.getAddress());
-      memberInfo.put("nickname", loginMember.getNickname());
-
-      return ResponseEntity.ok(Map.of(
-          "success", true,
-          "data", memberInfo
-      ));
+      cartSVC.clearCart(loginMember.getMemberId());
+      return ResponseEntity.ok(Map.of("success", true));
 
     } catch (Exception e) {
-      log.error("회원정보 조회 실패", e);
+      log.error("장바구니 비우기 오류", e);
       return ResponseEntity.status(500).body(Map.of(
           "success", false,
-          "message", "회원정보 조회에 실패했습니다"
+          "message", "장바구니 비우기 중 오류가 발생했습니다"
       ));
     }
   }
+
 }

@@ -16,17 +16,16 @@ public class CartItem {
   @SequenceGenerator(name = "cart_items_seq", sequenceName = "CART_ITEMS_SEQ", allocationSize = 1)
   private Long cartItemId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "CART_ID")
-  private Cart cart;
+  @Column(name = "CART_ID")
+  private Long cartId;;
 
   private Long buyerId;
   private Long sellerId;
   private Long productId;
   private String optionType;
-  private Integer quantity;
-  private Integer originalPrice;
-  private Integer salePrice;
+  private Long quantity;
+  private Long originalPrice;
+  private Long salePrice;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 }
