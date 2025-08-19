@@ -1,3 +1,8 @@
+/*joinForm.css*/
+
+/* ===========================
+  기본 레이아웃/타이포
+=========================== */
 /* 전체 body 스타일 */
 body {
   font-family: 'Pretendard', sans-serif;
@@ -15,7 +20,7 @@ body {
   max-width: 520px;
   background: #fff;
   border-radius: 28px;
-  box-shadow: 0 8px 32px rgba(23,41,44,0.10);
+  box-shadow: 0 8px 32px rgba(23, 41, 44, 0.10);
   padding: 56px 40px 40px 40px;
   display: flex;
   flex-direction: column;
@@ -41,7 +46,9 @@ h2 {
   font-weight: 400;
 }
 
-/* 공통 폼 그룹 */
+/* ===========================
+  폼 공통
+=========================== */
 .form-group {
   margin-bottom: 20px;
   width: 480px !important;
@@ -49,6 +56,7 @@ h2 {
   margin-left: auto;
   margin-right: auto;
 }
+
 .form-group:last-child {
   margin-bottom: 0;
 }
@@ -60,42 +68,46 @@ h2 {
   align-items: flex-start;
 }
 
-.form-group.row > div {
+.form-group.row>div {
   flex: 1;
   max-width: 240px;
 }
 
 /* 입력 요소 공통 */
-.input-mosi, .select-mosi {
+.input-mosi,
+.select-mosi {
   width: 100% !important;
   height: 48px !important;
   padding: 12px 14px;
-  padding-right: 40px; /* 👈 눈 아이콘 공간 확보 */
+  padding-right: 40px;
+  /*  눈 아이콘 공간 */
   border: 1.5px solid #17292C;
-  border-radius: 14px;
+  border-radius: 10px;
   background: #fff;
   font-size: 1em;
   color: #17292C;
   outline: none;
   box-sizing: border-box;
-  transition: border 0.2s;
+  transition: border .2s;
   margin: 0 auto;
   display: block;
   margin-top: 10px;
 }
 
 /* 포커스 스타일 */
-.input-mosi:focus, .select-mosi:focus {
+.input-mosi:focus,
+.select-mosi:focus {
   border: 1.5px solid #0099ad;
 }
 
 /* 셀렉트 커스텀 */
-select.input-mosi, .select-mosi {
+select.input-mosi,
+.select-mosi {
   appearance: none;
   background: #fff url('data:image/svg+xml;utf8,<svg fill="%230099ad" height="24"...') no-repeat right 16px center/18px 18px;
 }
 
-/* 라디오 버튼 그룹 (성별) */
+/* 라디오(성별) */
 .gender-options {
   display: flex;
   justify-content: center;
@@ -103,25 +115,27 @@ select.input-mosi, .select-mosi {
   gap: 16px;
   font-size: 1em;
   margin-top: 6px;
+  padding-top: 25px;
 }
+
 .gender-options input[type="radio"] {
   margin-right: 4px;
 }
 
-/* 주소 행 등 수평 정렬 */
+/* 주소/입력 행 공통 가로 배치 */
 .address-row,
 .input-row,
 .form-row {
   display: flex;
   flex-direction: row;
-  gap: 16px;
+  gap: 8px;
   white-space: nowrap;
   overflow-x: auto;
   width: 480px;
   max-width: 100%;
 }
 
-/* 플렉스 입력 너비 조정 */
+/* 플렉스 너비 기본값: 행 내 요소 꽉 채우기 */
 .form-row input,
 .form-row .input-mosi,
 .address-row .input-mosi,
@@ -133,22 +147,75 @@ select.input-mosi, .select-mosi {
   width: 100% !important;
 }
 
-/* 이메일 + 버튼 비율 */
-.form-group input[type="email"] {
-  flex: 5;
+/* ===========================
+  === 이메일 전용 설정 ===
+  - 아이디 입력칸 넓게
+  - 도메인 입력/선택 보통 폭
+  - '@' 정렬 보정
+  - '중복확인' 버튼 축소
+=========================== */
+/* 아이디 입력칸을 더 넓게 */
+#emailId {
+  flex: 4 1 320px;
+  min-width: 260px;
 }
-.form-group .btn-small {
-  flex: 0 0 80px;
-  height: 40px;
-  font-size: 10px;
-  padding: 0 8px;
-  border-radius: 12px !important;
+
+/* 도메인 선택/직접입력 */
+#emailDomainSelect,
+#emailDomainInput {
+  flex: 2 1 200px;
 }
+
+/* '@' 기호 정렬 보정 (inline style 무력화) */
+.input-row>span {
+  flex: 0 0 auto;
+  margin-top: 0 !important;
+}
+
+/* [예외 처리] 이메일 버튼만 100% 적용 제외 */
+.input-row button:not(#emailCheckBtn) {
+  flex: 1 1 0 !important;
+  width: 100% !important;
+}
+
+/* 중복확인 버튼 최소화(가로 더 줄임) */
+#emailCheckBtn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 80px !important;
+  width: 80px !important;
+  min-width: 96px;  /* ⬅ 더 작게: 56px (원하면 48px까지 가능) */
+  height: 48px !important;
+  line-height: 30px !important;
+  padding: 0 6px !important;  /* 좌우 여백 축소 */
+  font-size: 12px !important;
+  white-space: nowrap;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px !important;
+  margin-top: 10px; /* 행과 수직 정렬 보정 */
+}
+
+/* (아이콘/스팬 등 자식 요소도 라인높이 1로 통일) */
+#emailCheckBtn > * { line-height: 1 !important; }
+
+/* (전역 버튼 규칙이 강할 때 대비한 보조 규칙) */
+#emailCheckBtn.btn-small {
+  height: 40px !important;
+  font-size: 14px !important;
+  padding: 0 6px !important;
+  border-radius: 8px !important;
+}
+
+/* 기타 보조 */
 #tel {
   margin-bottom: 50px;
 }
 
-/* 버튼 래퍼 */
+/* ===========================
+  버튼 공통
+=========================== */
 .btn-wrapper {
   display: flex;
   justify-content: center;
@@ -163,26 +230,30 @@ select.input-mosi, .select-mosi {
   background: #0099AD !important;
   color: #EBFCFF !important;
   border: none !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
   letter-spacing: 1px;
-  box-shadow: 0 2px 12px rgba(0,153,173,0.10);
-  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 12px rgba(0, 153, 173, .10);
+  transition: background .2s, color .2s;
   border-radius: 16px !important;
   font-size: 1.15em !important;
 }
 
-/* 중복확인, 우편번호 버튼 (작은 버튼) */
+/* 소형 버튼(우편번호 등 공통) — 이메일 버튼은 ID로 별도 처리 */
 .btn-small {
-  background: #0099AD !important;
-  color: #EBFCFF !important;
-  font-size: 0.875em !important;
-  border-radius: 12px !important;
-  height: 40px;
-  font-weight: 700;
+  display: flex;
+  background: #1EC4CC !important;
+  color: #fff !important;
+  font-size: .875em !important;
+  border-radius: 8px !important;
+  width: 96px;
+  height: 48px;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
   border: none;
-  transition: background 0.2s, color 0.2s;
+  transition: background .2s, color .2s;
   padding: 0 8px;
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 /* 호버 공통 */
@@ -192,38 +263,61 @@ select.input-mosi, .select-mosi {
   color: #fff !important;
 }
 
-/* 토스트 메시지 */
+/* ===========================
+  토스트/라벨/에러/비번 강도
+=========================== */
 .toast-message {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
   background-color: #0099AD;
-  color: white;
+  color: #fff;
   padding: 14px 24px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  font-size: 0.95em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+  font-size: .95em;
   z-index: 9999;
   opacity: 0;
   animation: fadeInOut 2.5s ease-in-out;
 }
+.check-msg {
+  margin-top: 5px;
+  margin-left: 5px;
+}
 
-/* 토스트 애니메이션 */
+.email-result {
+  margin-top: 5px;
+  margin-left: 5px;
+}
+
 @keyframes fadeInOut {
-  0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-  10%, 90% { opacity: 1; transform: translateX(-50%) translateY(0); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+
+  10%,
+  90% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
 }
 
 /* 라벨 */
 .form-group label {
-  font-size: 0.95em;
+  font-size: .95em;
   font-weight: 600;
   margin-bottom: 15px;
   margin-left: 10px;
   color: #17292C;
 }
+
 .required {
   color: red;
   margin-left: 4px;
@@ -233,7 +327,7 @@ select.input-mosi, .select-mosi {
 .error {
   color: #e53935;
   text-align: left;
-  font-size: 0.88em;
+  font-size: .88em;
   margin: 6px 0 0 4px;
   font-weight: 500;
   word-wrap: break-word;
@@ -245,9 +339,18 @@ select.input-mosi, .select-mosi {
   margin-top: 4px;
   height: 16px;
 }
-.pw-strength.weak { color: red; }
-.pw-strength.medium { color: orange; }
-.pw-strength.strong { color: green; }
+
+.pw-strength.weak {
+  color: red;
+}
+
+.pw-strength.medium {
+  color: orange;
+}
+
+.pw-strength.strong {
+  color: green;
+}
 
 /* 눈 아이콘 버튼 */
 .toggle-password {
@@ -260,17 +363,22 @@ select.input-mosi, .select-mosi {
   cursor: pointer;
   padding: 4px;
   color: #999;
-  transition: color 0.2s;
+  transition: color .2s;
 }
+
 .toggle-password:hover {
   color: #0099AD;
 }
+
 .toggle-password i {
   font-size: 1.1em;
 }
 
-/* 모바일 대응 */
-@media (max-width: 600px) {
+/* ===========================
+  모바일 대응
+=========================== */
+@media (max-width:600px) {
+
   .register-container,
   .form-group,
   .form-group.form-row,
