@@ -21,11 +21,11 @@
         <section class="content">
           <h1>판매자 페이지 생성</h1>
 
-          <form th:action="@{/mypage/seller/create}" method="post" enctype="multipart/form-data" th:object="${form}">
-            <input type="hidden" th:field="*{memberId}">
+          <form id="sellerCreateForm" th:action="@{/mypage/seller/create}" method="post" enctype="multipart/form-data" th:object="${form}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
             <div class="profile-section">
-              <label for="imageFile" class="profile-preview-box">
+              <label for="imageFile" class="profile-preview-box dropzone" tabindex="0" role="button" aria-label="프로필 이미지 드래그 앤 드롭 또는 클릭하여 업로드">
                 <img id="profilePreview" class="profile-preview" alt="미리보기" style="display: none;">
                 <span class="profile-placeholder-text" id="placeholderText">프로필 사진 등록</span>
                 <button type="button" id="removeImageBtn" class="remove-image-btn" style="display: none;"
@@ -40,7 +40,7 @@
             <div>
               <label for="nickname" class="sr-only">닉네임<span class="required">*</span></label>
               <div class="nickname-box">
-                <input type="text" th:field="*{nickname}" id="nickname" name="nickname" placeholder="닉네임을 입력해주세요."
+                <input type="text" th:field="*{nickname}" id="nickname" name="nickname" placeholder="닉네임 입력은 필수입니다."
                   autocomplete="off" required>
                 <button type="button" class="btn-small" id="nicknameToggleBtn">중복확인</button>
               </div>
