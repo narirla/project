@@ -13,7 +13,11 @@
   <title>상품 상세</title>
 </head>
 
-<body th:object="${productDetailForm}">
+<body id="page"
+      th:object="${productDetailForm}"
+      th:data-product-id="*{product.productId}"
+      th:data-seller-id="${sellerId}"
+      th:data-buyer-id="${buyerId}">
   <header th:replace="${loginRole} == 'SELLER' ?
           ~{fragments/sellerHeader :: sellerHeader} :
           ~{fragments/header :: header}">
@@ -464,6 +468,12 @@
     </div>
   </div>
   <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+  //============================== js 파일 ==============================
+  //-------------------- ws 호출 --------------------
+  <script th:src="@{/js/chat/createPopup.js}"></script>
+
+  //-------------------- 기본 레이아웃 --------------------
   <script th:src="@{/js/layout.js}"></script>
 </body>
 
