@@ -76,7 +76,7 @@ async function openChatPopup(){
     'noreferrer'  // Referer 헤더 차단 (보안)
   ].join(',');
 
-  // 서버 컨트롤러에서 popup.html을 렌더링하도록 매핑해두어야 함
+  // 서버 컨트롤러에서 popup_real.html을 렌더링하도록 매핑해두어야 함
   window.open(
     `/api/chat/popup?roomId=${encodeURIComponent(roomId)}`,
     `chat_${roomId}`,

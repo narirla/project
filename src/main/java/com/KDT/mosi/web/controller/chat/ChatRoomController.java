@@ -16,12 +16,12 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chat")
+@RequestMapping("/api/chat/rooms")
 public class ChatRoomController {
   private final ChatRoomService service;
 
   /** 기존에 방 있는지 조회 */
-  @PostMapping("/rooms/ensure")
+  @PostMapping("/ensure")
   public Map<String, Object> ensure(@RequestBody ChatRoomReqDto chatRoomReq) {
     log.info("chatRoomReq={}", chatRoomReq);
     long roomId = service.ensure(chatRoomReq.getProductId(), chatRoomReq.getBuyerId(), chatRoomReq.getSellerId());
@@ -29,12 +29,14 @@ public class ChatRoomController {
   }
 
   /** 이전 메시지 불러오기 */
-  @GetMapping("/api/chat/rooms/{roomId}/messages")
+  @GetMapping("/{roomId}/messages")
   public ResponseEntity<?> getMessages(
-      @PathVariable Long roomId,
-      @RequestParam(defaultValue = "30") int limit
+      @PathVariable("roomId") Long roomId,
+      @RequestParam(name = "limit", defaultValue = "30") int limit
   ) {
     List<ChatMessageDto> messages = service.findRecent(roomId, limit);
+    log.info("📨 getMessages 호출됨, roomId={}, limit={}", roomId, limit);
+
     if (messages == null || messages.isEmpty()) {
       return ResponseEntity.ok(Collections.emptyList()); // 빈 배열 반환
     }

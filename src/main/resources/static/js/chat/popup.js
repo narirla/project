@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadHistory() {
   try {
     const res = await fetch(`/api/chat/rooms/${roomId}/messages?limit=30`);
+     console.log("roomId from Thymeleaf:", document.body.dataset.roomId);
     if (!res.ok) {
       // 서버에서 에러코드 내려왔을 때만 경고
       console.warn("이전 메시지 불러오기 실패 (status: " + res.status + ")");
@@ -78,9 +79,10 @@ async function loadHistory() {
     stomp.connect({}, () => {
       console.log("✅ STOMP connected");
 
-      // 해당 방 구독 (서버에서 /topic/room/{roomId}로 메시지 브로드캐스트 가정)
-      stomp.subscribe(`/topic/room/${roomId}`, (frame) => {
+      // 해당 방 구독 (서버에서 /topic/chat/rooms/{roomId}로 메시지 브로드캐스트 가정)
+      stomp.subscribe(`/topic/chat/rooms/${roomId}`, (frame) => {
         const msg = JSON.parse(frame.body);
+        console.log("📩 새 메시지 수신:", msg);
         renderMessage(msg); // 수신 메시지 출력
       });
     });
@@ -101,8 +103,9 @@ async function loadHistory() {
       clientMsgId: Date.now() // 임시 클라이언트 메시지 ID
     };
 
-    // 서버의 @MessageMapping("/chat.send")로 전송
+    // 서버의 @MessageMapping("/app/chat/rooms/" + roomId)로 전송
     stomp.send("/app/chat/rooms/" + roomId, {}, JSON.stringify(payload));
+//    consol.log(payload);
 
     // 입력창 비우기
     input.value = "";
