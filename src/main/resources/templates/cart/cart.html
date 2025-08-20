@@ -29,7 +29,15 @@
       <aside th:replace="~{fragments/buyerSidebar :: buyerSidebar('cart', ${member})}"></aside>
 
       <section class="content">
-        <!-- ✅ React 장바구니 컨테이너 (빈 장바구니 + 일반 장바구니 통합) -->
+        <!-- 🏝️ React Islands: 기존 Thymeleaf 레이아웃은 그대로 두고, 
+             이 div에만 React 컴포넌트가 마운트됩니다 -->
+        <div class="cart-page-header">
+          <div class="breadcrumb">장바구니 &gt; 주문결제 &gt; 주문완료</div>
+          <a href="/" class="continue-shopping">쇼핑 계속하기</a>
+          <h1 class="page-title">장바구니</h1>
+        </div>
+        
+        <!-- React Island: 순수 장바구니 리스트만 렌더링 -->
         <div id="cart-root"></div>
       </section>
     </main>
@@ -46,8 +54,21 @@
   <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
 
+<!-- React Fast Refresh(화면 자동 반영) -->
+<script th:if="${@environment.acceptsProfiles('dev')}" type="module">
+  import RefreshRuntime from 'http://localhost:3000/@react-refresh'
+  RefreshRuntime.injectIntoGlobalHook(window)
+  window.$RefreshReg$ = () => {}
+  window.$RefreshSig$ = () => (type) => type
+  window.__vite_plugin_react_preamble_installed__ = true
+</script>
+
 <!-- React 스크립트 -->
-<script type="module" th:src="@{/js/cart/pages/CartPage.jsx}"></script>
+<script th:if="${@environment.acceptsProfiles('dev')}" type="module" src="http://localhost:3000/@vite/client"></script>
+<script th:if="${@environment.acceptsProfiles('dev')}" type="module" src="http://localhost:3000/src/main.jsx"></script>
+<script th:unless="${@environment.acceptsProfiles('dev')}" type="module" src="/assets/main.js"></script>
+
+<!-- 기존 스크립트 -->
 <script th:src="@{/js/buyerpage/buyerMypageHome.js}"></script>
 <script th:src="@{/js/layout.js}"></script>
 </body>

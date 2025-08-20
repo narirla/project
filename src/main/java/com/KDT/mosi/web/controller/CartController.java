@@ -17,24 +17,40 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 장바구니 컨트롤러
- * React+Vite 환경과 완전 호환
- */
 @Slf4j
-@RestController
-@RequestMapping("/api/cart")
+@Controller
+@RequestMapping("/cart")
 @RequiredArgsConstructor
 public class CartController {
 
   private final CartSVC cartSVC;
 
   /**
-   * 장바구니 조회
-   * GET /api/cart
+   * 장바구니 HTML 페이지 반환 (브라우저 직접 접근)
+   * GET /cart (Accept: text/html)
    */
-  @GetMapping
-  public ResponseEntity<Map<String, Object>> getCart(HttpSession session) {
+  @GetMapping(produces = "text/html")
+  public String cartPageHtml(HttpSession session, Model model) {
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    
+    if (loginMember == null) {
+      return "redirect:/login";
+    }
+
+    model.addAttribute("member", loginMember);
+    log.info("장바구니 HTML 페이지 접근: memberId={}, nickname={}", 
+        loginMember.getMemberId(), loginMember.getNickname());
+    
+    return "cart/cart";
+  }
+
+  /**
+   * 장바구니 JSON 데이터 반환 (React AJAX 호출)
+   * GET /cart (Accept: application/json)
+   */
+  @GetMapping(produces = "application/json")
+  @ResponseBody
+  public ResponseEntity<Map<String, Object>> getCartJson(HttpSession session) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       return ResponseEntity.status(401).body(Map.of(
@@ -49,7 +65,6 @@ public class CartController {
           loginMember.getNickname()
       );
 
-      // React에서 기대하는 정확한 구조로 응답
       Map<String, Object> response = new HashMap<>();
       response.put("success", cartResponse.isSuccess());
       response.put("empty", cartResponse.isEmpty());
@@ -61,7 +76,7 @@ public class CartController {
       response.put("totalPrice", cartResponse.getTotalPrice());
 
       if (cartResponse.isEmpty()) {
-        response.put("message", cartResponse.getMessage());
+        response.put("message", "장바구니가 비어있습니다");
       }
 
       return ResponseEntity.ok(response);
@@ -77,9 +92,10 @@ public class CartController {
 
   /**
    * 장바구니 상품 추가
-   * POST /api/cart/add
+   * POST cart/add
    */
   @PostMapping("/add")
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> addToCart(
       @Valid @RequestBody CartRequest request,
       HttpSession session) {
@@ -102,7 +118,6 @@ public class CartController {
 
       Map<String, Object> response = new HashMap<>();
 
-      // 🔧 수정: ApiResponse toString()을 사용해서 성공 여부 판단
       boolean isSuccess = result.toString().contains("rtcd=S00");
 
       response.put("success", isSuccess);
@@ -128,9 +143,10 @@ public class CartController {
 
   /**
    * 장바구니 수량 변경
-   * PUT /api/cart/quantity
+   * PUT cart/quantity
    */
   @PutMapping("/quantity")
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> updateQuantity(
       @Valid @RequestBody CartRequest request,
       HttpSession session) {
@@ -177,9 +193,10 @@ public class CartController {
 
   /**
    * 장바구니 상품 삭제
-   * DELETE /api/cart/remove
+   * DELETE /cart/remove
    */
   @DeleteMapping("/remove")
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> removeFromCart(
       @Valid @RequestBody CartRequest request,
       HttpSession session) {
@@ -225,9 +242,10 @@ public class CartController {
 
   /**
    * 장바구니 상품 개수 조회
-   * GET /api/cart/count
+   * GET /cart/count
    */
   @GetMapping("/count")
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> getCartItemCount(HttpSession session) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
@@ -255,9 +273,10 @@ public class CartController {
 
   /**
    * 장바구니 전체 비우기
-   * DELETE /api/cart/clear
+   * DELETE /cart/clear
    */
   @DeleteMapping("/clear")
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> clearCart(HttpSession session) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
