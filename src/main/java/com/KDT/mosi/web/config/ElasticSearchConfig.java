@@ -11,7 +11,9 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @Configuration
 @EnableElasticsearchRepositories(basePackages = {
     "com.KDT.mosi.domain.publicdatamanage.facility.repository",
-    "com.KDT.mosi.domain.publicdatamanage.restaurant.document"
+    "com.KDT.mosi.domain.publicdatamanage.restaurant.document",
+    "com.KDT.mosi.domain.product.document",
+    "com.KDT.mosi.domain.product.search.document"
 })
 public class ElasticSearchConfig extends ElasticsearchConfiguration {
 

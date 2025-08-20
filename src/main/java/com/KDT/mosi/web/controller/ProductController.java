@@ -2,9 +2,8 @@ package com.KDT.mosi.web.controller;
 
 import com.KDT.mosi.domain.entity.*;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
-import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
-import com.KDT.mosi.domain.product.svc.ProductImageSVC;
-import com.KDT.mosi.domain.product.svc.ProductSVC;
+import com.KDT.mosi.domain.product.document.ProductDocument;
+import com.KDT.mosi.domain.product.svc.*;
 import com.KDT.mosi.web.form.product.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -38,11 +37,39 @@ public class ProductController {
   private final ProductImageSVC productImageSVC;
   private final ProductCoursePointSVC productCoursePointSVC;
   private final SellerPageSVC sellerPageSVC;
+  private final ProductSearchService productSearchService;
+  private final SearchTrendService searchTrendService;
 
   // 유효한 카테고리 집합
   private static final Set<String> validCategories = Set.of(
       "area", "pet", "restaurant", "culture_history", "season_nature", "silver_disables"
   );
+
+  @GetMapping("/search")
+  public String searchProducts(@RequestParam(required = false) String keyword, Model model) throws IOException {
+    if (keyword != null && !keyword.trim().isEmpty()) {
+      List<ProductDocument> searchResults = productSearchService.searchProductsByKeyword(keyword);
+      model.addAttribute("searchResults", searchResults);
+      model.addAttribute("searchKeyword", keyword);
+    }
+
+    List<String> popularKeywords = searchTrendService.getPopularKeywords();
+    model.addAttribute("popularKeywords", popularKeywords);
+
+    return "searchResultPage";
+  }
+
+  // 초기 인덱싱을 위한 임시 API
+  @GetMapping("/index-all-products")
+  @ResponseBody
+  public String indexAllProducts() {
+    try {
+      productSearchService.indexAllProductsFromDB();
+      return "All products indexing started successfully.";
+    } catch (Exception e) {
+      return "Failed to start product indexing: " + e.getMessage();
+    }
+  }
 
   // 구매자 상품 조회
   @GetMapping("/list")
