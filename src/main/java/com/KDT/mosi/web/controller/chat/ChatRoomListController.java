@@ -45,13 +45,26 @@ public class ChatRoomListController {
   @ResponseBody
   public List<ChatRoomListDto> roomListApi(HttpSession session) {
     Long memberId = (Long) session.getAttribute("loginMemberId");
-    List<ChatRoomListDto> rooms = chatRoomService.findBySellerId(memberId);
     if (memberId == null) {
       throw new IllegalStateException("로그인 필요");
     }
-    log.info("📋 판매자 {}의 채팅방 목록: {}", memberId, rooms);
-    return chatRoomService.findBySellerId(memberId);
+
+    List<ChatRoomListDto> rooms = chatRoomService.findBySellerId(memberId);
+
+    // 로그는 필요한 정보만 추려서 찍기
+    rooms.forEach(room ->
+        log.info("📋 [판매자:{}] 채팅방ID={}, 상품ID={}, 구매자={}, 마지막메시지={}, 이미지크기={}",
+            memberId,
+            room.getRoomId(),
+            room.getProductId(),
+            room.getBuyerId(),
+            room.getLastMessage(),
+            room.getProductImage() != null ? room.getProductImage().length : 0)
+    );
+
+    return rooms;
   }
+
 }
 
 

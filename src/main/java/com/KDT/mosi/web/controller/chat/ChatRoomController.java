@@ -45,14 +45,4 @@ public class ChatRoomController {
 
 
 
-//  @GetMapping("/api/chat/rooms/{roomId}/messages")
-//  public List<ChatMessageDto> history(
-//      @PathVariable Long roomId,
-//      @RequestParam(defaultValue = "30") int limit,
-//      @RequestParam(required=false) Long beforeId
-//  ) {
-//    return service.findRecent(roomId, limit, beforeId);
-//  }
-
-
 }

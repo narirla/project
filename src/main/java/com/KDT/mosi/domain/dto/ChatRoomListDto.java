@@ -16,6 +16,13 @@ public class ChatRoomListDto {
   private Long productId;
   private String status;
   private LocalDateTime createdAt;
-  // 필요하다면 buyerNickname, productTitle 등도 포함 가능
+
+  // 화면 표시용 추가 필드
+  private String buyerNickname;
+  private String productTitle;
+  private byte[] productImage;
+  private String lastMessage;
+
+
 }
 
