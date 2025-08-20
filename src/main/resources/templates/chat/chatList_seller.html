@@ -74,16 +74,9 @@
 
                 <!-- 진행중 문의 리스트 -->
                 <div id="progress" class="tab-content active">
-                  <ul id="room-list">
-                    <li th:if="${#lists.isEmpty(rooms)}">
-                      받은 문의가 없습니다.
-                    </li>
-                    <li th:each="room : ${rooms}">
-                      <b>상품ID:</b> <span th:text="${room.productId}"></span><br />
-                      <b>구매자:</b> <span th:text="${room.buyerId}"></span><br />
-                      <b>채팅방ID:</b> <span th:text="${room.roomId}"></span>
-                    </li>
-                  </ul>
+                  <div class="inquiry-list" id="inquiry-list">
+                    <!-- js로 구현 -->
+                  </div>
                   <!-- 페이징 -->
                   <div class="pagination"></div>
                 </div>

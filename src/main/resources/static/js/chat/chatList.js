@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 //    const sellerId = document.body.dataset.sellerId; // body 태그에 sellerId를 주입해둔다
-    const listDiv = document.getElementById("room-list"); // 채팅방 목록 출력 영역
+    const listDiv = document.getElementById("inquiry-list"); // 채팅방 목록 출력 영역
 
     // ✅ 1. WebSocket 연결
     const socket = new SockJS("/ws");  // WebSocket 엔드포인트
@@ -38,29 +38,76 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ 4. 화면에 목록 그려주기
     function renderRoomList(data) {
+        const listDiv = document.getElementById("inquiry－list");
         listDiv.innerHTML = ""; // 기존 목록 지우기
-        if (data.length === 0) {
-            listDiv.innerHTML = "<li>받은 문의가 없습니다.</li>";
+
+        if (!data || data.length === 0) {
+            listDiv.innerHTML = "<div>받은 문의가 없습니다.</div>";
             return;
         }
 
         data.forEach(room => {
-            const li = document.createElement("li");
-//            div.classList.add("room-item");
-            li.innerHTML = `
-                <b>상품ID:</b> ${room.productId}<br/>
-                <b>구매자:</b> ${room.buyerId}<br/>
-                <b>채팅방ID:</b> ${room.roomId}
+            const row = document.createElement("div");
+            row.classList.add("inquiry-row");
+
+            row.innerHTML = `
+                <div class="inquiry-list-product_number">${room.productId}</div>
+                <div class="inquiry-list-product_img">
+                  ${room.productImage
+                    ? `<img src="data:image/jpeg;base64,${room.productImage}" alt="썸네일" width="60"/>`
+                    : `<span>이미지 없음</span>`}
+                </div>
+                <div class="inquiry-list-product_title">${room.productTitle}</div>
+                <div class="inquiry-list-msgs">
+                    <div class="inquiry-list-seller_nickname">${room.buyerNickname}</div>
+                    <div class="inquiry-list-last_msg">${room.lastMessage ?? ''}</div>
+                </div>
             `;
-            // 클릭하면 채팅창 팝업 띄우기
-            li.addEventListener("click", () => {
+
+            // 클릭 이벤트 → 채팅창 팝업 열기
+            row.addEventListener("click", () => {
                 window.open(`/api/chat/popup?roomId=${room.roomId}`,
                     `chat_${room.roomId}`,
                     "width=400,height=600");
             });
-            listDiv.appendChild(li);
+
+            listDiv.appendChild(row);
         });
     }
+
+
+
+
+
+
+
+
+
+
+    //function renderRoomList(data) {
+    //    listDiv.innerHTML = ""; // 기존 목록 지우기
+    //    if (data.length === 0) {
+    //        listDiv.innerHTML = "<li>받은 문의가 없습니다.</li>";
+    //        return;
+    //    }
+    //
+    //    data.forEach(room => {
+    //        const li = document.createElement("li");
+//  //          div.classList.add("room-item");
+    //        li.innerHTML = `
+    //            <b>상품ID:</b> ${room.productId}<br/>
+    //            <b>구매자:</b> ${room.buyerId}<br/>
+    //            <b>채팅방ID:</b> ${room.roomId}
+    //        `;
+    //        // 클릭하면 채팅창 팝업 띄우기
+    //        li.addEventListener("click", () => {
+    //            window.open(`/api/chat/popup?roomId=${room.roomId}`,
+    //                `chat_${room.roomId}`,
+    //                "width=400,height=600");
+    //        });
+    //        listDiv.appendChild(li);
+    //    });
+    //}
 
     // 페이지 로스 시 Ajax 호출
 //    refreshRoomList();
