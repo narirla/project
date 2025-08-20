@@ -34,6 +34,6 @@ public class ChatPopupController {
     model.addAttribute("roomId", roomId);
     model.addAttribute("senderId", senderId);
 //    model.addAttribute("messages", messages);
-    return "chat/popup_real"; // templates/chat/popup_real.html
+    return "chat/popup"; // templates/chat/popup.html
   }
 }
