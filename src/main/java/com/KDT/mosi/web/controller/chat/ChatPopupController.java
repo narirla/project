@@ -1,5 +1,6 @@
 package com.KDT.mosi.web.controller.chat;
 
+import com.KDT.mosi.domain.chat.svc.ChatRoomService;
 import com.KDT.mosi.domain.member.svc.MemberSVCImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import java.security.Principal;
 public class ChatPopupController {
 
   private final MemberSVCImpl memberSVC;
+  private final ChatRoomService chatRoomService;
 
   @GetMapping("/popup")
   public String chatPopup(@RequestParam("roomId") Long roomId, Principal principal, Model model) {
@@ -26,8 +28,12 @@ public class ChatPopupController {
     // 로그인한 사용자 ID (예시: principal에서 이메일 → memberId 조회)
     Long senderId = memberSVC.findByEmail(principal.getName()).orElseThrow().getMemberId();
 
+
+
+
     model.addAttribute("roomId", roomId);
     model.addAttribute("senderId", senderId);
-    return "chat/popup_real.html"; // templates/chat/popup_real.html
+//    model.addAttribute("messages", messages);
+    return "chat/popup_real"; // templates/chat/popup_real.html
   }
 }

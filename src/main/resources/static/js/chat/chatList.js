@@ -54,8 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
             // 클릭하면 채팅창 팝업 띄우기
             li.addEventListener("click", () => {
-                window.open(`/chat/popup?roomId=${room.roomId}`,
-                    "chatPopup",
+                window.open(`/api/chat/popup?roomId=${room.roomId}`,
+                    `chat_${room.roomId}`,
                     "width=400,height=600");
             });
             listDiv.appendChild(li);
