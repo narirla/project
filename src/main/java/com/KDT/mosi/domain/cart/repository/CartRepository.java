@@ -14,7 +14,4 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
   // 장바구니 존재 여부
   boolean existsByBuyerId(Long buyerId);
-
-  // 장바구니 전체 삭제 (주문완료 후)
-  void deleteByBuyerId(Long buyerId);
 }

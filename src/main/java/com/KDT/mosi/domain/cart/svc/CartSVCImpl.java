@@ -1,18 +1,30 @@
 package com.KDT.mosi.domain.cart.svc;
 
-import com.KDT.mosi.domain.cart.repository.CartRepository;
+import com.KDT.mosi.domain.cart.dto.CartResponse;
+import com.KDT.mosi.domain.cart.dto.CartItemResponse;
 import com.KDT.mosi.domain.cart.repository.CartItemRepository;
+import com.KDT.mosi.domain.cart.repository.CartRepository;
 import com.KDT.mosi.domain.entity.Product;
+import com.KDT.mosi.domain.entity.SellerPage;
 import com.KDT.mosi.domain.entity.cart.Cart;
 import com.KDT.mosi.domain.entity.cart.CartItem;
+import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.product.svc.ProductSVC;
+import com.KDT.mosi.web.api.ApiResponse;
+import com.KDT.mosi.web.api.ApiResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+/**
+ * 장바구니 Service 구현체
+ * React+Vite 환경과 완전 호환
+ */
 @Slf4j
 @Service
 @Transactional
@@ -22,42 +34,32 @@ public class CartSVCImpl implements CartSVC {
   private final CartRepository cartRepository;
   private final CartItemRepository cartItemRepository;
   private final ProductSVC productSVC;
+  private final SellerPageSVC sellerPageSVC;
 
   @Override
-  public Map<String, Object> addToCart(Long buyerId, Long productId, String optionType, Long quantity) {
-    Map<String, Object> result = new HashMap<>();
-
+  public ApiResponse<Void> addToCart(Long buyerId, Long productId, String optionType, Long quantity) {
     try {
-      // 입력값 검증
       if (quantity <= 0) {
-        result.put("success", false);
-        return result;
+        return ApiResponse.of(ApiResponseCode.INVALID_PARAMETER, null);
       }
 
-      // Product 존재 여부 및 상태 확인
       Optional<Product> productOpt = productSVC.getProduct(productId);
       if (productOpt.isEmpty() || !"판매중".equals(productOpt.get().getStatus())) {
-        result.put("success", false);
-        return result;
+        return ApiResponse.of(ApiResponseCode.ENTITY_NOT_FOUND, null);
       }
 
       Product product = productOpt.get();
 
-      // 기존 동일 상품 확인
       Optional<CartItem> existingItem = cartItemRepository
           .findByBuyerIdAndProductIdAndOptionType(buyerId, productId, optionType);
 
-      CartItem savedItem;
       if (existingItem.isPresent()) {
-        // 기존 상품 수량 증가
         CartItem item = existingItem.get();
         item.setQuantity(item.getQuantity() + quantity);
-        savedItem = cartItemRepository.save(item);
+        cartItemRepository.save(item);
       } else {
-        // 장바구니 조회 또는 생성
         Cart cart = getOrCreateCart(buyerId);
 
-        // 새 상품 추가
         CartItem newItem = new CartItem();
         newItem.setCartId(cart.getCartId());
         newItem.setBuyerId(buyerId);
@@ -66,187 +68,195 @@ public class CartSVCImpl implements CartSVC {
         newItem.setOptionType(optionType);
         newItem.setQuantity(quantity);
 
-        // 가격 설정
         setPrice(newItem, product, optionType);
-
-        savedItem = cartItemRepository.save(newItem);
+        cartItemRepository.save(newItem);
       }
 
-      // 총액 업데이트 (통합 메소드 사용)
       updateCartTotal(buyerId);
-
-      result.put("success", true);
-      result.put("data", savedItem);
+      return ApiResponse.of(ApiResponseCode.SUCCESS, null);
 
     } catch (Exception e) {
-      log.error("장바구니 추가 실패", e);
-      result.put("success", false);
+      log.error("장바구니 추가 중 오류 발생: buyerId={}, productId={}", buyerId, productId, e);
+      return ApiResponse.of(ApiResponseCode.BUSINESS_ERROR, null);
     }
-
-    return result;
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Map<String, Object> getCartSummary(Long buyerId) {
-    Map<String, Object> result = new HashMap<>();
-
+  public CartResponse getCart(Long buyerId, String memberNickname) {
     try {
       List<CartItem> items = cartItemRepository.findByBuyerId(buyerId);
 
-      // 빈 장바구니 처리
       if (items.isEmpty()) {
-        Map<String, Object> emptySummary = new HashMap<>();
-        emptySummary.put("items", new ArrayList<>());
-        emptySummary.put("totalCount", 0);
-        emptySummary.put("totalQuantity", 0);
-        emptySummary.put("totalPrice", 0L);
-
-        result.put("success", true);
-        result.put("data", emptySummary);
-        return result;
+        return CartResponse.createEmptyCart(memberNickname, buyerId);
       }
 
-      // 총 수량 계산
-      int totalQuantity = 0;
-      for (CartItem item : items) {
-        totalQuantity += item.getQuantity();
-      }
+      // Entity → DTO 수동 변환
+      List<CartItemResponse> cartItems = convertToCartItemResponses(items);
 
-      // Product 정보와 함께 응답 생성
-      List<Map<String, Object>> itemsWithProduct = new ArrayList<>();
       long totalPrice = 0;
+      int totalQuantity = 0;
 
-      for (CartItem item : items) {
-        Optional<Product> productOpt = productSVC.getProduct(item.getProductId());
-        Map<String, Object> itemData = new HashMap<>();
-        itemData.put("cartItem", item);
-        itemData.put("product", productOpt.orElse(null));
-
-        // 판매중인 상품만 총액에 포함
-        if (productOpt.isPresent() && "판매중".equals(productOpt.get().getStatus())) {
-          totalPrice += item.getSalePrice() * item.getQuantity();
-          itemData.put("available", true);
-        } else {
-          itemData.put("available", false);
+      // React에서 계산 로직을 단순화하기 위해 서버에서 미리 계산
+      for (CartItemResponse dto : cartItems) {
+        if (dto.isAvailable()) {
+          totalPrice += dto.getPrice() * dto.getQuantity();
+          totalQuantity += dto.getQuantity().intValue();
         }
-
-        itemsWithProduct.add(itemData);
       }
 
-      Map<String, Object> summary = new HashMap<>();
-      summary.put("items", itemsWithProduct);
-      summary.put("totalCount", items.size());
-      summary.put("totalQuantity", totalQuantity);
-      summary.put("totalPrice", totalPrice);
-
-      result.put("success", true);
-      result.put("data", summary);
+      // 🔧 수정: 모든 파라미터를 Long 타입으로 전달, CartItemResponse 리스트 사용
+      return CartResponse.createSuccess(
+          memberNickname,
+          buyerId,
+          cartItems,                    // List<CartItemResponse>
+          (long) cartItems.size(),      // Long
+          (long) totalQuantity,         // Long
+          totalPrice                    // Long
+      );
 
     } catch (Exception e) {
-      log.error("장바구니 조회 실패", e);
-      result.put("success", false);
+      log.error("장바구니 조회 중 오류 발생: buyerId={}", buyerId, e);
+      return CartResponse.createError(memberNickname, buyerId, "장바구니 조회 중 오류가 발생했습니다");
     }
-
-    return result;
   }
 
   @Override
-  public Map<String, Object> updateQuantity(Long buyerId, Long productId, String optionType, Long quantity) {
-    Map<String, Object> result = new HashMap<>();
-
+  public ApiResponse<Void> updateQuantity(Long buyerId, Long productId, String optionType, Long quantity) {
     try {
       if (quantity <= 0) {
-        // 수량이 0 이하면 삭제
         cartItemRepository.deleteByBuyerIdAndProductIdAndOptionType(buyerId, productId, optionType);
         updateCartTotal(buyerId);
-        result.put("success", true);
-        return result;
+        return ApiResponse.of(ApiResponseCode.SUCCESS, null);
       }
 
       Optional<CartItem> itemOpt = cartItemRepository
           .findByBuyerIdAndProductIdAndOptionType(buyerId, productId, optionType);
 
       if (itemOpt.isEmpty()) {
-        result.put("success", false);
-        return result;
+        return ApiResponse.of(ApiResponseCode.ENTITY_NOT_FOUND, null);
       }
 
       CartItem item = itemOpt.get();
       item.setQuantity(quantity);
       cartItemRepository.save(item);
 
-      // 총액 업데이트 (통합 메소드 사용)
       updateCartTotal(buyerId);
-
-      result.put("success", true);
+      return ApiResponse.of(ApiResponseCode.SUCCESS, null);
 
     } catch (Exception e) {
-      log.error("수량 변경 실패", e);
-      result.put("success", false);
+      log.error("수량 변경 중 오류 발생: buyerId={}, productId={}", buyerId, productId, e);
+      return ApiResponse.of(ApiResponseCode.BUSINESS_ERROR, null);
     }
-
-    return result;
   }
 
   @Override
-  public Map<String, Object> removeFromCart(Long buyerId, Long productId, String optionType) {
-    Map<String, Object> result = new HashMap<>();
-
+  public ApiResponse<Void> removeFromCart(Long buyerId, Long productId, String optionType) {
     try {
       cartItemRepository.deleteByBuyerIdAndProductIdAndOptionType(buyerId, productId, optionType);
-
-      // 총액 업데이트 (통합 메소드 사용)
       updateCartTotal(buyerId);
-
-      result.put("success", true);
+      return ApiResponse.of(ApiResponseCode.SUCCESS, null);
 
     } catch (Exception e) {
-      log.error("상품 삭제 실패", e);
-      result.put("success", false);
+      log.error("상품 삭제 중 오류 발생: buyerId={}, productId={}", buyerId, productId, e);
+      return ApiResponse.of(ApiResponseCode.BUSINESS_ERROR, null);
     }
-
-    return result;
   }
 
   @Override
   public void clearCart(Long buyerId) {
-    cartItemRepository.deleteByBuyerId(buyerId);
-    updateCartTotal(buyerId);
-    log.info("장바구니 전체 비우기: buyerId={}", buyerId);
+    try {
+      cartItemRepository.deleteByBuyerId(buyerId);
+      updateCartTotal(buyerId);
+      log.info("장바구니 전체 비우기 완료: buyerId={}", buyerId);
+    } catch (Exception e) {
+      log.error("장바구니 비우기 중 오류 발생: buyerId={}", buyerId, e);
+    }
   }
 
   @Override
   @Transactional(readOnly = true)
   public int getCartItemCount(Long buyerId) {
-    return cartItemRepository.countByBuyerId(buyerId);
+    try {
+      return cartItemRepository.countByBuyerId(buyerId);
+    } catch (Exception e) {
+      log.error("장바구니 개수 조회 중 오류 발생: buyerId={}", buyerId, e);
+      return 0;
+    }
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public List<CartItem> getSelectedCartItems(Long buyerId, List<Long> cartItemIds) {
-    List<CartItem> allSelectedItems = cartItemRepository.findByCartItemIdIn(cartItemIds);
+  /**
+   * CartItem → CartItemResponse 변환
+   * React+Vite와 완전 호환되는 DTO 변환
+   */
+  private List<CartItemResponse> convertToCartItemResponses(List<CartItem> items) {
+    List<CartItemResponse> result = new ArrayList<>();
 
-    // 보안: 구매자 ID로 필터링
-    List<CartItem> validItems = new ArrayList<>();
-    for (CartItem item : allSelectedItems) {
-      if (item.getBuyerId().equals(buyerId)) {
-        validItems.add(item);
+    for (CartItem item : items) {
+      Optional<Product> productOpt = productSVC.getProduct(item.getProductId());
+
+      if (productOpt.isPresent()) {
+        Product product = productOpt.get();
+        String sellerNickname = getSellerNickname(item.getSellerId());
+        boolean isAvailable = "판매중".equals(product.getStatus());
+
+        // 🔧 수정: React가 기대하는 정확한 필드명으로 매핑
+        CartItemResponse dto = isAvailable ?
+            CartItemResponse.createAvailable(
+                item.getProductId(),
+                product.getTitle(),          // productName으로 매핑됨
+                product.getDescription(),
+                item.getSalePrice(),
+                item.getOriginalPrice(),
+                item.getQuantity(),
+                item.getOptionType(),
+                product.getFileName(),       // productImage로 매핑됨
+                sellerNickname
+            ) :
+            CartItemResponse.createUnavailable(
+                item.getProductId(),
+                product.getTitle(),          // productName으로 매핑됨
+                product.getDescription(),
+                item.getSalePrice(),
+                item.getOriginalPrice(),
+                item.getQuantity(),
+                item.getOptionType(),
+                product.getFileName(),       // productImage로 매핑됨
+                sellerNickname
+            );
+
+        result.add(dto);
       }
     }
-    return validItems;
+
+    return result;
   }
 
+  /**
+   * 판매자 닉네임 조회
+   */
+  private String getSellerNickname(Long sellerId) {
+    return sellerPageSVC.findByMemberId(sellerId)
+        .map(SellerPage::getNickname)
+        .orElse("판매자");
+  }
+
+  /**
+   * 장바구니 가져오기 또는 생성
+   */
   private Cart getOrCreateCart(Long buyerId) {
-    if (!cartRepository.existsByBuyerId(buyerId)) {
-      Cart newCart = new Cart();
-      newCart.setBuyerId(buyerId);
-      newCart.setTotalPrice(0L);
-      return cartRepository.save(newCart);
-    }
-    return cartRepository.findByBuyerId(buyerId).get();
+    return cartRepository.findByBuyerId(buyerId)
+        .orElseGet(() -> {
+          Cart newCart = new Cart();
+          newCart.setBuyerId(buyerId);
+          newCart.setTotalPrice(0L);
+          return cartRepository.save(newCart);
+        });
   }
 
+  /**
+   * 상품 가격 설정
+   */
   private void setPrice(CartItem newItem, Product product, String optionType) {
     if ("가이드포함".equals(optionType)) {
       newItem.setOriginalPrice(product.getGuidePrice() != null ?
@@ -261,21 +271,23 @@ public class CartSVCImpl implements CartSVC {
     }
   }
 
+  /**
+   * 장바구니 총액 업데이트
+   */
   private void updateCartTotal(Long buyerId) {
     List<CartItem> items = cartItemRepository.findByBuyerId(buyerId);
-    long totalPrice = 0;
 
-    for (CartItem item : items) {
-      Optional<Product> prod = productSVC.getProduct(item.getProductId());
-      if (prod.isPresent() && "판매중".equals(prod.get().getStatus())) {
-        totalPrice += item.getSalePrice() * item.getQuantity();
-      }
-    }
+    long totalPrice = items.stream()
+        .filter(item -> {
+          Optional<Product> prod = productSVC.getProduct(item.getProductId());
+          return prod.isPresent() && "판매중".equals(prod.get().getStatus());
+        })
+        .mapToLong(item -> item.getSalePrice() * item.getQuantity())
+        .sum();
 
-    Optional<Cart> cartOpt = cartRepository.findByBuyerId(buyerId);
-    if (cartOpt.isPresent()) {
-      cartOpt.get().setTotalPrice(totalPrice);
-      cartRepository.save(cartOpt.get());
-    }
+    cartRepository.findByBuyerId(buyerId).ifPresent(cart -> {
+      cart.setTotalPrice(totalPrice);
+      cartRepository.save(cart);
+    });
   }
 }
