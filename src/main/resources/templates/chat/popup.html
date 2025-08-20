@@ -1,50 +1,75 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1:1 문의</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>1:1 문의</title>
+    <!-- 공통 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/layout.css}" />
+    <link rel="stylesheet" th:href="@{/css/common.css}" />
+    <link rel="stylesheet" th:href="@{/css/chat/popup.css}" />
+    <!-- 아이콘 / 폰트 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css"
+    />
 
-  <!-- 공통 스타일 -->
-  <link rel="stylesheet" href="/static/css/layout.css">
-  <link rel="stylesheet" href="/static/css/common.css">
-  <link rel="stylesheet" href="/static/css/chat/popup.css">
-  <!-- 아이콘 / 폰트 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
+    <!-- SockJS/STOMP (전역) -->
+    <!-- popup.html head 영역에 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  </head>
 
-</head>
-
-<body th:data-room-id="${roomId}" th:data-sender-id="${senderId}" th:data-partner="${partnerNickname}"
-  th:data-product-title="${productTitle}" th:data-product-price="${productPrice}"
-  th:data-product-thumb="${productThumbBase64}">
-
-  <!-- 상단 헤더 -->
-  <div class="header">
-    <div class="title" th:text="${partnerNickname}">상대 닉네임</div>
-    <!-- 신고 버튼 -->
-    <div class="icon-btn report-btn" id="reportBtn" title="신고" role="button" aria-label="신고하기">
-      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-      <span class="label">신고</span>
+  <body
+    th:data-room-id="${roomId}"
+    th:data-sender-id="${senderId}"
+    th:data-partner="${partnerNickname}"
+    th:data-product-title="${productTitle}"
+    th:data-product-price="${productPrice}"
+    th:data-product-thumb="${productThumbBase64}"
+  >
+    <!-- 상단 헤더 -->
+    <div class="header">
+      <div class="title" th:text="${partnerNickname}">상대 닉네임</div>
+      <!-- 신고 버튼 -->
+      <div
+        class="icon-btn report-btn"
+        id="reportBtn"
+        title="신고"
+        role="button"
+        aria-label="신고하기"
+      >
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        <span class="label">신고</span>
+      </div>
     </div>
-  </div>
 
-  <!-- 상품 요약 카드 -->
-  <div class="product-card">
-    <img class="product-thumb"
-      th:src="${productThumbBase64 != null} ? ${productThumbBase64} : @{/img/default-product.png}" alt="상품 썸네일"
-      onerror="this.onerror=null; this.src='/img/default-product.png';">
-    <div class="product-meta">
-      <b th:text="${productTitle}">상품명</b>
-      <span th:text="${#numbers.formatInteger(productPrice, 3, 'COMMA')} + '원'">99,000원</span>
+    <!-- 상품 요약 카드 -->
+    <div class="product-card">
+      <img
+        class="product-thumb"
+        th:src="${productThumbBase64 != null} ? ${productThumbBase64} : @{/img/default-product.png}"
+        alt="상품 썸네일"
+        onerror="this.onerror=null; this.src='/img/default-product.png';"
+      />
+      <div class="product-meta">
+        <b th:text="${productTitle}">상품명</b>
+        <span
+          th:text="${#numbers.formatInteger(productPrice, 3, 'COMMA')} + '원'"
+          >99,000원</span
+        >
+      </div>
     </div>
-  </div>
 
-  <!-- 메시지 리스트 -->
-  <div id="list" class="scroll" aria-live="polite">
-    <!-- 예시 구조: JS에서 동적으로 삽입 -->
-    <!--
+    <!-- 메시지 리스트 -->
+    <div id="list" class="scroll" aria-live="polite">
+      <!-- 예시 구조: JS에서 동적으로 삽입 -->
+      <!--
     <div class="item them">
       <img class="profile" src="/img/default-profile.png" alt="상대 프로필">
       <div class="msg-box">
@@ -60,23 +85,29 @@
         <div class="time">15:21</div>
       </div>
     </div>
-    -->
-  </div>
+    --></div>
 
-  <!-- 입력창 -->
-  <div class="input">
-    <label for="file" class="attach" title="이미지 보내기"><i class="fa-regular fa-image"></i></label>
-    <input id="file" class="hidden" type="file" accept="image/*">
-    <input id="text" type="text" placeholder="메시지를 입력하세요" />
-    <button id="send" class="send" title="전송"><i class="fa-solid fa-paper-plane"></i></button>
-  </div>
+    <!-- 입력창 -->
+    <div class="input">
+      <label for="file" class="attach" title="이미지 보내기"
+        ><i class="fa-regular fa-image"></i
+      ></label>
+      <input id="file" class="hidden" type="file" accept="image/*" />
+      <input id="text" type="text" placeholder="메시지를 입력하세요" />
+      <button id="send" class="send" title="전송">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
 
-  <!-- 스크립트 -->
-  <script th:src="@{/js/chat/popup.js}"></script>
+    <!-- 스크립트 -->
+    <script th:src="@{/js/chat/popup.js}"></script>
 
-  <!-- SockJS / STOMP -->
-  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js"></script>
-</body>
-
+    <!-- SockJS / STOMP -->
+    <script
+      th:src="@{https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js}"
+    ></script>
+    <script
+      th:src="@{https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js}"
+    ></script>
+  </body>
 </html>
