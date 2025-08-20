@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ 4. 화면에 목록 그려주기
     function renderRoomList(data) {
-        const listDiv = document.getElementById("inquiry－list");
+        const listDiv = document.getElementById("inquiry-list");
         listDiv.innerHTML = ""; // 기존 목록 지우기
 
         if (!data || data.length === 0) {
