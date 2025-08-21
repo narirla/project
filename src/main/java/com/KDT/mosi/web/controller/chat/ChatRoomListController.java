@@ -2,7 +2,7 @@ package com.KDT.mosi.web.controller.chat;
 
 
 import com.KDT.mosi.domain.chat.svc.ChatRoomService;
-import com.KDT.mosi.domain.dto.ChatRoomListDto;
+import com.KDT.mosi.domain.dto.chat.ChatRoomListDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

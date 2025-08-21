@@ -4,10 +4,8 @@ package com.KDT.mosi.domain.chat.svc;
 import com.KDT.mosi.domain.chat.dao.ChatMessageDao;
 import com.KDT.mosi.domain.chat.dao.ChatRoomDao;
 import com.KDT.mosi.domain.chat.dao.ChatRoomListDao;
-import com.KDT.mosi.domain.dto.ChatMessageDto;
-import com.KDT.mosi.domain.dto.ChatRoomDto;
-import com.KDT.mosi.domain.dto.ChatRoomListDto;
-import jakarta.transaction.Transactional;
+import com.KDT.mosi.domain.dto.chat.*;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -51,24 +49,16 @@ public class ChatRoomService {
   /**
    * 메시지 조회
    * @param roomId
-   * @param limit
+   * @param
    * @return
    */
   @org.springframework.transaction.annotation.Transactional(readOnly = true)
-  public List<ChatMessageDto> findRecent(Long roomId, int limit) {
+  public List<ChatMessageResponse> findRecent(Long roomId) {
     // beforeId 파라미터는 지금 Dao에 없으니, 일단 offset 방식으로 간단히 처리
     int offset = 0; // 가장 최근부터
-    return messageDao.findPageByRoom(roomId, offset, limit);
+    return messageDao.findAllByRoomWithMember(roomId);
   }
 
-//  public List<ChatMessageDto> findRecent(Long roomId, int limit, Long beforeId) {
-//    int offset = 0; // 가장 최근부터
-//    List<ChatMessageDto> list = messageDao.findPageByRoom(roomId, offset, limit);
-//    if (list == null) {
-//      return Collections.emptyList();
-//    }
-//    return list;
-//  }
 
   /**
    * 판매자 기준 채팅방 목록 조회
@@ -80,6 +70,15 @@ public class ChatRoomService {
     return listDao.findBySellerId(sellerId);
   }
 
+  /**
+   * 팝업 전용 조회
+   * @param roomId
+   * @return
+   */
+  @Transactional(readOnly = true)
+  public ChatPopupDto getPopupInfo(long roomId) {
+    return dao.findPopupInfo(roomId);
+  }
 
 
 

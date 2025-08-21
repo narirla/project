@@ -1,14 +1,13 @@
 package com.KDT.mosi.domain.chat.dao;
 
-import com.KDT.mosi.domain.dto.ChatMessageDto;
+import com.KDT.mosi.domain.dto.chat.ChatMessageDto;
+import com.KDT.mosi.domain.dto.chat.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -17,9 +16,11 @@ public class ChatMessageDao {
 
   private final NamedParameterJdbcTemplate jdbc;
 
-  private static final RowMapper<ChatMessageDto> ROW_MAPPER = new RowMapper<>() {
-    @Override public ChatMessageDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-      return new ChatMessageDto(
+  //================ 매퍼 ====================
+
+  /** 테이블 그대로 → ChatMessageDto 매핑 */
+  private static final RowMapper<ChatMessageDto> ROW_MAPPER = (rs, rowNum) ->
+      new ChatMessageDto(
           rs.getLong("MSG_ID"),
           rs.getLong("ROOM_ID"),
           rs.getLong("SENDER_ID"),
@@ -27,18 +28,31 @@ public class ChatMessageDao {
           rs.getTimestamp("CREATED_AT").toLocalDateTime(),
           "Y".equals(rs.getString("READ_YN"))
       );
-    }
-  };
 
-  /** 메시지 저장 (시퀀스 직접 사용) */
+  /** member JOIN 결과 → ChatMessageResponse 매핑 */
+  private static final RowMapper<ChatMessageResponse> RESPONSE_MAPPER = (rs, rowNum) ->
+      new ChatMessageResponse(
+          rs.getLong("MSG_ID"),
+          rs.getLong("ROOM_ID"),
+          rs.getLong("SENDER_ID"),
+          rs.getString("CONTENT"),
+          rs.getTimestamp("CREATED_AT").toLocalDateTime(),
+          "Y".equals(rs.getString("READ_YN")),
+          rs.getString("NICKNAME"),
+          rs.getBytes("PIC")   // DB 컬럼명 PIC
+      );
+
+  //================ CRUD ====================
+
+  /** 메시지 저장 */
   public long insert(long roomId, long senderId, String content, String clientMsgId){
     Long msgId = jdbc.getJdbcTemplate()
         .queryForObject("SELECT CHAT_MESSAGE_SEQ.NEXTVAL FROM DUAL", Long.class);
 
     String sql = """
-      INSERT INTO CHAT_MESSAGE (MSG_ID, ROOM_ID, SENDER_ID, CONTENT, CREATED_AT, READ_YN, CLIENT_MSG_ID)
-      VALUES (:msgId, :roomId, :senderId, :content, SYSTIMESTAMP, 'N', :clientMsgId)
-    """;
+          INSERT INTO CHAT_MESSAGE (MSG_ID, ROOM_ID, SENDER_ID, CONTENT, CREATED_AT, READ_YN, CLIENT_MSG_ID)
+          VALUES (:msgId, :roomId, :senderId, :content, SYSTIMESTAMP, 'N', :clientMsgId)
+        """;
     var p = new MapSqlParameterSource()
         .addValue("msgId", msgId)
         .addValue("roomId", roomId)
@@ -50,25 +64,81 @@ public class ChatMessageDao {
     return msgId;
   }
 
-  /** 특정 방의 메시지 갯수 */
-  public long countByRoom(long roomId){
-    String sql = "SELECT COUNT(*) FROM CHAT_MESSAGE WHERE ROOM_ID = :roomId";
-    return jdbc.queryForObject(sql, new MapSqlParameterSource("roomId", roomId), Long.class);
+  /** 특정 방 전체 메시지 (닉네임+프로필 포함) */
+  public List<ChatMessageResponse> findAllByRoomWithMember(Long roomId) {
+    String sql = """
+          SELECT m.MSG_ID,
+                 m.ROOM_ID,
+                 m.SENDER_ID,
+                 m.CONTENT,
+                 m.CREATED_AT,
+                 m.READ_YN,
+                 mem.NICKNAME,
+                 mem.PIC
+          FROM CHAT_MESSAGE m
+          JOIN MEMBER mem
+            ON m.SENDER_ID = mem.MEMBER_ID
+          WHERE m.ROOM_ID = :roomId
+          ORDER BY m.CREATED_AT ASC
+        """;
+
+    var p = new MapSqlParameterSource()
+        .addValue("roomId", roomId);
+
+    return jdbc.query(sql, p, RESPONSE_MAPPER);
   }
 
-  /** 특정 방의 메시지 페이지 조회 (최신순/오래된순은 UI 정책에 맞게) */
-  public List<ChatMessageDto> findPageByRoom(long roomId, int offset, int size){
-    String sql = """
-      SELECT MSG_ID, ROOM_ID, SENDER_ID, CONTENT, CREATED_AT, READ_YN
-      FROM CHAT_MESSAGE
-      WHERE ROOM_ID = :roomId
-      ORDER BY CREATED_AT ASC
-      OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY
-    """;
-    var p = new MapSqlParameterSource()
-        .addValue("roomId", roomId)
-        .addValue("offset", offset)
-        .addValue("size", size);
-    return jdbc.query(sql, p, ROW_MAPPER);
-  }
+  /** (옵션) 페이징 조회 */
+//  public List<ChatMessageResponse> findPageByRoomWithMember(long roomId, int offset, int size) {
+//    String sql = """
+//          SELECT m.MSG_ID,
+//                 m.ROOM_ID,
+//                 m.SENDER_ID,
+//                 m.CONTENT,
+//                 m.CREATED_AT,
+//                 m.READ_YN,
+//                 mem.NICKNAME,
+//                 mem.PIC
+//          FROM CHAT_MESSAGE m
+//          JOIN MEMBER mem
+//            ON m.SENDER_ID = mem.MEMBER_ID
+//          WHERE m.ROOM_ID = :roomId
+//          ORDER BY m.CREATED_AT ASC
+//          OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY
+//        """;
+//
+//    var p = new MapSqlParameterSource()
+//        .addValue("roomId", roomId)
+//        .addValue("offset", offset)
+//        .addValue("size", size);
+//
+//    return jdbc.query(sql, p, RESPONSE_MAPPER);
+//  }
+
+
+  /**
+   //   * 읽음 처리
+   //   * @param roomId
+   //   * @param memberId
+   //   */
+//  public void markAsRead(long roomId, long memberId) {
+//    String sql = """
+//      UPDATE CHAT_MESSAGE
+//      SET READ_YN = 'Y'
+//      WHERE ROOM_ID = :roomId
+//        AND SENDER_ID != :memberId
+//        AND READ_YN = 'N'
+//    """;
+//    jdbc.update(sql, new MapSqlParameterSource()
+//        .addValue("roomId", roomId)
+//        .addValue("memberId", memberId));
+//  }
+
+
 }
+
+//
+
+
+
+

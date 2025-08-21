@@ -21,4 +21,11 @@ public class ChatService {
     return msgId;
   }
 
+
+//  /** 특정 채팅방의 전체 메시지 (닉네임, 프로필 포함) */
+//  @Transactional(readOnly = true)
+//  public List<ChatMessageResponse> getMessagesWithMember(long roomId) {
+//    return messageDao.findPageByRoomWithMember(roomId);
+//  }
+
 }

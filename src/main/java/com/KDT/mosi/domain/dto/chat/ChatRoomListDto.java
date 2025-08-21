@@ -1,4 +1,4 @@
-package com.KDT.mosi.domain.dto;
+package com.KDT.mosi.domain.dto.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
