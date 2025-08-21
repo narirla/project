@@ -37,6 +37,7 @@ public class WebSecurityConfig {
                 "/members/emailCheck", "/members/nicknameCheck",
                 "/members/goodbye",
                 "/find/**",
+                "/cart/**",
                 "/css/**", "/js/**", "/img/**", "/images/**", "/webjars/**",
                 "/favicon.ico", "/.well-known/**"
             ).permitAll()

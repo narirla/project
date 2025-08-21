@@ -46,13 +46,18 @@ public class ProductImage {
   
   // Base64 인코딩된 이미지 데이터 (임시 저장용)
   @Transient
-  private String base64ImageData;
+  private String encodedImageData;
   
   // Base64 인코딩 메서드
-  public String getBase64ImageData() {
-    if (base64ImageData == null && imageData != null) {
-      base64ImageData = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageData);
+  public String getEncodedImageData() {
+    if (encodedImageData == null && imageData != null) {
+      encodedImageData = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageData);
     }
-    return base64ImageData;
+    return encodedImageData;
+  }
+  
+  // 호환성을 위한 별칭 메서드
+  public String getBase64ImageData() {
+    return getEncodedImageData();
   }
 }
