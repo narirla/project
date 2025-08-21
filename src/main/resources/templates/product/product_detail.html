@@ -9,11 +9,19 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  
+  <!-- CSRF 토큰 -->
+  <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
 
   <title>상품 상세</title>
 </head>
 
-<body th:object="${productDetailForm}">
+<body id="page"
+      th:object="${productDetailForm}"
+      th:data-product-id="*{product.productId}"
+      th:data-seller-id="${sellerId}"
+      th:data-buyer-id="${buyerId}">
   <header th:replace="${loginRole} == 'SELLER' ?
           ~{fragments/sellerHeader :: sellerHeader} :
           ~{fragments/header :: header}">
@@ -379,7 +387,7 @@
       </section>
 
       <!-- 오른쪽 (구매박스) -->
-      <section class="product-body-right">
+      <section class="product-body-right" th:attr="data-product-id=*{product.productId}, data-product-status=*{product.status}">
         <div class="product-body-right-container">
           <!-- 탭 -->
           <div style="display: flex;">
@@ -410,9 +418,15 @@
             <button class="product-btn btn-question">
               가이드에게 문의하기
             </button>
-            <button class="product-btn btn-buy">
-              구매하기
-            </button>
+            <!-- 구매/장바구니 버튼 그룹 -->
+            <div class="btn-group">
+              <button class="product-btn btn-cart" data-option="기본코스" data-price="" th:attr="data-price=*{product.salesPrice}">
+                장바구니
+              </button>
+              <button class="product-btn btn-buy" data-option="기본코스">
+                구매하기
+              </button>
+            </div>
           </div>
 
           <!-- 가이드 포함 -->
@@ -433,9 +447,7 @@
             <button class="product-btn btn-question">
               가이드에게 문의하기
             </button>
-            <button class="product-btn btn-buy">
-              구매하기
-            </button>
+            <!-- 가이드포함 옵션은 문의하기만 가능 -->
           </div>
         </div>
       </section>
@@ -464,6 +476,12 @@
     </div>
   </div>
   <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+  //============================== js 파일 ==============================
+  //-------------------- 채팅창 팝업 --------------------
+  <script th:src="@{/js/chat/createPopup.js}"></script>
+
+  //-------------------- 기본 레이아웃 --------------------
   <script th:src="@{/js/layout.js}"></script>
 </body>
 

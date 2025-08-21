@@ -37,6 +37,7 @@ public class WebSecurityConfig {
                 "/members/emailCheck", "/members/nicknameCheck",
                 "/members/goodbye",
                 "/find/**",
+                "/cart/**",
                 "/css/**", "/js/**", "/img/**", "/images/**", "/webjars/**",
                 "/favicon.ico", "/.well-known/**"
             ).permitAll()
@@ -71,6 +72,7 @@ public class WebSecurityConfig {
             // 7) 그 외는 기본 인증 필요
             .anyRequest().authenticated()
         )
+        .csrf(csrf -> csrf.disable())  // CSRF 비활성화 (테스트용)
         .exceptionHandling(ex -> ex
             .accessDeniedPage("/error/403")
         )
@@ -78,5 +80,17 @@ public class WebSecurityConfig {
 
     return http.build();
   }
+
+//  @Bean
+//  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//    http
+//        .authorizeHttpRequests(authz -> authz
+//            .requestMatchers("/api/**").permitAll()  // 테스트용 경로 인증 제외
+//            .anyRequest().authenticated()
+//        )
+//        .csrf(csrf -> csrf.disable());  // CSRF 비활성화 (테스트용)
+//
+//    return http.build();
+//  }
 }
 

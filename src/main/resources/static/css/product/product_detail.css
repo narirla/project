@@ -633,12 +633,47 @@ h3{
     background-color: #fff;
     font-size: 18px;
     font-weight: 500;
+    margin-bottom: 5px;
 }
 
 .product-btn.btn-buy{
     background-color: #80CCD6;
     font-size: 20px;
     font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.product-btn.btn-buy:hover{
+    background-color: #6BB8C4;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(128, 204, 214, 0.3);
+}
+
+.product-btn.btn-cart{
+    background-color: #d9d9d9;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.product-btn.btn-cart:hover{
+    background-color: #c5c5c5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(217, 217, 217, 0.3);
+}
+
+/* 버튼 그룹 레이아웃 */
+.btn-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 0px;
+}
+
+.btn-group .product-btn {
+    flex: 1;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 

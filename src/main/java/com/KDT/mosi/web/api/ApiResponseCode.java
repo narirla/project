@@ -17,6 +17,7 @@ public enum ApiResponseCode {
   VALIDATION_ERROR("E01", "Validation error occurred"),
   BUSINESS_ERROR("E02", "Business error occurred"),
   ENTITY_NOT_FOUND("E03", "Entity not found"),
+  DUPLICATE_DATA("E04", "이미 장바구니에 동일한 상품이 존재합니다"),
 
   // 사용자 관련 예외
   USER_NOT_FOUND("U01", "User not found"),

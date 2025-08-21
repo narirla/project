@@ -1,3 +1,6 @@
+// popup.js
+// 채팅 팝업 내부에서 동작하는 스크립트
+// 역할: 채팅 히스토리 로딩 + WebSocket 연결 + 메시지 송/수신 처리
 /* popup.js */
 
 // ====== 초기 데이터 ======
@@ -34,7 +37,7 @@ function scrollToBottom() {
 // ====== 메시지 렌더링 ======
 function renderMessage(msg) {
   // msg: {id, roomId, senderId, nickname, profileImage, content, type, createdAt}
-  const mine = msg.senderId === senderId;
+  const mine = msg.senderId == senderId;
 
   const wrap = document.createElement('div');
   wrap.className = `item ${mine ? 'me' : 'them'}`;
@@ -92,20 +95,29 @@ function connect() {
   stomp = Stomp.over(socket);
 
   stomp.connect({}, () => {
-    // 메시지 구독
-    stomp.subscribe(`/topic/room/${roomId}`, (frame) => {
+    console.log("✅ STOMP connected");
+
+    // 1) 메시지 구독
+    stomp.subscribe(`/topic/chat/rooms/${roomId}`, (frame) => {
       try {
         const body = JSON.parse(frame.body);
         renderMessage(body);
+
+        // 상대방 메시지 받으면 → 읽음 이벤트 보냄
+        if (body.senderId != senderId) {
+          stomp.send(`/app/chat/rooms/${roomId}/read`,
+            {}, JSON.stringify({ roomId, readerId: senderId, lastReadMessageId: body.id }));
+        }
       } catch (err) {
         console.error("메시지 파싱 오류:", err);
       }
     });
 
-    // 읽음 이벤트 구독
-    stomp.subscribe(`/topic/room/${roomId}/read`, (frame) => {
+    // 2) 읽음 이벤트 구독
+    stomp.subscribe(`/topic/chat/rooms/${roomId}/read`, (frame) => {
       try {
-        const { lastReadMessageId } = JSON.parse(frame.body);
+        const { lastReadMessageId, readerId } = JSON.parse(frame.body);
+        if (readerId == senderId) return; // 내가 보낸 건 무시
 
         // 기존 읽음 표시 제거
         document.querySelectorAll('.item.me .read').forEach(el => el.remove());
@@ -117,7 +129,7 @@ function connect() {
 
           const readEl = document.createElement('div');
           readEl.className = 'read';
-          readEl.textContent = '읽음'; // 시간 아래에 표시
+          readEl.textContent = '읽음';
           msgBox.appendChild(readEl);
         }
       } catch (err) {
@@ -125,8 +137,8 @@ function connect() {
       }
     });
 
-    // 최근 메시지 불러오기
-    fetch(`/api/chat/messages?roomId=${roomId}&size=30`)
+    // 3) 최근 메시지 불러오기
+    fetch(`/api/chat/rooms/${roomId}/messages?limit=30`)
       .then(r => r.ok ? r.json() : [])
       .then(arr => Array.isArray(arr) && arr.forEach(renderMessage))
       .catch(() => { /* 무시 */ });
@@ -142,7 +154,7 @@ function sendText() {
   if (!content || !stomp || !stomp.connected) return;
 
   const payload = { roomId, senderId, content, type: 'TEXT' };
-  stomp.send('/app/chat.send', {}, JSON.stringify(payload));
+  stomp.send(`/app/chat/rooms/${roomId}`, {}, JSON.stringify(payload));
   input.value = '';
 }
 
@@ -162,7 +174,7 @@ async function sendImage(file) {
     }
     const { imageUrl } = await res.json();
     const payload = { roomId, senderId, content: imageUrl, type: 'IMAGE' };
-    stomp.send('/app/chat.send', {}, JSON.stringify(payload));
+    stomp.send(`/app/chat/rooms/${roomId}`, {}, JSON.stringify(payload));
   } catch (err) {
     console.error('이미지 전송 실패:', err);
     alert('이미지 전송 중 오류가 발생했습니다.');
