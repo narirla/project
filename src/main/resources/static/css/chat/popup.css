@@ -11,7 +11,7 @@
 /* 공통 기본 스타일           */
 /* ========================= */
 * {
-  box-sizing: border-box; /* 패딩/보더 포함한 크기 계산 */
+  box-sizing: border-box;
 }
 
 html,
@@ -25,10 +25,23 @@ body {
 
 body {
   display: flex;
-  width: 405px;          /* 채팅창 가로 고정 */
-  height: 630px;         /* 채팅창 세로 고정 */
-  flex-direction: column; /* 헤더-본문-입력창 세로 배치 */
+  flex-direction: column;  /* 헤더-본문-입력창 세로 배치 */
+  background: #fff;
+
+  width: 100%;
+  height: 100%;
+
+  /* ✅ 최소 크기 보장 */
+  min-width: 470px;
+  min-height: 800px;
+
+  /* ✅ 화면에 꽉 차도록 (팝업 창 크기에 따라 자동 늘어남) */
+  max-width: 100%;
+  max-height: 100%;
 }
+
+
+
 
 /* ========================= */
 /* 상단 헤더                  */
@@ -38,17 +51,18 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
-  position: sticky;   /* 스크롤 내려도 상단 고정 */
+  border-bottom: 1px solid #D9D9D9;
+  position: sticky;
   top: 0;
   background: #fff;
   z-index: 10;
+  height: 50px;
 }
 
 .header .title {
   flex: 1;
   text-align: center;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   padding-left: 40px; /* 신고 버튼 공간 확보 */
 }
@@ -64,15 +78,16 @@ body {
 
 /* 신고 버튼 (아이콘+텍스트 가로 배치) */
 .header .icon-btn.report-btn {
-  width: 44px;      /* 아이콘+텍스트 크기 */
-  min-width: 0;     /* 기존 70px 무효화 */
+  width: 44px;
+  min-width: 0;
   height: 44px;
   margin-left: 15px;
   display: inline-flex;
   flex-direction: row;
   align-items: flex-end;
   justify-content: center;
-  gap: 5px;         /* 아이콘-라벨 간격 */
+  gap: 5px;
+  margin-bottom: 5px;
 }
 
 .header .icon-btn.report-btn i {
@@ -93,18 +108,25 @@ body {
 /* ========================= */
 .product-card {
   display: flex;
-  width: 405px;
-  height: 100px;
+  align-items: center;
+  width: 100%;
+  min-height: 100px;
   gap: 10px;
   padding: 10px 12px;
-  border: 1px solid var(--line);
+  border-bottom: 1px solid #D9D9D9;
+
+  position: sticky;   /* ✅ 스크롤 내려도 고정 */
+  top: 50px;          /* 헤더(50px) 바로 아래에 붙도록 */
+  background: #fff;   /* 겹침 방지 */
+  z-index: 9;
 }
+
 
 .product-thumb {
   width: 75px;
   height: 75px;
   border-radius: 6px;
-  object-fit: cover; /* 이미지 비율 유지 */
+  object-fit: cover;
   background: #ddd;
 }
 
@@ -112,24 +134,22 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-width: 0; /* 텍스트 영역 줄바꿈 대비 */
+  min-width: 0;
 }
 
 .product-meta b {
-  width: 240px;
-  height: 40px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* 긴 상품명 말줄임 처리 */
-  max-width: 240px;
+  text-overflow: ellipsis;
+  max-width: 100%;     /* ✅ 폭 자동 */
+  height: 30px;
   display: block;
 }
 
 .product-meta span {
-  height: 20px;
   font-size: 16px;
   font-weight: 500;
   color: #666;
@@ -140,20 +160,19 @@ body {
 /* ========================= */
 .scroll {
   flex: 1;
-  overflow-y: auto;   /* 스크롤 생성 */
+  overflow-y: auto;
   padding: 12px;
-  background: #f8f9fa;
+  background: #ffffff;
 }
 
-/* 메시지 아이템 공통 */
+
 .item {
   display: flex;
   margin: 6px 0;
   gap: 6px;
-  max-width: 78%; /* 채팅 버블 최대 너비 */
+  max-width: 75%;   /* ✅ 상대적 너비 */
 }
 
-/* 상대방 메시지 (왼쪽 정렬) */
 .item.them {
   align-items: flex-start;
   margin-right: auto;
@@ -162,7 +181,7 @@ body {
 .item.them .profile {
   width: 36px;
   height: 36px;
-  border-radius: 50%; /* 동그란 프로필 */
+  border-radius: 50%;
   object-fit: cover;
 }
 
@@ -173,61 +192,55 @@ body {
   margin-bottom: 2px;
 }
 
-/* 내 메시지 (오른쪽 정렬) */
 .item.me {
   margin-left: auto;
   justify-content: flex-end;
 }
 
-/* 내 메시지 시간 */
-.item.me .time {
+.item.me .time,
+.item.me .read {
   font-size: 11px;
   color: #8b8b8b;
   margin-top: 3px;
   text-align: right;
 }
 
-/* 내 메시지 읽음 표시 (시간 아래) */
-.item.me .read {
+.item.them .time,
+.item.them .read {
   font-size: 11px;
-  color: #8b8b8b;   /* ✅ 회색 */
-  margin-top: 2px;
-  text-align: right;
+  color: #8b8b8b;
+  margin-top: 3px;
+  text-align: left;
 }
 
-/* 메시지 박스 (닉네임+버블+시간 묶음) */
 .msg-box {
   display: flex;
   flex-direction: column;
 }
 
-/* 말풍선 공통 */
 .bubble {
   padding: 10px 12px;
   border-radius: 16px;
   position: relative;
   line-height: 1.4;
-  word-break: break-word; /* 긴 단어 줄바꿈 */
+  word-break: break-word;
 }
 
-/* 내가 보낸 말풍선 */
 .me .bubble {
   background: var(--me);
   color: #fff;
   border-bottom-right-radius: 6px;
 }
 
-/* 상대방 말풍선 */
 .them .bubble {
   background: var(--them);
   color: #414141;
   border-bottom-left-radius: 6px;
 }
 
-/* 이미지 메시지 */
 .bubble img.msg-img {
   display: block;
-  max-width: 220px;
+  max-width: 100%;   /* ✅ 부모 폭에 맞게 */
   height: auto;
   border-radius: 12px;
 }
@@ -240,9 +253,8 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-top: 1px solid var(--line);
   background: #fff;
-  position: sticky; /* 스크롤 내려도 하단 고정 */
+  position: sticky;
   bottom: 0;
 }
 
@@ -259,6 +271,7 @@ body {
 
 .input input[type="text"] {
   flex: 1;
+  min-width: 0;        /* ✅ 줄어듦 대응 */
   height: 40px;
   padding: 0 12px;
   border: 1px solid var(--line);

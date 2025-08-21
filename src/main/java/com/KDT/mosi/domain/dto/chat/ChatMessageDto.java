@@ -1,4 +1,4 @@
-package com.KDT.mosi.domain.dto;
+package com.KDT.mosi.domain.dto.chat;
 
 // src/main/java/com/mosi/chat/dto/ChatMessageDto.java
 import java.time.LocalDateTime;

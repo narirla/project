@@ -1,4 +1,4 @@
-package com.KDT.mosi.domain.dto;
+package com.KDT.mosi.domain.dto.chat;
 
 public record ChatSendRes(
     Long msgId,

@@ -1,6 +1,6 @@
 package com.KDT.mosi.domain.chat.dao;
 
-import com.KDT.mosi.domain.dto.ChatRoomListDto;
+import com.KDT.mosi.domain.dto.chat.ChatRoomListDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

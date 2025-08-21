@@ -2,8 +2,8 @@ package com.KDT.mosi.web.controller.chat;
 
 
 import com.KDT.mosi.domain.chat.svc.ChatRoomService;
-import com.KDT.mosi.domain.dto.ChatMessageDto;
-import com.KDT.mosi.domain.dto.ChatRoomReqDto;
+import com.KDT.mosi.domain.dto.chat.ChatMessageResponse;
+import com.KDT.mosi.domain.dto.chat.ChatRoomReqDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,7 @@ public class ChatRoomController {
       @PathVariable("roomId") Long roomId,
       @RequestParam(name = "limit", defaultValue = "30") int limit
   ) {
-    List<ChatMessageDto> messages = service.findRecent(roomId, limit);
+    List<ChatMessageResponse> messages = service.findRecent(roomId);
     log.info("📨 getMessages 호출됨, roomId={}, limit={}", roomId, limit);
 
     if (messages == null || messages.isEmpty()) {
@@ -42,7 +42,5 @@ public class ChatRoomController {
     }
     return ResponseEntity.ok(messages);
   }
-
-
 
 }

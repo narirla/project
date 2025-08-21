@@ -1,4 +1,4 @@
-package com.KDT.mosi.domain.dto;
+package com.KDT.mosi.domain.dto.chat;
 /**
  * 클라이언트 → 서버로 WebSocket 전송할 페이로드
  * NOTE: 테스트를 쉽게 하려고 senderId도 payload에 포함했지만,
