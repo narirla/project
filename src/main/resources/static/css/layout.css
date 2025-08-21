@@ -11,7 +11,7 @@ html, body {
   background-color: #ffffff;
 }
 body {
-    padding-top: 167px;
+    /*padding-top: 167px;*/
 }
 
 .layout-wrapper {
@@ -25,7 +25,7 @@ body {
 /* ============================= */
 
 header {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
@@ -35,7 +35,6 @@ header {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /*overflow: hidden;*/
   box-sizing: border-box;
 }
 
@@ -101,6 +100,7 @@ header {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  background-color: #fff;
 }
 
 .logo {
@@ -130,7 +130,7 @@ header {
   width: 440px;
   border: 1px solid #0099ad;
   border-radius: 10px;
-  padding: 2px;
+  padding: 2px 5px 2px 5px;
   background-color: #fff;
 }
 
@@ -181,6 +181,7 @@ header {
   justify-content: center;
   border-bottom: 1px solid #eee;
   box-sizing: border-box;
+  position: relative;
 }
 
 .header-nav ul {
@@ -200,21 +201,33 @@ header {
 }
 
 .header-nav a {
-  width: 100%;
-  height: 100%;
+  height: 47px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   font-size: 16px;
   font-weight: 500;
   text-decoration: none;
   color: #000;
-  white-space: nowrap;
+  width: 100%;
 }
 
-.header-nav ul li a:hover {
-  border-bottom: 2px solid #0099AD;
-  color: #0099AD;
+.header-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 8px; /* 테스트 결과 가장 자연스러운 위치 */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #0099AD;
+  transform: scaleX(0);
+  transition: transform 0.25s ease-in-out;
+}
+
+.header-nav a:hover::after {
+  transform: scaleX(1);
+  transform-origin: center;
 }
 
 /* ============================= */
@@ -228,6 +241,7 @@ footer {
   padding: 40px;
   min-height: 300px;          /* 300px 보장, 넘치면 확장 */
   box-sizing: border-box;
+  margin-top: 40px;
 }
 
 .footer-container {
@@ -314,41 +328,46 @@ footer {
 
 .menu-item {
   position: relative;
+  text-align: center;
 }
 
 .menu-item a {
   text-decoration: none;
   color: #333;
   font-weight: 600;
-  padding: 0px 10px;
+  padding: 10px 10px;
 }
+/*==================================================*/
+/*               3. 드롭다운 메뉴 스타일                  */
+/*==================================================*/
 
-/*===============드롭다운 메뉴 스타일==================*/
 /* ✅ 드롭다운 기준점 wrapper 추가 */
 .dropdown-wrapper {
-  position: relative;       /* ✅ 드롭다운 기준점 */
+  /*position: relative;*/       /* ✅ 드롭다운 기준점 */
   display: inline-block;    /* ✅ 크기 맞춰 기준점 잡기 */
+  /*width: 1200px;*/
 }
 
 .dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 47px;                /* ✅ 메뉴 아래쪽으로 내림 */
-  left: 34%;                /* ✅ wrapper 중앙을 기준점으로 */
-  transform: translateX(-25%); /* ✅ 정확히 가운데 정렬 */
+  position: fixed;
+  top: 167px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 1013px;
   height: 350px;
   background: #fff;
-  border: 1px solid #fff;
-  padding: 0px 20px;
-  /*box-shadow: 0 4px 10px rgba(0,0,0,0.1);*/
-  flex-direction: row;
+  z-index: 2000;
+  padding: 0 20px 0 167px;
+  display: none;
   justify-content: center;
   gap: 20px;
-  z-index: 2000;
-  padding-left: 167px;
+  border: 1px solid #D4D4D4;
 }
 
+/* ✅ 열릴 때만 표시 */
+.dropdown-menu.open {
+  display: flex;      /* 🔥 open일 때만 보이기 */
+}
 
 /* ✅ 카테고리 하나 (테마여행 / 커뮤니티 / 관광정보) */
 .dropdown-section {
@@ -367,6 +386,7 @@ footer {
   color: #0099AD;
   border-bottom: 1px solid #ddd;
   padding-bottom: 5px;
+  margin-top: 12px;
   text-align: center;
 }
 
@@ -398,10 +418,213 @@ footer {
   transition: color 0.2s ease;
   line-height: 1.3;     /* ✅ 글자 줄 간격도 살짝 줄임 */
   height: 25px;
-  padding: 0;
+  padding: 0px 0px 10px 0px;
 }
 
 .dropdown-section li a:hover {
   color: #0099AD;
+}
+
+/* ==================================== */
+/* ✅ 3.1 검색창 드롭다운 메뉴 스타일  */
+/* ==================================== */
+
+/* 검색창 컨테이너에 상대 위치 지정 */
+.search-box {
+  position: relative;
+}
+
+/* 드롭다운 메뉴 기본 스타일 */
+.search-dropdown {
+  position: absolute;
+  top: 85%;
+  left: -1px;
+  width: calc(100% + 2px);
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-top: none;
+  z-index: 100;
+  display: none;
+  box-sizing: border-box;
+}
+
+/* 드롭다운의 목록을 담는 컨테이너 */
+#search-list-buyer {
+    list-style: none; /* ul의 기본 점 제거 */
+    padding: 0;
+    margin: 0;
+}
+
+/* 드롭다운 항목들의 기본 스타일 */
+.search-item {
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+/* 드롭다운 항목 호버 시 효과 */
+.search-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* --- ✅ 새로운 안내 라벨 스타일 추가 --- */
+/* 검색 드롭다운 헤더 (최근 검색어 / 추천 검색어 라벨) */
+.search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+/* 헤더 라벨 텍스트 */
+.search-header .header-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #888;
+}
+
+/* '전체 삭제' 버튼 */
+.search-header .delete-all-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* 검색 기록 개별 삭제 버튼 */
+.history-item .delete-history-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    opacity: 0; /* 평소에는 숨겨두기 */
+    transition: opacity 0.2s;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* 마우스를 올렸을 때 삭제 버튼 표시 */
+.history-item:hover .delete-history-btn {
+    opacity: 1;
+}
+
+.dropdown-label {
+    padding: 10px 15px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #888;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+/* '검색 삭제' 버튼을 감싸는 컨테이너 */
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+}
+
+/* 드롭다운 하단 스위치 컨테이너 */
+.search-options-container {
+  padding: 8px 15px;
+  border-top: 1px solid #eee;
+  margin-top: 5px;
+  background-color: #f9f9f9;
+}
+
+/* ============================= */
+/* ✅ 3.1.1 스위치 버튼 스타일링    */
+/* ============================= */
+
+/* 드롭다운 내부 컨테이너 (스위치) */
+.search-options-container {
+  padding: 8px 15px;
+  border-top: 1px solid #eee;
+  margin-top: 5px;
+  background-color: #f9f9f9;
+}
+
+/* 스위치와 텍스트를 담는 Flexbox */
+.search-options {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* 스위치 컨테이너 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+/* 체크박스는 숨김 */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* 슬라이더 모양 */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+/* 슬라이더 원 모양 */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* 둥근 모양 */
+.slider.round {
+  border-radius: 20px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 

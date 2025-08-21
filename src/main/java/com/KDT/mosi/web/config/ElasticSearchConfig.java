@@ -13,7 +13,8 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
     "com.KDT.mosi.domain.publicdatamanage.facility.repository",
     "com.KDT.mosi.domain.publicdatamanage.restaurant.document",
     "com.KDT.mosi.domain.product.document",
-    "com.KDT.mosi.domain.product.search.document"
+    "com.KDT.mosi.domain.product.search.document",
+    "com.KDT.mosi.domain.product.repository"
 })
 public class ElasticSearchConfig extends ElasticsearchConfiguration {
 

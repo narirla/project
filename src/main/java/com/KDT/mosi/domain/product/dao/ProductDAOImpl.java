@@ -2,6 +2,7 @@ package com.KDT.mosi.domain.product.dao;
 
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.Product;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 @Transactional
 public class ProductDAOImpl implements ProductDAO {
@@ -269,7 +271,15 @@ public class ProductDAOImpl implements ProductDAO {
     params.put("offset", offset);
     params.put("limit", pageSize);
 
-    return jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
+    // ✨✨✨ 새로 추가할 로그
+    log.info("findAllByPage - SQL 실행: {}, offset: {}, limit: {}", sql.toString(), offset, pageSize);
+
+    List<Product> products = jdbcTemplate.query(sql.toString(), params, new ProductRowMapper());
+
+    // ✨✨✨ 새로 추가할 로그
+    log.info("findAllByPage - 페이지 {}에서 조회된 상품 수: {}", pageNumber, products.size());
+
+    return products;
   }
 
   // countAll
@@ -278,7 +288,15 @@ public class ProductDAOImpl implements ProductDAO {
     StringBuffer sql = new StringBuffer();
     sql.append("SELECT COUNT(*) FROM product");
 
-    return jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
+    // ✨✨✨ 새로 추가할 로그
+    log.info("countAll - SQL 실행: {}", sql.toString());
+
+    long count = jdbcTemplate.queryForObject(sql.toString(), new HashMap<>(), Long.class);
+
+    // ✨✨✨ 새로 추가할 로그
+    log.info("countAll - DB에서 조회된 전체 상품 수: {}", count);
+
+    return count;
   }
 
   // 카테고리별 상품 갯수

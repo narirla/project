@@ -35,10 +35,12 @@ public class WebSecurityConfig {
                 "/members/join", "/members/join/**",
                 "/members/emailCheck", "/members/nicknameCheck",
                 "/find/**", "/css/**", "/js/**", "/img/**",
-                "/api/image-proxy", // ✅ 이미지 프록시 URL을 허용하도록 추가
+                "/api/image-proxy", // 이미지 프록시 URL을 허용하도록 추가
                 "/api/food/**", // 혹시 몰라 food API도 추가
                 "/members/goodbye",
-                "/find/**", "/css/**", "/js/**", "/img/**"
+                "/find/**", "/css/**", "/js/**", "/img/**",
+                // ✨✨✨ 여기에 추가합니다. ✨✨✨
+                "/.well-known/**" // Chrome 개발자 도구 관련 요청 허용
             ).permitAll()
             .requestMatchers("/mypage/seller/**").authenticated()
             .requestMatchers("/mypage/role/**").authenticated()

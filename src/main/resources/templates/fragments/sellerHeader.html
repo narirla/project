@@ -32,8 +32,12 @@
       </a>
 
       <div class="search-box">
-        <input type="text" id="search-input-seller" placeholder="검색어를 입력하세요." aria-label="검색어 입력창">
-        <button type="submit" aria-label="검색"><i class="fa fa-search" aria-hidden="true"></i></button>
+        <input type="text" id="search-input-buyer" placeholder="검색어를 입력하세요." aria-label="검색어 입력창" autocomplete="off">
+        <button id="search-button-buyer" type="submit" aria-label="검색"><i class="fa fa-search" aria-hidden="true"></i></button>
+
+        <div id="search-dropdown-buyer" class="search-dropdown">
+          <div id="search-list-buyer"></div>
+        </div>
       </div>
 
       <div class="user-menu">
@@ -104,6 +108,7 @@
       </div>
     </nav>
   </div>
+  <script th:src="@{/js/Search.js}"></script>
 </header>
 
 

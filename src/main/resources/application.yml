@@ -35,9 +35,7 @@ logging:
   level:
     root: info
     com.KDT.mosi.domain.publicdatamanage: DEBUG
-    org.springframework.boot: info # Spring Boot 관련 디버그 로그
-    org.springframework.jdbc: info # JDBC 관련 디버그 로그
-    org.hibernate: info          # JPA/Hibernate 관련 디버그 로그 (JPA 사용 시)
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: OFF
 
 # 게시판 업로드 위치
 upload:

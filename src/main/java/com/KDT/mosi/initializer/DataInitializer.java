@@ -2,6 +2,7 @@ package com.KDT.mosi.initializer;
 
 import com.KDT.mosi.domain.publicdatamanage.facility.svc.FacilityDataProcessorService;
 import com.KDT.mosi.domain.publicdatamanage.restaurant.svc.FoodDataProcessorService;
+import com.KDT.mosi.domain.product.svc.ProductSearchService; // ✨✨✨ ProductSearchService 클래스를 임포트합니다.
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +24,7 @@ public class DataInitializer implements CommandLineRunner {
   // @RequiredArgsConstructor에 의해 자동으로 의존성 주입됩니다.
   private final FoodDataProcessorService foodDataProcessorService;
   private final FacilityDataProcessorService facilityDataProcessorService;
+  private final ProductSearchService productSearchService; // ✨✨✨ ProductSearchService 필드 추가
 
   /**
    * 애플리케이션 시작 시 실행되는 메서드입니다.
@@ -55,6 +57,15 @@ public class DataInitializer implements CommandLineRunner {
     } catch (Exception e) {
       log.error(">>>>>> 부산 시설 데이터 로딩 중 오류가 발생했습니다: {}", e.getMessage(), e);
       // throw e;
+    }
+
+    // ✨✨✨ 새로 추가된 코드
+    try {
+      log.info(">>>>>> Oracle DB의 상품 데이터를 Elasticsearch에 인덱싱을 시작합니다.");
+      productSearchService.indexAllProductsFromDB();
+      log.info(">>>>>> Oracle DB 상품 데이터 인덱싱 완료.");
+    } catch (Exception e) {
+      log.error(">>>>>> Oracle DB 상품 데이터 인덱싱 중 오류가 발생했습니다: {}", e.getMessage(), e);
     }
 
     log.info(">>>>>> 공공데이터 초기화 프로세스 종료.");

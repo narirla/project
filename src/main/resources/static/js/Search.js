@@ -2,135 +2,187 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input-buyer');
     const searchButton = document.getElementById('search-button-buyer');
     const searchDropdown = document.getElementById('search-dropdown-buyer');
+    const searchList = document.getElementById('search-list-buyer');
+
+    // 요소들이 HTML에 제대로 로드되었는지 확인하는 로그
+    console.log("searchInput:", searchInput);
+    console.log("searchButton:", searchButton);
+    console.log("searchDropdown:", searchDropdown);
+    console.log("searchList:", searchList);
+
+    // 검색 관련 요소가 하나라도 없으면 여기서 스크립트 실행을 중단합니다.
+    if (!searchInput || !searchButton || !searchDropdown || !searchList) {
+        console.error("검색 관련 요소를 찾을 수 없습니다. HTML 구조(id)를 확인하세요.");
+        return;
+    }
 
     // 로컬 스토리지에서 자동완성 상태를 불러오거나 기본값(true) 설정
     let isAutocompleteEnabled = JSON.parse(localStorage.getItem('isAutocompleteEnabled')) !== false;
 
     // --- [ 드롭다운 UI 동적 생성 및 업데이트 함수 ] ---
 
-    // 자동완성 on/off 버튼을 생성하고 이벤트 리스너를 추가하는 함수
-    function createAutocompleteToggleButton() {
-        const toggleBtn = document.createElement('button');
-        toggleBtn.id = 'autocomplete-toggle-btn';
-        toggleBtn.className = 'dropdown-toggle-btn';
-        toggleBtn.textContent = isAutocompleteEnabled ? '자동완성 끄기' : '자동완성 켜기';
+    // 자동완성 on/off 스위치를 생성하고 이벤트 리스너를 추가하는 함수
+    function createAutocompleteToggleSwitch() {
+        const toggleContainer = document.createElement('div');
+        toggleContainer.className = 'search-options-container';
 
-        toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // 드롭다운 숨김 이벤트 방지
-            isAutocompleteEnabled = !isAutocompleteEnabled;
+        toggleContainer.innerHTML = `
+            <div class="search-options">
+                <span>자동완성</span>
+                <label class="switch">
+                    <input type="checkbox" id="autocompleteToggle" ${isAutocompleteEnabled ? 'checked' : ''}>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        `;
+
+        const toggleInput = toggleContainer.querySelector('#autocompleteToggle');
+        toggleInput.addEventListener('change', (e) => {
+            isAutocompleteEnabled = e.target.checked;
             localStorage.setItem('isAutocompleteEnabled', isAutocompleteEnabled);
-            toggleBtn.textContent = isAutocompleteEnabled ? '자동완성 끄기' : '자동완성 켜기';
-            searchDropdown.style.display = 'none'; // 버튼 클릭 시 드롭다운 숨기기
+            updateDropdownContent(searchInput.value.trim());
         });
 
-        return toggleBtn;
+        searchDropdown.appendChild(toggleContainer);
     }
 
-    // 로컬 스토리지에서 검색 기록을 불러와서 드롭다운에 표시
-    function loadSearchHistory() {
-        searchDropdown.innerHTML = '';
+    // 이전에 검색한 기록을 로컬 스토리지에 저장하는 함수
+    function saveSearchHistory(keyword) {
+        console.log("saveSearchHistory 함수 호출. 저장할 키워드:", keyword);
+
+        if (!keyword) return;
         const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        const newHistory = [keyword, ...history.filter(item => item !== keyword)];
+        localStorage.setItem('searchHistory', JSON.stringify(newHistory.slice(0, 5))); // 최신 5개만 저장
+
+        console.log("로컬 스토리지에 저장된 검색 기록:", localStorage.getItem('searchHistory'));
+    }
+
+    // 로컬 스토리지에서 검색 기록을 불러와 드롭다운에 표시하는 함수
+    function loadSearchHistory() {
+        const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        searchList.innerHTML = ''; // 기존 내용 초기화
+
+        // ✅ [수정] 헤더가 이미 있으면 제거
+        const existingHeader = searchDropdown.querySelector('.search-header');
+        if (existingHeader) {
+            existingHeader.remove();
+        }
+
+        // ✅ [추가] 안내 라벨과 전체 삭제 버튼을 포함하는 헤더 div 생성
+        const historyHeader = document.createElement('div');
+        historyHeader.className = 'search-header';
+        historyHeader.innerHTML = `
+            <span class="header-label">최근 검색어</span>
+            <button class="delete-all-btn">전체 삭제</button>
+        `;
+        searchDropdown.prepend(historyHeader); // 드롭다운 최상단에 추가
+
+        // 전체 삭제 버튼 이벤트 리스너 추가
+        historyHeader.querySelector('.delete-all-btn').addEventListener('click', () => {
+            localStorage.removeItem('searchHistory');
+            loadSearchHistory();
+        });
+
 
         if (history.length > 0) {
-            const historyHeader = document.createElement('div');
-            historyHeader.className = 'dropdown-header';
-            historyHeader.innerHTML = '<strong>최근 검색어</strong>';
-
-            const clearBtn = document.createElement('span');
-            clearBtn.className = 'clear-btn';
-            clearBtn.textContent = '전체 삭제';
-            clearBtn.addEventListener('click', clearSearchHistory);
-
-            historyHeader.appendChild(clearBtn);
-            historyHeader.appendChild(createAutocompleteToggleButton());
-            searchDropdown.appendChild(historyHeader);
-
-            const historyList = document.createElement('ul');
-            historyList.className = 'history-list';
             history.forEach(item => {
                 const li = document.createElement('li');
-                li.textContent = item;
-                li.addEventListener('click', () => {
-                    searchInput.value = item;
+                li.className = 'search-item history-item';
+                li.innerHTML = `<span>${item}</span><button class="delete-history-btn">삭제</button>`;
+                li.addEventListener('click', (e) => {
+                    e.stopPropagation(); // li 클릭 이벤트가 삭제 버튼 클릭에도 영향 미치지 않도록
                     performSearch(item);
                 });
-                historyList.appendChild(li);
+                li.querySelector('.delete-history-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteSearchHistory(item);
+                });
+                searchList.appendChild(li);
             });
-            searchDropdown.appendChild(historyList);
-            searchDropdown.style.display = 'block';
         } else {
-            searchDropdown.style.display = 'none';
+            const li = document.createElement('li');
+            li.className = 'search-item no-history';
+            li.textContent = '최근 검색 기록이 없습니다.';
+            searchList.appendChild(li);
         }
     }
 
-    // 자동완성 제안을 드롭다운에 표시
-    function displayAutocompleteSuggestions(suggestions) {
-        searchDropdown.innerHTML = '';
-
-        if (suggestions.length > 0) {
-            const header = document.createElement('div');
-            header.className = 'dropdown-header';
-            header.innerHTML = '<strong>자동완성</strong>';
-            header.appendChild(createAutocompleteToggleButton());
-            searchDropdown.appendChild(header);
-
-            const suggestionList = document.createElement('ul');
-            suggestionList.className = 'suggestion-list';
-            suggestions.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                li.addEventListener('click', () => {
-                    searchInput.value = item;
-                    performSearch(item);
-                });
-                suggestionList.appendChild(li);
-            });
-            searchDropdown.appendChild(suggestionList);
-            searchDropdown.style.display = 'block';
-        } else {
-            searchDropdown.style.display = 'none';
-        }
+    // 검색 기록 삭제 함수
+    function deleteSearchHistory(keywordToDelete) {
+        let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        history = history.filter(item => item !== keywordToDelete);
+        localStorage.setItem('searchHistory', JSON.stringify(history));
+        loadSearchHistory(); // 삭제 후 목록 새로고침
     }
 
-    // --- [ 로직 관련 함수 ] ---
-
-    // 검색어를 로컬 스토리지에 저장
-    function saveSearchHistory(keyword) {
-        if (!keyword.trim()) return;
-        const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-        const normalizedKeyword = keyword.trim().toLowerCase();
-        const updatedHistory = [normalizedKeyword, ...history.filter(item => item !== normalizedKeyword)];
-        localStorage.setItem('searchHistory', JSON.stringify(updatedHistory.slice(0, 5)));
-    }
-
-    // 로컬 스토리지 검색 기록 전체 삭제
-    function clearSearchHistory() {
-        localStorage.removeItem('searchHistory');
-        loadSearchHistory();
-    }
-
-    // 백엔드 API를 호출하여 자동완성 키워드 가져오기
+    // 자동완성 제안을 서버에서 가져와 드롭다운에 표시하는 함수
     function fetchAutocompleteSuggestions(keyword) {
-        if (!isAutocompleteEnabled) {
-            searchDropdown.style.display = 'none';
-            return;
+        // ✅ [수정] 헤더가 이미 있으면 제거
+        const existingHeader = searchDropdown.querySelector('.search-header');
+        if (existingHeader) {
+            existingHeader.remove();
         }
-        fetch(`/api/autocomplete/keywords?keyword=${encodeURIComponent(keyword)}`)
+
+        // ✅ [추가] 자동완성 안내 라벨을 포함하는 헤더 div 생성
+        const autocompleteHeader = document.createElement('div');
+        autocompleteHeader.className = 'search-header';
+        autocompleteHeader.innerHTML = `<span class="header-label">추천 검색어</span>`;
+        searchDropdown.prepend(autocompleteHeader);
+
+        fetch(`/api/autocomplete?keyword=${encodeURIComponent(keyword)}`)
             .then(response => response.json())
-            .then(data => displayAutocompleteSuggestions(data))
-            .catch(error => console.error('Error fetching autocomplete data:', error));
+            .then(data => {
+                searchList.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'search-item autocomplete-item';
+                        li.textContent = item;
+                        li.addEventListener('click', () => {
+                            performSearch(item);
+                        });
+                        searchList.appendChild(li);
+                    });
+                } else {
+                    // ✅ 수정: 자동완성 결과가 없으면 최근 검색 기록을 보여줌
+                    searchList.innerHTML = ''; // 기존 내용 초기화
+                    autocompleteHeader.remove(); // 추천 검색어 헤더 제거
+                    loadSearchHistory();
+                }
+            })
+            .catch(error => {
+                console.error('자동완성 데이터를 가져오는 중 오류 발생:', error);
+                // ✅ 수정: 에러 발생 시에도 최근 검색 기록을 보여줌
+                searchList.innerHTML = '';
+                autocompleteHeader.remove(); // 추천 검색어 헤더 제거
+                loadSearchHistory();
+            });
     }
 
     // 검색 실행 함수
     function performSearch(keyword) {
+        console.log("performSearch 함수 호출. 검색어:", keyword);
         saveSearchHistory(keyword);
         window.location.href = `/product/search?keyword=${encodeURIComponent(keyword)}`;
+    }
+
+    // ✨✨✨ 드롭다운 내용 업데이트를 위한 단일 함수 추가 ✨✨✨
+    function updateDropdownContent(keyword) {
+        // ✅ 수정: 키워드가 있으면 자동완성(상품명)을, 없으면 최근 검색 기록을 보여줌
+        if (keyword.length > 0 && isAutocompleteEnabled) {
+            fetchAutocompleteSuggestions(keyword);
+        } else {
+            loadSearchHistory();
+        }
     }
 
     // --- [ 이벤트 리스너 ] ---
 
     // 검색 버튼 클릭 시 검색 실행
-    searchButton.addEventListener('click', () => performSearch(searchInput.value));
+    searchButton.addEventListener('click', () => {
+        performSearch(searchInput.value);
+    });
 
     // input 필드에서 Enter 키 입력 시 검색 실행
     searchInput.addEventListener('keypress', (e) => {
@@ -140,31 +192,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // input 필드에 입력할 때마다 자동완성 실행
+    // 검색창 포커스 시 드롭다운 표시 및 내용 업데이트
+    searchInput.addEventListener('focus', () => {
+        searchDropdown.style.display = 'block';
+        updateDropdownContent(searchInput.value.trim());
+    });
+
+    // 검색창 입력 시 드롭다운 내용 업데이트
     searchInput.addEventListener('input', (e) => {
         const keyword = e.target.value.trim();
         if (keyword.length > 0) {
-            fetchAutocompleteSuggestions(keyword);
+            updateDropdownContent(keyword);
         } else {
-            loadSearchHistory(); // 입력 내용이 없으면 검색 기록 표시
-        }
-    });
-
-    // input 필드에 포커스될 때 검색 기록 표시
-    searchInput.addEventListener('focus', () => {
-        const keyword = searchInput.value.trim();
-        if (keyword.length === 0) {
             loadSearchHistory();
         }
     });
 
-    // 드롭다운 외부를 클릭하면 숨기기
+    // 드롭다운 외부를 클릭하면 드롭다운 숨기기
     document.addEventListener('click', (e) => {
-        if (!searchDropdown.contains(e.target) && !searchInput.contains(e.target)) {
+        if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
             searchDropdown.style.display = 'none';
         }
     });
 
-    // 초기 로드 시 검색 기록 불러오기 (검색창이 이미 포커스될 경우 대비)
-    loadSearchHistory();
+    // 드롭다운 내부에 클릭 이벤트가 발생했을 때 버블링 막기
+    searchDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // 페이지 로드 시 기존 자동완성 on/off 스위치 생성
+    createAutocompleteToggleSwitch();
 });
