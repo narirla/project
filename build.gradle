@@ -51,11 +51,21 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-databind' // JSON 파싱 라이브러리
 	implementation 'org.jsoup:jsoup:1.17.2' // Jsoup 최신 버전 사용
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.2'
+
+	// 1) WebSocket(STOMP) 서버
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// 2) Spring JDBC (JdbcTemplate 사용)
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+	// 3) Oracle JDBC 드라이버 - ★버전 명시 필수
+	runtimeOnly 'com.oracle.database.jdbc:ojdbc11:23.5.0.24.07'
 }
 
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+        mavenBom "com.oracle.database.jdbc:ojdbc-bom:23.4.0.24.05"
 	}
 }
 

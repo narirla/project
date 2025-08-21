@@ -17,74 +17,8 @@
     <header th:replace="~{fragments/sellerHeader :: sellerHeader}"></header>
     <div class="page-container">
       <main class="mypage-container">
-        <aside class="sidebar">
-          <div class="sidebar-card">
-            <div class="profile-box">
-              <div class="profile-image">
-                <!-- 프로필 이미지 (사이드바) -->
-                <img th:if="${sellerPage != null and sellerPage.image != null}"
-                     th:src="@{'/mypage/seller/images/profile/' + ${sellerPage.pageId}}"
-                     alt="프로필 이미지">
-                <img th:if="${sellerPage == null or sellerPage.image == null}"
-                     th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
-              </div>
-              <div class="profile-info">
-                <a href="#" class="profile-badge"> 프로가이드 ></a>
-                <div class="profile-name" th:text="${sellerPage.nickname}">닉네임</div>
-                <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
-                  <button type="submit" class="btn-role-switch">구매자 전환</button>
-                </form>
-              </div>
-            </div>
-
-            <nav class="mypage-nav">
-              <div class="nav-title active">MY PAGE</div>
-              <ul>
-                <li><a href="#">상품</a>
-                  <ul>
-                    <li><a th:href="@{/product/manage}">내 상품 목록</a></li>
-                    <li><a th:href="@{/product/upload}">상품 등록</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">판매 현황</a>
-                  <ul>
-                    <li><a href="#">주문 현황</a></li>
-                    <li><a href="#">총 판매수 / 매출액</a></li>
-                    <li><a href="#">판매 통계</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">문의 / 리뷰</a>
-                  <ul>
-                    <li><a href="#">상품 문의</a></li>
-                    <li><a href="#">나의 답글</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">알림 / 공지</a>
-                  <ul>
-                    <li><a href="#">공지사항</a></li>
-                    <li><a href="#">프로모션</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">내 정보</a>
-                  <ul>
-                    <li><a th:href="@{/mypage/seller/view}">프로필</a></li>
-                    <li><a href="#">정산 정보 관리</a></li>
-                    <li><a href="#">구독자 관리</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">고객센터</a>
-                  <ul>
-                    <li><a href="#">1:1 문의</a></li>
-                    <li><a href="#">판매 Q&A 내역</a></li>
-                    <li><a href="#">공지사항</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">고객의 소리</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </aside>
+        <!-- 사이드 바 분리 -->
+        <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${activePath}, ${member})}"></aside>
 
         <section class="content">
 
@@ -133,11 +67,13 @@
 <!--            <input type="hidden" th:field="*{name}" id="name" autocomplete="name">-->
             <!--            </div>-->
 
+            <!--아이디-->
             <div class="form-row">
               <label for="userEmail">아이디</label>
               <input type="text" th:value="${member.email}" id="userEmail" readonly autocomplete="email">
             </div>
 
+            <!--닉네임-->
             <div class="form-row">
               <label for="nickname">닉네임</label>
               <div class="nickname-box">
@@ -148,53 +84,14 @@
               <p class="error-msg" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">닉네임 오류</p>
             </div>
 
+            <!--전화번호-->
             <div class="form-row">
               <label for="tel">전화번호</label>
               <input type="tel" th:field="*{tel}" id="tel" name="tel" autocomplete="tel">
               <span id="telMsg" class="form-text ms-2"></span>
             </div>
 
-            <!-- ✅ 기존 비밀번호 확인 -->
-            <div class="form-row">
-              <label for="currentPasswd">기존 비밀번호</label>
-              <div class="password-wrapper">
-                <input type="password" th:field="*{currentPasswd}" id="currentPasswd" name="currentPasswd" autocomplete="current-password">
-                <button type="button" class="toggle-password" onclick="togglePassword('currentPasswd')">
-                  <i class="fa-solid fa-eye-slash"></i>
-                </button>
-              </div>
-              <p class="error-msg" th:if="${#fields.hasErrors('currentPasswd')}" th:errors="*{currentPasswd}">현재 비밀번호 오류</p>
-              <p id="currentPwMsg" class="form-text ms-2"></p>
-            </div>
-
-            <!-- ✅ 비밀번호 -->
-            <div class="form-row">
-              <label for="passwd">비밀번호</label>
-              <div class="password-wrapper">
-                <input type="password" th:field="*{passwd}" id="passwd" name="passwd" autocomplete="new-password">
-                <button type="button" class="toggle-password" onclick="togglePassword('passwd')">
-                  <i class="fa-solid fa-eye-slash"></i>
-                </button>
-              </div>
-              <!-- ✅ 강도 평가 메시지 -->
-              <p id="pwStrength" class="pw-strength"></p>
-              <p id="pwHint" class="form-text ms-2"></p>
-            </div>
-
-            <!-- ✅ 비밀번호 확인 -->
-            <div class="form-row">
-              <label for="confirmPasswd">비밀번호 확인</label>
-              <div class="password-wrapper">
-                <input type="password" th:field="*{confirmPasswd}" id="confirmPasswd" name="confirmPasswd" autocomplete="new-password">
-                <button type="button" class="toggle-password" onclick="togglePassword('confirmPasswd')">
-                  <i class="fa-solid fa-eye-slash"></i>
-                </button>
-              </div>
-              <p class="error-msg" th:if="${#fields.hasErrors('confirmPasswd')}" th:errors="*{confirmPasswd}">비밀번호 확인 오류</p>
-              <p id="pwMatchMsg" class="form-text ms-2"></p>
-            </div>
-
-
+            <!--자기소개-->
             <div class="form-row">
               <label for="intro">자기소개</label>
               <div class="intro-wrapper">
@@ -203,7 +100,7 @@
               </div>
             </div>
 
-
+            <!--알림설정-->
             <div class="form-row">
               <label for="notification">알림 설정</label>
               <div class="notification-wrapper">
@@ -219,6 +116,7 @@
             <h3 class="section-subtitle">추가 정보</h3>
             <hr class="top-line">
 
+            <!--우편번호-->
             <div class="form-row address-row">
               <label for="zonecode">우편번호</label>
               <div>
@@ -227,11 +125,13 @@
               </div>
             </div>
 
+            <!--기본주소-->
             <div class="form-row">
               <label for="address">기본주소</label>
               <input type="text" id="address" th:field="*{address}"  autocomplete="address-line1" readonly>
             </div>
 
+            <!--상세주소-->
             <div class="form-row">
               <label for="detailAddress">상세주소</label>
               <input type="text" id="detailAddress" th:field="*{detailAddress}"  autocomplete="address-line2">

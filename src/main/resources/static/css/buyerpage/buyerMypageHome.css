@@ -11,7 +11,7 @@ body {
   font-family: 'Pretendard', sans-serif;
   color: #333;
   background-color: #FFFFFF;
-  padding-top: 167px;
+  /*padding-top: 167px;*/
 }
 
 a {
@@ -198,7 +198,7 @@ body>div>div>main>section>h2 {
   display: flex;
   justify-content: space-between;  /* ✅ title은 왼쪽, value는 오른쪽 */
   align-items: center;
-  padding: 0 20px;                /* ✅ 좌우 동일한 여백 */
+  padding: 0 35px;                /* ✅ 좌우 동일한 여백 */
   position: relative;
 }
 
@@ -259,7 +259,6 @@ body>div>div>main>section>h2 {
   background-color: #414141;
 }
 
-
 .order-item {
   display: flex;
   align-items: center;
@@ -317,16 +316,12 @@ body>div>div>main>section>h2 {
 }
 
 .card-list {
-  display: flex;
-  /* ✅ grid → flex로 변경 */
-  justify-content: center;
-  /* ✅ 가로 중앙 정렬 */
-  align-items: center;
-  /* ✅ 세로 중앙 정렬 (높이 맞출 때) */
+  display: flex;    /* ✅ grid → flex로 변경 */
+  justify-content: center;  /* ✅ 가로 중앙 정렬 */
+  align-items: center;  /* ✅ 세로 중앙 정렬 (높이 맞출 때) */
   gap: 24px;
-  width: 912px;
-  /* 요청된 크기 */
-  height: 400px;
+  width: 918px; /* 요청된 크기 */
+  height: 410px;
 }
 
 /* 전체 카드 */
@@ -346,16 +341,16 @@ body>div>div>main>section>h2 {
   width: 290px;
   height: 290px;
   position: relative;
+  overflow: hidden;
 }
 
 .card-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  /* 비율 유지하면서 잘 맞게 채움 */
+  object-fit: cover;    /* 비율 유지하면서 잘 맞게 채움 */
+  object-position: center;
   display: block;
 }
-
 
 /* 하트 아이콘 */
 .heart-icon {
@@ -371,7 +366,7 @@ body>div>div>main>section>h2 {
 /* 콘텐츠 영역 */
 .card-content {
   width: 290px;
-  height: 124px;
+  height: 144px;
   padding: 12px 16px;
   box-sizing: border-box;
   display: flex;
@@ -493,14 +488,10 @@ body>div>div>main>section>h2 {
 /* 최근 본 코스 */
 .recent-course-list {
   display: flex;
-  gap: 12px;
-  /* 카드 간격 */
-  justify-content: center;
-  /* 카드 중앙 정렬 */
-  overflow-x: hidden;
-  /* 스크롤바 숨김 */
-  scroll-behavior: smooth;
-  /* 부드러운 이동 */
+  gap: 12px;    /* 카드 간격 */
+  justify-content: center;  /* 카드 중앙 정렬 */
+  overflow-x: hidden;   /* 스크롤바 숨김 */
+  scroll-behavior: smooth;  /* 부드러운 이동 */
   width: 863px;
   height: 290px;
   padding: 0 5px;

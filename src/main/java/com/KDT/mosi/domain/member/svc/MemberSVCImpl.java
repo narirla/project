@@ -23,7 +23,6 @@ import java.util.Optional;
 public class MemberSVCImpl implements MemberSVC {
 
   private final MemberDAO memberDAO;
-  private final MemberRoleDAO memberroleDAO;
   private final TermsDAO termsDAO;
   private final BuyerPageDAO buyerPageDAO;
   private final MemberRoleDAO memberRoleDAO;
@@ -42,7 +41,7 @@ public class MemberSVCImpl implements MemberSVC {
     Long memberId = memberDAO.save(member);
 
     // 2. 기본 역할(R01) 자동 부여
-    memberroleDAO.addRole(memberId, "R01");
+    memberRoleDAO.addRole(memberId, "R01");
 
     return memberId;
   }
@@ -66,7 +65,7 @@ public class MemberSVCImpl implements MemberSVC {
     if (roles != null && !roles.isEmpty()) {
       log.info("역할 등록 시작: {}", roles);
       for (String roleId : roles) {
-        memberroleDAO.addRole(memberId, roleId);
+        memberRoleDAO.addRole(memberId, roleId);
       }
       log.info("역할 등록 완료");
     } else {
@@ -118,17 +117,6 @@ public class MemberSVCImpl implements MemberSVC {
   @Override
   public boolean isExistEmail(String email) {
     return memberDAO.isExistEmail(email);
-  }
-
-  /**
-   * 이메일 존재 여부 확인 (비밀번호 재설정 등에서 사용)
-   *
-   * @param email 확인할 이메일
-   * @return true: 존재함, false: 없음
-   */
-  @Override
-  public boolean existsByEmail(String email) {
-    return memberDAO.findByEmail(email).isPresent();
   }
 
   /**
@@ -195,7 +183,7 @@ public class MemberSVCImpl implements MemberSVC {
    */
   @Override
   public boolean hasRole(Long memberId, String roleId) {
-    return memberroleDAO.findRolesByMemberId(memberId)
+    return memberRoleDAO.findRolesByMemberId(memberId)
         .stream()
         .anyMatch(role -> role.getRoleId().equals(roleId));
   }
@@ -272,7 +260,7 @@ public class MemberSVCImpl implements MemberSVC {
     return memberDAO.findPasswdById(memberId);
   }
 
-  // ✅ MemberSVCImpl.java
+
   @Override
   public List<String> findRolesByMemberId(Long memberId) {
     return memberDAO.findRolesByMemberId(memberId);

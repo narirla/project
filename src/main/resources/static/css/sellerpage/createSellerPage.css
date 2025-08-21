@@ -5,7 +5,7 @@ body {
   background-color: #ffffff;
   font-family: 'Pretendard', sans-serif;
   color: #414141;
-  padding-top: 167px;
+  /*padding-top: 167px;*/
 }
 
 .layout-wrapper {
@@ -104,6 +104,17 @@ label {
   display: none;
 }
 
+.profile-preview-box.dropzone {
+  cursor: pointer;
+  outline: none;
+}
+
+.profile-preview-box.dropzone.drag-over {
+  border: 2px dashed #4aa3ff;
+  background: #f7fbff;
+}
+
+
 /* ✅ 이미지 삭제 X 버튼 */
 .remove-image-btn {
   position: absolute;
@@ -126,6 +137,17 @@ label {
 
 .remove-image-btn:hover {
   background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* 드롭존 기본/오버 상태 */
+.dropzone {
+  cursor: pointer;
+  outline: none;
+}
+
+.dropzone.drag-over {
+  border: 2px dashed #4aa3ff !important;
+  background: #f7fbff;
 }
 
 /* ✅ 닉네임 입력 */
@@ -154,13 +176,13 @@ label {
 /* ✅ 중복확인 버튼 */
 .nickname-box .btn-small {
   width: 62px;
-  height: 22px;
-  font-size: 10px;
+  height: 26px;
+  font-size: 12px;
   font-weight: 400;
   border-radius: 8px;
   line-height: 1;
-  margin-top: 18px;
-  padding-top: 2px;
+  margin: 10px 0px;
+  padding: 2px 0px;
 }
 
 /* ✅ 제출 버튼 */
@@ -172,6 +194,12 @@ label {
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.btn-small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .submit-btn {
@@ -227,10 +255,18 @@ label {
   align-items: center;
 }
 
-#charCountNum, .unit {
+#charCountNum,
+.unit {
   color: #6B6B6B;
 }
 
 .maxCount {
   color: #B2B2B2;
+}
+
+.required {
+  color: red;
+  margin-left: 3px;
+  /* 텍스트와 간격 */
+  font-weight: bold;
 }

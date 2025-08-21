@@ -603,7 +603,7 @@ public class ProductController {
       // 필요 시 로그인 페이지로 리다이렉트 또는 예외 처리
       throw new IllegalStateException("로그인한 회원이 아닙니다.");
     }
-    Long memberId = loginMember.getMemberId();
+    Long buyerId = loginMember.getMemberId();
 
     // 2) 상품 조회, 없으면 예외 처리
     Product product = productSVC.getProduct(id)
@@ -613,14 +613,19 @@ public class ProductController {
     List<ProductImage> images = productImageSVC.findByProductId(id);
     List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
 
-    // 4) 판매자 페이지 정보 조회
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
+
+    //4) 판매자 id → 상품의 member
+    Long sellerId = product.getMember().getMemberId();
+
+
+    // 5) 판매자 페이지 정보 조회
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(sellerId);
     if (optional.isEmpty()) {
       return "redirect:/mypage/seller/create";
     }
     SellerPage sellerPage = optional.get();
 
-    // 5) DTO에 데이터 세팅
+    // 6) DTO에 데이터 세팅
     product.setMember(loginMember);
     product.setProductImages(images); // 엔티티에 이미지 세팅
 
@@ -641,10 +646,12 @@ public class ProductController {
     }
 
     // 판매자 상품 수
-    productDetailForm.setCountProduct(productSVC.countByMemberId(memberId));
+    productDetailForm.setCountProduct(productSVC.countByMemberId(sellerId));
 
     // 6) model에 DTO 등록
     model.addAttribute("productDetailForm", productDetailForm);
+    model.addAttribute("buyerId", buyerId);
+    model.addAttribute("sellerId", sellerId);
     log.info("nickname = {}", sellerPage.getNickname());
 
     return "product/product_detail";

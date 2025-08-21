@@ -1,0 +1,296 @@
+:root {
+  /* 공통 색상 변수 */
+  --me: #22C5CD;     /* 내가 보낸 말풍선 */
+  --them: #F8F8F8;   /* 상대방 말풍선 */
+  --bg: #fff;        /* 배경색 */
+  --line: #e9ecef;   /* 구분선 */
+  --text: #222;      /* 기본 글자색 */
+}
+
+/* ========================= */
+/* 공통 기본 스타일           */
+/* ========================= */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Pretendard', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;  /* 헤더-본문-입력창 세로 배치 */
+  background: #fff;
+
+  width: 100%;
+  height: 100%;
+
+  /* ✅ 최소 크기 보장 */
+  min-width: 470px;
+  min-height: 800px;
+
+  /* ✅ 화면에 꽉 차도록 (팝업 창 크기에 따라 자동 늘어남) */
+  max-width: 100%;
+  max-height: 100%;
+}
+
+
+
+
+/* ========================= */
+/* 상단 헤더                  */
+/* ========================= */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #D9D9D9;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+  height: 50px;
+}
+
+.header .title {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  padding-left: 40px; /* 신고 버튼 공간 확보 */
+}
+
+.header .icon-btn {
+  width: 70px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+/* 신고 버튼 (아이콘+텍스트 가로 배치) */
+.header .icon-btn.report-btn {
+  width: 44px;
+  min-width: 0;
+  height: 44px;
+  margin-left: 15px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.header .icon-btn.report-btn i {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.header .icon-btn.report-btn .label {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  user-select: none;
+  color: #6B6B6B;
+}
+
+/* ========================= */
+/* 상품 카드                  */
+/* ========================= */
+.product-card {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 100px;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #D9D9D9;
+
+  position: sticky;   /* ✅ 스크롤 내려도 고정 */
+  top: 50px;          /* 헤더(50px) 바로 아래에 붙도록 */
+  background: #fff;   /* 겹침 방지 */
+  z-index: 9;
+}
+
+
+.product-thumb {
+  width: 75px;
+  height: 75px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #ddd;
+}
+
+.product-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.product-meta b {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;     /* ✅ 폭 자동 */
+  height: 30px;
+  display: block;
+}
+
+.product-meta span {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+}
+
+/* ========================= */
+/* 메시지 영역                */
+/* ========================= */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  background: #ffffff;
+}
+
+
+.item {
+  display: flex;
+  margin: 6px 0;
+  gap: 6px;
+  max-width: 75%;   /* ✅ 상대적 너비 */
+}
+
+.item.them {
+  align-items: flex-start;
+  margin-right: auto;
+}
+
+.item.them .profile {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.item.them .nickname {
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.item.me {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.item.me .time,
+.item.me .read {
+  font-size: 11px;
+  color: #8b8b8b;
+  margin-top: 3px;
+  text-align: right;
+}
+
+.item.them .time,
+.item.them .read {
+  font-size: 11px;
+  color: #8b8b8b;
+  margin-top: 3px;
+  text-align: left;
+}
+
+.msg-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.bubble {
+  padding: 10px 12px;
+  border-radius: 16px;
+  position: relative;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.me .bubble {
+  background: var(--me);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+
+.them .bubble {
+  background: var(--them);
+  color: #414141;
+  border-bottom-left-radius: 6px;
+}
+
+.bubble img.msg-img {
+  display: block;
+  max-width: 100%;   /* ✅ 부모 폭에 맞게 */
+  height: auto;
+  border-radius: 12px;
+}
+
+/* ========================= */
+/* 입력창                     */
+/* ========================= */
+.input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  position: sticky;
+  bottom: 0;
+}
+
+.attach {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #22C5CD;
+  border: 1px solid #22C5CD;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.input input[type="text"] {
+  flex: 1;
+  min-width: 0;        /* ✅ 줄어듦 대응 */
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #22C5CD;
+  border-radius: 12px;
+}
+
+.send {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #22C5CD;   /* ✅ 테두리 컬러 */
+  border-radius: 50%;
+  background: #fff;            /* 흰 배경 */
+  color: #22C5CD;              /* 아이콘 컬러 */
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}

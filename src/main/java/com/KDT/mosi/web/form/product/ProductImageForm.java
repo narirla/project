@@ -10,7 +10,7 @@ public class ProductImageForm {
   private Long productId;
 
   // DB에서 읽은 imageData를 Base64 변환 후 전달하는 필드
-  private String base64ImageData;
+  private String encodedImageData;
 
   private Integer imageOrder;
   private String fileName;

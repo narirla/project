@@ -331,10 +331,13 @@
         <a href="#" class="notice-more">+ 더보기</a>
       </div>
     </div>
-    <!-- 예: /templates/index.html 하단 -->
+    <!-- 기존 푸터 -->
     <div th:replace="~{fragments/footer :: footer}"></div>
   </div>
+
+  <!-- React/Vite 스크립트는 메인페이지에서 제거 (Islands 방식) -->
+
+  <!-- 기존 스크립트 -->
   <script th:src="@{/js/layout.js}"></script>
 </body>
-
 </html>

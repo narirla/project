@@ -170,6 +170,8 @@
   opacity: 0.9;
 }
 
+.mypage-nav a.is-active { font-weight:700; color:#00c7e2; }
+
 
 /* ============================= */
 /* ✅ B. Notice Bar & Section   */

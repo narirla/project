@@ -36,7 +36,7 @@ public class ApiResponse<T> {
   // 1. 기본 헤더 (details가 없는 경우)
   @Getter
   @ToString
-  private static class Header {
+  public static class Header {
     private final String rtcd;      //응답코드
     private final String rtmsg;     //응답메시지
     private final Map<String, String> details;  //상세 메세지

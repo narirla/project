@@ -9,7 +9,11 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,7 +25,14 @@ import java.util.List;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final MemberSVC memberSVC;
+  private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
+  /**
+   * 로그인 성공 시 실행되는 메서드
+   * @param request  클라이언트의 HTTP 요청 객체
+   * @param response 서버의 HTTP 응답 객체
+   * @param authentication Spring Security 인증 객체(로그인 사용자 정보)
+   */
   @Override
   public void onAuthenticationSuccess(
       HttpServletRequest request,
@@ -29,28 +40,40 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
       Authentication authentication
   ) throws IOException, ServletException {
 
-    // ✅ 1. 로그인 이메일로 Member 조회
+    // 1) 로그인 사용자 이메일로 Member 조회
     String email = authentication.getName();
     Member member = memberSVC.findByEmail(email).orElseThrow();
 
-    // ✅ 2. 세션 생성 및 로그인 정보 저장
+    // 2) 세션 저장
     HttpSession session = request.getSession(true);
     session.setAttribute("loginMember", member);
     session.setAttribute("loginMemberId", member.getMemberId());
 
-    // ✅ 3. ROLE 리스트 조회 (BUYER, SELLER 둘 다 가능)
+    // 3) 보유 역할 조회(예: ["R01","R02"]) → 표시용으로 정규화
     List<String> roles = memberSVC.findRolesByMemberId(member.getMemberId());
-    session.setAttribute("loginRoles", roles);  // ✅ 다중 역할 저장
+    List<String> normRoles = roles.stream()
+        .map(r -> switch (r) {
+          case "R01" -> "BUYER";
+          case "R02" -> "SELLER";
+          default -> r;
+        })
+        .toList();
+    session.setAttribute("loginRoles", normRoles);
 
-    // ✅ 4. 필요 시 기본 역할(첫 번째 값)만 따로 저장
-    if (!roles.isEmpty()) {
-      session.setAttribute("loginRole", roles.get(0));  // 기본값: 구매자(BUYER)
+    // 4) 기본 표시 역할은 항상 BUYER
+    session.setAttribute("loginRole", "BUYER");
+
+    log.info("✅ 로그인 성공: {}, Roles(norm)={}", member.getEmail(), normRoles);
+
+    // 5) 로그인 직전 요청 URL로 복귀
+    SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
+    if (savedRequest != null) {
+      String redirectUrl = savedRequest.getRedirectUrl();
+      log.info("↩ 이전 요청 URL로 이동: {}", redirectUrl);
+      redirectStrategy.sendRedirect(request, response, redirectUrl);
+    } else {
+      log.info("기본 페이지(/)로 이동");
+      redirectStrategy.sendRedirect(request, response, "/");
     }
-
-    log.info("✅ 로그인 성공: 세션에 loginMember & loginRoles 저장 - {}, Roles: {}",
-        member.getEmail(), roles);
-
-    // ✅ 5. 로그인 후 메인 페이지로 이동
-    response.sendRedirect("/");
   }
 }

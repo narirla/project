@@ -1,5 +1,7 @@
 <!-- sellerHeader.html -->
-<header th:fragment="sellerHeader">
+<header th:fragment="sellerHeader"
+        th:if="${session.loginRole} == 'SELLER'"
+        id="SELLER_HEADER" data-frag="SELLER-HEADER">
   <div class="header-inner">
     <!-- 최상단 로그인/회원가입 or 사용자 정보 -->
     <div class="header-top-bar">
@@ -14,6 +16,7 @@
         <th:block th:if="${#authorization.expression('isAuthenticated()')}">
           <div class="user-logged-in">
             <form th:action="@{/login/logout}" method="post" class="logout-form">
+              <input type="hidden" sec:csrf/>
               <button type="submit" class="logout-button" aria-label="로그아웃">로그아웃</button>
             </form>
             <a th:href="@{/notifications}" class="notification-link" aria-label="알림">
@@ -57,56 +60,57 @@
     <nav class="header-nav">
       <div class="dropdown-wrapper">
         <ul class="menu">
-          <li class="menu-item dropdown">
-            <a href="#" class="menuButton">전체메뉴</a>
-            <div class="dropdown-menu">
-              <!-- 테마여행 -->
-              <div class="dropdown-section">
-                <h4>테마여행</h4>
-                <ul>
-                  <li><a href="#">지역</a></li>
-                  <li><a href="#">반려동물</a></li>
-                  <li><a href="#">맛집</a></li>
-                  <li><a href="#">문화/역사</a></li>
-                  <li><a href="#">계절/자연</a></li>
-                  <li><a href="#">실버/교통약자</a></li>
-                </ul>
-              </div>
-              <!-- 커뮤니티 -->
-              <div class="dropdown-section">
-                <h4>커뮤니티</h4>
-                <ul>
-                  <li><a th:href="@{/review}">리뷰</a></li>
-                  <li><a th:href="@{/bbs/community}">자유 게시판</a></li>
-                </ul>
-              </div>
-              <!-- 항공 / 호텔 -->
-              <div class="dropdown-section">
-                <h4>항공/호텔</h4>
-                <ul>
-                  <li><a href="#">항공</a></li>
-                  <li><a href="#">호텔</a></li>
-                </ul>
-              </div>
-              <!-- 관광 정보 -->
-              <div class="dropdown-section">
-                <h4>관광 정보</h4>
-                <ul>
-                  <li><a href="#">맛집</a></li>
-                  <li><a href="#">교통약자 편의시설</a></li>
-                </ul>
-              </div>
-            </div>
-          </li>
-
-          <!-- 다른 메뉴 -->
-          <li><a th:href="@{/product/list}">테마여행</a></li>
-          <li><a th:href="@{/bbs}">커뮤니티</a></li>
-          <li><a th:href="@{/airhotel}">항공/호텔</a></li>
-          <li><a th:href="@{/information}">관광 정보</a></li>
+          <!-- 모든 메뉴 버튼 -->
+          <li class="menu-item dropdown"><a href="#" class="menuButton">전체메뉴</a></li>
+          <li class="menu-item dropdown"><a href="#" class="menuButton">테마여행</a></li>
+          <li class="menu-item dropdown"><a href="#" class="menuButton">커뮤니티</a></li>
+          <li class="menu-item dropdown"><a href="#" class="menuButton">항공/호텔</a></li>
+          <li class="menu-item dropdown"><a href="#" class="menuButton">관광 정보</a></li>
         </ul>
+
+        <!-- ✅ 모든 메뉴가 여는 하나의 드롭다운 -->
+        <div class="dropdown-menu">
+          <!-- 테마여행 -->
+          <div class="dropdown-section">
+            <h4>테마여행</h4>
+            <ul>
+              <li><a th:href="@{/product/list}">지역</a></li>
+              <li><a href="#">반려동물</a></li>
+              <li><a href="#">맛집</a></li>
+              <li><a href="#">문화/역사</a></li>
+              <li><a href="#">계절/자연</a></li>
+              <li><a href="#">실버/교통약자</a></li>
+            </ul>
+          </div>
+          <!-- 커뮤니티 -->
+          <div class="dropdown-section">
+            <h4>커뮤니티</h4>
+            <ul>
+              <li><a th:href="@{/bbs}">리뷰</a></li>
+              <li><a th:href="@{/bbs/community}">자유 게시판</a></li>
+            </ul>
+          </div>
+          <!-- 항공 / 호텔 -->
+          <div class="dropdown-section">
+            <h4>항공/호텔</h4>
+            <ul>
+              <li><a href="#">항공</a></li>
+              <li><a href="#">호텔</a></li>
+            </ul>
+          </div>
+          <!-- 관광 정보 -->
+          <div class="dropdown-section">
+            <h4>관광 정보</h4>
+            <ul>
+              <li><a th:href="@{/information/restaurant}">맛집</a></li>
+              <li><a th:href="@{/information/accessibility}">교통약자 편의시설</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </nav>
+
+
   </div>
   <script th:src="@{/js/Search.js}"></script>
 </header>

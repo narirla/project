@@ -338,7 +338,7 @@ footer {
   padding: 10px 10px;
 }
 /*==================================================*/
-/*               3. 드롭다운 메뉴 스타일                  */
+/*               3. 드롭다운 메뉴 스타일               */
 /*==================================================*/
 
 /* ✅ 드롭다운 기준점 wrapper 추가 */
@@ -626,5 +626,37 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+
+/* ============================= */
+/* ✅ 장바구니 배지 스타일        */
+/* ============================= */
+.cart-link {
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #ff4757;
+  color: white;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 11px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  box-sizing: border-box;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-badge:empty {
+  display: none;
 }
 
