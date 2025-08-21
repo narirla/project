@@ -1,124 +1,129 @@
 /* ======================= */
-/* ========= 기본 ========= */
+/* ========= 기본 설정 ========= */
 /* ======================= */
-
+/* 모든 요소의 여백 및 박스 모델 초기화 */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* body{
-    height: 3500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-} */
-
+/* 전체 컨테이너 스타일 */
 .product-registration {
     font-family: 'Pretendard', sans-serif;
-    width: 941px;
-    color: #414141;
-    line-height: 1.6;
+    width: 941px; /* 고정된 너비 */
+    color: #414141; /* 기본 텍스트 색상 */
+    line-height: 1.6; /* 줄 간격 */
     margin-bottom: 100px;
-    
 }
 
-.page-container{
-    height: 2600px;
+/* 페이지 컨테이너 스타일 */
+.page-container {
+    height: 3000px; /* 임시 높이 설정 */
 }
 
-
-.page-container section{
+/* 섹션 너비 설정 */
+.page-container section {
     width: 941px;
 }
 
 /* ======================= */
-/* ======= 등록내용 ======= */
+/* ======= 등록 내용 ========= */
 /* ======================= */
 
-/* 상품 기본 정보 등록 */
+/* '상품 기본 정보 등록' 제목 스타일 */
 .resgistratrion-title {
     font-size: larger;
     padding-top: 40px;
     padding-bottom: 20px;
 }
 
-
+/* 각 입력 필드 그룹 (라벨+입력란) */
 .form-group {
-    display: flex;
-    height: 54px;
-    border-top: solid 2px #B2B2B2;
+    display: flex; /* 자식 요소들을 가로로 정렬 */
+    min-height: 54px; /* 최소 높이 설정 */
+    border-top: solid 2px #B2B2B2; /* 상단 구분선 */
+    padding-bottom: 5px;
+    position: relative; /* 중요: 이 요소를 기준으로 자식 요소(메시지)의 위치를 정함 */
 }
 
-
-/* label */
+/* 라벨 스타일 (배경색, 너비, 텍스트 정렬 등) */
 .form-group label {
     width: 220px;
     background-color: #EFEFEF;
     padding-left: 30px;
     display: flex;
-    align-items: center;
+    align-items: center; /* 수직 중앙 정렬 */
     font-weight: bold;
+    flex-shrink: 0; /* 라벨 너비가 줄어들지 않도록 방지 */
 }
 
-.form-group b{
+/* 필수 항목(*) 표시 색상 */
+.form-group b {
     color: #FF3030;
 }
 
-
-/* input 내용들 */
-.form-group div {
-    padding-left: 20px;
-    padding-top: 7px;
-    padding-bottom: 7px;
+/* 입력란, select, textarea 등을 감싸는 컨테이너 */
+.input-container {
+    position: relative; /* 중요: 내부 메시지 위치의 기준이 됨 */
     display: flex;
     align-items: center;
+    width: 100%;
+    padding: 10px 20px;
+    flex-wrap: wrap; /* 내용이 넘치면 다음 줄로 자동 줄바꿈 */
+    gap: 10px; /* flexbox 아이템 사이의 간격 */
 }
 
-.form-group div .pname {
+/* 상품명 입력 필드 */
+.form-group .pname {
     border-radius: 5px;
     width: 480px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     padding-left: 7px;
 }
 
-.form-group div .price,
-.form-group div .transport {
+/* 가격, 교통 정보 입력 필드 */
+.form-group .price,
+.form-group .transport {
     border-radius: 5px;
     width: 150px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     padding-left: 7px;
 }
 
-.form-group div .span {
+/* 기간/시간 입력 필드 */
+.form-group .span {
     border-radius: 5px;
     width: 70px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     padding-left: 7px;
 }
 
-.form-group div .recommendation {
+/* 추천 인원/대상 입력 필드 */
+.form-group .recommendation {
     border-radius: 5px;
     width: 220px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     padding-left: 7px;
 }
 
-.form-group div div {
+/* 라디오 버튼 텍스트와 간격을 위한 래퍼 */
+.input-container > div {
+    display: flex;
+    align-items: center;
     padding-left: 3px;
     padding-right: 30px;
 }
 
-/* 라디오버튼 */
+/* 라디오 버튼 기본 스타일 */
 input[type='radio'] {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -132,213 +137,284 @@ input[type='radio'] {
     margin-right: 5px;
 }
 
+/* 선택된 라디오 버튼 스타일 */
 input[type='radio']:checked {
     background-color: #80CCD6;
     border: 3px solid white;
     box-shadow: 0 0 0 1.6px #80CCD6;
 }
 
-
-/* 카테고리 */
-.form-group div select {
+/* 카테고리 드롭다운 메뉴 */
+.form-group select {
     border-radius: 5px;
     width: 180px;
     height: 34px;
-    border: 1px, solid #DEDEDE;
-    color:#717171
+    border: 1px solid #DEDEDE;
+    color: #717171;
 }
 
-.form-group div select:focus {
+.form-group select:focus {
     outline: none;
 }
 
-
-/* 이미지 업로드 영역*/
-.form-group.img{
+/* 이미지 업로드 필드 그룹 */
+.form-group.img {
     height: 300px;
 }
 
 .form-group.img .image-upload-container {
     width: 600px;
+    display: flex;
+    position: relative;
+    padding: 0 20px 25px 20px;
+    flex-grow: 1;
 }
 
-.image-upload-container .image-upload-single {
-    width: 300px;
-    height: 250px;
-    padding: 0;
-}
-
-.image-upload-container .image-upload-single .upload-box{
+/* 이미지 업로드 박스 */
+.image-upload-container .image-upload-single .upload-box {
     border: 1px dashed #D9D9D9;
     border-radius: 5px;
     cursor: pointer;
-    margin: 0 auto;
-    padding: 0;
     width: 300px;
     height: 250px;
-    vertical-align: top;
-    margin-right: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.fa.fa-cloud-upload-alt{
-    font-size:48px; 
-    color:#80CCD6; 
-    margin-top: 20px;
-    margin-bottom: 10px; 
-    display: block; 
-    text-align:center;
+/* 업로드 아이콘 */
+.fa.fa-cloud-upload-alt {
+    font-size: 48px;
+    color: #80CCD6;
 }
 
-.image-name-list{
+/* 이미지 파일 목록 */
+.image-name-list {
     display: flex;
     flex-direction: column;
-    border: 1px solid #D9D9D9; 
+    border: 1px solid #D9D9D9;
     border-radius: 5px;
-    width:250px;
+    width: 250px;
     height: 250px;
     overflow-y: auto;
     padding: 5px;
-    box-sizing: border-box;
-    padding-right: 3px;
 }
 
+/* 이미지 파일 이름 아이템 */
 .image-name-list .image-name-item {
     font-weight: 500;
     font-size: 16px;
     color: #B2B2B2;
-    cursor: pointer;
-    padding-right: 3px;
-    width:100%;
 }
 
+/* 선택된 이미지 파일 이름 아이템 */
 .image-name-list .image-name-item.active {
     color: #22C5CD;
 }
 
+/* 이미지 삭제 버튼 */
 .image-name-list .remove-image {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    border-radius: 6px;
-    margin-left: 10px;
     width: 15px;
     height: 15px;
     background-color: #B2B2B2;
-    font-size: 15px;
-    color: #FFF;
 }
 
-.image-name-list .remove-image:active {
-    background-color: #414141;
-}
-
-
-/* 상품 설명 */
+/* 상품 설명 필드 그룹 */
 .pdescription {
     height: 400px;
 }
 
-.form-group.pdescription div textarea {
+/* textarea를 감싸는 컨테이너 */
+.form-group.pdescription > .input-container {
+    display: block; /* 블록 요소로 변경하여 유연하게 높이 조절 */
+    padding-bottom: 25px; /* 메시지가 들어갈 공간 확보 */
+}
+
+/* 상품 설명 textarea */
+.form-group.pdescription textarea {
     border-radius: 5px;
     width: 555px;
-    height: 380px;
-    border: 1px, solid #DEDEDE;
+    height: 300px;
+    border: 1px solid #DEDEDE;
     outline: none;
     resize: none;
     padding: 10px;
 }
 
-
-
-
-/* 가격 정보 상세 기입 */
-.price {
+/* 가격 정보 상세 기입 필드 그룹 */
+.form-group.price {
     height: 350px;
 }
 
-.form-group div .price-box {
+.form-group .price-info {
+    display: flex;
+    flex-grow: 1;
+}
+
+.form-group .price-box {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: start;
-    margin-top: 10px;
-    margin-bottom: 15px;
     width: 270px;
-    padding-left: 0px;
-    padding-right: 0px;
+    margin-top: 10px;
+    margin-right: 20px;
 }
 
 .price-box textarea {
     border-radius: 5px;
-    width: 240px;
+    width: 100%;
     height: 280px;
-    border: 1px, solid #DEDEDE;
+    border: 1px solid #DEDEDE;
     outline: none;
     resize: none;
     padding: 10px;
 }
 
-.form-group div .price-box .price-info-basic,
-.form-group div .price-box .price-info-guided {
-    font-weight: bold;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-
-
-/* 등록 취소 버튼 */
+/* 버튼 그룹 */
 .form-group.submit-btn {
     display: flex;
     justify-content: center;
     height: 70px;
     padding-top: 30px;
+    border-top: none;
 }
 
+/* 버튼 공통 스타일 */
 .form-group.submit-btn button {
-    margin-left: 10px;
-    margin-right: 10px;
-
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-
-    text-align: center;
-    text-decoration: none;
-
     width: 120px;
     height: 35px;
-
-    border: none;
     border-radius: 10px;
+    border: none;
 }
 
+/* '등록' 버튼 */
 .form-group.submit-btn button:first-child {
     background-color: #80CCD6;
     color: #fff;
-    font-size: medium;
-}
-.form-group.submit-btn button:first-child:hover{
-    background-color: #0099AD;
-    color: #fff;
-    font-weight: bold;
 }
 
+/* '취소' 버튼 */
 .form-group.submit-btn button:last-child {
     background-color: #fff;
     color: #414141;
-    font-size: medium;
     border: 3px solid #80CCD6;
 }
 
-.form-group.submit-btn button:last-child:hover{
-    background-color: #0099AD;
-    color: #fff;
-    font-weight: bold;
-    border: none;
+/* ======================= */
+/* ====== 유효성 검사/안내 메시지 ====== */
+/* ======================= */
+
+/* 모든 유효성 검사 메시지의 공통 스타일 */
+.validation-message {
+    color: #e53935; /* 붉은색 글씨 */
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap; /* 줄바꿈 방지 */
+    display: none; /* 기본적으로 숨김 */
+    position: absolute; /* 부모 요소(form-group 또는 input-container)를 기준으로 위치 */
+    z-index: 10;
 }
+
+/* 글자수 카운터의 공통 스타일 */
+.word-count-message {
+    font-size: 12px;
+    color: gray;
+    position: absolute; /* 부모 요소를 기준으로 위치 */
+    z-index: 10;
+}
+
+/* 카테고리, 상품명, 라디오 버튼, 최소 경비 등 대부분의 필드에 적용되는 메시지 위치 */
+/* 입력란 오른쪽에 수직 중앙 정렬 */
+.form-group .input-container .validation-message {
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+/* 가격 필드 그룹 (`.price-group`)에 대한 메시지 위치 조정 */
+/* 여러 입력란이 겹치는 경우를 위해 필드 아래에 메시지를 표시 */
+.price-input-container {
+    flex-direction: column; /* 가격 필드들을 세로로 정렬 */
+}
+.price-input-container .input-with-tag {
+    position: relative;
+}
+.price-input-container .input-with-tag .validation-message {
+    position: absolute;
+    bottom: -15px; /* 입력 필드 아래쪽으로 위치 */
+    left: 0;
+    transform: none; /* 수직 중앙 정렬 해제 */
+}
+
+/* 소요 시간/기간 필드 메시지 위치 조정 */
+/* 입력란이 여러 개이므로, 그룹 전체의 오른쪽에 메시지를 배치 */
+.form-group.duration-group .input-container .validation-message {
+    top: 50%;
+    left: auto;
+    right: 20px;
+    transform: translateY(-50%);
+    width: auto;
+}
+
+/* 상품명 글자수 카운터 위치 */
+.form-group .pname ~ .word-count-message {
+    top: 10px;
+    right: 20px;
+}
+
+/* 상품 설명 (`textarea`) 필드에 대한 메시지 및 카운터 위치 조정 */
+/* 입력란이 크므로 메시지와 카운터를 아래쪽에 배치 */
+.form-group.pdescription .input-container .validation-message,
+.form-group.pdescription .input-container .word-count-message {
+    position: absolute;
+    bottom: 5px;
+}
+.form-group.pdescription .input-container .validation-message {
+    left: 10px;
+}
+.form-group.pdescription .input-container .word-count-message {
+    right: 10px;
+}
+
+/* 가격 상세 (`textarea`) 필드에 대한 메시지 및 카운터 위치 조정 */
+/* textarea 아래에 배치 */
+.form-group.price .price-box .input-container .validation-message,
+.form-group.price .price-box .input-container .word-count-message {
+    position: absolute;
+    bottom: 5px;
+}
+.form-group.price .price-box .input-container .validation-message {
+    left: 10px;
+}
+.form-group.price .price-box .input-container .word-count-message {
+    right: 10px;
+}
+
+/* 이미지 업로드 필드에 대한 메시지 위치 조정 */
+/* 이미지 박스 아래에 메시지 표시 */
+.form-group.img .image-upload-container .validation-message {
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    transform: none;
+}
+
+/* 파일 첨부 필드에 대한 메시지 위치 조정 */
+/* 입력란 오른쪽에 수직 중앙 정렬 */
+.form-group input[type='file'] ~ .validation-message {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+.error-message {
+        color: red;
+        font-size: 0.8em;
+    }
+
+/* 유효성 검사 메시지 임시로 항상 표시
+.validation-message {
+    display: block !important;
+}
+*/

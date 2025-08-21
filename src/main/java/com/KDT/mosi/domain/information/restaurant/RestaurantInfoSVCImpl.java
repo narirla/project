@@ -25,7 +25,7 @@ public class RestaurantInfoSVCImpl implements RestaurantInfoSVC {
   /**
    * 부산 맛집 API 서비스 키
    */
-  @Value("${busan.api.food.service-key}")
+  @Value("${busan.api.common.service-key}")
   private String serviceKey;
 
   /**

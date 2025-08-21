@@ -16,4 +16,5 @@ public class ProductManagingForm {
   private String nickname;
   private String sellerImage;
   private long countProduct;
+  private long salesRate;
 }

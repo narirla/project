@@ -33,10 +33,16 @@
         <img th:src="@{/img/msi.png}" alt="MO:SI 아이콘" style="width:64px; height:64px; margin-left:23px;">
         <span>MO:SI</span>
       </a>
+
       <div class="search-box">
-        <input type="text" id="search-input-buyer" placeholder="검색어를 입력하세요." aria-label="검색어 입력창">
-        <button type="submit" aria-label="검색"><i class="fa fa-search" aria-hidden="true"></i></button>
+        <input type="text" id="search-input-buyer" placeholder="검색어를 입력하세요." aria-label="검색어 입력창" autocomplete="off">
+        <button id="search-button-buyer" type="submit" aria-label="검색"><i class="fa fa-search" aria-hidden="true"></i></button>
+
+        <div id="search-dropdown-buyer" class="search-dropdown">
+          <div id="search-list-buyer"></div>
+        </div>
       </div>
+
       <div class="user-menu">
         <a th:href="@{/wishlist}" aria-label="관심상품">
           <i class="fas fa-heart" aria-hidden="true"></i><span>관심상품</span>
@@ -107,6 +113,7 @@
 
 
   </div>
+  <script th:src="@{/js/Search.js}"></script>
 </header>
 
 
