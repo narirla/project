@@ -1,4 +1,4 @@
-// layout.js
+// 레이아웃 초기화
 (() => {
   if (window.__LAYOUT_INIT__) return;
   window.__LAYOUT_INIT__ = true;
@@ -26,13 +26,13 @@
       openedBtn  = btn;
     };
 
-    // 각 드롭다운 래퍼 초기화
+    // 드롭다운 초기화
     wrappers.forEach((wrap) => {
       const btns = wrap.querySelectorAll('.menuButton');
       const menu = wrap.querySelector('.dropdown-menu');
       if (!btns.length || !menu) return;
 
-      // 모든 버튼에 접근성 속성 부여 + 클릭 토글
+      // 버튼 설정
       btns.forEach((btn) => {
         btn.setAttribute('aria-haspopup', 'true');
         btn.setAttribute('aria-expanded', 'false');
@@ -73,9 +73,63 @@
 
     // 디버깅용
     window.__closeAllDropdowns = closeAll;
+    
+    // 장바구니 개수 설정
+    initCartCount();
   };
 
   (document.readyState === 'loading')
     ? document.addEventListener('DOMContentLoaded', ready)
     : ready();
 })();
+
+// 장바구니 개수 초기화
+async function initCartCount() {
+  try {
+    const response = await fetch('/cart/count', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      updateCartBadge(data.count || 0);
+    }
+  } catch (error) {
+    // 오류 시 조용히 무시 (로그인하지 않은 경우 등)
+  }
+}
+
+// 장바구니 개수 업데이트
+async function updateCartCount() {
+  try {
+    const response = await fetch('/cart/count', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      updateCartBadge(data.count || 0);
+    }
+  } catch (error) {
+    console.error('장바구니 개수 업데이트 실패:', error);
+  }
+}
+
+// 장바구니 배지 업데이트
+function updateCartBadge(count) {
+  const badge = document.getElementById('cart-count');
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+}
+
+// 전역에서 접근 가능하도록
+window.updateCartCount = updateCartCount;
+window.initCartCount = initCartCount;

@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 장바구니 Service 구현체
- * React+Vite 환경과 완전 호환
+ * 장바구니 서비스 구현체
  */
 @Slf4j
 @Service
@@ -54,9 +53,7 @@ public class CartSVCImpl implements CartSVC {
           .findByBuyerIdAndProductIdAndOptionType(buyerId, productId, optionType);
 
       if (existingItem.isPresent()) {
-        CartItem item = existingItem.get();
-        item.setQuantity(item.getQuantity() + quantity);
-        cartItemRepository.save(item);
+        return ApiResponse.of(ApiResponseCode.DUPLICATE_DATA, null);
       } else {
         Cart cart = getOrCreateCart(buyerId);
 
@@ -97,7 +94,7 @@ public class CartSVCImpl implements CartSVC {
       long totalPrice = 0;
       int totalQuantity = 0;
 
-      // React에서 계산 로직을 단순화하기 위해 서버에서 미리 계산
+      // 총 금액과 수량 계산
       for (CartItemResponse dto : cartItems) {
         if (dto.isAvailable()) {
           totalPrice += dto.getPrice() * dto.getQuantity();
@@ -105,7 +102,7 @@ public class CartSVCImpl implements CartSVC {
         }
       }
 
-      // 🔧 수정: 모든 파라미터를 Long 타입으로 전달, CartItemResponse 리스트 사용
+      // 장바구니 응답 생성
       return CartResponse.createSuccess(
           memberNickname,
           buyerId,
@@ -186,8 +183,7 @@ public class CartSVCImpl implements CartSVC {
   }
 
   /**
-   * CartItem → CartItemResponse 변환
-   * React+Vite와 완전 호환되는 DTO 변환
+   * 장바구니 아이템 DTO 변환
    */
   private List<CartItemResponse> convertToCartItemResponses(List<CartItem> items) {
     List<CartItemResponse> result = new ArrayList<>();
@@ -200,28 +196,34 @@ public class CartSVCImpl implements CartSVC {
         String sellerNickname = getSellerNickname(item.getSellerId());
         boolean isAvailable = "판매중".equals(product.getStatus());
 
-        // 🔧 수정: React가 기대하는 정확한 필드명으로 매핑
+        // 상품 이미지 조회
+        String imageData = null;
+        if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
+          imageData = product.getProductImages().get(0).getEncodedImageData();
+        }
+
+        // DTO 매핑
         CartItemResponse dto = isAvailable ?
             CartItemResponse.createAvailable(
                 item.getProductId(),
-                product.getTitle(),          // productName으로 매핑됨
+                product.getTitle(),
                 product.getDescription(),
                 item.getSalePrice(),
                 item.getOriginalPrice(),
                 item.getQuantity(),
                 item.getOptionType(),
-                product.getFileName(),       // productImage로 매핑됨
+                imageData,
                 sellerNickname
             ) :
             CartItemResponse.createUnavailable(
                 item.getProductId(),
-                product.getTitle(),          // productName으로 매핑됨
+                product.getTitle(),
                 product.getDescription(),
                 item.getSalePrice(),
                 item.getOriginalPrice(),
                 item.getQuantity(),
                 item.getOptionType(),
-                product.getFileName(),       // productImage로 매핑됨
+                imageData,
                 sellerNickname
             );
 

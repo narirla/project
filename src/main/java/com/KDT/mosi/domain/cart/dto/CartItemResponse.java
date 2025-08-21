@@ -31,7 +31,7 @@ public class CartItemResponse {
    */
   public static CartItemResponse createAvailable(Long productId, String productTitle, String description,
                                                  Long price, Long originalPrice, Long quantity,
-                                                 String optionType, String fileName, String sellerNickname) {
+                                                 String optionType, String imageData, String sellerNickname) {
     return CartItemResponse.builder()
         .productId(productId)
         .productName(productTitle)  // title → productName으로 매핑
@@ -40,7 +40,7 @@ public class CartItemResponse {
         .originalPrice(originalPrice)
         .quantity(quantity)
         .optionType(optionType)
-        .productImage(fileName)     // fileName → productImage로 매핑
+        .productImage(imageData)    // ProductImage → productImage로 매핑
         .sellerNickname(sellerNickname)
         .available(true)
         .build();
@@ -51,7 +51,7 @@ public class CartItemResponse {
    */
   public static CartItemResponse createUnavailable(Long productId, String productTitle, String description,
                                                    Long price, Long originalPrice, Long quantity,
-                                                   String optionType, String fileName, String sellerNickname) {
+                                                   String optionType, String imageData, String sellerNickname) {
     return CartItemResponse.builder()
         .productId(productId)
         .productName(productTitle)
@@ -60,7 +60,7 @@ public class CartItemResponse {
         .originalPrice(originalPrice)
         .quantity(quantity)
         .optionType(optionType)
-        .productImage(fileName)
+        .productImage(imageData)
         .sellerNickname(sellerNickname)
         .available(false)
         .build();

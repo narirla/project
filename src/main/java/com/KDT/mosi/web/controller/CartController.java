@@ -5,6 +5,7 @@ import com.KDT.mosi.domain.cart.dto.CartResponse;
 import com.KDT.mosi.domain.cart.svc.CartSVC;
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.web.api.ApiResponse;
+import com.KDT.mosi.web.api.ApiResponseCode;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -98,16 +99,15 @@ public class CartController {
    */
   @PostMapping("/add")
   @ResponseBody
-  public ResponseEntity<Map<String, Object>> addToCart(
+  public ResponseEntity<ApiResponse<Void>> addToCart(
       @Valid @RequestBody CartRequest request,
       HttpSession session) {
 
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
-      return ResponseEntity.status(401).body(Map.of(
-          "success", false,
-          "message", "로그인이 필요합니다"
-      ));
+      return ResponseEntity.status(401).body(
+          ApiResponse.of(ApiResponseCode.USER_NOT_FOUND, null)
+      );
     }
 
     try {
@@ -118,28 +118,25 @@ public class CartController {
           request.getQuantity()
       );
 
-      Map<String, Object> response = new HashMap<>();
-
-      boolean isSuccess = result.toString().contains("rtcd=S00");
-
-      response.put("success", isSuccess);
-      response.put("code", isSuccess ? "S00" : "ERROR");
+      boolean isSuccess = "S00".equals(result.getHeader().getRtcd());
 
       if (isSuccess) {
-        response.put("message", "장바구니에 상품이 추가되었습니다");
+        return ResponseEntity.ok(result);
       } else {
-        response.put("message", "상품 추가에 실패했습니다");
+        // 중복 상품인 경우 409 Conflict
+        if ("E04".equals(result.getHeader().getRtcd())) {
+          return ResponseEntity.status(409).body(result);
+        } else {
+          return ResponseEntity.badRequest().body(result);
+        }
       }
-
-      return ResponseEntity.ok(response);
 
     } catch (Exception e) {
       log.error("장바구니 추가 오류: memberId={}, productId={}",
           loginMember.getMemberId(), request.getProductId(), e);
-      return ResponseEntity.status(500).body(Map.of(
-          "success", false,
-          "message", "장바구니 추가 중 오류가 발생했습니다"
-      ));
+      return ResponseEntity.status(500).body(
+          ApiResponse.of(ApiResponseCode.INTERNAL_SERVER_ERROR, null)
+      );
     }
   }
 
@@ -170,10 +167,10 @@ public class CartController {
       );
 
       Map<String, Object> response = new HashMap<>();
-      boolean isSuccess = result.toString().contains("rtcd=S00");
+      boolean isSuccess = "S00".equals(result.getHeader().getRtcd());
 
       response.put("success", isSuccess);
-      response.put("code", isSuccess ? "S00" : "ERROR");
+      response.put("code", result.getHeader().getRtcd());
 
       if (isSuccess) {
         response.put("message", "수량이 변경되었습니다");
@@ -219,10 +216,10 @@ public class CartController {
       );
 
       Map<String, Object> response = new HashMap<>();
-      boolean isSuccess = result.toString().contains("rtcd=S00");
+      boolean isSuccess = "S00".equals(result.getHeader().getRtcd());
 
       response.put("success", isSuccess);
-      response.put("code", isSuccess ? "S00" : "ERROR");
+      response.put("code", result.getHeader().getRtcd());
 
       if (isSuccess) {
         response.put("message", "상품이 삭제되었습니다");

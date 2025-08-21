@@ -21,7 +21,7 @@
 <body>
 <div class="layout-wrapper">
   <!-- 기존 헤더 -->
-  <header th:replace="~{fragments/buyerHeader :: buyerHeader}"></header>
+  <header th:replace="~{fragments/header :: header}"></header>
 
   <div class="page-container">
     <main class="mypage-container">
@@ -32,9 +32,11 @@
         <!-- 🏝️ React Islands: 기존 Thymeleaf 레이아웃은 그대로 두고, 
              이 div에만 React 컴포넌트가 마운트됩니다 -->
         <div class="cart-page-header">
-          <div class="breadcrumb">장바구니 &gt; 주문결제 &gt; 주문완료</div>
-          <a href="/" class="continue-shopping">쇼핑 계속하기</a>
-          <h1 class="page-title">장바구니</h1>
+          <div class="cart-title-breadcrumb">
+            <h1 class="page-title">장바구니</h1>
+            <div class="breadcrumb"><strong style="color: #000;">장바구니</strong> &gt; 주문결제 &gt; 주문완료</div>
+          </div>
+          <div class="title-divider"></div>
         </div>
         
         <!-- React Island: 순수 장바구니 리스트만 렌더링 -->
