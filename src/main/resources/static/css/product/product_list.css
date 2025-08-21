@@ -122,6 +122,7 @@ a {
   justify-content: space-evenly;
   background-color: #F9F9F9;
   margin: 0 auto;
+  border-radius: 10px;
 }
 
 .top-keywords-title {
@@ -148,28 +149,34 @@ a {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  margin: 0 37px;
 }
 
 .keyword-card {
   display: flex;
   flex-direction: row;
-  width: 216px;
+  width: 195px;
   height: 88px;
+  border: 1px solid #09D0C0;
+  border-radius: 10px;
+  gap: 10px;
 }
 
 .keyword-content {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 90px;
-  height: 90px;
+  width: 60px;
+  height: 60px;
 
 }
 
 .keyword-content img {
-  width: 80px;
-  height: 80px;
+  display: flex;
+  width: 60px;
+  height: 60px;
   margin: 5px 5px;
+  align-items: center;
 }
 
 .keyword-label {
