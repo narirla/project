@@ -1,4 +1,4 @@
-package com.KDT.mosi.search.controller;
+package com.KDT.mosi.web.controller;
 
 import com.KDT.mosi.domain.product.svc.ProductSearchService;
 import com.KDT.mosi.domain.product.svc.SearchTrendService;

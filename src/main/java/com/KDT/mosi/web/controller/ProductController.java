@@ -7,7 +7,6 @@ import com.KDT.mosi.domain.product.dto.response.ProductSearchResponse;
 import com.KDT.mosi.domain.product.svc.*;
 import com.KDT.mosi.web.form.product.*;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,13 +18,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.naming.Binding;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -169,7 +165,7 @@ public class ProductController {
       // 전체 목록 조회 (상태 조건 없음)
       products = productSVC.getProductsByMemberIdAndPage(memberId, page, size);
       totalCount = productSVC.countByMemberId(memberId);
-    } else if ("판매중".equals(status) || "판매대기".equals(status) || "임시저장".equals(status)) {
+    } else if ("판매중".equals(status) || "판매대기".equals(status)) {
       // 상태 필터링
       products = productSVC.getProductsByMemberIdAndStatusAndPage(memberId, status, page, size);
       totalCount = productSVC.countByMemberIdAndStatus(memberId, status);
@@ -274,7 +270,7 @@ public class ProductController {
     String status = body.get("status");
 
     // 상태 값 유효성 검사
-    if (status == null || (!"판매중".equals(status) && !"판매대기".equals(status) && !"임시저장".equals(status))) {
+    if (status == null || (!"판매중".equals(status) && !"판매대기".equals(status))) {
       return ResponseEntity.badRequest().body("잘못된 상태 값입니다.");
     }
 
@@ -324,45 +320,21 @@ public class ProductController {
 
   // 상품 등록 적용
   @PostMapping("/upload")
-  public String uploadSubmit(@Valid @ModelAttribute("productUploadForm") ProductUploadForm form,
-                             BindingResult bindingResult,
-                             HttpSession session,
-                             Model model) throws IOException {
+  public String uploadSubmit(@ModelAttribute ProductUploadForm form, HttpSession session, Model model) throws IOException {
 
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       return "redirect:/login";
     }
 
-    // ⭐ DTO 유효성 검사 외, 커스텀 비즈니스 로직 유효성 검사 추가 (모든 검사를 먼저 수행)
-    // 판매 가격이 정상 가격보다 큰지 확인
-    if (form.getNormalPrice() != null && form.getSalesPrice() != null && form.getSalesPrice() > form.getNormalPrice()) {
-      bindingResult.addError(new FieldError("productUploadForm", "salesPrice", "판매 가격은 정상 가격보다 작아야 합니다."));
-    }
-    // 가이드 동반 판매 가격이 동반 가격보다 큰지 확인
-    if (form.getGuidePrice() != null && form.getSalesGuidePrice() != null && form.getSalesGuidePrice() > form.getGuidePrice()) {
-      bindingResult.addError(new FieldError("productUploadForm", "salesGuidePrice", "가이드 동반 판매 가격은 동반 가격보다 작아야 합니다."));
-    }
-    // 소요 기간 또는 시간 유효성 검사 (둘 다 0인지 확인)
-    if (form.getTotalDay() != null && form.getTotalTime() != null && form.getTotalDay() == 0 && form.getTotalTime() == 0) {
-      bindingResult.addError(new FieldError("productUploadForm", "totalDay", "소요 기간 또는 시간을 올바르게 입력해주세요."));
-    }
-    // 이미지 개수 제한
-    if (form.getProductImages() != null && form.getProductImages().size() > 10) {
-      bindingResult.addError(new FieldError("productUploadForm", "productImages", "이미지는 최대 10장까지 업로드 가능합니다."));
-    }
-
-    // ⭐ 모든 유효성 검사 결과를 한 번에 확인
-    if (bindingResult.hasErrors()) {
-      log.info("유효성 검사 실패: {}", bindingResult.getAllErrors());
-      // 헬퍼 메서드로 모델을 재구성
-      prepareModelForForm(model, loginMember);
-      return "product/product_enroll";
-    }
-
-    // 모든 검사를 통과했을 때만 실행되는 DB 저장 로직
+    // 로그인한 회원 ID를 form에 세팅
     form.setMemberId(loginMember.getMemberId());
     form.setNickname(loginMember.getNickname());
+
+    if (form.getProductImages() != null && form.getProductImages().size() > 10) {
+      model.addAttribute("errorMessage", "이미지는 최대 10장까지 업로드 가능합니다.");
+      return "product/upload";
+    }
 
     Product product = toEntity(form);
     product.setCreateDate(new Date(System.currentTimeMillis()));
@@ -409,115 +381,6 @@ public class ProductController {
     productCoursePointSVC.saveAll(coursePoints);
 
     return "redirect:/product/manage";
-  }
-
-  // ⭐⭐⭐ 상품 임시저장 ⭐⭐⭐
-  @PostMapping("/temp-save")
-  public String tempSaveProduct(@ModelAttribute com.KDT.mosi.domain.product.dto.ProductTempSaveForm form,
-                                HttpSession session) {
-    MultipartFile mainImage = form.getDocumentFile();
-    List<MultipartFile> extraImages = form.getProductImages();
-
-    try {
-      Product product = new Product();
-
-      // ⭐⭐⭐ 수정 포인트 1: 로그인 멤버 객체와 ID 확보 ⭐⭐⭐
-      Member loginMember = (Member) session.getAttribute("loginMember");
-      if (loginMember == null) {
-        log.error("세션에 로그인된 회원 정보(loginMember)가 없습니다. 로그인 상태를 확인하거나 로그인 페이지로 리다이렉트합니다.");
-        return "redirect:/login"; // 로그인 페이지로 리다이렉트
-      }
-      Long memberId = loginMember.getMemberId();
-      product.setMember(new Member(memberId)); // Product에 Member 객체 설정
-
-      // ⭐⭐⭐ 필드 복사 로직 시작 ⭐⭐⭐
-      product.setProductId(form.getProductId());
-      product.setTitle(form.getTitle());
-      product.setCategory(form.getCategory());
-      product.setGuideYn(form.getGuideYn());
-      // Integer 타입 필드에 대해 null 방어 로직 추가
-      product.setNormalPrice(Optional.ofNullable(form.getNormalPrice()).orElse(0));
-      product.setSalesPrice(Optional.ofNullable(form.getSalesPrice()).orElse(0));
-      product.setGuidePrice(Optional.ofNullable(form.getGuidePrice()).orElse(0));
-      product.setSalesGuidePrice(Optional.ofNullable(form.getSalesGuidePrice()).orElse(0));
-      product.setTotalDay(Optional.ofNullable(form.getTotalDay()).orElse(0));
-      product.setTotalTime(Optional.ofNullable(form.getTotalTime()).orElse(0));
-      product.setReqMoney(Optional.ofNullable(form.getReqMoney()).orElse(0));
-      product.setReqPeople(Optional.ofNullable(form.getReqPeople()).orElse(""));
-      product.setStucks(form.getStucks());
-      product.setDescription(form.getDescription());
-      product.setDetail(form.getDetail());
-      product.setPriceDetail(form.getPriceDetail());
-      product.setGpriceDetail(form.getGpriceDetail());
-      product.setTarget(form.getTarget());
-      product.setTransportInfo(form.getTransportInfo());
-      product.setSleepInfo(form.getSleepInfo());
-      product.setFoodInfo(form.getFoodInfo());
-      product.setStatus(form.getStatus());
-      // ⭐⭐⭐ 필드 복사 로직 끝 ⭐⭐⭐
-
-
-      // 대표 이미지 데이터 처리: 파일이 존재하면 데이터를, 없으면 빈 값으로 설정
-      if (mainImage != null && !mainImage.isEmpty()) {
-        product.setFileName(mainImage.getOriginalFilename());
-        product.setFileData(mainImage.getBytes());
-        product.setFileType(mainImage.getContentType());
-        product.setFileSize(mainImage.getSize());
-      } else {
-        // ⭐⭐⭐ Null 방지: 파일이 없으면 NULL이 아닌 빈 값으로 초기화 ⭐⭐⭐
-        product.setFileName("");
-        product.setFileData(new byte[0]);
-        product.setFileType("");
-        product.setFileSize(0L);
-      }
-
-      // 2. 상품 정보 저장 및 productId 확보
-      Product savedProduct = productSVC.saveNewProduct(product, extraImages.toArray(new MultipartFile[0]));
-
-      return "redirect:/product/" + savedProduct.getProductId();
-    } catch (IOException e) {
-      log.error("파일 처리 중 예외 발생", e);
-      return "redirect:/error";
-    }
-  }
-
-  // 이미지와 코스 포인트 저장을 위한 헬퍼 메서드 (중복 코드 제거)
-  private void saveImagesAndCoursePoints(Product product, List<MultipartFile> files, List<ProductCoursePointForm> points) throws IOException {
-    // 다중 이미지 저장 (기존 코드와 동일)
-    List<ProductImage> images = new ArrayList<>();
-    if (files != null) {
-      int order = 1;
-      for (MultipartFile file : files) {
-        if (file != null && !file.isEmpty()) {
-          ProductImage pi = new ProductImage();
-          pi.setProduct(product);
-          pi.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
-          pi.setFileSize(file.getSize());
-          pi.setMimeType(file.getContentType());
-          pi.setImageOrder(order++);
-          pi.setImageData(file.getBytes());
-          images.add(pi);
-        }
-      }
-    }
-    productImageSVC.saveAll(images);
-
-    // 지도 코스포인트 저장 (기존 코드와 동일)
-    List<ProductCoursePoint> coursePoints = new ArrayList<>();
-    if (points != null) {
-      int pointOrder = 1;
-      for (ProductCoursePointForm pointForm : points) {
-        ProductCoursePoint pcp = new ProductCoursePoint();
-        pcp.setProduct(product);
-        pcp.setLatitude(pointForm.getLatitude());
-        pcp.setLongitude(pointForm.getLongitude());
-        pcp.setDescription(pointForm.getDescription());
-        pcp.setPointOrder(pointOrder++);
-        pcp.setCreatedAt(new Date(System.currentTimeMillis()));
-        coursePoints.add(pcp);
-      }
-    }
-    productCoursePointSVC.saveAll(coursePoints);
   }
 
   // 수정 페이지 호출
@@ -594,7 +457,7 @@ public class ProductController {
     }
 
     // 기존 상품 정보 조회
-    Product existingProduct = productSVC.getProduct(id).orElseThrow(() -> 
+    Product existingProduct = productSVC.getProduct(id).orElseThrow(() ->
         new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
     // form의 Product 사용
@@ -602,7 +465,7 @@ public class ProductController {
     product.setProductId(id);
     product.setUpdateDate(new Date(System.currentTimeMillis()));
     product.setMember(loginMember);
-    
+
     // 새로운 문서 파일이 업로드된 경우에만 파일 정보 업데이트
     MultipartFile docFile = form.getDocumentFile();
     if (docFile != null && !docFile.isEmpty()) {
@@ -617,12 +480,12 @@ public class ProductController {
       product.setFileSize(existingProduct.getFileSize());
       product.setFileData(existingProduct.getFileData());
     }
-    
+
     // status가 null이면 기존 값 유지
     if (product.getStatus() == null || product.getStatus().trim().isEmpty()) {
       product.setStatus(existingProduct.getStatus());
     }
-    
+
     // createDate는 기존 값 유지
     product.setCreateDate(existingProduct.getCreateDate());
 
@@ -740,7 +603,7 @@ public class ProductController {
       // 필요 시 로그인 페이지로 리다이렉트 또는 예외 처리
       throw new IllegalStateException("로그인한 회원이 아닙니다.");
     }
-    Long buyerId = loginMember.getMemberId();
+    Long memberId = loginMember.getMemberId();
 
     // 2) 상품 조회, 없으면 예외 처리
     Product product = productSVC.getProduct(id)
@@ -750,19 +613,14 @@ public class ProductController {
     List<ProductImage> images = productImageSVC.findByProductId(id);
     List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
 
-
-    //4) 판매자 id → 상품의 member
-    Long sellerId = product.getMember().getMemberId();
-
-
-    // 5) 판매자 페이지 정보 조회
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(sellerId);
+    // 4) 판매자 페이지 정보 조회
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
     if (optional.isEmpty()) {
       return "redirect:/mypage/seller/create";
     }
     SellerPage sellerPage = optional.get();
 
-    // 6) DTO에 데이터 세팅
+    // 5) DTO에 데이터 세팅
     product.setMember(loginMember);
     product.setProductImages(images); // 엔티티에 이미지 세팅
 
@@ -783,31 +641,13 @@ public class ProductController {
     }
 
     // 판매자 상품 수
-    productDetailForm.setCountProduct(productSVC.countByMemberId(sellerId));
+    productDetailForm.setCountProduct(productSVC.countByMemberId(memberId));
 
     // 6) model에 DTO 등록
     model.addAttribute("productDetailForm", productDetailForm);
-    model.addAttribute("buyerId", buyerId);
-    model.addAttribute("sellerId", sellerId);
     log.info("nickname = {}", sellerPage.getNickname());
 
     return "product/product_detail";
-  }
-
-  // 헬퍼 메서드: 뷰에 필요한 모델 데이터를 준비하는 로직을 분리 ⭐⭐⭐
-  private void prepareModelForForm(Model model, Member loginMember) {
-    Long memberId = loginMember.getMemberId();
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
-    if (optional.isPresent()) {
-      SellerPage sellerPage = optional.get();
-      byte[] imageBytes = sellerPage.getImage();
-      String base64SellerImage = null;
-      if (imageBytes != null && imageBytes.length > 0) {
-        base64SellerImage = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
-      }
-      model.addAttribute("nickname", sellerPage.getNickname());
-      model.addAttribute("sellerImage", base64SellerImage);
-    }
   }
 
   // DTO -> Entity 변환 메서드
@@ -882,51 +722,6 @@ public class ProductController {
     form.setGpriceDetail(product.getGpriceDetail());
     form.setStatus(product.getStatus());
     return form;
-  }
-
-  private Product toEntity(com.KDT.mosi.domain.product.dto.ProductTempSaveForm form) throws IOException {
-    Product product = new Product();
-
-    // 임시저장 시에는 폼에 없는 데이터가 많으므로, null 체크가 필요합니다.
-    if (form.getMemberId() != null) {
-      Member member = new Member();
-      member.setMemberId(form.getMemberId());
-      product.setMember(member);
-    }
-
-    product.setProductId(form.getProductId()); // 수정 시 ProductId 설정
-    product.setCategory(form.getCategory());
-    product.setTitle(form.getTitle());
-    product.setGuideYn(form.getGuideYn());
-    product.setNormalPrice(form.getNormalPrice());
-    product.setGuidePrice(form.getGuidePrice());
-    product.setSalesPrice(form.getSalesPrice());
-    product.setSalesGuidePrice(form.getSalesGuidePrice());
-    product.setTotalDay(form.getTotalDay());
-    product.setTotalTime(form.getTotalTime());
-    product.setReqMoney(form.getReqMoney());
-    product.setSleepInfo(form.getSleepInfo());
-    product.setTransportInfo(form.getTransportInfo());
-    product.setFoodInfo(form.getFoodInfo());
-    product.setReqPeople(form.getReqPeople());
-    product.setTarget(form.getTarget());
-    product.setStucks(form.getStucks());
-    product.setDescription(form.getDescription());
-    product.setDetail(form.getDetail());
-    product.setPriceDetail(form.getPriceDetail());
-    product.setGpriceDetail(form.getGpriceDetail());
-    product.setStatus(form.getStatus());
-
-    // 첨부 문서 파일 처리
-    MultipartFile docFile = form.getDocumentFile();
-    if (docFile != null && !docFile.isEmpty()) {
-      product.setFileName(docFile.getOriginalFilename());
-      product.setFileType(docFile.getContentType());
-      product.setFileSize(docFile.getSize());
-      product.setFileData(docFile.getBytes());
-    }
-
-    return product;
   }
 
   // 파일 다운로드
