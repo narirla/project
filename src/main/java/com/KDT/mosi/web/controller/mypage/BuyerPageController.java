@@ -1,4 +1,4 @@
-package com.KDT.mosi.web.controller;
+package com.KDT.mosi.web.controller.mypage;
 
 import com.KDT.mosi.domain.entity.BuyerPage;
 import com.KDT.mosi.domain.entity.Member;
@@ -353,4 +353,8 @@ public class  BuyerPageController {
     return "mypage/buyerpage/buyerMypageHome";
   }
 
+
 }
+
+
+
