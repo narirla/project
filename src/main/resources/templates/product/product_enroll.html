@@ -67,13 +67,11 @@
                     <div class="input-with-tag">
                       <input class="price" type="number" th:field="*{normalPrice}" placeholder="기본 정보 가격" min="0">
                       <div class="tag">원</div>
+                      <div class="validation-message"></div>
                     </div>
                     <div class="input-with-tag">
                       <input class="price" type="number" th:field="*{guidePrice}" placeholder="가이드 동반 가격" min="0">
                       <div class="tag">원</div>
-                    </div>
-                    <div class="validation-message-group">
-                      <div class="validation-message"></div>
                       <div class="validation-message"></div>
                     </div>
                   </div>
@@ -84,13 +82,11 @@
                     <div class="input-with-tag">
                       <input class="price" type="number" th:field="*{salesPrice}" placeholder="기본 정보 가격" min="0">
                       <div class="tag">원</div>
+                      <div class="validation-message"></div>
                     </div>
                     <div class="input-with-tag">
                       <input class="price" type="number" th:field="*{salesGuidePrice}" placeholder="가이드 동반 가격" min="0">
                       <div class="tag">원</div>
-                    </div>
-                    <div class="validation-message-group">
-                      <div class="validation-message"></div>
                       <div class="validation-message"></div>
                     </div>
                   </div>
@@ -225,7 +221,10 @@
                   </div>
                 </div>
                 <div class="form-group submit-btn">
-                  <button type="submit">등록</button>
+                  <button type="submit" id="registerBtn">등록</button>
+
+                  <button type="button" id="tempSaveBtn">임시저장</button>
+
                   <button type="button" onclick="history.back()">취소</button>
                 </div>
               </form>
@@ -237,9 +236,9 @@
   </div>
   <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
+<script th:src="@{/js/product/product_validation.js}"></script>
 <script th:src="@{/js/product/product_enroll.js}"></script>
 <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
 <script th:src="@{/js/layout.js}"></script>
-<script th:src="@{/js/product/product_validation.js}"></script>
 </body>
 </html>

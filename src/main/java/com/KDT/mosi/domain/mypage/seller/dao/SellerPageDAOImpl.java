@@ -142,6 +142,28 @@ public class SellerPageDAOImpl implements SellerPageDAO {
     return v != null && v == 1;
   }
 
+<<<<<<< HEAD
+=======
+  // memberID로 별명 찾기
+  @Override
+  public Optional<String> findNicknameByMemberId(Long memberId) {
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT nickname FROM seller_page WHERE member_id = :memberId");
+
+    MapSqlParameterSource param = new MapSqlParameterSource();
+    param.addValue("memberId", memberId);
+
+    try {
+      String nickname = template.queryForObject(sql.toString(), param, String.class);
+      return Optional.ofNullable(nickname);
+    } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+      // 조회 결과가 없을 경우
+      return Optional.empty();
+    }
+  }
+
+
+>>>>>>> e506fd3749059f9445a987ad395676865572bc94
   /**
    * 마이페이지 정보 수정
    */

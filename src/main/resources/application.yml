@@ -25,6 +25,11 @@ spring:
       file-size-threshold: 0B
       resolve-lazily: true
 
+  # Elasticsearch 설정
+  elasticsearch:
+    rest:
+      uris: localhost:9200 # host:port 포맷으로 변경
+
 # 웹서버 포트
 server:
   port: 9070
@@ -59,6 +64,7 @@ kakao:
   api:
     key: 9eb31105e83dcf3d0dc84b734b609fa8
     url:
+<<<<<<< HEAD
       geocode: https://dapi.kakao.com/v2/local/search/address.json
 
   # ElasticSearchConfig에서 @Value로 읽어올 속성들
@@ -74,3 +80,6 @@ data:
   elasticsearch:
     indices:
       auto-create: true
+=======
+      geocode: https://dapi.kakao.com/v2/local/search/address.json
+>>>>>>> e506fd3749059f9445a987ad395676865572bc94

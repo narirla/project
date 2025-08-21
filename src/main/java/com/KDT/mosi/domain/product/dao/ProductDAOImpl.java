@@ -2,17 +2,27 @@ package com.KDT.mosi.domain.product.dao;
 
 import com.KDT.mosi.domain.entity.Member;
 import com.KDT.mosi.domain.entity.Product;
+<<<<<<< HEAD
 import lombok.extern.slf4j.Slf4j;
+=======
+import com.KDT.mosi.domain.entity.ProductImage;
+>>>>>>> e506fd3749059f9445a987ad395676865572bc94
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.*;
 
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,54 +91,53 @@ public class ProductDAOImpl implements ProductDAO {
   // insert
   @Override
   public Product insert(Product product) {
-
-    Long nextId = getNextProductId();
-    product.setProductId(nextId);
-
     StringBuffer sql = new StringBuffer();
-    sql.append("INSERT INTO product (")
-        .append("product_id, member_id, category, title, guide_yn, normal_price, guide_price, sales_price, sales_guide_price, ")
-        .append("total_day, total_time, req_money, sleep_info, transport_info, food_info, req_people, target, stucks, ")
-        .append("description, detail, file_name, file_type, file_size, file_data, price_detail, gprice_detail, status, ")
-        .append("create_date, update_date) ")
-        .append("VALUES (")
-        .append(":productId, :memberId, :category, :title, :guideYn, :normalPrice, :guidePrice, :salesPrice, :salesGuidePrice, ")
-        .append(":totalDay, :totalTime, :reqMoney, :sleepInfo, :transportInfo, :foodInfo, :reqPeople, :target, :stucks, ")
-        .append(":description, :detail, :fileName, :fileType, :fileSize, :fileData, :priceDetail, :gpriceDetail, :status, ")
-        .append(":createDate, :updateDate)");
+    sql.append(" insert into product ( ");
+    sql.append(" product_id, member_id, category, title, guide_yn, normal_price, ");
+    sql.append(" guide_price, sales_price, sales_guide_price, total_day, total_time, ");
+    sql.append(" req_money, sleep_info, transport_info, food_info, req_people, ");
+    sql.append(" target, stucks, description, detail, file_name, file_data, file_type, file_size, ");
+    sql.append(" price_detail, gprice_detail, status ");
+    sql.append(" ) values ( ");
+    sql.append(" product_product_id_seq.nextval, :memberId, :category, :title, :guideYn, :normalPrice, ");
+    sql.append(" :guidePrice, :salesPrice, :salesGuidePrice, :totalDay, :totalTime, ");
+    sql.append(" :reqMoney, :sleepInfo, :transportInfo, :foodInfo, :reqPeople, ");
+    sql.append(" :target, :stucks, :description, :detail, :fileName, :fileData, :fileType, :fileSize, ");
+    sql.append(" :priceDetail, :gpriceDetail, :status ");
+    sql.append(" ) ");
 
-    MapSqlParameterSource params = new MapSqlParameterSource()
-        .addValue("productId", product.getProductId())
-        .addValue("memberId", product.getMember() != null ? product.getMember().getMemberId() : null)
-        .addValue("category", product.getCategory())
+    SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("memberId", product.getMember().getMemberId())
+        .addValue("category", Optional.ofNullable(product.getCategory()).orElse(null))
         .addValue("title", product.getTitle())
         .addValue("guideYn", product.getGuideYn())
-        .addValue("normalPrice", product.getNormalPrice())
-        .addValue("guidePrice", product.getGuidePrice())
-        .addValue("salesPrice", product.getSalesPrice())
-        .addValue("salesGuidePrice", product.getSalesGuidePrice())
-        .addValue("totalDay", product.getTotalDay())
-        .addValue("totalTime", product.getTotalTime())
-        .addValue("reqMoney", product.getReqMoney())
-        .addValue("sleepInfo", product.getSleepInfo())
-        .addValue("transportInfo", product.getTransportInfo())
-        .addValue("foodInfo", product.getFoodInfo())
-        .addValue("reqPeople", product.getReqPeople())
-        .addValue("target", product.getTarget())
-        .addValue("stucks", product.getStucks())
-        .addValue("description", product.getDescription())
-        .addValue("detail", product.getDetail())
-        .addValue("fileName", product.getFileName())
-        .addValue("fileType", product.getFileType())
-        .addValue("fileSize", product.getFileSize())
-        .addValue("fileData", product.getFileData())
-        .addValue("priceDetail", product.getPriceDetail())
-        .addValue("gpriceDetail", product.getGpriceDetail())
-        .addValue("status", product.getStatus())
-        .addValue("createDate", product.getCreateDate())
-        .addValue("updateDate", product.getUpdateDate());
+        .addValue("normalPrice", Optional.ofNullable(product.getNormalPrice()).orElse(0)) // ⭐⭐⭐ NullPointerException 해결 ⭐⭐⭐
+        .addValue("guidePrice", Optional.ofNullable(product.getGuidePrice()).orElse(0)) // ⭐⭐⭐ NullPointerException 해결 ⭐⭐⭐
+        .addValue("salesPrice", Optional.ofNullable(product.getSalesPrice()).orElse(0)) // ⭐⭐⭐ NullPointerException 해결 ⭐⭐⭐
+        .addValue("salesGuidePrice", Optional.ofNullable(product.getSalesGuidePrice()).orElse(0)) // ⭐⭐⭐ NullPointerException 해결 ⭐⭐⭐
+        .addValue("totalDay", Optional.ofNullable(product.getTotalDay()).orElse(0))
+        .addValue("totalTime", Optional.ofNullable(product.getTotalTime()).orElse(0))
+        .addValue("reqMoney", Optional.ofNullable(product.getReqMoney()).orElse(0))
+        .addValue("sleepInfo", Optional.ofNullable(product.getSleepInfo()).orElse(null))
+        .addValue("transportInfo", Optional.ofNullable(product.getTransportInfo()).orElse(null))
+        .addValue("foodInfo", Optional.ofNullable(product.getFoodInfo()).orElse(null))
+        .addValue("reqPeople", Optional.ofNullable(product.getReqPeople()).orElse(""))
+        .addValue("target", Optional.ofNullable(product.getTarget()).orElse(null))
+        .addValue("stucks", Optional.ofNullable(product.getStucks()).orElse(null))
+        .addValue("description", Optional.ofNullable(product.getDescription()).orElse(null))
+        .addValue("detail", Optional.ofNullable(product.getDetail()).orElse(null))
+        .addValue("fileName", Optional.ofNullable(product.getFileName()).orElse(""))
+        .addValue("fileData", Optional.ofNullable(product.getFileData()).orElse(new byte[0]))
+        .addValue("fileType", Optional.ofNullable(product.getFileType()).orElse(""))
+        .addValue("fileSize", Optional.ofNullable(product.getFileSize()).orElse(0L))
+        .addValue("priceDetail", Optional.ofNullable(product.getPriceDetail()).orElse(null))
+        .addValue("gpriceDetail", Optional.ofNullable(product.getGpriceDetail()).orElse(null))
+        .addValue("status", product.getStatus());
 
-    jdbcTemplate.update(sql.toString(), params);
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+    jdbcTemplate.update(sql.toString(), param, keyHolder, new String[]{"product_id"});
+    long productId = keyHolder.getKey().longValue();
+    product.setProductId(productId);
 
     return product;
   }
@@ -333,5 +342,48 @@ public class ProductDAOImpl implements ProductDAO {
     params.put("memberId", memberId);
 
     return jdbcTemplate.queryForObject(sql.toString(), params, Long.class);
+  }
+
+  // ⭐⭐⭐ 새로 추가된 메서드들 구현부 ⭐⭐⭐
+
+  /**
+   * 새로운 상품 이미지 리스트를 저장합니다.
+   * @param images 저장할 ProductImage 리스트
+   */
+  @Override
+  public void saveImages(List<ProductImage> images) {
+    String sql = "INSERT INTO product_image (image_id, product_id, file_name, file_size, mime_type, image_order, image_data, create_date, update_date) " +
+        "VALUES (product_image_image_id_seq.nextval, :productId, :fileName, :fileSize, :mimeType, :imageOrder, :imageData, sysdate, sysdate)";
+
+    SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(images.toArray());
+    jdbcTemplate.batchUpdate(sql, batch);
+  }
+
+  /**
+   * 주어진 이미지 ID 리스트에 해당하는 이미지를 삭제합니다.
+   * @param imageIds 삭제할 이미지 ID 리스트
+   */
+  @Override
+  public void deleteImagesByIds(List<Long> imageIds) {
+    if (imageIds.isEmpty()) return;
+
+    String sql = "DELETE FROM product_image WHERE image_id IN (:imageIds)";
+    Map<String, List<Long>> params = new HashMap<>();
+    params.put("imageIds", imageIds);
+    jdbcTemplate.update(sql, params);
+  }
+
+  /**
+   * 특정 상품에 속한 이미지 중 가장 높은 이미지 순서(imageOrder)를 조회합니다.
+   * @param productId 상품 ID
+   * @return 가장 높은 imageOrder 값 또는 이미지가 없을 경우 null
+   */
+  @Override
+  public Integer findMaxImageOrderByProductId(Long productId) {
+    String sql = "SELECT MAX(image_order) FROM product_image WHERE product_id = :productId";
+    Map<String, Object> params = new HashMap<>();
+    params.put("productId", productId);
+
+    return jdbcTemplate.queryForObject(sql, params, Integer.class);
   }
 }
