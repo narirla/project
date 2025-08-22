@@ -174,7 +174,9 @@ public class ProductSearchService {
    * @return 제안 검색어 목록
    */
 
+
  public List<String> suggestSearchTerms(String keyword) {
+
 //    if (keyword == null || keyword.trim().isEmpty()) {
 //      return Collections.emptyList();
 //    }
@@ -200,6 +202,8 @@ public class ProductSearchService {
 //      }
 //    }
     return suggestions;
+
  }
+
 
 }
