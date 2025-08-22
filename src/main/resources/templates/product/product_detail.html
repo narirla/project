@@ -22,10 +22,12 @@
       th:data-product-id="*{product.productId}"
       th:data-seller-id="${sellerId}"
       th:data-buyer-id="${buyerId}">
-  <header th:replace="${loginRole} == 'SELLER' ?
-          ~{fragments/sellerHeader :: sellerHeader} :
-          ~{fragments/header :: header}">
+<th:block th:switch="${session.loginRole ?: 'BUYER'}">
+  <header th:case="'SELLER'" th:replace="~{fragments/sellerHeader :: sellerHeader(activeUri=${currentPath ?: ''})}">
   </header>
+  <header th:case="*" th:replace="~{fragments/header :: header(activeUri=${currentPath ?: ''})}">
+  </header>
+</th:block>
 
 
 <!-- 상품 타이틀 -->
