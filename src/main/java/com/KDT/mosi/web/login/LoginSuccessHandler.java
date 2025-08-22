@@ -27,12 +27,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
   private final MemberSVC memberSVC;
   private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-  /**
-   * 로그인 성공 시 실행되는 메서드
-   * @param request  클라이언트의 HTTP 요청 객체
-   * @param response 서버의 HTTP 응답 객체
-   * @param authentication Spring Security 인증 객체(로그인 사용자 정보)
-   */
   @Override
   public void onAuthenticationSuccess(
       HttpServletRequest request,
@@ -65,7 +59,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     log.info("✅ 로그인 성공: {}, Roles(norm)={}", member.getEmail(), normRoles);
 
-    // 5) 로그인 직전 요청 URL로 복귀
+    // ✅ 5) 로그인 직전 요청 URL로 복귀 (복잡한 체크 로직 제거)
     SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
     if (savedRequest != null) {
       String redirectUrl = savedRequest.getRedirectUrl();

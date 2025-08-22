@@ -2,8 +2,6 @@ package com.KDT.mosi.domain.product.svc;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch.core.search.Suggester;
-import co.elastic.clients.elasticsearch.core.termvectors.Term;
 import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.product.dao.ProductDAO;
 import com.KDT.mosi.domain.product.document.ProductDocument;
@@ -18,8 +16,6 @@ import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.suggest.response.Suggest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -184,26 +180,46 @@ public class ProductSearchService {
       return Collections.emptyList();
     }
 
-    // 1. Suggest 요청을 위한 Query 생성
-    Query query = Query.findAll()
-        .withSuggester(Suggester.term("title-suggester", keyword)
-            .field("title")
-            .size(5)); // 최대 5개 추천
+    try {
+      // ElasticsearchClient를 직접 사용한 suggestion 요청
+      co.elastic.clients.elasticsearch.core.SearchRequest searchRequest =
+          co.elastic.clients.elasticsearch.core.SearchRequest.of(s -> s
+              .index("products")
+              .suggest(suggest -> suggest
+                  .text(keyword)
+                  .suggesters("title-suggester", suggester -> suggester
+                      .term(term -> term
+                          .field("title.keyword")
+                          .size(5)
+                          .minWordLength(2)
+                          .maxEdits(2)
+                      )
+                  )
+              )
+              .size(0) // 검색 결과는 필요 없고 suggestion만 필요
+          );
 
-    // 2. Elasticsearch에 Suggestion 요청을 보냅니다.
-    SearchHits<?> searchHits = elasticsearchOperations.search(query, ProductDocument.class, IndexCoordinates.of("products"));
+      co.elastic.clients.elasticsearch.core.SearchResponse<ProductDocument> response =
+          esClient.search(searchRequest, ProductDocument.class);
 
-    List<String> suggestions = new ArrayList<>();
+      List<String> suggestions = new ArrayList<>();
 
-    // 3. SearchHits에서 Suggestion 결과를 추출합니다. (Elasticsearch 8.x+용 수정)
-    if (searchHits.hasSuggest()) {
-      List<Suggestion<TermSuggestOption>> termSuggestions = searchHits.getSuggest().getSuggestions("title-suggester");
-      if (termSuggestions != null && !termSuggestions.isEmpty()) {
-        suggestions = termSuggestions.get(0).getOptions().stream()
-            .map(TermSuggestOption::getText)
-            .collect(Collectors.toList());
+      if (response.suggest() != null && response.suggest().get("title-suggester") != null) {
+        response.suggest().get("title-suggester").forEach(suggestion -> {
+          suggestion.term().options().forEach(option -> {
+            suggestions.add(option.text());
+          });
+        });
       }
+
+      return suggestions.stream()
+          .distinct()
+          .limit(5)
+          .collect(Collectors.toList());
+
+    } catch (Exception e) {
+      log.warn("Suggestion failed, returning empty list: {}", e.getMessage());
+      return Collections.emptyList();
     }
-    return suggestions;
   }
 }
