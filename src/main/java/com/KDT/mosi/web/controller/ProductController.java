@@ -151,6 +151,8 @@ public class ProductController {
     return "product/product_list";
   }
 
+
+
   // 판매자별 등록 상품 조회
   @GetMapping("/manage")
   public String manage(Model model, HttpSession session,
@@ -612,6 +614,8 @@ public class ProductController {
     return "redirect:/product/manage";
   }
 
+
+
   // 상세페이지
   @GetMapping("/view/{id}")
   public String view(@PathVariable("id") Long id, Model model, HttpSession session,
@@ -629,22 +633,23 @@ public class ProductController {
     Product product = productSVC.getProduct(id)
         .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
 
+    // 판매자 id 세팅
+    Long sellerId = product.getMember().getMemberId();
+
     // 3) 상품 이미지, 코스 포인트 리스트 조회
     List<ProductImage> images = productImageSVC.findByProductId(id);
     List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
 
     // 4) 판매자 페이지 정보 조회
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(buyerId);
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(sellerId);
     if (optional.isEmpty()) {
       return "redirect:/mypage/seller/create";
     }
     SellerPage sellerPage = optional.get();
 
-    // 판매자 id 세팅
-    Long sellerId = product.getMember().getMemberId();
 
     // 5) DTO에 데이터 세팅
-    product.setMember(loginMember);
+    //product.setMember(loginMember);
     product.setProductImages(images); // 엔티티에 이미지 세팅
 
     ProductDetailForm productDetailForm = new ProductDetailForm();

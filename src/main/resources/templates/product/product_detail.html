@@ -80,11 +80,12 @@
         </div>
         <!-- 판매자 프로필 -->
         <div class="product-seller">
-          <img th:src="*{sellerImage}" alt="프로필 이미지" class="profile-img"
-            onerror="this.onerror=null; this.src='/img/default-profile.png';">
+          <img th:src="${productDetailForm.sellerImage}"
+               alt="프로필 이미지" class="profile-img"
+               onerror="this.onerror=null; this.src='/img/default-profile.png';">
           <div class="seller-info">
-            <strong th:text="*{nickname}"></strong>
-            <div class="seller-tags" th:text="*{intro}">#소개글 #태그들</div>
+            <strong th:text="${productDetailForm.nickname}"></strong>
+            <div class="seller-tags" th:text="${productDetailForm.intro}"></div>
           </div>
           <button class="inquiry-btn">문의하기</button>
         </div>
