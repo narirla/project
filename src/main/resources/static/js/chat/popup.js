@@ -74,7 +74,7 @@ function renderMessage(msg) {
   } else {
     bubble.textContent = msg.content;
   }
-  msgBox.appendChild(풍선껌);
+  msgBox.appendChild(bubble);
 
   const time = document.createElement('div');
   time.className = 'time';

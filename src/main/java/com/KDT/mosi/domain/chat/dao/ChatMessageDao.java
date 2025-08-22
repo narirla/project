@@ -156,23 +156,27 @@ public class ChatMessageDao {
    //   * @param roomId
    //   * @param memberId
    //   */
-//  public void markAsRead(long roomId, long memberId) {
-//    String sql = """
-//      UPDATE CHAT_MESSAGE
-//      SET READ_YN = 'Y'
-//      WHERE ROOM_ID = :roomId
-//        AND SENDER_ID != :memberId
-//        AND READ_YN = 'N'
-//    """;
-//    jdbc.update(sql, new MapSqlParameterSource()
-//        .addValue("roomId", roomId)
-//        .addValue("memberId", memberId));
-//  }
+  public int markAsRead(Long roomId, Long readerId, Long lastReadMessageId) {
+    String sql = """
+        UPDATE chat_message
+           SET read_yn = 'Y'
+         WHERE room_id = :roomId
+           AND sender_id <> :readerId
+           AND msg_id <= :lastReadMessageId
+           AND read_yn = 'N'
+    """;
+
+    MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("roomId", roomId)
+        .addValue("readerId", readerId)
+        .addValue("lastReadMessageId", lastReadMessageId);
+
+    return jdbc.update(sql, params);
+  }
+
 
 
 }
-
-//
 
 
 
