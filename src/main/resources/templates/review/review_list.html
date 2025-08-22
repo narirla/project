@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>리뷰 목록</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root { --gap: 12px; --muted:#667085; --chip:#eef2ff; --border:#e5e7eb; }
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Pretendard', sans-serif; margin: 0; padding: 24px; color:#111827; }
+        h1 { margin: 0 0 16px; font-size: 20px; }
+        .toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; }
+        .count { color: var(--muted); font-size: 13px; }
+        .list { display:grid; gap: var(--gap); }
+        .card {
+          display:grid; grid-template-columns: 96px 1fr auto;
+          gap: var(--gap); padding: 12px; border:1px solid var(--border); border-radius: 12px;
+          align-items:center; background:#fff;
+        }
+        .thumb { width:96px; height:72px; border-radius:10px; object-fit:cover; background:#f6f7f9; }
+        .meta { display:flex; flex-direction:column; gap:6px; min-width:0; }
+        .title { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .sub { color:var(--muted); font-size:13px; display:flex; gap:10px; flex-wrap:wrap; }
+        .chips { display:flex; gap:6px; flex-wrap:wrap; }
+        .chip { background:var(--chip); padding:2px 8px; border-radius:999px; font-size:12px; }
+        .score { font-weight:700; }
+        .right { text-align:right; font-size:12px; color:var(--muted); }
+        .right .yn { font-size:12px; display:inline-block; padding:2px 6px; border-radius:6px; border:1px solid var(--border); background:#fafafa; margin-top:4px;}
+        .empty { padding:32px; text-align:center; color:var(--muted); border:1px dashed var(--border); border-radius:12px; }
+        nav.pager { margin-top: 16px; display:flex; gap:6px; justify-content:center; align-items:center; }
+        .pager button {
+          min-width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:#fff; cursor:pointer;
+        }
+        .pager button[disabled]{ opacity:.5; cursor:not-allowed; }
+        .pager .current { font-weight:700; border-color:#c7d2fe; background:#eef2ff; }
+    </style>
+</head>
+<!-- buyer 또는 seller 로 모드 설정 -->
+<body data-mode="buyer">
+<h1>리뷰 목록</h1>
+<div class="toolbar">
+    <div class="count" id="countText"></div>
+    <div class="count" id="modeText"></div>
+</div>
+
+<div class="list" id="reviewList"></div>
+<div class="empty" id="emptyBox" hidden>표시할 리뷰가 없습니다.</div>
+
+<nav class="pager" id="pager">
+    <button id="prevBtn">이전</button>
+    <span id="pageDots"></span>
+    <button id="nextBtn">다음</button>
+</nav>
+
+<script type="module">
+    import { ajax } from '/js/community/common.js';
+
+    // ----- 설정/상태 -----
+    const listEl = document.getElementById('reviewList');
+    const emptyEl = document.getElementById('emptyBox');
+    const countEl = document.getElementById('countText');
+    const modeEl  = document.getElementById('modeText');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsEl  = document.getElementById('pageDots');
+
+    const mode = document.body.dataset.mode === 'seller' ? 'seller' : 'buyer';
+    const endpoint = mode === 'seller' ? '/api/review/paging/seller' : '/api/review/paging/buyer';
+    const NUM_OF_ROWS = 5; // 고정
+
+    // URL에서 pageNo 읽고 없으면 1
+    function getPageFromURL() {
+      const sp = new URLSearchParams(location.search);
+      return parseInt(sp.get('pageNo') || '1', 10);
+    }
+    let currentPage = Math.max(1, getPageFromURL());
+
+    // 첫 진입 시 URL 정리
+    (function ensureParams() {
+      const url = new URL(location.href);
+      if (!url.searchParams.get('pageNo')) {
+        url.searchParams.set('pageNo', String(currentPage));
+        url.searchParams.set('numOfRows', String(NUM_OF_ROWS));
+        history.replaceState({ pageNo: currentPage }, '', url);
+      } else if (!url.searchParams.get('numOfRows')) {
+        url.searchParams.set('numOfRows', String(NUM_OF_ROWS));
+        history.replaceState({ pageNo: currentPage }, '', url);
+      }
+    })();
+
+    modeEl.textContent = mode === 'seller' ? '모드: 판매자(내 상품 리뷰)' : '모드: 구매자(내가 쓴 리뷰)';
+
+    // ----- 데이터 -----
+    async function fetchPage(pageNo) {
+      const res = await ajax.get(`${endpoint}?pageNo=${pageNo}&numOfRows=${NUM_OF_ROWS}`);
+      if (res?.header?.rtcd !== 'S00') throw new Error('리뷰 조회 실패');
+      // 이 API는 총건수를 안 주니, 건수 표시는 페이지 항목 수로 대체
+      return res.body ?? [];
+    }
+
+    // ----- 렌더링 -----
+    function fmtDate(s) {
+      if (!s) return '';
+      // LocalDateTime 직렬화 기준: "2025-08-21T09:41:29.813"
+      const d = new Date(s);
+      if (isNaN(d)) return s; // 혹시 파싱 실패하면 원본 출력
+      return d.toLocaleString();
+    }
+    function imgSrc(item) {
+      return item.productImageId ? `/images/${item.productImageId}?size=thumb` : 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+    }
+    function renderRows(rows) {
+      if (!rows || rows.length === 0) {
+        listEl.innerHTML = '';
+        emptyEl.hidden = false;
+        countEl.textContent = '0개';
+        return;
+      }
+      emptyEl.hidden = true;
+      countEl.textContent = `${rows.length}개`;
+
+      listEl.innerHTML = rows.map(r => {
+        const tags = (r.tagLabels || '').split(' | ').filter(Boolean);
+        const score = (typeof r.score === 'number') ? r.score.toFixed(1) : r.score;
+        const sellerYN = (r.sellerRecoYn || '').toUpperCase();
+
+        return `
+          <div class="card">
+            <img class="thumb" src="${imgSrc(r)}" alt="" loading="lazy" />
+            <div class="meta">
+              <div class="title" title="${r.title ?? ''}">${r.title ?? '-'}</div>
+              <div class="sub">
+                <span class="score">★ ${score ?? '-'}</span>
+                ${r.optionType ? `<span>${r.optionType}</span>` : ''}
+                ${mode === 'seller' && r.nickname ? `<span>구매자: ${r.nickname}</span>` : ''}
+                <span>작성: ${fmtDate(r.rcreate)}</span>
+              </div>
+              <div class="chips">
+                ${tags.map(t => `<span class="chip">${t}</span>`).join('')}
+              </div>
+            </div>
+            <div class="right">
+              <div>상품 생성: ${fmtDate(r.pcreate)}</div>
+              <div class="yn">판매자 추천: ${sellerYN || '-'}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ----- 페이징 (간단: 이전/다음 + 현재 표시) -----
+    function updatePagerState(hasPrev, hasNext) {
+      prevBtn.disabled = !hasPrev;
+      nextBtn.disabled = !hasNext;
+      // 점(현재페이지만 강조)
+      dotsEl.innerHTML = `<button class="current" disabled>${currentPage}</button>`;
+    }
+
+    async function go(pageNo, { updateHistory = true, push = true } = {}) {
+      const rows = await fetchPage(pageNo);
+      renderRows(rows);
+
+      // hasNext는 알 수 없지만, "받은 개수가 5개면 다음 있을 가능성" 정도로 추정
+      const hasPrev = pageNo > 1;
+      const hasNext = (rows?.length || 0) >= NUM_OF_ROWS;
+      updatePagerState(hasPrev, hasNext);
+
+      currentPage = pageNo;
+      if (updateHistory) {
+        const u = new URL(location.href);
+        u.searchParams.set('pageNo', String(pageNo));
+        u.searchParams.set('numOfRows', String(NUM_OF_ROWS));
+        const state = { pageNo };
+        push ? history.pushState(state, '', u) : history.replaceState(state, '', u);
+      }
+    }
+
+    prevBtn.addEventListener('click', () => go(Math.max(1, currentPage - 1)));
+    nextBtn.addEventListener('click', () => go(currentPage + 1));
+
+    window.addEventListener('popstate', (e) => {
+      const pageNo = e.state?.pageNo ?? getPageFromURL();
+      go(Math.max(1, pageNo), { updateHistory: false });
+    });
+
+    // 초기 로드
+    go(currentPage, { updateHistory: false });
+</script>
+</body>
+</html>
