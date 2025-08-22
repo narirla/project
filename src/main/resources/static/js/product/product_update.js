@@ -245,4 +245,72 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+
+  // 임시저장 버튼 이벤트
+   const tempSaveBtn = document.getElementById('tempSaveBtn');
+    const updateBtn = document.getElementById('updateBtn');
+
+    if (tempSaveBtn) {
+      tempSaveBtn.addEventListener('click', function(event) {
+        handleTempSave();
+      });
+    }
+
+    // 임시저장 버튼 클릭 핸들러 함수
+    async function handleTempSave() {
+      const form = document.getElementById('productForm');
+      const formData = new FormData(form);
+
+      // '임시저장' 상태 값 추가
+      formData.append('status', '임시저장');
+
+      // ⭐ 기존 로직을 활용하여 삭제할 이미지 ID 리스트를 FormData에 추가
+      const deleteImageIds = document.getElementById('deleteImageIds').value;
+      if (deleteImageIds) {
+        formData.append('deleteImageIds', deleteImageIds);
+      }
+
+      // ⭐ 기존 로직을 활용하여 업로드할 새 이미지 파일을 FormData에 추가
+      // filesArr는 현재 JS 코드에서 업로드할 새 이미지를 담는 배열입니다.
+      filesArr.forEach(file => {
+        formData.append('uploadImages', file); // HTML의 name="uploadImages"와 일치시킴
+      });
+
+      // ⭐ 기존 문서 파일 로직에서 선택한 새 문서 파일을 FormData에 추가
+      const documentFile = document.querySelector('input[name="documentFile"]').files[0];
+      if (documentFile) {
+          formData.append('documentFile', documentFile);
+      }
+
+      try {
+        const response = await fetch('/product/temp-save', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          const result = await response.json();
+          if (result.error) {
+            alert(result.error);
+          } else {
+            alert('상품이 임시저장되었습니다.');
+            window.location.href = '/product/manage?status=임시저장';
+          }
+        }
+
+      } catch (error) {
+        console.error('임시저장 중 오류 발생:', error);
+        alert('임시저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+
+    // ⭐ 기존 수정 버튼 이벤트
+    if (updateBtn) {
+      updateBtn.addEventListener('click', function(event) {
+        // 폼의 기본 제출 동작을 따르므로, 별도 로직 없이 그대로 둡니다.
+        // 폼의 action="/product/edit/{id}"와 method="post"가 동작하게 됩니다.
+      });
+    }
 });

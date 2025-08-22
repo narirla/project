@@ -35,6 +35,9 @@ public class WebSecurityConfig {
                 "/", "/login/**",
                 "/members/join", "/members/join/**",
                 "/members/emailCheck", "/members/nicknameCheck",
+                "/find/**", "/css/**", "/js/**", "/img/**",
+                "/api/image-proxy", // 이미지 프록시 URL을 허용하도록 추가
+                "/api/food/**", // 혹시 몰라 food API도 추가
                 "/members/goodbye",
                 "/find/**",
                 "/cart/**",
@@ -72,7 +75,6 @@ public class WebSecurityConfig {
             // 7) 그 외는 기본 인증 필요
             .anyRequest().authenticated()
         )
-        .csrf(csrf -> csrf.disable())  // CSRF 비활성화 (테스트용)
         .exceptionHandling(ex -> ex
             .accessDeniedPage("/error/403")
         )

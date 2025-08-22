@@ -264,8 +264,8 @@ body {
   height: 36px;
   display: grid;
   place-items: center;
-  color: #666;
-  border: 1px solid var(--line);
+  color: #22C5CD;
+  border: 1px solid #22C5CD;
   border-radius: 10px;
   cursor: pointer;
 }
@@ -275,17 +275,17 @@ body {
   min-width: 0;        /* ✅ 줄어듦 대응 */
   height: 40px;
   padding: 0 12px;
-  border: 1px solid var(--line);
+  border: 1px solid #22C5CD;
   border-radius: 12px;
 }
 
 .send {
   width: 40px;
   height: 40px;
-  border: none;
+  border: 1px solid #22C5CD;   /* ✅ 테두리 컬러 */
   border-radius: 50%;
-  background: var(--me);
-  color: #fff;
+  background: #fff;            /* 흰 배경 */
+  color: #22C5CD;              /* 아이콘 컬러 */
   display: grid;
   place-items: center;
   cursor: pointer;

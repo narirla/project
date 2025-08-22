@@ -19,7 +19,7 @@
   <div class="page-container">
     <main class="mypage-container">
       <!-- 사이드 바 분리 -->
-      <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${activePath}, ${member})}"></aside>
+      <div th:replace="~{fragments/sellerSidebar :: sellerSidebar(activePath=${activePath})}"></div>
 
       <section class="content">
         <div class="product-registration">
@@ -216,7 +216,10 @@
                   </div>
                 </div>
                 <div class="form-group submit-btn">
-                  <button type="submit">수정</button>
+                  <button type="submit" id="updateBtn">수정</button>
+
+                  <button type="button" id="tempSaveBtn">임시저장</button>
+
                   <button type="button" onclick="history.back()">취소</button>
                 </div>
               </form>
@@ -231,6 +234,7 @@
 <script th:src="@{/js/product/product_update.js}"></script>
 <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
 <script th:src="@{/js/layout.js}"></script>
+<script th:src="@{/js/product/product_validation.js}"></script>
 </body>
 
 </html>
