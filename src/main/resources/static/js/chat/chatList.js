@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  //    const sellerId = document.body.dataset.sellerId; // body 태그에 sellerId를 주입해둔다
+  const sellerId = document.body.dataset.sellerId; // body 태그에 sellerId를 주입해둔다
   const listDiv = document.getElementById("inquiry-list"); // 채팅방 목록 출력 영역
 
   // ✅ 1. WebSocket 연결
@@ -9,26 +9,46 @@ document.addEventListener("DOMContentLoaded", () => {
   stompClient.connect({}, () => {
     console.log("✅ WebSocket 연결됨");
 
-    // ✅ 2. 판매자 전용 채널 구독
-    stompClient.subscribe(`/chat/rooms`, (message) => {
+    // ✅ 2. 판매자 전용 채널 구독 (새 메시지 도착 알림)
+    stompClient.subscribe(`/topic/chat/rooms/${sellerId}`, (message) => {
       const roomDto = JSON.parse(message.body);
-      console.log("📩 새 채팅방 알림:", roomDto);
-
-      // 알림이 오면 Ajax로 최신 목록 다시 가져오기
+      console.log("📩 알림:", roomDto);
       refreshRoomList();
     });
 
-    // 페이지 처음 열 때 목록 로딩
-    refreshRoomList();
+    // ✅ 3. 목록 초기 로딩 + 각 방별 읽음 이벤트 구독
+    refreshRoomList(() => {
+      // 목록 다 가져온 뒤 각 roomId별로 읽음 이벤트 구독
+      fetch(`/chat/rooms/api?sellerId=${sellerId}`)
+        .then(res => res.json())
+        .then(data => {
+          data.forEach(room => {
+            stompClient.subscribe(`/topic/chat/rooms/${room.roomId}/read`, (frame) => {
+              const readEvent = JSON.parse(frame.body);
+              console.log("👀 읽음 이벤트 수신:", readEvent);
+
+              // 해당 roomId DOM 찾아서 NEW 라벨 제거
+              const row = document.querySelector(
+                `.inquiry-row[data-room-id="${room.roomId}"]`
+              );
+              if (row) {
+                const newLabel = row.querySelector(".new-label");
+                if (newLabel) newLabel.remove();
+              }
+            });
+          });
+        });
+    });
   });
 
-  // ✅ 3. Ajax로 채팅방 목록 불러오기
-  function refreshRoomList() {
-    fetch(`/chat/rooms/api`)
+  // ✅ 4. Ajax로 채팅방 목록 불러오기
+  function refreshRoomList(callback) {
+    fetch(`/chat/rooms/api?sellerId=${sellerId}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("📋 현재 채팅방 목록:", data);
         renderRoomList(data);
+        if (callback) callback(); // 목록 로딩 후 콜백 실행
       })
       .catch((err) => {
         console.error("❌ 채팅방 목록 조회 실패", err);
@@ -36,9 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // ✅ 4. 화면에 목록 그려주기
+  // ✅ 5. 화면에 목록 그려주기
   function renderRoomList(data) {
-    const listDiv = document.getElementById("inquiry-list");
     listDiv.innerHTML = ""; // 기존 목록 지우기
 
     if (!data || data.length === 0) {
@@ -49,30 +68,28 @@ document.addEventListener("DOMContentLoaded", () => {
     data.forEach((room) => {
       const row = document.createElement("div");
       row.classList.add("inquiry-row");
+      row.dataset.roomId = room.roomId; // DOM에 roomId 저장
 
       row.innerHTML = `
-                <div class="inquiry-list-product_number">${room.roomId}</div>
-                <div class="inquiry-list-product_img">
-                  ${
-                    room.productImage
-                      ? `<img src="data:image/jpeg;base64,${room.productImage}" alt="썸네일" width="120"/>`
-                      : `<span>이미지 없음</span>`
-                  }
-                </div>
-                <div class="inquiry-list-product_title">${
-                  room.productTitle
-                }</div>
-                <div class="inquiry-list-msgs">
-                    <div class="inquiry-list-buyer_nickname">${
-                      room.buyerNickname
-                    }</div>
-                    <div class="inquiry-list-last_msg">${
-                      room.lastMessage ?? ""
-                    }</div>
-                </div>
-            `;
+        <div class="inquiry-list-product_number">${room.roomId}</div>
+        <div class="inquiry-list-product_img">
+          ${room.productImage
+            ? `<img src="data:image/jpeg;base64,${room.productImage}" alt="썸네일" width="120"/>`
+            : `<span>이미지 없음</span>`}
+        </div>
+        <div class="inquiry-list-product_title">${room.productTitle}</div>
+        <div class="inquiry-list-msgs">
+            <div class="inquiry-list-buyer_nickname">
+              ${room.buyerNickname}
+              ${room.hasNew ? `<span class="new-label">NEW</span>` : ""}
+            </div>
+            <div class="inquiry-list-last_msg">
+                ${room.lastMessage ?? ""}
+            </div>
+        </div>
+      `;
 
-      // ✅ 특정 요소에만 이벤트 부여
+      // ✅ 이벤트 바인딩
       const buyerEl = row.querySelector(".inquiry-list-buyer_nickname");
       const lastMsgEl = row.querySelector(".inquiry-list-last_msg");
 
@@ -90,32 +107,4 @@ document.addEventListener("DOMContentLoaded", () => {
       listDiv.appendChild(row);
     });
   }
-
-  //function renderRoomList(data) {
-  //    listDiv.innerHTML = ""; // 기존 목록 지우기
-  //    if (data.length === 0) {
-  //        listDiv.innerHTML = "<li>받은 문의가 없습니다.</li>";
-  //        return;
-  //    }
-  //
-  //    data.forEach(room => {
-  //        const li = document.createElement("li");
-  //  //          div.classList.add("room-item");
-  //        li.innerHTML = `
-  //            <b>상품ID:</b> ${room.productId}<br/>
-  //            <b>구매자:</b> ${room.buyerId}<br/>
-  //            <b>채팅방ID:</b> ${room.roomId}
-  //        `;
-  //        // 클릭하면 채팅창 팝업 띄우기
-  //        li.addEventListener("click", () => {
-  //            window.open(`/api/chat/popup?roomId=${room.roomId}`,
-  //                `chat_${room.roomId}`,
-  //                "width=400,height=600");
-  //        });
-  //        listDiv.appendChild(li);
-  //    });
-  //}
-
-  // 페이지 로스 시 Ajax 호출
-  //    refreshRoomList();
 });

@@ -33,6 +33,7 @@ spring:
 # 웹서버 포트
 server:
   port: 9070
+#  max-http-header-size: 32KB
 
 # 로그레벨
 # trace > debug > info > warn > error > fatal

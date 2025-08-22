@@ -25,7 +25,7 @@
   </head>
 
 
-  <body
+  <body id="whole_body"
     th:data-room-id="${roomId}"
     th:data-sender-id="${senderId}"
     th:data-partner="${partnerNickname}"
@@ -103,11 +103,11 @@
     <script th:src="@{/js/chat/popup.js}"></script>
 
     <!-- SockJS / STOMP -->
-    <script
-      th:src="@{https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js}"
-    ></script>
-    <script
-      th:src="@{https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js}"
-    ></script>
+<!--    <script-->
+<!--      th:src="@{https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js}"-->
+<!--    ></script>-->
+<!--    <script-->
+<!--      th:src="@{https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js}"-->
+<!--    ></script>-->
   </body>
 </html>

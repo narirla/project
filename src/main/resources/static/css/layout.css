@@ -9,9 +9,7 @@ html, body {
   padding: 0;
   font-family: 'Pretendard', sans-serif;
   background-color: #ffffff;
-}
-body {
-    /*padding-top: 167px;*/
+  margin:0;
 }
 
 .layout-wrapper {
@@ -354,7 +352,7 @@ footer {
   left: 50%;
   transform: translateX(-50%);
   width: 1013px;
-  height: 350px;
+  height: 360px;
   background: #fff;
   z-index: 2000;
   padding: 0 20px 0 167px;

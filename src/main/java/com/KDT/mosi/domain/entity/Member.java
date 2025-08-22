@@ -30,4 +30,5 @@ public class Member implements Serializable {
   private String zonecode;
   private String detailAddress;
   private String notification;   // 알림 설정 (Y: 수신, N: 수신 안 함)
+
 }

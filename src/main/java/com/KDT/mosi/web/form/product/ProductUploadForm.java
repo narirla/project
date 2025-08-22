@@ -121,4 +121,6 @@ public class ProductUploadForm {
 
     // 지도 코스포인트 리스트
     private List<ProductCoursePointForm> coursePoints;
+
+    private String sellerImage;
 }

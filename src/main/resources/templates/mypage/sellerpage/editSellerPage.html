@@ -18,7 +18,7 @@
     <div class="page-container">
       <main class="mypage-container">
         <!-- 사이드 바 분리 -->
-        <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${activePath}, ${member})}"></aside>
+        <div th:replace="~{fragments/sellerSidebar :: sellerSidebar(activePath=${activePath})}"></div>
 
         <section class="content">
 

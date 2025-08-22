@@ -60,7 +60,7 @@ public class ProductController {
 
   // ✅ 상품 목록 조회 (카테고리 및 키워드)
   @GetMapping("/list")
-  public String list(Model model,
+  public String list(Model model,HttpServletRequest request,
                      @RequestParam(name = "page", defaultValue = "1") int page,
                      @RequestParam(name = "size", defaultValue = "12") int size,
                      @RequestParam(name = "category", required = false) String category,
@@ -135,6 +135,10 @@ public class ProductController {
     if (startPage < 1) startPage = 1;
     if (endPage > totalPages) endPage = totalPages;
 
+
+      
+
+
     model.addAttribute("productList", productList);
     model.addAttribute("totalCount", totalCount);
     model.addAttribute("currentPage", page);
@@ -143,6 +147,8 @@ public class ProductController {
     model.addAttribute("keyword", keyword);
     model.addAttribute("startPage", startPage);
     model.addAttribute("endPage", endPage);
+    
+    model.addAttribute("activePath", request.getRequestURI());
 
     return "product/product_list";
   }
@@ -263,6 +269,8 @@ public class ProductController {
     model.addAttribute("startPage", startPage);
     model.addAttribute("endPage", endPage);
 
+    model.addAttribute("activePath", request.getRequestURI());
+
     log.info("nickname = {}", sellerPage);
 
     return "product/product_managing";
@@ -293,7 +301,8 @@ public class ProductController {
 
   // 상품 등록 페이지 호출
   @GetMapping("/upload")
-  public String uploadForm(Model model, HttpSession session, RedirectAttributes redirectAttrs) {
+  public String uploadForm(Model model, HttpSession session, RedirectAttributes redirectAttrs,
+                           HttpServletRequest request) {
 
     Member loginMember = (Member) session.getAttribute("loginMember");
 
@@ -320,6 +329,9 @@ public class ProductController {
     model.addAttribute("nickname", sellerPage.getNickname());
     model.addAttribute("sellerImage", base64SellerImage);
     model.addAttribute("productUploadForm", new ProductUploadForm());
+
+    model.addAttribute("activePath", request.getRequestURI());
+
     return "product/product_enroll";
   }
 
@@ -392,6 +404,7 @@ public class ProductController {
   @GetMapping("/edit/{id}")
   public String editForm(@PathVariable("id") Long id, Model model,
                          HttpSession session,
+                         HttpServletRequest request,
                          RedirectAttributes redirectAttrs) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
@@ -437,6 +450,9 @@ public class ProductController {
     model.addAttribute("productUploadForm", form);
     model.addAttribute("images", images);
     model.addAttribute("coursePoints", coursePoints);
+
+    model.addAttribute("activePath", request.getRequestURI());
+
     return "product/product_update";
   }
 
@@ -600,7 +616,8 @@ public class ProductController {
 
   // 상세페이지
   @GetMapping("/view/{id}")
-  public String view(@PathVariable("id") Long id, Model model, HttpSession session) {
+  public String view(@PathVariable("id") Long id, Model model, HttpSession session,
+                     HttpServletRequest request) {
 
     // 1) 로그인 회원 정보 조회
     Member loginMember = (Member) session.getAttribute("loginMember");
@@ -651,6 +668,11 @@ public class ProductController {
 
     // 6) model에 DTO 등록
     model.addAttribute("productDetailForm", productDetailForm);
+    model.addAttribute("buyerId", buyerId);
+    model.addAttribute("sellerId", sellerId);
+
+    model.addAttribute("activePath", request.getRequestURI());
+
     log.info("nickname = {}", sellerPage.getNickname());
 
     return "product/product_detail";

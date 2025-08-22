@@ -1,5 +1,5 @@
 <!-- templates/fragments/sellerSidebar.html -->
-<aside th:fragment="sellerSidebar(activePath, sp)"
+<aside th:fragment="sellerSidebar(activePath)"
        xmlns:th="http://www.thymeleaf.org"
        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
        th:if="${session.loginRole == 'SELLER'}"
@@ -7,29 +7,28 @@
 
   <div class="sidebar-card">
     <div class="profile-box">
+      <!-- 판매자 사이드바 프로필 -->
       <div class="profile-image">
-        <!-- ✅ 타입 가드 후 프로퍼티 접근 -->
-        <img th:if="${sp instanceof T(com.KDT.mosi.domain.entity.SellerPage) and sp.image != null}"
-             th:src="@{/mypage/seller/images/profile/{id}(id=${sp.pageId})}"
-             alt="프로필 이미지">
+        <img th:if="${sidebarImage != null}"
+             th:src="${sidebarImage}"
+             alt="판매자 프로필 이미지">
 
-        <img th:unless="${sp instanceof T(com.KDT.mosi.domain.entity.SellerPage) and sp.image != null}"
+        <img th:unless="${sidebarImage != null}"
              th:src="@{/img/default-profile.png}"
              alt="기본 프로필 이미지">
       </div>
-
       <div class="profile-info">
         <a href="#" class="profile-badge">프로가이드 ></a>
 
-        <!-- ✅ 닉네임도 타입 가드 포함 -->
+        <!-- 닉네임 -->
         <div class="profile-name"
-             th:text="${sp instanceof T(com.KDT.mosi.domain.entity.SellerPage) and sp.nickname != null
-                        ? sp.nickname
+             th:text="${sellerSidebar != null and sellerSidebar.nickname != null
+                        ? sellerSidebar.nickname
                         : (session.loginMember != null ? session.loginMember.nickname : '닉네임')}">
           닉네임
         </div>
 
-        <!-- 역할 전환: POST + CSRF -->
+        <!-- 역할 전환 -->
         <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top:10px;" sec:authorize="isAuthenticated()">
           <input type="hidden" sec:csrf/>
           <button type="submit" class="btn-role-switch">구매자 전환</button>
@@ -42,8 +41,18 @@
       <ul>
         <li><a href="#">상품</a>
           <ul>
-            <li><a th:href="@{/product/manage}">내 상품 목록</a></li>
-            <li><a th:href="@{/product/upload}">상품 등록</a></li>
+            <li>
+              <a th:href="@{/product/manage}"
+                 th:classappend="${activePath != null and #strings.startsWith(activePath, '/product/manage')} ? ' is-active'">
+                내 상품 목록
+              </a>
+            </li>
+            <li>
+              <a th:href="@{/product/upload}"
+                 th:classappend="${activePath != null and #strings.startsWith(activePath, '/product/upload')} ? ' is-active'">
+                상품 등록
+              </a>
+            </li>
           </ul>
         </li>
         <li><a href="#">판매 현황</a>
