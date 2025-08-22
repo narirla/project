@@ -623,7 +623,8 @@ public class ProductController {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
       // 필요 시 로그인 페이지로 리다이렉트 또는 예외 처리
-      throw new IllegalStateException("로그인한 회원이 아닙니다.");
+//      throw new IllegalStateException("로그인한 회원이 아닙니다.");
+      return "redirect:/login";
     }
     Long memberId = loginMember.getMemberId();
 
