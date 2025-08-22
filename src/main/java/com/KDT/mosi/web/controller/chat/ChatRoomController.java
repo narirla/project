@@ -20,7 +20,7 @@ import java.util.Map;
 public class ChatRoomController {
   private final ChatRoomService service;
 
-  /** 기존에 방 있는지 조회 */
+  /** 방보장 : 기존에 방 있는지 조회 */
   @PostMapping("/ensure")
   public Map<String, Object> ensure(@RequestBody ChatRoomReqDto chatRoomReq) {
     log.info("chatRoomReq={}", chatRoomReq);

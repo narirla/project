@@ -23,6 +23,7 @@ public class ChatRoomListDto {
   private byte[] productImage;
   private String lastMessage;
 
-
+  // 🔔 새 메시지 여부
+  private boolean hasNew;
 }
 
