@@ -6,6 +6,7 @@ import com.KDT.mosi.domain.product.document.ProductDocument;
 import com.KDT.mosi.domain.product.dto.response.ProductSearchResponse;
 import com.KDT.mosi.domain.product.svc.*;
 import com.KDT.mosi.web.form.product.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -27,7 +27,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -52,10 +51,10 @@ public class ProductController {
   public String searchProducts(@RequestParam(name="keyword", required = false) String keyword,
                                @RequestParam(name = "page", defaultValue = "1") int page,
                                @RequestParam(name = "size", defaultValue = "12") int size,
-                               Model model) throws IOException {
+                               Model model,HttpServletRequest request) throws IOException {
 
     // 검색 로직을 performSearch 메서드에 통합
-    return performSearch(keyword, null, page, size, model);
+    return performSearch(keyword, null, page, size, model,request);
   }
 
   // ✅ 상품 목록 조회 (카테고리 및 키워드)
@@ -67,11 +66,13 @@ public class ProductController {
                      @RequestParam(name = "keyword", required = false) String keyword) throws IOException {
 
     log.info("Product list/search request. Category: {}, Keyword: {}, Page: {}", category, keyword, page);
-    return performSearch(keyword, category, page, size, model);
+    return performSearch(keyword, category, page, size, model,request);
   }
 
   // ✅ 검색 및 목록 조회 로직을 통합한 헬퍼 메서드
-  private String performSearch(String keyword, String category, int page, int size, Model model) throws IOException {
+  private String performSearch(String keyword, String category, int page, int size, Model model,
+                               HttpServletRequest request
+                               ) throws IOException {
     List<ProductListForm> productList = new ArrayList<>();
     long totalCount;
 
@@ -136,9 +137,6 @@ public class ProductController {
     if (endPage > totalPages) endPage = totalPages;
 
 
-      
-
-
     model.addAttribute("productList", productList);
     model.addAttribute("totalCount", totalCount);
     model.addAttribute("currentPage", page);
@@ -147,7 +145,7 @@ public class ProductController {
     model.addAttribute("keyword", keyword);
     model.addAttribute("startPage", startPage);
     model.addAttribute("endPage", endPage);
-    
+
     model.addAttribute("activePath", request.getRequestURI());
 
     return "product/product_list";
@@ -626,7 +624,7 @@ public class ProductController {
 //      throw new IllegalStateException("로그인한 회원이 아닙니다.");
       return "redirect:/login";
     }
-    Long memberId = loginMember.getMemberId();
+    Long buyerId = loginMember.getMemberId();
 
     // 2) 상품 조회, 없으면 예외 처리
     Product product = productSVC.getProduct(id)
@@ -637,11 +635,14 @@ public class ProductController {
     List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
 
     // 4) 판매자 페이지 정보 조회
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(buyerId);
     if (optional.isEmpty()) {
       return "redirect:/mypage/seller/create";
     }
     SellerPage sellerPage = optional.get();
+
+    // 판매자 id 세팅
+    Long sellerId = product.getMember().getMemberId();
 
     // 5) DTO에 데이터 세팅
     product.setMember(loginMember);
@@ -664,7 +665,7 @@ public class ProductController {
     }
 
     // 판매자 상품 수
-    productDetailForm.setCountProduct(productSVC.countByMemberId(memberId));
+    productDetailForm.setCountProduct(productSVC.countByMemberId(sellerId));
 
     // 6) model에 DTO 등록
     model.addAttribute("productDetailForm", productDetailForm);

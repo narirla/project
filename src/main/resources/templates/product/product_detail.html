@@ -106,7 +106,7 @@
           <div class="slider-container">
             <button id="prevBtn" class="prev-button" aria-label="이전 슬라이드">❰</button>
             <div class="slider-wrapper">
-              <div class="slider">
+              <div class="image-slider">
                 <div class="slide" th:each="img, iterStat : ${productDetailForm.product.productImages}"
                   th:classappend="${iterStat.index == 0} ? 'active' : ''">
                   <img th:if="${img != null and img.base64ImageData != null}" th:src="${img.base64ImageData}"
@@ -140,7 +140,10 @@
                       <img src="https://via.placeholder.com/40" alt="user" class="profile-img"
                         onerror="this.onerror=null; this.src='/img/default-profile.png';">
                       <div>
-                        <div class="stars">⭐ 5.0</div>
+                        <div class="stars">
+                          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                          5.0
+                        </div>
                         <strong>류**</strong>
                       </div>
                     </div>
@@ -153,7 +156,10 @@
                       <img src="https://via.placeholder.com/40" alt="user" class="profile-img"
                         onerror="this.onerror=null; this.src='/img/default-profile.png';">
                       <div>
-                        <div class="stars">⭐ 5.0</div>
+                        <div class="stars">
+                          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                          5.0
+                        </div>
                         <strong>김**</strong>
                       </div>
                     </div>
@@ -167,12 +173,14 @@
             </div>
           </div>
           <!-- 탭 메뉴 -->
-          <div class="tab-menu">
-            <a href="#basic-info">기본 정보</a>
-            <a href="#detail-info">상세 정보</a>
-            <a href="#price-info">가격 정보</a>
-            <a href="#guide-info">가이드 정보</a>
-            <a href="#review">리뷰</a>
+          <div class="tab-wrapper">
+            <div class="tab-menu">
+              <a href="#basic-info">기본 정보</a>
+              <a href="#detail-info">상세 정보</a>
+              <a href="#price-info">가격 정보</a>
+              <a href="#guide-info">가이드 정보</a>
+              <a href="#review">리뷰</a>
+            </div>
           </div>
           <!-- 섹션들 -->
           <div id="basic-info">

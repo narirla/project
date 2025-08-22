@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import co.elastic.clients.elasticsearch.core.search.Suggestion;
-import co.elastic.clients.elasticsearch.core.search.TermSuggestOption;
 
 @Slf4j
 @Service
@@ -175,51 +173,33 @@ public class ProductSearchService {
    * @param keyword 검색어
    * @return 제안 검색어 목록
    */
-  public List<String> suggestSearchTerms(String keyword) {
-    if (keyword == null || keyword.trim().isEmpty()) {
-      return Collections.emptyList();
-    }
 
-    try {
-      // ElasticsearchClient를 직접 사용한 suggestion 요청
-      co.elastic.clients.elasticsearch.core.SearchRequest searchRequest =
-          co.elastic.clients.elasticsearch.core.SearchRequest.of(s -> s
-              .index("products")
-              .suggest(suggest -> suggest
-                  .text(keyword)
-                  .suggesters("title-suggester", suggester -> suggester
-                      .term(term -> term
-                          .field("title.keyword")
-                          .size(5)
-                          .minWordLength(2)
-                          .maxEdits(2)
-                      )
-                  )
-              )
-              .size(0) // 검색 결과는 필요 없고 suggestion만 필요
-          );
+ public List<String> suggestSearchTerms(String keyword) {
+//    if (keyword == null || keyword.trim().isEmpty()) {
+//      return Collections.emptyList();
+//    }
+//
+//    // 1. Suggest 요청을 위한 Query 생성
+//    Query query = Query.findAll()
+//        .withSuggester(Suggester.term("title-suggester", keyword)
+//            .field("title")
+//            .size(5)); // 최대 5개 추천
+//
+//    // 2. Elasticsearch에 Suggestion 요청을 보냅니다.
+//    SearchHits<?> searchHits = elasticsearchOperations.search(query, ProductDocument.class, IndexCoordinates.of("products"));
+//
+    List<String> suggestions = new ArrayList<>();
+//
+//    // 3. SearchHits에서 Suggestion 결과를 추출합니다. (Elasticsearch 8.x+용 수정)
+//    if (searchHits.hasSuggest()) {
+//      List<Suggestion<TermSuggestOption>> termSuggestions = searchHits.getSuggest().getSuggestions("title-suggester");
+//      if (termSuggestions != null && !termSuggestions.isEmpty()) {
+//        suggestions = termSuggestions.get(0).getOptions().stream()
+//            .map(TermSuggestOption::getText)
+//            .collect(Collectors.toList());
+//      }
+//    }
+    return suggestions;
+ }
 
-      co.elastic.clients.elasticsearch.core.SearchResponse<ProductDocument> response =
-          esClient.search(searchRequest, ProductDocument.class);
-
-      List<String> suggestions = new ArrayList<>();
-
-      if (response.suggest() != null && response.suggest().get("title-suggester") != null) {
-        response.suggest().get("title-suggester").forEach(suggestion -> {
-          suggestion.term().options().forEach(option -> {
-            suggestions.add(option.text());
-          });
-        });
-      }
-
-      return suggestions.stream()
-          .distinct()
-          .limit(5)
-          .collect(Collectors.toList());
-
-    } catch (Exception e) {
-      log.warn("Suggestion failed, returning empty list: {}", e.getMessage());
-      return Collections.emptyList();
-    }
-  }
 }
