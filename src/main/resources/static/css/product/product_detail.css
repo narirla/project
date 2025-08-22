@@ -200,12 +200,13 @@ h3{
 
 /* 슬라이드 여러 장을 나란히 두지 않고, 단일 슬라이드 표시용 */
 /* display: flex 및 transform 관련 스타일 제거 */
-.slider {
+.image-slider {
   /* 슬라이드 개별 처리를 하므로 flex 불필요 */
   /* height 고정 */
   width: 100%;
   height: 100%;
   /* transition 제거 (필요 시 JS에서 처리 가능) */
+  background-color: #fff !important;
 }
 
 /* 슬라이드 하나하나 스타일 */
@@ -278,6 +279,7 @@ h3{
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 30px;
+  margin-left: 30px;
   color: #414141;
 }
 
@@ -287,7 +289,6 @@ h3{
   border-radius: 10px;
   margin: 0 10px;
   padding: 10px 15px;
-  border: 1px solid red;
   background-color: rgba(128, 204, 214, 0.1);
 
 }
@@ -295,16 +296,9 @@ h3{
   width: 100%;
 }
 
-/*.swiper.review-swiper{
-  width: 430px;
-  height: 130px;
-}*/
-
 .swiper.review-swiper .swiper-wrapper {
     width: 430px;
     height: 130px;
-    /*margin: 0 auto;*/
-    /*border: 1px solid red;*/
 }
 
 .product-recent-reviews .swiper.review-swiper .review-header{
@@ -351,13 +345,17 @@ h3{
 }
 
 /* ------ 탭 메뉴 ----- */
+.tab-wrapper {
+  position: relative;  /* ✅ sticky 정상 작동을 위한 부모 */
+}
+
 .tab-menu{
     display: flex;
-    gap: 20px;
+    gap: 30px;
     padding-top: 10px;
     position: sticky;
     top: 160px;
-    border-bottom: 2px solid #BFBFBF;
+    border-bottom: 1px solid #BFBFBF;
     color: #BFBFBF;
     background: white;
     font-size: 22px;
@@ -373,7 +371,8 @@ h3{
 .tab-menu a.active {
   color: #6B6B6B;            /* 선택된 탭 색상 예시 (파란색) */
   border-bottom: 3px solid #6B6B6B;  /* 선택된 탭 밑 줄 */
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 22px;
 }
 
 /* ------ 정보란 공통 ----- */
@@ -381,7 +380,7 @@ h3{
 #price-info, #guide-info,
 #cancel-policy, #update-policy,
 #review {
-    margin-top: 50px;
+    margin-top: 40px;
     background-color: #FFF;
 }
 
@@ -390,6 +389,12 @@ h3{
     width:100%;
     text-align: left;
     padding: 0 30px;
+}
+
+#basic-info > h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
 }
 
 .price-info-container{
@@ -405,12 +410,13 @@ h3{
 /* ------ 기본 정보 ----- */
 .summary-box{
     height: 190px;
+    width: 763px;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     background: #F8F8F8;
     color: #414141;
-    padding: 15px;
+    padding: 20px 30px;
     border-radius: 10px;
 }
 .summary-box div {
@@ -418,6 +424,15 @@ h3{
     margin-top: 2px;
     margin-bottom: 2px;
     font-size: 15px;
+}
+
+/*------ 기본정보 --------*/
+.product-content.basic-description{
+  margin-top: 50px;
+  width: 670px;
+  height: auto;
+  min-height: 200px;
+  padding: 0 50px;
 }
 /*style="flex: 1 1 45%; margin: 5px 0;"*/
 /* ------ 상세 정보 ----- */

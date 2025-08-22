@@ -72,7 +72,9 @@ public class ProductController {
   // ✅ 검색 및 목록 조회 로직을 통합한 헬퍼 메서드
   private String performSearch(String keyword, String category, int page, int size, Model model,
                                HttpServletRequest request
-  ) throws IOException {
+
+                               ) throws IOException {
+
     List<ProductListForm> productList = new ArrayList<>();
     long totalCount;
 
