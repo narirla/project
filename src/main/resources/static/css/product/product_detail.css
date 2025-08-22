@@ -26,6 +26,12 @@ body {
     line-height: 1.6;
 }
 
+.layout-wrapper {
+  width: 1200px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
 /* --------------------- */
 /* ----- 다운로드 스타일 ----- */
 /* --------------------- */
@@ -165,7 +171,8 @@ h3{
 .product-body {
     display: flex;
     width: 1200px;
-    padding-top: 30px;
+    padding: 30px 20px 0px 20px;
+
 }
 /* ------ 왼쪽 (이미지, 리뷰, 상품탭 등) ----- */
 .product-body-left{
@@ -251,27 +258,53 @@ h3{
 }
 
 .prev-button {
-  left: 5px;
+  left: 0px;
 }
 
 .next-button {
-  right: 5px;
+  right: 0px;
 }
 
 /* ------ 최근 리뷰 ----- */
 .product-recent-reviews{
     display: flex;
     flex-direction: column;
-    background-color: #80CCD60D;
+    /*background-color: #80CCD60D;*/
+    margin-top: 10px;
+    margin-bottom: 85px;
 }
 
-.product-recent-reviews .swiper.review-swiper {
-    width: 100%;
+#recently-review{
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #414141;
 }
+
+.swiper-slide{
+  width: 430px;
+  height: 130px;
+  border-radius: 10px;
+  margin: 0 10px;
+  padding: 10px 15px;
+  border: 1px solid red;
+  background-color: rgba(128, 204, 214, 0.1);
+
+}
+.product-recent-reviews .swiper.review-swiper {
+  width: 100%;
+}
+
+/*.swiper.review-swiper{
+  width: 430px;
+  height: 130px;
+}*/
 
 .swiper.review-swiper .swiper-wrapper {
-    width: 85%;
-    margin: 0 auto;
+    width: 430px;
+    height: 130px;
+    /*margin: 0 auto;*/
+    /*border: 1px solid red;*/
 }
 
 .product-recent-reviews .swiper.review-swiper .review-header{
@@ -286,15 +319,13 @@ h3{
     margin-right: 10px;
 }
 
-#recently-review{
-    color: #414141;
-}
 #recently-review .see-all {
     display: inline-block;
     position: relative;
     left: 70%;
     color: #141414;
     font-size: 16px;
+    font-weight: 400;
     line-height: 24px;
 }
 .review-button {

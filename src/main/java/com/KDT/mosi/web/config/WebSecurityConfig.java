@@ -75,7 +75,6 @@ public class WebSecurityConfig {
             // 7) 그 외는 기본 인증 필요
             .anyRequest().authenticated()
         )
-        .csrf(csrf -> csrf.disable())  // CSRF 비활성화 (테스트용)
         .exceptionHandling(ex -> ex
             .accessDeniedPage("/error/403")
         )

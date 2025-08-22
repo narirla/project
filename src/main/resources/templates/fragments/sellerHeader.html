@@ -74,12 +74,27 @@
           <div class="dropdown-section">
             <h4>테마여행</h4>
             <ul>
-              <li><a th:href="@{/product/list}">지역</a></li>
-              <li><a href="#">반려동물</a></li>
-              <li><a href="#">맛집</a></li>
-              <li><a href="#">문화/역사</a></li>
-              <li><a href="#">계절/자연</a></li>
-              <li><a href="#">실버/교통약자</a></li>
+              <li th:classappend="${selectedCategory} == 'all' ? 'active'">
+                <a th:href="@{/product/list(category='all')}">전체</a>
+              </li>
+              <li th:classappend="${selectedCategory} == 'area' ? 'active'">
+                <a th:href="@{/product/list(category='area')}">지역</a>
+              </li>
+              <li th:classappend="${selectedCategory} == 'pet' ? 'active'">
+                <a th:href="@{/product/list(category='pet')}">반려동물</a>
+              </li>
+              <li th:classappend="${selectedCategory} == 'restaurant' ? 'active'">
+                <a th:href="@{/product/list(category='restaurant')}">맛집</a>
+              </li>
+              <li th:classappend="${selectedCategory} == 'culture_history' ? 'active'">
+                <a th:href="@{/product/list(category='culture_history')}">문화/역사</a>
+              </li>
+              <li th:classappend="${selectedCategory} == 'season_nature' ? 'active'">
+                <a th:href="@{/product/list(category='season_nature')}">계절/자연</a>
+              </li>
+              <li th:classappend="${selectedCategory} == 'silver_disables' ? 'active'">
+                <a th:href="@{/product/list(category='silver_disables')}">실버/교통약자</a>
+              </li>
             </ul>
           </div>
           <!-- 커뮤니티 -->

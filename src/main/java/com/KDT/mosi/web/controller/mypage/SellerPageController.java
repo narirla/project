@@ -238,9 +238,6 @@ public class SellerPageController {
     return "mypage/sellerpage/editSellerPage";
   }
 
-
-
-
   /**
    * ✅ 판매자 마이페이지 수정 처리 (Form 객체 기반)
    */
