@@ -20,7 +20,7 @@
       <main class="mypage-container">
         <!-- ✅ 좌측 사이드바 -->
         <!-- 사이드 바 분리 -->
-        <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${activePath}, ${sellerPage})}"></aside>
+        <div th:replace="~{fragments/sellerSidebar :: sellerSidebar(activePath=${activePath})}"></div>
 
         <!-- ✅ 우측 본문 -->
         <section class="content">

@@ -34,7 +34,7 @@ a {
   align-items: flex-start;
   max-width: 1200px;
   margin: 40px 20px;
-  min-height: 950px;
+  min-height: 2200px;
 }
 
 .breadcrumb {
@@ -44,6 +44,8 @@ a {
 .breadcrumb span {
   font-size: 18px;
   font-weight: 400;
+  color: #6b6b6b;
+  margin-left: 5px;
 }
 
 /* 카테고리명 */
@@ -74,16 +76,16 @@ a {
 
 /* 사이드 안내 박스 (상단에 딱 붙임) */
 .guide-box {
-  background: #e6fcfa;
-  border-radius: 7px;
+  background: rgba(249, 248, 113, 0.22);
+  border-radius: 10px;
   color: #09d0c0;
   font-size: 13px;
   font-weight: 600;
-  padding: 10px 10px 10px 10px;
-  border-left: 3px solid #13b4b1;
-  margin-top: 0;                    /* 여기! 꼭 0 또는 최소값으로! */
+  padding: 0 10px;
+  border: 2px solid rgba(249, 248, 113, 0.5);
+  margin-top: 7px;                    /* 여기! 꼭 0 또는 최소값으로! */
   margin-bottom: 16px;              /* 카테고리 메뉴와 간격만 */
-  width: 220px;
+  width: 216px;
   height: 88px;
   display: flex;
   align-items: center;
@@ -105,12 +107,16 @@ a {
   display: flex;
   justify-content: flex-start;
   color: #414141;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .guide-box ul .right-sort {
   display: flex;
   justify-content: flex-end;
   color: #0099AD;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 /* 인기 키워드 */
@@ -122,6 +128,7 @@ a {
   justify-content: space-evenly;
   background-color: #F9F9F9;
   margin: 0 auto;
+  margin-bottom: 30px;
   border-radius: 10px;
 }
 
@@ -157,9 +164,11 @@ a {
   flex-direction: row;
   width: 195px;
   height: 88px;
+  background-color: #fff;
   border: 1px solid #09D0C0;
   border-radius: 10px;
   gap: 10px;
+  padding: auto;
 }
 
 .keyword-content {
@@ -167,7 +176,7 @@ a {
   justify-content: center;
   align-items: center;
   width: 60px;
-  height: 60px;
+  height: 88px;
 
 }
 
@@ -175,16 +184,19 @@ a {
   display: flex;
   width: 60px;
   height: 60px;
-  margin: 5px 5px;
-  align-items: center;
+  object-fit: contain;
+  margin-left: 20px;
 }
 
 .keyword-label {
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
+  font-size: 18px;
+  font-weight: 400;
   width: 150px;
   height: 90px;
+  margin-left: 12px;
 }
 
 /* 카테고리 메뉴 */
@@ -192,7 +204,7 @@ a {
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: 0;
+  /* margin-left: 19px; */
 }
 
 .menu-frame ul {
@@ -204,27 +216,34 @@ a {
 }
 
 .menu-frame li {
+  display: flex;
   border: none;
-  margin: 0;
+  margin-left: 18px;
   padding: 0;
+  width: 200px;
+  height: 50px;
+  align-items: center;
+  justify-content: start;
 }
 
 .menu-frame a {
-  display: block;
+  display: flex;              /* ✅ 수직 정렬을 위해 flex 사용 */
+  align-items: center;        /* ✅ 세로 가운데 정렬 */
+  width: 200px;
+  height: 50px;
+  padding-left: 19px;         /* 좌측 여백만 유지 */
   color: #414141;
   font-size: 16px;
   font-weight: 700;
-  padding-top: 10px;
-  padding-bottom: 10px;
   transition: background 0.13s, color 0.13s;
 }
 
 .menu-frame a.active,
 .menu-frame a:hover {
-  background: #eafcfb;
-  color: #09d0c0;
-  font-weight: 700;
+  background: #E3E3E3;
+  color: #414141;
 }
+
 
 /* 본문 컨텐츠 영역*/
 .content-wrapper {
@@ -235,7 +254,7 @@ a {
 
 /*** 카테고리 선택 영역 ***/
 .filter-form {
-  background: #f6fafd;
+  background: #fff;
   border-radius: 13px;
   padding: 18px 28px 16px;
   display: flex;
@@ -258,16 +277,29 @@ a {
 }
 
 .filter-select {
-  border: 1.2px solid #09D0C0;
+  border: 1px solid #D9D9D9;
   border-radius: 7px;
   outline: none;
   padding: 7px 15px;
   background: #fff;
-  color: #313b49;
+  color: rgba(113, 113, 113, 0.65);
   font-size: 15px;
   font-weight: 500;
   transition: border-color 0.18s;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* 화살표 아이콘을 오른쪽에 배치 */
+  background-image: url("/img/right-arrow.png");
+  background-repeat: no-repeat;
+  background-position: right 12px center;  /* ✅ 오른쪽 정렬 */
+  background-size: 16px 16px;
+
+  padding-right: 36px; /* 텍스트와 아이콘이 겹치지 않게 여백 */
 }
+
 
 .filter-item.filter-search button {
   width: 100%;
@@ -278,13 +310,30 @@ a {
 }
 
 .keyword-input {
-  border: 1px solid #e7e7ea;
+  border: 1px solid #d9d9d9;
   border-radius: 7px;
   padding: 7px 15px;
   font-size: 15px;
-  min-width: 230px;
+  min-width: 290px;
+  height: 18px;
   margin-right: 8px;
+  margin-top: 3px;
+  color: #414141;
 }
+
+.keyword-input:focus {
+  border-color: #41cccf;     /* 클릭 시 테두리 색상 */
+  outline: none;             /* 브라우저 기본 파란 테두리 제거 */
+  /*box-shadow: 0 0 4px #41cccf;*/ /* 선택 효과 강조 (선택 사항) */
+}
+
+.keyword-input::placeholder {
+  color: #d9d9d9;         /* 글자색 */
+  font-size: 14px;     /* 폰트 크기 */
+  font-weight: 500;
+  opacity: 1;          /* 투명도 (기본은 브라우저마다 다름) */
+}
+
 
 .formButton-container {
   display: flex;
@@ -295,13 +344,14 @@ a {
 }
 
 .filter-example {
-  color: #b7b7c0;
+  color: rgba(113, 113, 113, 0.75);
   font-size: 13px;
+  font-weight: 600;
   font-family: 'Inter', sans-serif;
 }
 
 .btn-search {
-  background: #09D0C0;
+  background: linear-gradient(to right, #56DDF8 0%, #09D0C0 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -312,7 +362,8 @@ a {
 }
 
 .btn-search:hover {
-  background: #13a79f;
+  /* background: #09D0C0; */
+  background: linear-gradient(to right, #09D0C0 0%, #56DDF8 100%);
 }
 
 /* service-controls 컨테이너의 기본 스타일 */
@@ -608,6 +659,7 @@ input[type="radio"]:checked+.radio-img {
 /* 공지사항 */
 .notice-bar {
   width: 1152px;
+  margin: 0 auto;
 }
 
 /* .notice-frame {
