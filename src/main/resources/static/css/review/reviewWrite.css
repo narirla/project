@@ -1,0 +1,297 @@
+/* 한 줄 + 픽셀 고정 + 가로 크롭 + 5점 오버슈트 히트존 */
+.rating-precise{
+  /* 별 5개 이미지의 실제 픽셀 크기 */
+  --w: 165px;
+  --h: 33px;
+  --img-empty: url("/img/review/write/small-line.png");
+  --img-fill:  url("/img/review/write/small-fill.png");
+
+  /* 바깥을 눌러도 5점 처리할 오버슈트 폭 */
+  --overshoot: 24px; /* 필요시 조절 */
+
+  display: inline-flex;
+  align-items: center;
+
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  inline-size: max-content;
+}
+
+.rating-precise .stars-wrap{
+  display: inline-block;
+  line-height: 0;
+  flex: 0 0 auto;
+  margin-right: 24px;
+}
+
+.rating-precise .stars{
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  background-image: var(--img-empty);
+  background-repeat: no-repeat;
+  background-size: var(--w) var(--h);  /* 픽셀 고정 */
+  background-position: left top;
+  cursor: pointer;
+  overflow: visible;                   /* 히트존이 바깥으로 나가도 이벤트 받게 */
+}
+
+/* 채운 별(왼쪽에서 가로로 '잘라' 덮기) */
+.rating-precise .stars::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: var(--fill, 0%);             /* 0~100% */
+  overflow: hidden;
+  background-image: var(--img-fill);
+  background-repeat: no-repeat;
+  background-size: var(--w) var(--h); /* 픽셀 고정 */
+  background-position: left top;
+  pointer-events: none;
+}
+
+/* ★ 5점 오버슈트: 보이지 않는 클릭/호버 영역 (요소 오른쪽 바깥) */
+.rating-precise .stars::after{
+  content: "";
+  position: absolute;
+  left: 100%;                         /* 요소 오른쪽에 붙여서 */
+  top: 0;
+  width: var(--overshoot);
+  height: 100%;
+  pointer-events: auto;               /* 이벤트 받기 */
+  background: transparent;            /* 보이지 않게 */
+  cursor: pointer;
+}
+
+/* 점수 출력 (선택) */
+#scoreText, .rating-precise output{
+  min-width:3ch;
+  font-variant-numeric:tabular-nums;
+}
+
+
+
+/* 컨테이너: 좌측 라벨, 우측 태그영역 */
+.review-tags{
+  margin-top:19px;
+  padding-left: 85px;
+  display:grid;
+  grid-template-columns:max-content 1fr; /* 왼쪽 라벨, 오른쪽 리스트 */
+  row-gap:6px;
+  align-items:start;
+}
+
+.review-tags .subtitle{
+  width: 37px;
+  height: 24px;
+  font-size: 20px;
+  font-weight: 500;
+  margin:0;
+  margin-right: 41px;
+  padding-top:2px;
+}
+
+/* 리스트: 3열 고정 */
+.review-tags .tag-list{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 항상 한 줄에 3개 */
+}
+.review-tags .tag-list button {
+  margin-bottom: 11px;
+}
+
+/* 태그: 글자만큼 너비, 셀 안에서 늘어나지 않게 */
+.review-tags .tag{
+  justify-self: start;           /* 칸을 꽉 채우지 않음 */
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 1px 5px 1px 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;            /* 각 5px */
+  background: transparent;       /* 기본 배경 없음 */
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 330;
+  white-space: nowrap;
+  width: max-content;            /* 글자 길이에 맞춘 박스 */
+}
+
+
+/* 선택 상태 */
+.review-tags .tag.selected{
+  background:none;
+  border-color:#80CCD6;
+  color:#1EC4CC;
+}
+
+/* 선택 순서 뱃지(있다면 유지) */
+#reviewTags .tag.selected::before {
+  content: attr(data-order);
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff9800;
+  color: #fff;
+  font-size: 12px;
+  border-radius: 50%;
+}
+#reviewTags .tag {
+  position: relative; /* ::before의 기준 */
+}
+
+
+
+
+.content h1 {
+  font-size:24px;
+  padding-bottom:16px;
+  border-bottom: 1px solid #1EC4CC;
+  margin-bottom: 36px;
+}
+.content .summary {
+  display:flex;
+  padding-left: 44px;
+  padding-bottom: 36px;
+  border-bottom:1px solid #BFBFBF;
+  margin-bottom: 19px;
+}
+.summary .image{
+  width: 147px;
+  height: 147px;
+}
+.summary .image img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;     /* 비율 유지, 크롭 없음 */
+  object-position: center; /* 중앙 정렬 */
+  display: block;
+}
+
+.content .summary .info{
+  padding-top: 25px;
+  padding-left: 34px;
+}
+.content .summary .product-title {
+  font-size: 24px;
+  font-weight: 500;
+  padding-bottom: 10px;
+}
+.content .summary .option {
+  padding-bottom: 10px;
+}
+.content .summary .option .label {
+  font-size: 14px;
+  border:1px solid #6B6B6B;
+  background: #fff;
+  border-radius: 5px;
+  padding:1px 5px 1px 5px;
+}
+.content .summary .option .value {
+  font-size: 16px;
+  color: #717171;
+  padding-left:5px;
+}
+
+.content .summary .meta{
+  display:flex;
+  font-size: 16px;
+
+}
+
+.content .summary .meta span{
+  margin-left: 8px;
+}
+
+
+.rating-precise {
+  padding-left: 85px;
+
+}
+
+.rating-precise .star-title {
+  width: 37px;
+  height: 24px;
+  font-size: 20px;
+  font-weight: 500;
+  margin-right: 41px;
+}
+
+
+.review-tags {
+  border-top: 1px solid #BFBFBF;
+  padding-top:19px;
+  border-bottom: 1px solid #BFBFBF;
+  padding-bottom: 23px;
+  margin-bottom: 30px;
+}
+
+
+
+.review-content {
+  display: flex;
+  align-items: flex-start;
+  padding-left: 43px;
+  padding-bottom: 23px;
+  border-bottom: 1px solid #BFBFBF;
+  margin-bottom: 36px;
+}
+
+.review-content label{
+  height: 24px;
+  font-size: 20px;
+  font-weight: 500;
+  margin-right:36px;
+  padding-top:2px;
+}
+
+#content {
+  font-family: 'Roboto', sans-serif;
+  width: 770px;
+  resize: none;   /* 사용자가 드래그로 크기 조정 못 하게 */
+  overflow: hidden; /* 스크롤 안 보이게 */
+  padding:5px;
+  font-size: 20px;
+  font-weight: 400;
+  border: none;
+}
+textarea::placeholder {
+  font-family: 'Roboto', sans-serif;
+  width: 770px;
+  font-size: 20px;
+  font-weight: 400;
+  color: #B2B2B2;
+}
+.actions {
+  text-align: center;
+}
+
+.actions button {
+  width: 70px;
+  height: 32px;
+  border-radius: 5px;
+  font-size: 20px;
+  font-weight: 400;
+  background:none;
+  margin:0 6px 0 6px;
+}
+
+.actions .btnSave {
+  border:1px solid #1EC4CC;
+}
+
+.actions .btnCancel {
+  border:1px solid #B2B2B2;
+}
+
+
+
+
+
+
+
