@@ -35,6 +35,9 @@ public class WebSecurityConfig {
                 "/", "/login/**",
                 "/members/join", "/members/join/**",
                 "/members/emailCheck", "/members/nicknameCheck",
+                "/find/**", "/css/**", "/js/**", "/img/**",
+                "/api/image-proxy", // 이미지 프록시 URL을 허용하도록 추가
+                "/api/food/**", // 혹시 몰라 food API도 추가
                 "/members/goodbye",
                 "/find/**",
                 "/cart/**",

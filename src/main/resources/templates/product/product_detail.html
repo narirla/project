@@ -17,17 +17,20 @@
   <title>상품 상세</title>
 </head>
 
+
 <body id="page"
       th:object="${productDetailForm}"
       th:data-product-id="*{product.productId}"
       th:data-seller-id="${sellerId}"
       th:data-buyer-id="${buyerId}">
+
 <th:block th:switch="${session.loginRole ?: 'BUYER'}">
   <header th:case="'SELLER'" th:replace="~{fragments/sellerHeader :: sellerHeader(activeUri=${currentPath ?: ''})}">
   </header>
   <header th:case="*" th:replace="~{fragments/header :: header(activeUri=${currentPath ?: ''})}">
   </header>
 </th:block>
+
 
 
 <!-- 상품 타이틀 -->

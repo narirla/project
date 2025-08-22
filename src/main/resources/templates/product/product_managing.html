@@ -5,8 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MO:SI 판매자 마이페이지</title>
-  <!-- <link rel="stylesheet" href="/src/main/resources/static/css/layout.css">
-  <link rel="stylesheet" href="/src/main/resources/static/css/sellerpage/sellerMypageHome.css"> -->
   <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/sellerpage/sellerMypageHome.css}">
@@ -19,39 +17,98 @@
 
 <body>
 
-  <div class="layout-wrapper">
-    <header th:replace="~{fragments/sellerHeader :: sellerHeader}"></header>
-    <div class="page-container">
-      <main class="mypage-container">
-        <!-- 사이드 바 분리 -->
-        <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${activePath}, ${member})}"></aside>
-
-        <section class="content">
-          <div class="product-managing">
-            <h2>내 상품 목록</h2>
-            <hr>
+<div class="layout-wrapper">
+  <header th:replace="~{fragments/sellerHeader :: sellerHeader}"></header>
+  <div class="page-container">
+    <main class="mypage-container">
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <div class="profile-box">
+            <div class="profile-image">
+              <img th:if="${sellerImage != null}"
+                   th:src="${sellerImage}" alt="프로필 이미지">
+              <img th:if="${sellerPage == null or sellerPage.image == null}" th:src="@{/img/default-profile.png}"
+                   alt="기본 프로필 이미지">
+            </div>
+            <div class="profile-info">
+              <a href="#" class="profile-badge"> 프로가이드 ></a>
+              <div class="profile-name" th:text="${nickname}"></div>
+              <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top: 10px;">
+                <button type="submit" class="btn-role-switch">구매자 전환</button>
+              </form>
+            </div>
+          </div>
+          <nav class="mypage-nav">
+            <div class="nav-title active">MY PAGE</div>
+            <ul>
+              <li><a href="#">상품</a>
+                <ul>
+                  <li><a th:href="@{/product/manage}">내 상품 목록</a></li>
+                  <li><a th:href="@{/product/upload}">상품 등록</a></li>
+                </ul>
+              </li>
+              <li><a href="#">판매 현황</a>
+                <ul>
+                  <li><a href="#">주문 현황</a></li>
+                  <li><a href="#">총 판매수 / 매출액</a></li>
+                  <li><a href="#">판매 통계</a></li>
+                </ul>
+              </li>
+              <li><a href="#">문의 / 리뷰</a>
+                <ul>
+                  <li><a href="#">상품 문의</a></li>
+                  <li><a href="#">나의 답글</a></li>
+                </ul>
+              </li>
+              <li><a href="#">알림 / 공지</a>
+                <ul>
+                  <li><a href="#">공지사항</a></li>
+                  <li><a href="#">쿠폰오퍼</a></li>
+                </ul>
+              </li>
+              <li><a href="#">내 정보</a>
+                <ul>
+                  <li><a th:href="@{/mypage/seller/view}">프로필</a></li>
+                  <li><a href="#">정산 정보 관리</a></li>
+                  <li><a href="#">주소지 관리</a></li>
+                </ul>
+              </li>
+              <li><a href="#">고객센터</a>
+                <ul>
+                  <li><a href="#">1:1 문의</a></li>
+                  <li><a href="#">판매 Q&A 내역</a></li>
+                  <li><a href="#">공지사항</a></li>
+                  <li><a href="#">FAQ</a></li>
+                  <li><a href="#">고객의 소리</a></li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+      <section class="content">
+        <div class="product-managing">
+          <h2>내 상품 목록</h2>
+          <hr>
             <div class="product-managing-main">
-              <!-- 검색박스 -->
               <div class="product-search-box">
                 <input class="search-box-input" type="text" placeholder="상품명을 입력해주세요.">
               </div>
+
               <div class="overall-info">
                 <div th:text="|총 ${totalCount}개 상품|"></div>
-
-                <form th:action="@{/product/manage}" method="get" id="statusForm">
-                  <input type="hidden" name="page" value="1">
-                  <input type="hidden" name="size" th:value="5"/> <select name="status">
+                <select class="status-filter-select">
                   <option value="all" th:selected="${selectedStatus == 'all'}">전체</option>
                   <option value="판매중" th:selected="${selectedStatus == '판매중'}">판매중</option>
                   <option value="판매대기" th:selected="${selectedStatus == '판매대기'}">판매대기</option>
+                  <option value="임시저장" th:selected="${selectedStatus == '임시저장'}">임시저장</option>
                 </select>
-                </form>
               </div>
+
               <hr>
-              <!-- 상품목록 -->
+
               <div class="product-list">
                 <div class="product-item" th:each="form : ${productManagingForms}">
-                  <!-- 썸네일 이미지 -->
                   <img th:if="${form.images != null and #lists.size(form.images) > 0}"
                        th:src="${form.images[0].base64ImageData}"
                        th:alt="${form.images[0].fileName}"/>
@@ -62,13 +119,19 @@
                       <h2><a th:href="@{/product/view/{id}(id=${form.product.productId})}"
                              th:text="${form.product.title}">상품명</a></h2>
                       <div class="product-info-left-detail">
-
-                        <select class="status-select" th:data-product-id="${form.product.productId}"
-                                th:value="${form.product.status}">
+                        <select class="status-select"
+                                th:data-product-id="${form.product.productId}"
+                                th:value="${form.product.status}"
+                                th:disabled="${form.product.status == '임시저장'}">
                           <option value="판매중" th:selected="${form.product.status == '판매중'}">판매중</option>
                           <option value="판매대기" th:selected="${form.product.status == '판매대기'}">판매대기</option>
-                        </select>
 
+                          <option th:if="${form.product.status == '임시저장'}"
+                                  value="임시저장"
+                                  th:selected="${form.product.status == '임시저장'}">
+                            임시저장
+                          </option>
+                        </select>
                         <div class="product-info-left-detail-details">
                           <div
                               th:if="${form.product.updateDate == null or form.product.createDate == form.product.updateDate}"
@@ -85,31 +148,32 @@
                       </div>
                       <span class="text-trim" th:text="${form.product.description}"></span>
                     </div>
-                  </div>
-                  <div class="product-info-right">
-                    <div class="product-info-right-detail">
-                      <div>0% 저렴</div>
-                      <div class="price">
-                        <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|"></h1>
-                        <div>원</div>
+                    <div class="product-info-right">
+                      <div class="product-info-right-detail">
+                        <div th:text="|${form.salesRate}% 저렴|"></div>
+                        <div class="price">
+                          <h1 th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')}|"></h1>
+                          <div>원</div>
+                        </div>
+                        <div
+                            th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
                       </div>
-                      <div
-                          th:text="|정가 ${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')}원|"></div>
-                    </div>
-                    <div class="btn-group">
-                      <button class="btn-group-edit"
-                              th:onclick="|location.href='@{/product/edit/{id}(id=${form.product.productId})}'|">수정</button>
-                      <button class="btn-group-delete"
-                              th:onclick="|if(confirm('해당 상품을 삭제하시겠습니까?')) location.href='@{/product/delete/{id}(id=${form.product.productId})}'|">삭제</button>
+                      <div class="btn-group">
+                        <button class="btn-group-edit"
+                                th:onclick="|location.href='@{/product/edit/{id}(id=${form.product.productId})}'|">수정</button>
+                        <button class="btn-group-delete"
+                                th:onclick="|if(confirm('해당 상품을 삭제하시겠습니까?')) location.href='@{/product/delete/{id}(id=${form.product.productId})}'|">삭제</button>
+                      </div>
                     </div>
                   </div>
                 </div>
                 <hr>
               </div>
-              <!-- 페이지네이션 -->
-              <div class="pagination" th:if="${totalCount > 0}"><a th:if="${currentPage > 1}"
-                                                                   th:href="@{/product/manage(page=1, size=5, category=${selectedStatus})}"
-                                                                   class="page-link">&lt;&lt;</a>
+
+              <div class="pagination" th:if="${totalCount > 0}">
+                <a th:if="${currentPage > 1}"
+                   th:href="@{/product/manage(page=1, size=5, category=${selectedStatus})}"
+                   class="page-link">&lt;&lt;</a>
                 <span th:unless="${currentPage > 1}" class="page-link-spacer">&lt;&lt;</span>
                 <a th:if="${currentPage > 1}"
                    th:with="prevPageTarget = (${currentPage == startPage and startPage > 1} ? ${startPage - 1} : ${currentPage - 1})"
@@ -137,20 +201,20 @@
               </div>
             </div>
           </div>
-        </section>
-      </main>
-      <!-- 공지 -->
-      <div class="notice-bar">
-        <div class="notice-label">공지</div>
-        <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
-        <a href="#" class="more-link">+ 더보기</a>
-      </div>
+        </div>
+      </section>
+    </main>
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
     </div>
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
-  <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
-  <script th:src="@{/js/product/product_managing.js}"></script>
-  <script th:src="@{/js/layout.js}"></script>
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+<script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
+<script th:src="@{/js/product/product_managing.js}"></script>
+<script th:src="@{/js/layout.js}"></script>
 </body>
 
 </html>

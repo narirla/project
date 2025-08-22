@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "analyzer": {
+          "nori_analyzer": {
+            "type": "custom",
+            "tokenizer": "nori_tokenizer"
+          }
+        }
+      }
+    }
+  }
+}
