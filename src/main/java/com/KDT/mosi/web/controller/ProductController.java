@@ -2,9 +2,9 @@ package com.KDT.mosi.web.controller;
 
 import com.KDT.mosi.domain.entity.*;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
-import com.KDT.mosi.domain.product.svc.ProductCoursePointSVC;
-import com.KDT.mosi.domain.product.svc.ProductImageSVC;
-import com.KDT.mosi.domain.product.svc.ProductSVC;
+import com.KDT.mosi.domain.product.document.ProductDocument;
+import com.KDT.mosi.domain.product.dto.response.ProductSearchResponse;
+import com.KDT.mosi.domain.product.svc.*;
 import com.KDT.mosi.web.form.product.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -38,81 +39,118 @@ public class ProductController {
   private final ProductImageSVC productImageSVC;
   private final ProductCoursePointSVC productCoursePointSVC;
   private final SellerPageSVC sellerPageSVC;
+  private final ProductSearchService productSearchService;
+  private final SearchTrendService searchTrendService;
 
   // 유효한 카테고리 집합
   private static final Set<String> validCategories = Set.of(
       "area", "pet", "restaurant", "culture_history", "season_nature", "silver_disables"
   );
 
-  // 구매자 상품 조회
+  // ✅ 검색을 전담하는 엔드포인트
+  @GetMapping("/search")
+  public String searchProducts(@RequestParam(name="keyword", required = false) String keyword,
+                               @RequestParam(name = "page", defaultValue = "1") int page,
+                               @RequestParam(name = "size", defaultValue = "12") int size,
+                               Model model) throws IOException {
+
+    // 검색 로직을 performSearch 메서드에 통합
+    return performSearch(keyword, null, page, size, model);
+  }
+
+  // ✅ 상품 목록 조회 (카테고리 및 키워드)
   @GetMapping("/list")
   public String list(Model model,HttpServletRequest request,
                      @RequestParam(name = "page", defaultValue = "1") int page,
                      @RequestParam(name = "size", defaultValue = "12") int size,
-                     @RequestParam(name = "category", required = false) String category) {
+                     @RequestParam(name = "category", required = false) String category,
+                     @RequestParam(name = "keyword", required = false) String keyword) throws IOException {
 
-    List<Product> products;
+    log.info("Product list/search request. Category: {}, Keyword: {}, Page: {}", category, keyword, page);
+    return performSearch(keyword, category, page, size, model);
+  }
+
+  // ✅ 검색 및 목록 조회 로직을 통합한 헬퍼 메서드
+  private String performSearch(String keyword, String category, int page, int size, Model model) throws IOException {
+    List<ProductListForm> productList = new ArrayList<>();
     long totalCount;
-    try {
-      // 유효성 검사 및 기본값 지정
+
+    if (keyword != null && !keyword.trim().isEmpty()) {
+      // 키워드 검색 로직
+      ProductSearchResponse searchResponse = productSearchService.searchProducts(keyword, page, size);
+      totalCount = searchResponse.getTotalCount();
+      List<ProductDocument> searchResults = searchResponse.getProducts();
+
+      // ✅ 검색 결과가 없을 경우, 오타 교정 추천 검색어를 모델에 추가
+      if (totalCount == 0) {
+        List<String> suggestions = productSearchService.suggestSearchTerms(keyword);
+        if (!suggestions.isEmpty()) {
+          log.info("추천 검색어: {}", suggestions);
+          model.addAttribute("suggestions", suggestions);
+        }
+      }
+
+      for (ProductDocument doc : searchResults) {
+        Long productId = Long.parseLong(doc.getProductId());
+        Optional<Product> optionalProduct = productSVC.getProduct(productId);
+
+        if (optionalProduct.isPresent()) {
+          Product product = optionalProduct.get();
+          ProductListForm form = new ProductListForm();
+          form.setProduct(product);
+          form.setImages(productImageSVC.findByProductId(product.getProductId()));
+          form.setCoursePoints(productCoursePointSVC.findByProductId(product.getProductId()));
+          productList.add(form);
+        } else {
+          log.warn("상품 ID {}를 Oracle DB에서 찾을 수 없습니다. 데이터 동기화 문제를 확인하세요.", doc.getProductId());
+        }
+      }
+    } else {
+      // 일반 카테고리/전체 목록 조회 로직
+      List<Product> products;
       if (category == null || !validCategories.contains(category)) {
-        products = productSVC.getProductsByPage(page,size);
+        products = productSVC.getProductsByPage(page, size);
         totalCount = productSVC.countAllProducts();
         category = "all";
-      } else{
+      } else {
         products = productSVC.getProductsByCategoryAndPageAndSize(category, page, size);
         totalCount = productSVC.countByCategory(category);
       }
 
-      // *페이지네이션 구조를 만들기 위한 파트*
-      int currentPage = page;
-      int totalPages = (int) Math.ceil((double) totalCount / size);
-
-      int displayPageNum = 10; // 한 그룹에 보여줄 페이지 수
-
-
-      int endPage = (int) (Math.ceil(currentPage / (double) displayPageNum) * displayPageNum);
-      int startPage = endPage - displayPageNum + 1;
-
-      if (startPage < 1) {
-        startPage = 1;
-      }
-      if (endPage > totalPages) {
-        endPage = totalPages;
-      }
-
-      // 상품 목록별 이미지,코스 정보 값 가져와서 각 상품에 포함시키기
-      List<ProductListForm> productList = new ArrayList<>();
       for (Product product : products) {
-        List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
-        List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(product.getProductId());
-
         ProductListForm form = new ProductListForm();
         form.setProduct(product);
-        form.setImages(images);
-        form.setCoursePoints(coursePoints);
-
+        form.setImages(productImageSVC.findByProductId(product.getProductId()));
+        form.setCoursePoints(productCoursePointSVC.findByProductId(product.getProductId()));
         productList.add(form);
       }
-
-      model.addAttribute("productList", productList == null ? new ArrayList<>() : productList);
-      model.addAttribute("totalCount", totalCount);
-      model.addAttribute("currentPage", page);
-      model.addAttribute("totalPages", totalPages);
-      model.addAttribute("selectedCategory", category);
-
-      // *Thymeleaf로 전달할 페이징 관련 모델 속성*
-      model.addAttribute("startPage", startPage);
-      model.addAttribute("endPage", endPage);
-
-      model.addAttribute("activePath", request.getRequestURI());
-
-      return "product/product_list";
-
-    } catch (Exception e) {
-      log.error("상품 목록 조회 실패", e);
-      throw e; // 혹은 에러 페이지로 리다이렉트
     }
+
+    // 페이지네이션 로직
+    int currentPage = page;
+    int totalPages = (int) Math.ceil((double) totalCount / size);
+    int displayPageNum = 10;
+    int endPage = (int) (Math.ceil(currentPage / (double) displayPageNum) * displayPageNum);
+    int startPage = endPage - displayPageNum + 1;
+    if (startPage < 1) startPage = 1;
+    if (endPage > totalPages) endPage = totalPages;
+
+
+      
+
+
+    model.addAttribute("productList", productList);
+    model.addAttribute("totalCount", totalCount);
+    model.addAttribute("currentPage", page);
+    model.addAttribute("totalPages", totalPages);
+    model.addAttribute("selectedCategory", category);
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("startPage", startPage);
+    model.addAttribute("endPage", endPage);
+    
+    model.addAttribute("activePath", request.getRequestURI());
+
+    return "product/product_list";
   }
 
   // 판매자별 등록 상품 조회
@@ -177,16 +215,29 @@ public class ProductController {
     }
 
     List<ProductManagingForm> managingForms = new ArrayList<>();
+    // ✨✨✨ 여기에 Null 체크 로직을 추가해야 합니다. ✨✨✨
     for (Product product : products) {
-      List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
-      List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(product.getProductId());
+      if (product != null) { // 이 조건이 없어서 에러가 발생합니다.
+        List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
+        List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(product.getProductId());
 
-      ProductManagingForm form = new ProductManagingForm();
-      form.setProduct(product);
-      form.setImages(images);
-      form.setCoursePoints(coursePoints);
+        double discountAmount = (double) product.getNormalPrice() - (double) product.getSalesPrice();
+        double salePercent = (discountAmount / product.getNormalPrice()) * 100;
+        long salesRate = Math.round(salePercent);
+        if (salesRate < 0) {
+          salesRate = 0;
+        }
 
-      managingForms.add(form);
+        ProductManagingForm form = new ProductManagingForm();
+        form.setProduct(product);
+        form.setImages(images);
+        form.setCoursePoints(coursePoints);
+        form.setSalesRate(salesRate);
+
+        managingForms.add(form);
+      } else {
+        log.warn("상품 목록에 null 객체가 포함되어 있습니다. 데이터베이스 또는 서비스 로직을 확인하세요.");
+      }
     }
 
     // 디버깅용 출력
@@ -427,7 +478,7 @@ public class ProductController {
     }
 
     // 기존 상품 정보 조회
-    Product existingProduct = productSVC.getProduct(id).orElseThrow(() -> 
+    Product existingProduct = productSVC.getProduct(id).orElseThrow(() ->
         new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
     // form의 Product 사용
@@ -435,7 +486,7 @@ public class ProductController {
     product.setProductId(id);
     product.setUpdateDate(new Date(System.currentTimeMillis()));
     product.setMember(loginMember);
-    
+
     // 새로운 문서 파일이 업로드된 경우에만 파일 정보 업데이트
     MultipartFile docFile = form.getDocumentFile();
     if (docFile != null && !docFile.isEmpty()) {
@@ -450,12 +501,12 @@ public class ProductController {
       product.setFileSize(existingProduct.getFileSize());
       product.setFileData(existingProduct.getFileData());
     }
-    
+
     // status가 null이면 기존 값 유지
     if (product.getStatus() == null || product.getStatus().trim().isEmpty()) {
       product.setStatus(existingProduct.getStatus());
     }
-    
+
     // createDate는 기존 값 유지
     product.setCreateDate(existingProduct.getCreateDate());
 
@@ -574,7 +625,7 @@ public class ProductController {
       // 필요 시 로그인 페이지로 리다이렉트 또는 예외 처리
       throw new IllegalStateException("로그인한 회원이 아닙니다.");
     }
-    Long buyerId = loginMember.getMemberId();
+    Long memberId = loginMember.getMemberId();
 
     // 2) 상품 조회, 없으면 예외 처리
     Product product = productSVC.getProduct(id)
@@ -584,19 +635,14 @@ public class ProductController {
     List<ProductImage> images = productImageSVC.findByProductId(id);
     List<ProductCoursePoint> coursePoints = productCoursePointSVC.findByProductId(id);
 
-
-    //4) 판매자 id → 상품의 member
-    Long sellerId = product.getMember().getMemberId();
-
-
-    // 5) 판매자 페이지 정보 조회
-    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(sellerId);
+    // 4) 판매자 페이지 정보 조회
+    Optional<SellerPage> optional = sellerPageSVC.findByMemberId(memberId);
     if (optional.isEmpty()) {
       return "redirect:/mypage/seller/create";
     }
     SellerPage sellerPage = optional.get();
 
-    // 6) DTO에 데이터 세팅
+    // 5) DTO에 데이터 세팅
     product.setMember(loginMember);
     product.setProductImages(images); // 엔티티에 이미지 세팅
 
@@ -617,7 +663,7 @@ public class ProductController {
     }
 
     // 판매자 상품 수
-    productDetailForm.setCountProduct(productSVC.countByMemberId(sellerId));
+    productDetailForm.setCountProduct(productSVC.countByMemberId(memberId));
 
     // 6) model에 DTO 등록
     model.addAttribute("productDetailForm", productDetailForm);

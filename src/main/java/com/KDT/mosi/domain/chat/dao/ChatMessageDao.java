@@ -38,8 +38,10 @@ public class ChatMessageDao {
           rs.getString("CONTENT"),
           rs.getTimestamp("CREATED_AT").toLocalDateTime(),
           "Y".equals(rs.getString("READ_YN")),
-          rs.getString("NICKNAME"),
-          rs.getBytes("PIC")   // DB 컬럼명 PIC
+          rs.getString("SELLER_NICKNAME"),
+          rs.getString("BUYER_NICKNAME"),
+          rs.getBytes("SELLER_IMAGE"),   // DB 컬럼명 PIC
+          rs.getBytes("BUYER_IMAGE")   // DB 컬럼명 PIC
       );
 
   //================ CRUD ====================
@@ -67,17 +69,19 @@ public class ChatMessageDao {
   /** 특정 방 전체 메시지 (닉네임+프로필 포함) */
   public List<ChatMessageResponse> findAllByRoomWithMember(Long roomId) {
     String sql = """
-          SELECT m.MSG_ID,
+                  SELECT m.MSG_ID,
                  m.ROOM_ID,
                  m.SENDER_ID,
                  m.CONTENT,
                  m.CREATED_AT,
                  m.READ_YN,
-                 mem.NICKNAME,
-                 mem.PIC
+                 sp.NICKNAME AS SELLER_NICKNAME,
+                 bp.nickname AS BUYER_NICKNAME,
+                 sp.image AS SELLER_IMAGE,
+                 bp.IMAGE AS BUYER_IMAGE
           FROM CHAT_MESSAGE m
-          JOIN MEMBER mem
-            ON m.SENDER_ID = mem.MEMBER_ID
+          JOIN SELLER_PAGE sp  ON m.SENDER_ID = sp.MEMBER_ID
+          JOIN BUYER_PAGE bp ON m.SENDER_ID = bp.MEMBER_ID
           WHERE m.ROOM_ID = :roomId
           ORDER BY m.CREATED_AT ASC
         """;
@@ -87,6 +91,37 @@ public class ChatMessageDao {
 
     return jdbc.query(sql, p, RESPONSE_MAPPER);
   }
+
+  /** 메시지 들고오기 */
+  public ChatMessageResponse findByIdWithMember(Long msgId) {
+    String sql = """
+        SELECT m.MSG_ID,
+               m.ROOM_ID,
+               m.SENDER_ID,
+               m.CONTENT,
+               m.CREATED_AT,
+               m.READ_YN,
+               sp.NICKNAME AS seller_nickname,
+               bp.NICKNAME AS buyer_nickname,
+               sp.IMAGE AS SELLER_IMAGE,
+               bp.IMAGE AS BUYER_IMAGE
+        FROM CHAT_MESSAGE m
+        JOIN MEMBER mem ON m.SENDER_ID = mem.MEMBER_ID
+        JOIN SELLER_PAGE sp ON sp.MEMBER_ID = mem.MEMBER_ID
+        JOIN BUYER_PAGE bp ON bp.MEMBER_ID = mem.MEMBER_ID
+        WHERE m.MSG_ID = :msgId
+    """;
+
+
+    var p = new MapSqlParameterSource()
+        .addValue("msgId", msgId);
+
+    return jdbc.queryForObject(sql, p, RESPONSE_MAPPER);
+  }
+
+
+
+
 
   /** (옵션) 페이징 조회 */
 //  public List<ChatMessageResponse> findPageByRoomWithMember(long roomId, int offset, int size) {

@@ -59,29 +59,29 @@ public class ChatRoomDao {
   //팝업 채팅창 정보 조회
   public ChatPopupDto findPopupInfo(long roomId) {
     String sql = """
-        SELECT r.room_id,
-               r.buyer_id,
-               r.seller_id,
-               b.nickname   AS buyer_nickname,
-               s.nickname   AS seller_nickname,
-               p.title      AS product_title,
-               p.sales_price      AS product_price,
-               pi2.image_data AS product_image
-        FROM chat_room r
-        JOIN member b ON r.buyer_id = b.member_id
-        JOIN member s ON r.seller_id = s.member_id
-        JOIN product p ON r.product_id = p.product_id
-        JOIN (
-            SELECT product_id, image_data
-            FROM (
-                SELECT product_id,
-                       image_data,
-                       ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY image_id) AS rn
-                FROM product_image
-            )
-            WHERE rn = 1
-        ) pi2 ON r.product_id = pi2.product_id
-        WHERE r.room_id = :roomId
+      SELECT r.room_id,
+                 r.buyer_id,
+                 r.seller_id,
+                 b.nickname   AS buyer_nickname,
+                 s.nickname   AS seller_nickname,
+                 p.title      AS product_title,
+                 p.sales_price      AS product_price,
+                 pi2.image_data AS product_image
+          FROM chat_room r
+          JOIN BUYER_PAGE b ON r.buyer_id = b.member_id
+          JOIN SELLER_PAGE s ON r.seller_id = s.member_id
+          JOIN product p ON r.product_id = p.product_id
+          JOIN (
+              SELECT product_id, image_data
+              FROM (
+                  SELECT product_id,
+                         image_data,
+                         ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY image_id) AS rn
+                  FROM product_image
+              )
+              WHERE rn = 1
+          ) pi2 ON r.product_id = pi2.product_id
+          WHERE r.room_id = :roomId
     """;
 
     var params = new MapSqlParameterSource().addValue("roomId", roomId);

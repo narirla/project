@@ -8,6 +8,7 @@ public interface SellerPageDAO {
 
   /**
    * 판매자 마이페이지 저장
+   *
    * @param sellerPage 판매자 마이페이지 정보
    * @return 생성된 페이지 ID
    */
@@ -15,6 +16,7 @@ public interface SellerPageDAO {
 
   /**
    * 회원 ID로 마이페이지 조회
+   *
    * @param memberId 회원 ID
    * @return Optional<SellerPage>
    */
@@ -22,7 +24,8 @@ public interface SellerPageDAO {
 
   /**
    * 마이페이지 수정
-   * @param pageId 페이지 ID
+   *
+   * @param pageId     페이지 ID
    * @param sellerPage 수정할 데이터
    * @return 수정 건수
    */
@@ -31,6 +34,7 @@ public interface SellerPageDAO {
   /**
    * 회원 ID로 마이페이지 삭제
    * - 회원 탈퇴 시 사용
+   *
    * @param memberId 회원 ID
    * @return 삭제된 행 수
    */
@@ -38,6 +42,7 @@ public interface SellerPageDAO {
 
   /**
    * 마이페이지 ID로 조회
+   *
    * @param pageId 마이페이지 ID
    * @return Optional<SellerPage>
    */
@@ -45,6 +50,7 @@ public interface SellerPageDAO {
 
   /**
    * 판매자 페이지 존재 여부 확인
+   *
    * @param memberId 회원 ID
    * @return 존재하면 true, 없으면 false
    */
@@ -52,10 +58,12 @@ public interface SellerPageDAO {
 
   /**
    * 닉네임 중복 여부 확인
+   *
    * @param nickname 닉네임
    * @return true: 중복 있음, false: 사용 가능
    */
   boolean existByNickname(String nickname);
 
-
+  // memberId를 기반으로 닉네임을 조회하는 메서드
+  Optional<String> findNicknameByMemberId(Long memberId);
 }
