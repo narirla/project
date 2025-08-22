@@ -54,7 +54,7 @@ public class ProductController {
                                @RequestParam(name = "size", defaultValue = "12") int size,
                                Model model) throws IOException {
 
-    // 검색 로직을 searchProducts 메서드에 통합
+    // 검색 로직을 performSearch 메서드에 통합
     return performSearch(keyword, null, page, size, model);
   }
 
@@ -81,9 +81,14 @@ public class ProductController {
       totalCount = searchResponse.getTotalCount();
       List<ProductDocument> searchResults = searchResponse.getProducts();
 
-      // 검색된 키워드 저장 로직은 Service에서 처리하므로 Controller에서 제거
-      List<String> popularKeywords = searchTrendService.getTopSearchKeywords(keyword);
-      model.addAttribute("popularKeywords", popularKeywords);
+      // ✅ 검색 결과가 없을 경우, 오타 교정 추천 검색어를 모델에 추가
+      if (totalCount == 0) {
+        List<String> suggestions = productSearchService.suggestSearchTerms(keyword);
+        if (!suggestions.isEmpty()) {
+          log.info("추천 검색어: {}", suggestions);
+          model.addAttribute("suggestions", suggestions);
+        }
+      }
 
       for (ProductDocument doc : searchResults) {
         Long productId = Long.parseLong(doc.getProductId());

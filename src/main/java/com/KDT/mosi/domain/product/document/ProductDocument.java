@@ -1,72 +1,97 @@
 package com.KDT.mosi.domain.product.document;
 
-import lombok.AllArgsConstructor; // AllArgsConstructor 추가
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor; // NoArgsConstructor 추가
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.InnerField;
+import org.springframework.data.elasticsearch.annotations.MultiField;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
 import java.time.LocalDate;
 
-@Getter
+@Data
 @Builder
-@NoArgsConstructor // ✨✨✨ Lombok을 사용해 기본 생성자 추가
-@AllArgsConstructor // ✨✨✨ Lombok을 사용해 모든 필드를 인자로 받는 생성자 추가
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(indexName = "products")
-@Setting(shards = 1, replicas = 0)
+@Setting(shards = 1, replicas = 0, settingPath = "elasticsearch/product-settings.json")
 public class ProductDocument {
 
   @Id
-  @Field(type = FieldType.Keyword)
   private String productId;
 
   @Field(type = FieldType.Keyword)
   private String category;
 
-  @Field(type = FieldType.Text, analyzer = "nori") // nori 분석기 유지
+  // @MultiField를 사용하여 text와 keyword 타입 동시 정의
+  @MultiField(
+      mainField = @Field(type = FieldType.Text, analyzer = "nori_analyzer"),
+      otherFields = {
+          @InnerField(suffix = "keyword", type = FieldType.Keyword)
+      }
+  )
   private String title;
 
-  @Field(type = FieldType.Text, analyzer = "nori") // nori 분석기 유지
+  @MultiField(
+      mainField = @Field(type = FieldType.Text, analyzer = "nori_analyzer"),
+      otherFields = {
+          @InnerField(suffix = "keyword", type = FieldType.Keyword)
+      }
+  )
   private String description;
 
+  @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer")
+  private String autocomplete_title;
+
+  @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer")
+  private String autocomplete_description;
+
+  // ✅ Long 타입을 Integer로 수정하여 DB와 일치시킴
   @Field(type = FieldType.Integer)
   private Integer normalPrice;
 
-  @Field(type = FieldType.Keyword, name = "guide_yn")
+  @Field(type = FieldType.Keyword)
   private String guideYn;
 
-  @Field(type = FieldType.Integer, name = "guide_price")
+  // ✅ Long 타입을 Integer로 수정하여 DB와 일치시킴
+  @Field(type = FieldType.Integer)
   private Integer guidePrice;
 
-  @Field(type = FieldType.Integer, name = "sales_price")
+  // ✅ Long 타입을 Integer로 수정하여 DB와 일치시킴
+  @Field(type = FieldType.Integer)
   private Integer salesPrice;
 
-  @Field(type = FieldType.Integer, name = "sales_guide_price")
+  // ✅ Long 타입을 Integer로 수정하여 DB와 일치시킴
+  @Field(type = FieldType.Integer)
   private Integer salesGuidePrice;
 
-  @Field(type = FieldType.Integer, name = "total_day")
+  // ✅ Long 타입을 Integer로 수정하여 DB와 일치시킴
+  @Field(type = FieldType.Integer)
   private Integer totalDay;
 
-  @Field(type = FieldType.Integer, name = "total_time")
+  // ✅ Long 타입을 Integer로 수정하여 DB와 일치시킴
+  @Field(type = FieldType.Integer)
   private Integer totalTime;
 
-  @Field(type = FieldType.Integer, name = "req_money")
+  // ✅ Long 타입을 Integer로 수정하여 DB와 일치시킴
+  @Field(type = FieldType.Integer)
   private Integer reqMoney;
 
-  @Field(type = FieldType.Keyword, name = "sleep_info")
+  @Field(type = FieldType.Text)
   private String sleepInfo;
 
-  @Field(type = FieldType.Text, name = "transport_info")
+  @Field(type = FieldType.Text)
   private String transportInfo;
 
-  @Field(type = FieldType.Keyword, name = "food_info")
+  @Field(type = FieldType.Text)
   private String foodInfo;
 
-  @Field(type = FieldType.Text, name = "req_people")
+  @Field(type = FieldType.Text)
   private String reqPeople;
 
   @Field(type = FieldType.Text)
@@ -78,19 +103,19 @@ public class ProductDocument {
   @Field(type = FieldType.Text)
   private String detail;
 
-  @Field(type = FieldType.Keyword, name = "file_name")
+  @Field(type = FieldType.Text)
   private String fileName;
 
-  @Field(type = FieldType.Keyword, name = "file_type")
+  @Field(type = FieldType.Text)
   private String fileType;
 
-  @Field(type = FieldType.Long, name = "file_size")
+  @Field(type = FieldType.Long)
   private Long fileSize;
 
-  @Field(type = FieldType.Text, name = "price_detail")
+  @Field(type = FieldType.Text)
   private String priceDetail;
 
-  @Field(type = FieldType.Text, name = "gprice_detail")
+  @Field(type = FieldType.Text)
   private String gpriceDetail;
 
   @Field(type = FieldType.Keyword)
