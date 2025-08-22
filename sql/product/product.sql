@@ -10,35 +10,35 @@ DROP SEQUENCE COURSE_COURSE_ID_SEQ;
 
 -- 테이블 생성
 CREATE TABLE product(
-        product_id           NUMBER(10),
-        member_id              NUMBER(10),
-        category              varchar2(30)     NOT NULL,
-        title                    varchar2(90)     NOT NULL,
-        guide_yn              char(1)              NOT NULL,
-         normal_price        NUMBER(7)            NOT NULL,
-        guide_price           NUMBER(7)          NOT NULL,
-        sales_price           NUMBER(7)          NOT NULL,
-        sales_guide_price NUMBER(7)          NOT NULL,
-        total_day             NUMBER(2)            NOT NULL,
-        total_time             NUMBER(2)          NOT NULL,
-           req_money              NUMBER(7)           NOT NULL,
-        sleep_info           char(1),
-        transport_info     varchar2(45),
-        food_info              char(1),
-        req_people            varchar2(45)      NOT NULL,
-        target                 varchar2(45)       NOT NULL,
-        stucks                 varchar2(90),
-        description           varchar2(1500)    NOT NULL,
-        detail                 varchar2(3000)  NOT NULL,
-        file_name           varchar2(255)    NOT NULL,
-        file_type           varchar2(50)       NOT NULL,
-        file_size           NUMBER                NOT NULL,
-        file_data           BLOB                   NOT NULL,
-        price_detail         varchar2(450)    NOT NULL,
-        gprice_detail         varchar2(450)    NOT NULL,
-        status                  varchar2(12)     NOT NULL,
-        create_date           date,
-        update_date           date
+        product_id  			NUMBER(10),
+        member_id  				NUMBER(10),
+        category  				varchar2(30)  	NOT NULL,
+        title  						varchar2(90)  	NOT NULL,
+        guide_yn  				char(1)  				NOT NULL,
+      	normal_price  		NUMBER(7)				NOT NULL,
+        guide_price  			NUMBER(7) 			NOT NULL,
+        sales_price  			NUMBER(7) 			NOT NULL,
+        sales_guide_price NUMBER(7) 			NOT NULL,
+        total_day 				NUMBER(2)				NOT NULL,
+        total_time 				NUMBER(2) 			NOT NULL,
+  			req_money  				NUMBER(7)  			NOT NULL,
+        sleep_info  			char(1),
+        transport_info  	varchar2(45),
+        food_info  				char(1),
+        req_people   			varchar2(45)		NOT NULL,
+        target  					varchar2(45) 		NOT NULL,
+        stucks  					varchar2(90),
+        description  			varchar2(1500) 	NOT NULL,
+        detail  					varchar2(3000)  NOT NULL,
+        file_name     		varchar2(255) 	NOT NULL,
+        file_type     		varchar2(50) 		NOT NULL,
+        file_size     		NUMBER 					NOT NULL,
+        file_data     		BLOB 						NOT NULL,
+        price_detail			varchar2(450) 	NOT NULL,
+        gprice_detail			varchar2(450) 	NOT NULL,
+        status   					varchar2(12)  	NOT NULL,
+        create_date  			date,
+        update_date  			date
 );
 
 -- 제약 조건 추가
@@ -61,7 +61,7 @@ ALTER TABLE product ADD CHECK (sleep_info IN ('Y', 'N'));
 ALTER TABLE product MODIFY (sleep_info DEFAULT 'N');
 ALTER TABLE product ADD CHECK (food_info IN ('Y', 'N'));
 ALTER TABLE product MODIFY (food_info DEFAULT 'N');
-ALTER TABLE product ADD CHECK (status IN ('판매중', '판매대기'));
+ALTER TABLE product ADD CHECK (status IN ('판매중', '판매대기','임시저장'));
 ALTER TABLE product MODIFY (create_date NOT NULL);
 ALTER TABLE product MODIFY (create_date DEFAULT sysdate);
 ALTER TABLE product MODIFY (update_date DEFAULT sysdate);
@@ -71,14 +71,14 @@ CREATE SEQUENCE PRODUCT_PRODUCT_ID_SEQ;
 
 -- 테이블 생성
 CREATE TABLE product_image(
-        image_id        NUMBER(10),
-        product_id     NUMBER(10),
-        image_data     BLOB                 NOT NULL,
-        image_order     NUMBER(2)           NOT NULL,
-        file_name        varchar2(255),
-        file_size      NUMBER,
-        mime_type        varchar2(50),
-        upload_time    date                   NOT NULL
+        image_id  		NUMBER(10),
+        product_id  	NUMBER(10),
+        image_data  	BLOB  					NOT NULL,
+        image_order  	NUMBER(2)  			NOT NULL,
+        file_name  		varchar2(255),
+        file_size   	NUMBER,
+        mime_type  		varchar2(50),
+        upload_time 	date 						NOT NULL
 );
 
 -- 제약 조건 추가
@@ -92,13 +92,13 @@ CREATE SEQUENCE IMAGE_IMAGE_ID_SEQ;
 
 -- 테이블 생성
 CREATE TABLE product_course_point (
-        course_point_id    NUMBER(10),
-        product_id           NUMBER(10),
-        point_order           NUMBER              NOT NULL,
-        latitude              NUMBER(9,6)        NOT NULL,
-        longitude              NUMBER(9,6)        NOT NULL,
-        description         varchar2(500),
-        created_at           date
+        course_point_id 	NUMBER(10),
+        product_id  			NUMBER(10),
+        point_order  			NUMBER  				NOT NULL,
+        latitude  				NUMBER(9,6)  		NOT NULL,
+        longitude  				NUMBER(9,6)  		NOT NULL,
+        description   		varchar2(500),
+        created_at  			date
 );
 
 -- 제약 조건 추가
@@ -108,5 +108,8 @@ ALTER TABLE product_course_point MODIFY (created_at DEFAULT sysdate);
 
 -- 시퀀스 생성
 CREATE SEQUENCE COURSE_COURSE_ID_SEQ;
+SELECT * FROM product;
+INSERT INTO PRODUCT (PRODUCT_ID,MEMBER_ID,CATEGORY,TITLE,GUIDE_YN,NORMAL_PRICE,GUIDE_PRICE,SALES_PRICE,SALES_GUIDE_PRICE,TOTAL_DAY,TOTAL_TIME,REQ_MONEY,SLEEP_INFO,TRANSPORT_INFO,FOOD_INFO,REQ_PEOPLE,TARGET,STUCKS,DESCRIPTION,DETAIL,FILE_NAME,FILE_TYPE,FILE_SIZE,FILE_DATA,PRICE_DETAIL,GPRICE_DETAIL,STATUS,CREATE_DATE,UPDATE_DATE) VALUES
+	 (product_product_id_seq.nextval,6,'culture_history','asdf','N',10,10,10,10,0,10,10,'N','버스 및 지하철 이용','N','10','10','물','10','10','file_01.txt','text/plain',36,HEXTORAW('ED8C8CEC9DBC20EC9785EBA19CEB939C20ED858CEC8AA4ED8AB8EC9AA920ED8C8CEC9DBC'),'10','10','판매중',TIMESTAMP'2025-07-25 16:21:42',NULL);
 
 COMMIT;

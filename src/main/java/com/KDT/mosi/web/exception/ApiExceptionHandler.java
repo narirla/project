@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException; // ✨✨✨ import 추가
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,23 +27,23 @@ public class ApiExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        
+        MethodArgumentNotValidException ex) {
+
         BindingResult bindingResult = ex.getBindingResult();
         Map<String, String> details = new HashMap<>();
-        
+
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             details.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-        
+
         log.error("Validation error: {}", details);
-        
+
         ApiResponse<Void> response = ApiResponse.withDetails(
-                ApiResponseCode.VALIDATION_ERROR,
-                details,
-                null
+            ApiResponseCode.VALIDATION_ERROR,
+            details,
+            null
         );
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -69,32 +70,44 @@ public class ApiExceptionHandler {
      */
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoSuchElementException(
-            NoSuchElementException ex) {
-        
+        NoSuchElementException ex) {
+
         log.error("Entity not found: {}", ex.getMessage());
         Map<String, String> map = new HashMap<>();
         map.put("1", ex.getMessage());
 
         ApiResponse<Void> response = ApiResponse.withDetails(
-                ApiResponseCode.ENTITY_NOT_FOUND,
-                map,
-                null
+            ApiResponseCode.ENTITY_NOT_FOUND,
+            map,
+            null
         );
         return ResponseEntity.ok(response);
     }
 
     /**
-     * 기타 예외 처리
+     * static resource (정적 자원) 예외 처리
+     */
+    @ExceptionHandler(NoResourceFoundException.class) // ✨✨✨ 이 핸들러를 추가합니다.
+    public ResponseEntity<Void> handleNoResourceFoundException(NoResourceFoundException ex) {
+        // ✨✨✨ 로그를 남기지 않거나, INFO 레벨로만 남깁니다.
+        log.info("Requested static resource not found: {}", ex.getMessage());
+
+        // ✨✨✨ 404 Not Found 응답을 반환합니다.
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    /**
+     * 기타 예외 처리 (NoResourceFoundException 제외)
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleAllExceptions(Exception ex) {
         log.error("Unhandled exception occurred", ex);
-        
+
         ApiResponse<Void> response = ApiResponse.of(
-                ApiResponseCode.INTERNAL_SERVER_ERROR,
-                null
+            ApiResponseCode.INTERNAL_SERVER_ERROR,
+            null
         );
-        
+
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)

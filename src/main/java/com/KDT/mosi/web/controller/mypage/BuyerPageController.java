@@ -2,14 +2,9 @@ package com.KDT.mosi.web.controller.mypage;
 
 import com.KDT.mosi.domain.entity.BuyerPage;
 import com.KDT.mosi.domain.entity.Member;
-import com.KDT.mosi.domain.entity.Role;
-import com.KDT.mosi.domain.member.dao.MemberRoleDAO;
 import com.KDT.mosi.domain.member.svc.MemberSVC;
 import com.KDT.mosi.domain.mypage.buyer.svc.BuyerPageSVC;
-import com.KDT.mosi.domain.mypage.seller.dao.SellerPageDAO;
-import com.KDT.mosi.security.CustomUserDetails;
 import com.KDT.mosi.web.form.mypage.buyerpage.BuyerPageUpdateForm;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -57,9 +49,7 @@ public class  BuyerPageController {
 
   // ✅ 마이페이지 조회
   @GetMapping("/{memberId}")
-  public String view(@PathVariable("memberId") Long memberId,
-                     Model model,
-                     HttpServletRequest request) {
+  public String view(@PathVariable("memberId") Long memberId, Model model) {
     if (!getLoginMemberId().equals(memberId)) return "error/403";
 
 
@@ -69,7 +59,6 @@ public class  BuyerPageController {
 
     Member member = om.get();
     model.addAttribute("member", member);
-    model.addAttribute("activePath", request.getRequestURI());
 
     if (ob.isPresent()) {
       BuyerPage page = ob.get();
@@ -90,37 +79,39 @@ public class  BuyerPageController {
   }
 
 
-  // ✅ 프로필 이미지 조회(기본 이미지: /static/img/default-profile.png)
-  @GetMapping(value = "/{memberId}/image")
+  // ✅ 프로필 이미지 조회
+  @GetMapping("/{memberId}/image")
   @ResponseBody
-  public ResponseEntity<byte[]> image(@PathVariable Long memberId) {
-    Optional<BuyerPage> ob = buyerPageSVC.findByMemberId(memberId);
+  public ResponseEntity<byte[]> image(@PathVariable("memberId") Long memberId) {
+    Optional<BuyerPage> optional = buyerPageSVC.findByMemberId(memberId);
 
-    // 1) DB에 이미지가 있으면 그대로 반환(콘텐츠 타입 추정)
-    if (ob.isPresent() && ob.get().getImage() != null) {
-      byte[] bytes = ob.get().getImage();
-      MediaType mediaType = MediaType.IMAGE_JPEG; // 기본값
+    if (optional.isPresent() && optional.get().getImage() != null) {
+      byte[] image = optional.get().getImage();
+      MediaType mediaType = MediaType.IMAGE_JPEG;
 
       try {
-        String ct = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(bytes));
-        if (ct != null) mediaType = MediaType.parseMediaType(ct);
+        String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(image));
+        if (contentType != null) {
+          mediaType = MediaType.parseMediaType(contentType);
+        }
       } catch (IOException e) {
         log.warn("이미지 content type 분석 실패, 기본 JPEG 사용");
       }
 
       return ResponseEntity.ok()
           .contentType(mediaType)
-          .cacheControl(org.springframework.http.CacheControl.noCache()) // ♻ 변경 즉시 반영
-          .body(bytes);
+          .body(image);
     }
 
-    // 2) 없으면 기본 이미지 반환 (classpath: static/img/default-profile.png)
-    try (var is = new ClassPathResource("static/img/default-profile.png").getInputStream()) {
-      byte[] bytes = is.readAllBytes();
+    // ✅ 이미지가 없을 경우 기본 이미지 파일을 바이트 배열로 반환
+    try {
+      ClassPathResource defaultImage = new ClassPathResource("static/img/default-profile.png");
+      byte[] imageBytes = defaultImage.getInputStream().readAllBytes();
+
       return ResponseEntity.ok()
           .contentType(MediaType.IMAGE_PNG)
-          .cacheControl(org.springframework.http.CacheControl.noCache())
-          .body(bytes);
+          .body(imageBytes);
+
     } catch (IOException e) {
       log.error("기본 이미지 로드 실패", e);
       return ResponseEntity.notFound().build();
@@ -130,8 +121,7 @@ public class  BuyerPageController {
 
   // ✅ 수정 폼
   @GetMapping("/{memberId}/edit")
-  public String editForm(@PathVariable("memberId") Long memberId,
-                         Model model, HttpServletRequest request) {
+  public String editForm(@PathVariable("memberId") Long memberId, Model model) {
     if (!getLoginMemberId().equals(memberId)) {
       return "error/403";
     }
@@ -145,7 +135,7 @@ public class  BuyerPageController {
 
     // ✅ 핵심 포인트: 먼저 등록 (템플릿 파싱 전에 반드시 model에 존재해야 함)
     model.addAttribute("member", member);
-    model.addAttribute("activePath", request.getRequestURI());
+
     // 2. buyerPage 있으면 form 구성
     return buyerPageSVC.findByMemberId(memberId)
         .map(entity -> {
@@ -249,9 +239,9 @@ public class  BuyerPageController {
       return "mypage/buyerpage/editBuyerPage";
     }
 
-   // ───────────────────────────
-   // 4. BuyerPage 갱신
-   // ───────────────────────────
+    // ───────────────────────────
+    // 4. BuyerPage 갱신
+    // ───────────────────────────
     BuyerPage buyerPage = new BuyerPage();
     buyerPage.setPageId(form.getPageId());
     buyerPage.setMemberId(memberId);
@@ -348,112 +338,23 @@ public class  BuyerPageController {
 
 
   @GetMapping
-  public String buyerMypageHome(Model model, HttpServletRequest request) {
+  public String buyerMypageHome(Model model) {
     Long loginMemberId = getLoginMemberId();
 
     Optional<Member> optionalMember = memberSVC.findById(loginMemberId);
-    if (optionalMember.isEmpty()) return "error/403";
+    if (optionalMember.isEmpty()) {
+      return "error/403"; // 로그인 정보 없음
+    }
 
     Member member = optionalMember.get();
     model.addAttribute("memberId", loginMemberId);
     model.addAttribute("member", member);
 
-    model.addAttribute("activePath", request.getRequestURI()); // ✅ 추가
-
     return "mypage/buyerpage/buyerMypageHome";
   }
 
-  @Slf4j
-  @Controller
-  @RequiredArgsConstructor
-  public static class RoleChangeController {
 
-    private final MemberRoleDAO memberRoleDAO;
-    private final SellerPageDAO sellerPageDAO;
-
-    /** ✅ 구매자 → 판매자 전환 */
-    @PostMapping("/mypage/role/toSeller")
-    public String changeToSeller(HttpServletRequest request) {
-      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-      if (auth == null || !auth.isAuthenticated()) {
-        return "redirect:/login";
-      }
-
-      CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-      Member loginMember = userDetails.getMember();
-      Long memberId = loginMember.getMemberId();
-
-      // R02 없으면 부여
-      if (!memberRoleDAO.hasRole(memberId, "R02")) {
-        memberRoleDAO.addRole(memberId, "R02");
-      }
-
-      // 최신 권한으로 SecurityContext 갱신
-      List<Role> updatedRoles = memberRoleDAO.findRolesByMemberId(memberId);
-      CustomUserDetails updatedUserDetails = new CustomUserDetails(loginMember, updatedRoles);
-      UsernamePasswordAuthenticationToken newAuth =
-          new UsernamePasswordAuthenticationToken(updatedUserDetails, null, updatedUserDetails.getAuthorities());
-      SecurityContext context = SecurityContextHolder.getContext();
-      context.setAuthentication(newAuth);
-
-      // 세션 갱신
-      HttpSession session = request.getSession(true);
-      session.setAttribute("loginMember", loginMember);
-      session.setAttribute("loginMemberId", memberId);
-      List<String> normRoles = updatedRoles.stream()
-          .map(Role::getRoleId) // "R01","R02"
-          .map(r -> "R01".equals(r) ? "BUYER" : "R02".equals(r) ? "SELLER" : r)
-          .toList();
-      session.setAttribute("loginRoles", normRoles);
-      session.setAttribute("loginRole", "SELLER");
-      log.info("✅ BUYER→SELLER 전환, Roles(norm)={}, loginRole=SELLER", normRoles);
-
-      // 판매자 페이지 없으면 생성 페이지로
-      if (!sellerPageDAO.existByMemberId(memberId)) {
-        return "redirect:/mypage/seller/create";
-      }
-      return "redirect:/mypage/seller/home";
-    }
-
-    /** ✅ 판매자 → 구매자 전환 */
-    @PostMapping("/mypage/role/toBuyer")
-    public String changeToBuyer(HttpServletRequest request) {
-      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-      if (auth == null || !auth.isAuthenticated()) {
-        return "redirect:/login";
-      }
-
-      CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-      Member loginMember = userDetails.getMember();
-      Long memberId = loginMember.getMemberId();
-
-      // 정책: SELLER(R02) 역할 제거 (보유 유지 원하면 이 블록 삭제)
-      if (memberRoleDAO.hasRole(memberId, "R02")) {
-        memberRoleDAO.deleteRole(memberId, "R02");
-        log.info("🗑 SELLER(R02) 삭제 완료 memberId={}", memberId);
-      }
-
-      // 최신 권한으로 SecurityContext 갱신
-      List<Role> updatedRoles = memberRoleDAO.findRolesByMemberId(memberId);
-      CustomUserDetails updatedUserDetails = new CustomUserDetails(loginMember, updatedRoles);
-      UsernamePasswordAuthenticationToken newAuth =
-          new UsernamePasswordAuthenticationToken(updatedUserDetails, null, updatedUserDetails.getAuthorities());
-      SecurityContextHolder.getContext().setAuthentication(newAuth);
-
-      // 세션 갱신
-      HttpSession session = request.getSession(true);
-      session.setAttribute("loginMember", loginMember);
-      session.setAttribute("loginMemberId", memberId);
-      List<String> normRoles = updatedRoles.stream()
-          .map(Role::getRoleId)
-          .map(r -> "R01".equals(r) ? "BUYER" : "R02".equals(r) ? "SELLER" : r)
-          .toList();
-      session.setAttribute("loginRoles", normRoles);
-      session.setAttribute("loginRole", "BUYER");
-
-      log.info("✅ SELLER→BUYER 전환, Roles(norm)={}, loginRole=BUYER", normRoles);
-
-      return "redirect:/mypage/buyer";
-    }
-  }
 }
+
+
+

@@ -20,7 +20,7 @@
       <main class="mypage-container">
         <!-- ✅ 좌측 사이드바 -->
         <!-- 사이드 바 분리 -->
-        <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar(${activePath}, ${sellerPage})}"></aside>
+        <div th:replace="~{fragments/sellerSidebar :: sellerSidebar(activePath=${activePath})}"></div>
 
         <!-- ✅ 우측 본문 -->
         <section class="content">
@@ -71,7 +71,7 @@
             </div>
           </div>
           <div class="form-button-group">
-            <a th:href="@{/mypage/seller/{memberId}/edit(memberId=${member.memberId})}" class="btn btn-primary">
+            <a th:href="@{'/members/verify-password?next=/mypage/seller/' + ${member.memberId} + '/edit'}" class="btn">
               회원정보 수정하기
             </a>
 

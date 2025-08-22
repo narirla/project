@@ -83,12 +83,15 @@
         <aside class="sidebar">
           <div class="guide-box">
             <ul>
-              <li class="left-sort">탑 글래스 여행가이드</li>
+              <li class="left-sort">탑 클래스 여행가이드</li>
               <li class="right-sort">모시에서 만나보세요!</li>
             </ul>
           </div>
           <div class="menu-frame">
             <ul>
+              <li th:classappend="${selectedCategory} == 'all' ? 'active'">
+                <a th:href="@{/product/list(category='all')}">전체</a>
+              </li>
               <li th:classappend="${selectedCategory} == 'area' ? 'active'">
                 <a th:href="@{/product/list(category='area')}">지역</a>
               </li>
@@ -223,7 +226,7 @@
               </div>
               <div class="formButton-container">
                 <div class="filter-example">
-                  실버, 가이드 동반 O, 4명, 70대, 판매중, 3박 4일, 200만원,
+                  실버, 가이드 동반 O, 4명, 70대, 판매중, 3박 4일, 200만원
                 </div>
                 <!-- 검색 버튼 -->
                 <div class="filter-item filter-search">
@@ -290,23 +293,40 @@
             </div>
             <!--상품리스트-->
             <div class="product-list">
-              <div class="product-item" th:each="form : ${productList}">
-                <a class="product-item-container" th:href="@{/product/view/{id}(id=${form.product.productId})}">
-                  <div class="thumbnail">
-                    <img th:if="${form.images != null and #lists.size(form.images) > 0}"
-                      th:src="${form.images[0].base64ImageData}" th:alt="${form.images[0].fileName}" />
-                    <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
-                      th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
-                  </div>
-                  <div class="product-info">
-                    <h3 th:text="${form.product.title}">상품명</h3>
-                    <p class="s-price"
-                      th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
-                    <p class="n-price"
-                      th:text="|${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
-                  </div>
-                </a>
-              </div>
+              <th:block th:if="${totalCount > 0}">
+                <div class="product-item" th:each="form : ${productList}">
+                  <a class="product-item-container" th:href="@{/product/view/{id}(id=${form.product.productId})}">
+                    <div class="thumbnail">
+                      <img th:if="${form.images != null and #lists.size(form.images) > 0}"
+                           th:src="${form.images[0].base64ImageData}" th:alt="${form.images[0].fileName}" />
+                      <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
+                           th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
+                    </div>
+                    <div class="product-info">
+                      <h3 th:text="${form.product.title}">상품명</h3>
+                      <p class="s-price"
+                         th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                      <p class="n-price"
+                         th:text="|${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                    </div>
+                  </a>
+                </div>
+              </th:block>
+
+              <th:block th:if="${totalCount == 0}">
+                <div class="no-results-message">
+                  <p th:text="|'${currentKeyword}' (으)로 검색된 결과가 없습니다.|"></p>
+                </div>
+                <div class="suggestions-container" th:if="${suggestions != null and !suggestions.isEmpty()}">
+                  <p>혹시 이런 검색어를 찾으셨나요?</p>
+                  <ul>
+                    <li th:each="suggestion : ${suggestions}">
+                      <a th:href="@{/product/search(keyword=${suggestion})}" th:text="${suggestion}"></a>
+                    </li>
+                  </ul>
+                </div>
+              </th:block>
+
             </div>
             <div class="pagination" th:if="${totalCount > 0}">
               <a th:if="${currentPage > 1}" th:href="@{/product/list(page=1, size=12, category=${selectedCategory})}"
@@ -338,12 +358,12 @@
           </main>
         </div>
       </div>
-      <!--공지-->
-      <div class="notice-bar">
-        <div class="notice-label">공지</div>
-        <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
-        <a href="#" class="more-link">+ 더보기</a>
-      </div>
+    </div>
+    <!--공지-->
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
     </div>
     <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>

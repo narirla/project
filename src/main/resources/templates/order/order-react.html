@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주문결제 - MO:SI</title>
+
+  <!-- 기존 CSS 파일들 (상품목록 구조 참고) -->
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/buyerpage/buyerMypageHome.css}">
+  <link rel="stylesheet" th:href="@{/css/order/order.css}">
+  <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css}">
+  <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css}"/>
+  <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<div class="layout-wrapper">
+  <!-- 기존 헤더 사용 -->
+  <header th:replace="~{fragments/buyerHeader :: buyerHeader}"></header>
+
+  <div class="page-container">
+    <main class="mypage-container">
+      <!-- 사이드바 (상품목록과 동일 구조) -->
+      <aside th:replace="~{fragments/buyerSidebar :: buyerSidebar('order', ${member})}"></aside>
+
+      <section class="content">
+        <!-- React 주문결제 컨테이너 -->
+        <div id="order-root"></div>
+      </section>
+    </main>
+
+    <!-- 공지 바 (상품목록과 동일) -->
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
+    </div>
+  </div>
+
+  <!-- 기존 푸터 사용 -->
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- React 스크립트 -->
+<script type="module" th:src="@{/js/order/pages/OrderPage.jsx}"></script>
+<script th:src="@{/js/buyerpage/buyerMypageHome.js}"></script>
+<script th:src="@{/js/layout.js}"></script>
+</body>
+</html>

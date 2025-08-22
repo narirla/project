@@ -38,7 +38,7 @@ public class PasswordVerifyController {
 
   /** 재인증 폼 GET */
   @GetMapping("/verify-password")
-  public String verifyForm(@RequestParam(required=false, defaultValue="/members/password") String next,
+  public String verifyForm(@RequestParam(required=false, name="next", defaultValue="/members/password") String next,
                            HttpSession session,
                            HttpServletRequest request,
                            Model model) {
@@ -55,7 +55,7 @@ public class PasswordVerifyController {
   @PostMapping("/verify-password")
   public String verify(@Valid @ModelAttribute("passwordForm") PasswordForm form,
                        BindingResult bindingResult,
-                       @RequestParam(required=false, defaultValue="/members/password") String next,
+                       @RequestParam(required=false, name="next", defaultValue="/members/password") String next,
                        HttpSession session,
                        HttpServletRequest request,
                        HttpServletResponse response,

@@ -36,4 +36,6 @@ public interface SellerPageSVC {
   //닉네임 중복 여부 확인
   boolean existByNickname(String nickname);
 
+  // memberId로 별명 찾기
+  Optional<String> getNicknameByMemberId(Long memberId);
 }

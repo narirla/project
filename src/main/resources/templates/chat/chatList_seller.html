@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기본틀</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/chat/chatList_seller.css}">
+  <link rel="stylesheet" th:href="@{/css/chat/chat_list_common.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
+</head>
+
+<body th:attr="data-seller-id=${memberId}">
+<div class="layout-wrapper">
+
+  <!--헤더 -->
+  <th:block th:switch="${session.loginRole ?: 'BUYER'}">
+    <header th:case="'SELLER'" th:replace="~{fragments/sellerHeader :: sellerHeader(activeUri=${currentPath ?: ''})}">
+    </header>
+    <header th:case="*" th:replace="~{fragments/header :: header(activeUri=${currentPath ?: ''})}">
+    </header>
+  </th:block>
+
+  <div class="page-container">
+    <main class="main-container">
+      <!-- 사이드바 분리-->
+      <th:block th:switch="${session.loginRole ?: 'BUYER'}">
+        <aside th:case="'SELLER'" th:replace="~{fragments/sellerSidebar ::
+           sellerSidebar(activePath=${'/members/password'}, sp=${sellerPage} ?: null)}">
+        </aside>
+        <aside th:case="*" th:replace="~{fragments/buyerSidebar ::
+           buyerSidebar(activePath=${'/members/password'}, member=${member ?: session.loginMember})}">
+        </aside>
+      </th:block>
+
+      <section class="content">
+        <div class="community-wrapper">
+          <section th:attr="data-member-id=${memberId}" class="post-section">
+            <h2>1:1 문의 내역</h2>
+            <div class="info_box">
+              <div class="setting_box">
+                <div class="setting setting_time">
+                  <div class="setting_time_ques">답변가능 시간</div>
+                  <div>10:00 - 19:00&nbsp&nbsp
+                    <button class="setting_btn">수정</button>
+                  </div>
+
+                </div>
+                <div class="setting setting_greeting">
+                  <div class="setting_time_ques">기본 인삿말</div>
+                  <div>안녕하세요, 무엇을 도와드릴까요?&nbsp&nbsp
+                    <button class="setting_btn"> 수정</button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ 초기 렌더링용 (서버에서 내려주는 목록) -->
+            <div class="inquiry-container">
+              <!-- 탭 메뉴 -->
+              <div class="tab-menu">
+                <button class="tab-button active" data-tab="progress">
+                  진행중인 문의
+                </button>
+                <button class="tab-button" data-tab="closed">
+                  종료된 문의
+                </button>
+              </div>
+
+
+              <!-- 진행중 문의 리스트 -->
+              <div id="progress" class="tab-content active">
+                <div class="inquiry-list" id="inquiry-list">
+                  <!-- js로 구현 -->
+                </div>
+                <!-- 페이징 -->
+                <div class="pagination"></div>
+              </div>
+
+              <!-- 종료된 문의 리스트 -->
+              <div id="closed" class="tab-content">
+                <ul class="inquiry-list">
+                  <li>종료된 문의 1</li>
+                  <li>종료된 문의 2</li>
+                  <li>종료된 문의 3</li>
+                  <li>종료된 문의 4</li>
+                  <li>종료된 문의 5</li>
+                </ul>
+                <!-- 페이징 -->
+                <div class="pagination">
+                  <a href="#">«</a>
+                  <a href="#">1</a>
+                  <a href="#" class="active">2</a>
+                  <a href="#">3</a>
+                  <a href="#">4</a>
+                  <a href="#">5</a>
+                  <a href="#">»</a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+
+<!-- ✅ JS 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<!-- ✅ Ajax + WebSocket 처리 -->
+<script src="/js/chat/chatList.js"></script>
+<script src="/js/chat/createPopup.js"></script>
+
+<!-- script 영역 -->
+<script th:src="@{/js/layout.js}"></script>
+<script th:src="@{/js/chat/chat_list_common.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+
+/* ─── 사이드바와 컨텐트 분리 ─── */ 
+.main-container{
+    display: flex;
+    justify-content: space-between;
+    padding: 40px 20px;
+}
+
+/* ─── seller_setting ─── */ 
+.info_box{
+    border-top: 3px solid #1EC4CC;
+    border-bottom: 3px solid #1EC4CC;
+    height: 128px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.setting_box{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.setting{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 840px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.setting .setting_time_ques{
+    width: 150px;
+    text-align: end;
+    margin-right: 50px;
+    font-weight: bold;
+    color: #414141;
+}
+
+.setting div{
+    width: 550px;
+    color: #6B6B6B;
+    display: flex;
+    align-items: center;
+}
+
+.setting_btn{
+    width: 48px;
+    height: 21px;
+    font-size: smaller;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    background-color: #80CCD6;
+    border: none;
+    color: white;
+}
+
+.setting_btn:hover{
+    background-color: #0099AD;
+}
+
+
+/* ─── 컨텐트 ─── */ 
+.content{
+    width: 950px;
+}
+
+.post-section h2{
+    margin-top: 0;
+    margin-bottom: 16px;
+    height: 29;
+    /* border-bottom: 2px solid #1EC4CC; */
+}
+
+.new-label {
+  display: inline-block;
+  margin-left: 8px;
+  margin-bottom: 2px;
+  padding: 2px 6px;
+  background-color: rgb(240, 6, 6);
+  color: white;
+  font-size: 10px;
+  /*font-weight: bold;*/
+  border-radius: 5px;
+}

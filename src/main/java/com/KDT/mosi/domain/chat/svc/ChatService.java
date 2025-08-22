@@ -2,10 +2,15 @@ package com.KDT.mosi.domain.chat.svc;
 
 
 import com.KDT.mosi.domain.chat.dao.ChatMessageDao;
+import com.KDT.mosi.domain.dto.chat.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -20,4 +25,27 @@ public class ChatService {
     // roomDao.updateLastMsgId(roomId, msgId); // 필요 시 활성화
     return msgId;
   }
+
+
+  /** 특정 채팅방의 전체 메시지 (닉네임, 프로필 포함) */
+  @Transactional(readOnly = true)
+  public List<ChatMessageResponse> getMessagesWithMember(Long roomId) {
+    return messageDao.findAllByRoomWithMember(roomId);
+  }
+
+  /** 특정 채팅방의 메시지 1개) */
+  @Transactional(readOnly = true)
+  public ChatMessageResponse findMessageWithMember(Long msgId){
+    return messageDao.findByIdWithMember(msgId);
+  }
+
+
+  /** 읽음 처리 */
+  @Transactional
+  public int markAsRead(Long roomId, Long readerId, Long lastReadMessageId) {
+    return messageDao.markAsRead(roomId, readerId, lastReadMessageId);
+  }
+
+
+
 }

@@ -82,4 +82,10 @@ public class SellerPageSVCImpl implements SellerPageSVC {
   public boolean existByNickname(String nickname) {
     return sellerPageDAO.existByNickname(nickname);
   }
+
+  @Override
+  public Optional<String> getNicknameByMemberId(Long memberId) {
+    // SellerPageDAO에 findNicknameByMemberId 메서드를 호출
+    return sellerPageDAO.findNicknameByMemberId(memberId);
+  }
 }

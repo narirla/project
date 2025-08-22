@@ -205,6 +205,13 @@ public class SellerPageController {
       throw new AccessDeniedException("본인의 마이페이지만 수정할 수 있습니다.");
     }
 
+    // 🔐 비밀번호 재인증 TTL 확인
+    Long expireAt = (Long) session.getAttribute("PWD_VERIFY_EXPIRES_AT");
+    boolean verified = expireAt != null && expireAt > System.currentTimeMillis();
+    if (!verified) {
+      return "redirect:/members/verify-password?next=/mypage/seller/" + id + "/edit";
+    }
+
     Optional<SellerPage> optional = sellerPageSVC.findByMemberId(id);
     if (optional.isEmpty()) throw new AccessDeniedException("판매자 페이지가 존재하지 않습니다.");
 
@@ -230,8 +237,6 @@ public class SellerPageController {
 
     return "mypage/sellerpage/editSellerPage";
   }
-
-
 
   /**
    * ✅ 판매자 마이페이지 수정 처리 (Form 객체 기반)

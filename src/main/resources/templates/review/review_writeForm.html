@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>리뷰</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/buyerpage/buyerMypageHome.css}">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/review/reviewWrite.css}">
+
+</head>
+<body>
+<div class="layout-wrapper">
+  <header th:replace="~{fragments/header :: header}"></header>
+  <!-- 헤더 -->
+
+  <div class="page-container">
+    <main class="mypage-container">
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <div class="profile-box">
+            <div class="profile-image">
+              <img id="asideProfileImage" th:src="@{'/mypage/buyer/' + ${member.memberId} + '/image'}" alt="프로필 이미지">
+            </div>
+            <div class="profile-info">
+              <a href="#" class="profile-badge">프로여행러 ></a>
+              <div class="profile-name" th:text="${member.name}"></div>
+              <form th:action="@{/mypage/role/toSeller}" method="post" style="margin-top: 10px;">
+                <button type="submit" class="btn-role-switch">판매자 전환</button>
+              </form>
+            </div>
+          </div>
+          <nav class="mypage-nav">
+            <div class="nav-title active">MY PAGE</div>
+            <ul>
+              <li><a href="#">주문 배송</a>
+                <ul>
+                  <li><a href="#">주문/배송 내역</a></li>
+                </ul>
+              </li>
+              <li><a href="#">알림 및 메시지</a>
+                <ul>
+                  <li><a href="#">알림</a></li>
+                  <li><a href="#">메시지</a></li>
+                </ul>
+              </li>
+              <li><a href="#">나의 활동</a>
+                <ul>
+                  <li><a href="#">후기</a></li>
+                  <li><a href="#">게시글</a></li>
+                </ul>
+              </li>
+              <li><a href="#">관심</a>
+                <ul>
+                  <li><a href="#">찜한 상품</a></li>
+                  <li><a href="#">팔로잉 가이드</a></li>
+                  <li><a href="#">최근 본 상품</a></li>
+                </ul>
+              </li>
+              <li><a href="#">내 정보</a>
+                <ul>
+                  <li><a href="#">회원 등급</a></li>
+                  <li><a th:href="@{'/mypage/buyer/' + ${member.memberId}}">회원 정보 관리</a></li>
+                  <li><a href="#">신용 카드 및 환불계좌 관리</a></li>
+                  <li><a href="#">배송지 관리</a></li>
+                  <li><a href="#">본인 인증</a></li>
+                </ul>
+              </li>
+              <li><a href="#">고객센터</a>
+                <ul>
+                  <li><a href="#">1:1 문의</a></li>
+                  <li><a href="#">상품 Q&A 내역</a></li>
+                  <li><a href="#">공지사항</a></li>
+                  <li><a href="#">FAQ</a></li>
+                  <li><a href="#">고객의 소리</a></li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <section class="content review">
+        <h1 class="title">리뷰 작성</h1>
+
+        <!-- 데이터 없을 때 -->
+        <div class="empty" th:if="${reviewProduct == null}">
+          잘못된 접근이거나 상품 정보를 찾을 수 없습니다.
+        </div>
+
+        <!-- 요약 영역 -->
+        <div class="summary"  th:if="${reviewProduct != null}" th:data-category="${reviewProduct.category}">
+          <div class="image">
+            <img th:if="${imageSrc}" th:src="${imageSrc}" alt="상품 이미지">
+          </div>
+
+          <div class="info">
+            <div class="product-title" th:text="${reviewProduct.title}">상품 제목</div>
+
+            <div class="option">
+              <span class="label">옵션</span>
+              <span class="value" th:text="${reviewProduct.optionType}">옵션</span>
+            </div>
+
+            <div class="meta">
+              <div class="date">
+                <span>상품등록일 :</span>
+                <span th:text="${reviewProduct.createDate}">2025.08.19</span>
+              </div>
+              <div class="nickname">
+                <span>판매자 : </span>
+                <span th:text="${reviewProduct.nickname}">판매자</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rating-precise" id="ratingPrecise">
+          <div class="star-title">별점</div>
+          <div class="stars-wrap">
+            <div class="stars"></div>
+          </div>
+          <input type="hidden" name="score" id="score" value="0">
+          <output id="scoreText">0.0</output>
+        </div>
+        <div class="review-tags" id="reviewTags">
+          <div class="subtitle">태그</div>
+          <div class="tag-list">
+          </div>
+          <input type="hidden" name="selectedTags" id="selectedTags" value="">
+        </div>
+        <div class="review-content">
+          <label for="content">리뷰 내용</label>
+          <textarea id="content" name="content" rows="15" placeholder="클릭하여 후기를 작성해 주세요."></textarea>
+        </div>
+        <div class="actions">
+          <button type="button" id="saveBtn" class="btnSave">저장</button>
+          <button type="button" id="cancelBtn" class="btnCancel">취소</button>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+<script th:src="@{/js/layout.js}"></script>
+<script src="/js/review/rating-precise.js" defer></script>
+<script src="/js/review/reviewWrite.js" type="module" defer></script>
+</html>

@@ -25,15 +25,23 @@ spring:
       file-size-threshold: 0B
       resolve-lazily: true
 
+  # Elasticsearch 설정
+  elasticsearch:
+    rest:
+      uris: localhost:9200 # host:port 포맷으로 변경
+
 # 웹서버 포트
 server:
   port: 9070
+#  max-http-header-size: 32KB
 
 # 로그레벨
 # trace > debug > info > warn > error > fatal
 logging:
   level:
     root: info
+    com.KDT.mosi.domain.publicdatamanage: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: OFF
 
 # 게시판 업로드 위치
 upload:
@@ -43,19 +51,32 @@ upload:
 # 공공데이터 api
 busan:
   api:
+    common:
+      numOfRows: 100
+      resultType: json
+      serviceKey: ${API_SERVICE_KEY}
+    facility:
+      url: https://apis.data.go.kr/6260000/BusanFcltsDsgstInfoService/getFcltsDsgstInfo
     food:
-      url: http://apis.data.go.kr/6260000/FoodService
-      service-key: fPdY0rW%2Fg4SDZfiWY4leSfZXwCLWVtXo23evqleikvxs8PED%2BZ4KUA%2FPTyLYAdb8oTEFRKqPyPTVLBNuMKn8lQ%3D%3D
-    accessibility:
-      url: https://apis.data.go.kr/6260000/BusanFcltsDsgstInfoService
-      service-key: fPdY0rW%2Fg4SDZfiWY4leSfZXwCLWVtXo23evqleikvxs8PED%2BZ4KUA%2FPTyLYAdb8oTEFRKqPyPTVLBNuMKn8lQ%3D%3D
+      url: https://apis.data.go.kr/6260000/FoodService/getFoodKr
 
-# 카카오 지도 API 설정
+#카카오 api
 kakao:
-  map:
-    api-key: f966608df4bf0eb3e9a2d62ad6cf4ecc
+  api:
+    key: 9eb31105e83dcf3d0dc84b734b609fa8
+    url:
+      geocode: https://dapi.kakao.com/v2/local/search/address.json
 
-# elasticsearch 설정
+  # ElasticSearchConfig에서 @Value로 읽어올 속성들
 elasticsearch:
   host: localhost
   port: 9200
+
+# Spring Data Elasticsearch의 자동 인덱스 생성 설정은 유지
+# @Document 어노테이션이 붙은 엔티티를 자동으로 감지하여 인덱스를 생성/업데이트합니다.
+# 이 부분은 ElasticSearchConfig에서 ElasticsearchConfiguration을 상속받으므로 더 이상 필요 없을 수도 있습니다.
+# 하지만 명시적으로 두는 것이 좋습니다.
+data:
+  elasticsearch:
+    indices:
+      auto-create: true

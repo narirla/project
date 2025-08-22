@@ -18,7 +18,31 @@ public class ProductImageSVCImpl implements ProductImageSVC {
 
   @Override
   public void saveAll(List<ProductImage> images) {
+    // 이미지가 null 이거나 비어있을 경우, 더 이상 진행하지 않음
+    if (images == null || images.isEmpty()) {
+      return;
+    }
+
     for (ProductImage image : images) {
+      // ⭐⭐⭐ NULL 값 방지: fileName이 null일 경우 빈 문자열로 설정 ⭐⭐⭐
+      if (image.getFileName() == null) {
+        image.setFileName("");
+      }
+      if (image.getFileSize() == null) {
+        image.setFileSize(0L);
+      }
+      if (image.getMimeType() == null) {
+        image.setMimeType("");
+      }
+      if (image.getImageData() == null) {
+        image.setImageData(new byte[0]);
+      }
+
+      // fileName이 빈 문자열인 경우는 DB에 삽입하지 않고 건너뜁니다.
+      if (image.getFileName().isEmpty()) {
+        continue;
+      }
+
       productImageDAO.insert(image);
     }
   }
