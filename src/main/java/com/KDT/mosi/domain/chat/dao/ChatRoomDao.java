@@ -21,6 +21,7 @@ public class ChatRoomDao {
     var p = new MapSqlParameterSource()
         .addValue("pid", productId).addValue("bid", buyerId).addValue("sid", sellerId);
     var list = jdbc.queryForList(sql, p, Long.class);
+    //ACTIVE인 채팅방 중 결국 쿼리로 찾아낸 채팅방정보에서 첫번째 값(roomId) 반환
     return list.isEmpty() ? null : list.get(0);
   }
 
@@ -100,6 +101,9 @@ public class ChatRoomDao {
         }
     );
   }
+
+
+
 
 
 

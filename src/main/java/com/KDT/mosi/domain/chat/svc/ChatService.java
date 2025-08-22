@@ -4,11 +4,13 @@ package com.KDT.mosi.domain.chat.svc;
 import com.KDT.mosi.domain.chat.dao.ChatMessageDao;
 import com.KDT.mosi.domain.dto.chat.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -36,6 +38,14 @@ public class ChatService {
   public ChatMessageResponse findMessageWithMember(Long msgId){
     return messageDao.findByIdWithMember(msgId);
   }
+
+
+  /** 읽음 처리 */
+  @Transactional
+  public int markAsRead(Long roomId, Long readerId, Long lastReadMessageId) {
+    return messageDao.markAsRead(roomId, readerId, lastReadMessageId);
+  }
+
 
 
 }
