@@ -610,6 +610,55 @@ input[type="radio"]:checked+.radio-img {
   width: 1152px;
 }
 
+.no-results-message {
+    text-align: center;
+    padding: 50px 0;
+    color: #888;
+    font-size: 1.2em;
+}
+
+.suggestions-container {
+    text-align: center;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.suggestions-container p {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.suggestions-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+
+.suggestions-container li {
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.suggestions-container a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1em;
+    padding: 5px 10px;
+    border: 1px solid #007bff;
+    border-radius: 20px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.suggestions-container a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
 /* .notice-frame {
     display: flex;
     justify-content: space-between;

@@ -1,7 +1,6 @@
 package com.KDT.mosi.domain.product.dao;
 
 import com.KDT.mosi.domain.entity.Product;
-import com.KDT.mosi.domain.entity.ProductImage;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,25 +44,4 @@ public interface ProductDAO {
 
   // 판매자별 상품 등록 갯수 확인
   long countByMemberId(Long memberId);
-
-  // ⭐⭐⭐ 새로 추가된 메서드들 ⭐⭐⭐
-
-  /**
-   * 새로운 상품 이미지 리스트를 저장합니다.
-   * @param images 저장할 ProductImage 리스트
-   */
-  void saveImages(List<ProductImage> images);
-
-  /**
-   * 주어진 이미지 ID 리스트에 해당하는 이미지를 삭제합니다.
-   * @param imageIds 삭제할 이미지 ID 리스트
-   */
-  void deleteImagesByIds(List<Long> imageIds);
-
-  /**
-   * 특정 상품에 속한 이미지 중 가장 높은 이미지 순서(imageOrder)를 조회합니다.
-   * @param productId 상품 ID
-   * @return 가장 높은 imageOrder 값 또는 이미지가 없을 경우 null
-   */
-  Integer findMaxImageOrderByProductId(Long productId);
 }

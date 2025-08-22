@@ -142,8 +142,6 @@ public class SellerPageDAOImpl implements SellerPageDAO {
     return v != null && v == 1;
   }
 
-<<<<<<< HEAD
-=======
   // memberID로 별명 찾기
   @Override
   public Optional<String> findNicknameByMemberId(Long memberId) {
@@ -161,9 +159,6 @@ public class SellerPageDAOImpl implements SellerPageDAO {
       return Optional.empty();
     }
   }
-
-
->>>>>>> e506fd3749059f9445a987ad395676865572bc94
   /**
    * 마이페이지 정보 수정
    */

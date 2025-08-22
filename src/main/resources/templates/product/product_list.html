@@ -290,23 +290,40 @@
             </div>
             <!--상품리스트-->
             <div class="product-list">
-              <div class="product-item" th:each="form : ${productList}">
-                <a class="product-item-container" th:href="@{/product/view/{id}(id=${form.product.productId})}">
-                  <div class="thumbnail">
-                    <img th:if="${form.images != null and #lists.size(form.images) > 0}"
-                      th:src="${form.images[0].base64ImageData}" th:alt="${form.images[0].fileName}" />
-                    <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
-                      th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
-                  </div>
-                  <div class="product-info">
-                    <h3 th:text="${form.product.title}">상품명</h3>
-                    <p class="s-price"
-                      th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
-                    <p class="n-price"
-                      th:text="|${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
-                  </div>
-                </a>
-              </div>
+              <th:block th:if="${totalCount > 0}">
+                <div class="product-item" th:each="form : ${productList}">
+                  <a class="product-item-container" th:href="@{/product/view/{id}(id=${form.product.productId})}">
+                    <div class="thumbnail">
+                      <img th:if="${form.images != null and #lists.size(form.images) > 0}"
+                           th:src="${form.images[0].base64ImageData}" th:alt="${form.images[0].fileName}" />
+                      <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
+                           th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
+                    </div>
+                    <div class="product-info">
+                      <h3 th:text="${form.product.title}">상품명</h3>
+                      <p class="s-price"
+                         th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                      <p class="n-price"
+                         th:text="|${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                    </div>
+                  </a>
+                </div>
+              </th:block>
+
+              <th:block th:if="${totalCount == 0}">
+                <div class="no-results-message">
+                  <p th:text="|'${currentKeyword}' (으)로 검색된 결과가 없습니다.|"></p>
+                </div>
+                <div class="suggestions-container" th:if="${suggestions != null and !suggestions.isEmpty()}">
+                  <p>혹시 이런 검색어를 찾으셨나요?</p>
+                  <ul>
+                    <li th:each="suggestion : ${suggestions}">
+                      <a th:href="@{/product/search(keyword=${suggestion})}" th:text="${suggestion}"></a>
+                    </li>
+                  </ul>
+                </div>
+              </th:block>
+
             </div>
             <div class="pagination" th:if="${totalCount > 0}">
               <a th:if="${currentPage > 1}" th:href="@{/product/list(page=1, size=12, category=${selectedCategory})}"
