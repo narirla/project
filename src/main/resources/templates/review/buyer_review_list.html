@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>리뷰</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/buyerpage/buyerMypageHome.css}">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/review/seller_review_list.css}">
+
+</head>
+<body>
+<div class="layout-wrapper">
+  <th:block th:switch="${session.loginRole ?: 'BUYER'}">
+    <header th:case="'SELLER'" th:replace="~{fragments/sellerHeader :: sellerHeader(activeUri=${currentPath ?: ''})}">
+    </header>
+    <header th:case="*" th:replace="~{fragments/header :: header(activeUri=${currentPath ?: ''})}">
+    </header>
+  </th:block>
+  <!-- 헤더 -->
+
+  <div class="page-container">
+    <main class="mypage-container">
+      <th:block th:switch="${session.loginRole ?: 'BUYER'}">
+
+        <!-- 판매자 -->
+        <aside th:case="'SELLER'"
+               th:replace="~{fragments/sellerSidebar ::
+             sellerSidebar(activePath=${'/review/seller/list'}, sp=${sellerPage} ?: null)}">
+        </aside>
+
+        <!-- 구매자 (기본) -->
+        <aside th:case="*"
+               th:replace="~{fragments/buyerSidebar ::
+             buyerSidebar(activePath=${'/review/buyer/list'}, member=${member ?: session.loginMember})}">
+        </aside>
+
+      </th:block>
+
+
+      <section class="content">
+        <div class="review_list">
+          <h2>내가 작성한 리뷰 목록</h2>
+          <hr>
+          <div class="review_list_main">
+            <!-- 검색박스 -->
+            <div class="review-search-box">
+              <input class="search-box-input" type="text" placeholder="상품명을 입력해주세요.">
+            </div>
+            <div class="overall-info">
+              <div>총 1개 </div>
+            </div>
+            <hr>
+
+
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</div>
+</body>
+<script src="/js/review/buyer_review_list.js" type="module" defer></script>
+<script src="/js/layout.js"></script>
+</html>

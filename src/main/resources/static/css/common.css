@@ -5,13 +5,13 @@
 
 .sidebar {
   width: 180px;
-  height: 1400px;
+  height: 1000px;
   flex-shrink: 0;
 }
 
 .sidebar-card {
   width: 180px;
-  height: 1400px;
+  height: 1000px;
   border: 1px solid #82d8d8;
   border-radius: 4px;
   background: #fff;

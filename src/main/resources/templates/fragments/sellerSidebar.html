@@ -1,36 +1,32 @@
 <!-- templates/fragments/sellerSidebar.html -->
-<aside th:fragment="sellerSidebar(activePath)"
-       xmlns:th="http://www.thymeleaf.org"
-       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-       th:if="${session.loginRole == 'SELLER'}"
+<aside th:fragment="sellerSidebar" xmlns:th="http://www.thymeleaf.org"
+       xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:if="${session.loginRole == 'SELLER'}"
        id="SELLER_SIDEBAR" data-frag="SELLER-SIDEBAR">
 
   <div class="sidebar-card">
     <div class="profile-box">
       <!-- 판매자 사이드바 프로필 -->
       <div class="profile-image">
-        <img th:if="${sidebarImage != null}"
-             th:src="${sidebarImage}"
-             alt="판매자 프로필 이미지">
+        <img th:if="${sidebarImage != null}" th:src="${sidebarImage}" alt="판매자 프로필 이미지">
 
-        <img th:unless="${sidebarImage != null}"
-             th:src="@{/img/default-profile.png}"
-             alt="기본 프로필 이미지">
+        <img th:unless="${sidebarImage != null}" th:src="@{/img/default-profile.png}" alt="기본 프로필 이미지">
       </div>
       <div class="profile-info">
         <a href="#" class="profile-badge">프로가이드 ></a>
 
         <!-- 닉네임 -->
         <div class="profile-name"
-             th:text="${sellerSidebar != null and sellerSidebar.nickname != null
-                        ? sellerSidebar.nickname
-                        : (session.loginMember != null ? session.loginMember.nickname : '닉네임')}">
+             th:text="${sellerPage != null && sellerPage.nickname != null
+               ? sellerPage.nickname
+               : (session.loginMember != null ? session.loginMember.nickname : '닉네임')}">
           닉네임
         </div>
 
+
         <!-- 역할 전환 -->
-        <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top:10px;" sec:authorize="isAuthenticated()">
-          <input type="hidden" sec:csrf/>
+        <form th:action="@{/mypage/role/toBuyer}" method="post" style="margin-top:10px;"
+              sec:authorize="isAuthenticated()">
+          <input type="hidden" sec:csrf />
           <button type="submit" class="btn-role-switch">구매자 전환</button>
         </form>
       </div>
@@ -57,18 +53,26 @@
         </li>
         <li><a href="#">판매 현황</a>
           <ul>
-            <li><a href="#">주문 현황</a></li>
-            <li><a href="#">총 판매수 / 매출액</a></li>
-            <li><a href="#">판매 통계</a></li>
+            <li>
+              <a th:href="@{/order/seller/history}"
+                 th:classappend="${activePath != null and #strings.startsWith(activePath, '/order/seller/history')} ? ' is-active'">
+                판매 내역
+              </a>
+            </li>
           </ul>
         </li>
         <li><a href="#">문의 / 리뷰</a>
           <ul>
-            <li><a th:href="@{/chat/rooms}">상품 문의</a></li>
-            <li><a href="#">나의 답글</a></li>
+            <li>
+              <a th:href="@{/chat/rooms/seller}"
+                 th:classappend="${(activePath != null and #strings.startsWith(activePath, '/chat/rooms/seller')) ? ' is-active' : ''}">
+                1:1 문의
+              </a>
+            </li>
+            <li><a th:href="@{/review/seller/list}">상품 리뷰</a></li>
           </ul>
         </li>
-        <li><a href="#">알림 / 공지</a>
+        <li><a href="#">알림</a>
           <ul>
             <li><a href="#">공지사항</a></li>
             <li><a href="#">프로모션</a></li>
@@ -88,17 +92,6 @@
                 비밀번호 변경
               </a>
             </li>
-            <li><a href="#">정산 정보 관리</a></li>
-            <li><a href="#">구독자 관리</a></li>
-          </ul>
-        </li>
-        <li><a href="#">고객센터</a>
-          <ul>
-            <li><a href="#">1:1 문의</a></li>
-            <li><a href="#">판매 Q&amp;A 내역</a></li>
-            <li><a href="#">공지사항</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">고객의 소리</a></li>
           </ul>
         </li>
       </ul>

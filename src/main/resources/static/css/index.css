@@ -21,10 +21,22 @@ a {
 
 /* ================== ✅ 메인 배너 ================== */
 .main-banner {
-  width: 1200px;
-  height: 500px;
+  width: 1200px;     /* 고정 폭 */
+  height: 500px;     /* 고정 높이 */
   overflow: hidden;
   position: relative;
+  margin: 0 auto;    /* 브라우저 정중앙 배치 */
+}
+
+.main-banner .swiper-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.main-banner .swiper-slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .main-banner img {
@@ -54,6 +66,93 @@ a {
   font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
 }
+
+ChatGPT의 말:
+
+좋습니다 👍 그러면 이렇게 정리하면 됩니다.
+
+1. HTML (슬라이드별 클래스 부여)
+<!-- 감천문화마을 -->
+<div class="swiper-slide gamcheon">
+  <img src="/img/banner/gamcheon.jpg" alt="감천문화마을">
+  <div class="main-banner-text">
+    <h2>감천문화마을,<br>다채로운 색을 담다.</h2>
+    <p>골목마다 숨어 있는 이야기</p>
+  </div>
+</div>
+
+<!-- 해동용궁사 -->
+<div class="swiper-slide yonggungsa">
+  <img src="/img/banner/yonggungsa.jpg" alt="해동용궁사">
+  <div class="main-banner-text">
+    <h2>해동용궁사,<br>바다와 맞닿은 사찰.</h2>
+    <p>동해 위에서의 힐링</p>
+  </div>
+</div>
+
+2. CSS (개별 스타일 적용)
+/* 공통 스타일 */
+.main-banner-text {
+  position: absolute;
+  left: 80px;
+  bottom: 80px;
+  color: white;
+  z-index: 2;
+}
+
+.main-banner-text h2 {
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.main-banner-text p {
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* 감천문화마을 → 오른쪽 위 */
+.swiper-slide.gamcheon .main-banner-text {
+  right: 60px;
+  top: 10px;
+  left: auto;   /* 기존 left 무효화 */
+  bottom: auto; /* 기존 bottom 무효화 */
+  text-align: right;
+}
+
+/* 감천문화마을 배너 전용 */
+.swiper-slide.gamcheon .main-banner-text h2 {
+  margin-bottom: 0px; /* 기존 12px → 4px */
+  line-height: 1.2;   /* 줄 간격도 약간 조정 */
+}
+
+.swiper-slide.gamcheon .main-banner-text p {
+  margin-top: 15px;      /* 혹시 기본 margin 있으면 제거 */
+  margin-right: 10px;
+}
+
+/* 해동용궁사 전용 스타일 */
+.swiper-slide.yonggungsa .main-banner-text {
+  color: #fff;
+  padding: 12px 20px;        /* 여백은 유지 */
+  border-radius: 8px;
+}
+
+.swiper-slide.yonggungsa .main-banner-text h2 {
+  margin-bottom: 6px;        /* h2와 p 간격 살짝 */
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.6); /* 글자 그림자 */
+}
+
+.swiper-slide.yonggungsa .main-banner-text p {
+  margin-top: 0;
+  color: rgba(255, 255, 255, 0.9); /* 설명 글씨 흰색에 가까움 */
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6); /* 설명에도 그림자 */
+}
+
+
+
 
 /* ================== ✅ 이달의 인기 투어 ================== */
 .tour-section {

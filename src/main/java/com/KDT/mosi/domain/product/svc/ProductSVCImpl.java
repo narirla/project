@@ -3,14 +3,16 @@ package com.KDT.mosi.domain.product.svc;
 import com.KDT.mosi.domain.entity.Product;
 import com.KDT.mosi.domain.member.dao.MemberDAO;
 import com.KDT.mosi.domain.product.dao.ProductDAO;
+import com.KDT.mosi.web.form.product.ProductTempSaveForm; // DTO 임포트
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.io.IOException;
 import java.sql.Date;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class ProductSVCImpl implements ProductSVC {
@@ -36,7 +38,6 @@ public class ProductSVCImpl implements ProductSVC {
   public Product updateProduct(Product product) {
     Long memberId = extractMemberId(product);
     validateMemberId(memberId);
-    // 기존 상품 존재 여부 체크 추가 가능
     return productDAO.update(product);
   }
 
@@ -58,14 +59,12 @@ public class ProductSVCImpl implements ProductSVC {
 
   @Override
   public List<Product> getProductsByMemberIdAndStatusAndPage(Long memberId, String status, int page, int size) {
-    // DAO에 적절한 메서드를 호출
     return productDAO.findByMemberIdAndStatusWithPaging(memberId, status, page, size);
   }
 
   // 카테고리별 상품출력
   @Override
   public List<Product> getProductsByCategoryAndPageAndSize(String category, int page, int size) {
-    // DAO에 적절한 메서드를 호출
     return productDAO.findByCategoryWithPaging(category, page, size);
   }
 
@@ -78,7 +77,7 @@ public class ProductSVCImpl implements ProductSVC {
 
     Product product = optionalProduct.get();
     product.setStatus(status);
-    product.setUpdateDate(new Date(System.currentTimeMillis())); // 현재 시간으로 세팅
+    product.setUpdateDate(new Date(System.currentTimeMillis()));
     productDAO.update(product);
   }
 
@@ -90,7 +89,6 @@ public class ProductSVCImpl implements ProductSVC {
   // 카테고리별 상품 갯수
   @Override
   public long countByCategory(String category) {
-    // DAO에 적절한 메서드를 호출
     return productDAO.countByCategory(category);
   }
 
@@ -104,7 +102,6 @@ public class ProductSVCImpl implements ProductSVC {
     return productDAO.countAll();
   }
 
-  // Member 객체에서 ID 안전하게 추출
   private Long extractMemberId(Product product) {
     if (product == null || product.getMember() == null) {
       return null;
@@ -112,7 +109,6 @@ public class ProductSVCImpl implements ProductSVC {
     return product.getMember().getMemberId();
   }
 
-  // memberId 유효성 검사
   private void validateMemberId(Long memberId) {
     if (memberId == null || !memberDAO.isExistMemberId(memberId)) {
       throw new IllegalArgumentException("존재하지 않는 회원 ID입니다: " + memberId);
@@ -120,4 +116,74 @@ public class ProductSVCImpl implements ProductSVC {
   }
 
   public long countByMemberId(Long memberId){ return productDAO.countByMemberId(memberId); }
+
+  // -------------------------------------------------------------
+  // ✨✨✨ 임시저장 기능 구현 부분 ✨✨✨
+  // -------------------------------------------------------------
+  @Override
+  @Transactional
+  public Product saveTempProduct(ProductTempSaveForm form, Long memberId) {
+    // 1. DTO -> 엔티티 변환
+    Product product = new Product();
+
+    // memberId 설정 (member 엔티티를 조회하여 설정)
+    product.setMember(memberDAO.findById(memberId).orElseThrow(
+        () -> new IllegalArgumentException("존재하지 않는 회원 ID입니다.")
+    ));
+
+    // 백엔드에서 자동으로 설정하는 필수 필드
+    product.setStatus("임시저장");
+    product.setCreateDate(new Date(System.currentTimeMillis()));
+    product.setUpdateDate(new Date(System.currentTimeMillis()));
+
+    // 2. 사용자가 입력한 필드 설정 (NULL 허용)
+    // title
+    product.setTitle(form.getTitle());
+
+    // category
+    product.setCategory(form.getCategory() != null && !form.getCategory().isEmpty() ? form.getCategory() : "임시저장");
+
+    // 나머지 필드들
+    product.setGuideYn(form.getGuideYn());
+    product.setNormalPrice(form.getNormalPrice());
+    product.setGuidePrice(form.getGuidePrice());
+    product.setSalesPrice(form.getSalesPrice());
+    product.setSalesGuidePrice(form.getSalesGuidePrice());
+    product.setTotalDay(form.getTotalDay());
+    product.setTotalTime(form.getTotalTime());
+    product.setReqMoney(form.getReqMoney());
+    product.setSleepInfo(form.getSleepInfo());
+    product.setTransportInfo(form.getTransportInfo());
+    product.setFoodInfo(form.getFoodInfo());
+    product.setReqPeople(form.getReqPeople());
+    product.setTarget(form.getTarget());
+    product.setStucks(form.getStucks());
+    product.setDescription(form.getDescription());
+    product.setDetail(form.getDetail());
+
+    // 줄바꿈 정규화 (\r\n → \n)
+    if (form.getPriceDetail() != null) {
+      product.setPriceDetail(form.getPriceDetail().replaceAll("\r\n", "\n"));
+    }
+    if (form.getGpriceDetail() != null) {
+      product.setGpriceDetail(form.getGpriceDetail().replaceAll("\r\n", "\n"));
+    }
+
+
+    // 3. 파일 처리
+    if (form.getDocumentFile() != null && !form.getDocumentFile().isEmpty()) {
+      try {
+        product.setFileName(form.getDocumentFile().getOriginalFilename());
+        product.setFileType(form.getDocumentFile().getContentType());
+        product.setFileSize(form.getDocumentFile().getSize());
+        product.setFileData(form.getDocumentFile().getBytes());
+      } catch (IOException e) {
+        log.error("파일 처리 중 오류 발생", e);
+        throw new RuntimeException("파일 처리 중 오류가 발생했습니다.", e);
+      }
+    }
+
+    // 4. DAO를 통해 DB에 저장 (insert)
+    return productDAO.insert(product);
+  }
 }

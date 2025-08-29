@@ -1,6 +1,6 @@
-<!-- src/main/resources/templates/bbs/bbs_detail.html -->
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="utf-8">
   <title th:text="${'Mo:Si  ' + bbs.title}">게시글</title>
@@ -20,10 +20,15 @@
 </head>
 
 <body th:attr="data-parent-id=${bbs.bbsId}">
-<header th:replace="${loginRole} == 'SELLER' ?
-          ~{fragments/sellerHeader :: sellerHeader} :
-          ~{fragments/header :: header}">
-</header>
+
+
+<th:block th:switch="${session.loginRole ?: 'BUYER'}">
+  <header th:case="'SELLER'" th:replace="~{fragments/sellerHeader :: sellerHeader(activeUri=${currentPath ?: ''})}">
+  </header>
+  <header th:case="*" th:replace="~{fragments/header :: header(activeUri=${currentPath ?: ''})}">
+  </header>
+</th:block>
+
 
 <!-- ========================= MAIN LAYOUT ========================= -->
 <div class="layout-wrapper">
@@ -42,24 +47,30 @@
         </div>
       </aside>
 
+
       <!-- ---------- 본문 영역 ---------- -->
       <section class="content">
         <section class="post-section">
-          <div class="board" th:id="${bbs.bbsId}"><h1>게시글</h1></div>
+          <div class="board" th:id="${bbs.bbsId}">
+            <h1>게시글</h1>
+          </div>
 
           <div class="btnGroup">
             <span class="location">커뮤니티 &gt; 자유 게시판</span>
-            <div class="btn-controll" th:classappend="${ #authorization.expression('isAuthenticated()') and (#authentication.principal.member.memberId != bbs.memberId)} ? 'hidden' : ''">
+            <div class="btn-controll"
+                 th:classappend="${ #authorization.expression('isAuthenticated()') and (#authentication.principal.member.memberId != bbs.memberId)} ? 'hidden' : ''">
               <div class="btn-area view-mode">
                 <button id="btn-edit" class="btn-post-edit" type="button">수정</button>
                 <button id="btn-del" class="btn-post-delete" type="button">삭제</button>
               </div>
               <div class="edit-mode hidden">
-                <button id="btn-save"    class="btn-post-save"   type="button">저장</button>
-                <button id="btn-cancel"  class="btn-post-cancel" type="button">취소</button>
+                <button id="btn-save" class="btn-post-save" type="button">저장</button>
+                <button id="btn-cancel" class="btn-post-cancel" type="button">취소</button>
               </div>
             </div>
-            <button id="btn-reply" th:classappend="${(#authentication.principal.member.memberId == bbs.memberId) and (bbs.bindent < 2)} ? 'hidden' : ''" type="button">
+            <button id="btn-reply"
+                    th:classappend="${(#authentication.principal.member.memberId == bbs.memberId) and (bbs.bindent < 2)} ? 'hidden' : ''"
+                    type="button">
               답글
             </button>
           </div>
@@ -71,36 +82,29 @@
             <p class="meta-item"><span th:text="${bbs.title}">게시글 제목</span></p>
             <p class="meta-item contentCategory"><span th:text="${bbs.bcategory}">[카테고리]</span></p>
             <div class="contentInfo">
-              <img class="post-pic profile-pic"
-                   th:if="${picData != null}"
-                   th:src="${picData}"
-                   th:alt="${bbs.memberId}" />
+              <img class="post-pic profile-pic" th:if="${picData != null}" th:src="${picData}"
+                   th:alt="${bbs.memberId}"/>
 
-              <img class="post-pic profile-pic"
-                   th:if="${picData == null}"
-                   th:src="@{/img/bbs/bbs_detail/profile-pic.png}"
-                   th:alt="${bbs.memberId}" />
+              <img class="post-pic profile-pic" th:if="${picData == null}"
+                   th:src="@{/img/bbs/bbs_detail/profile-pic.png}" th:alt="${bbs.memberId}"/>
               <div class="info-text">
                 <span class="nickname" th:text="${bbs.nickname}">닉네임</span>
                 <span class="hit" th:text="${'조회수 '+bbs.hit}">조회수</span>
                 <div class="time-group">
-                  <span class="createTime"  th:text="${'작성일: ' + #temporals.format(bbs.createDate, 'yyyy.MM.dd HH:mm')}">2025.07.02 09:58</span>
-                  <span class="updateTime"  th:text="${'수정일: ' + #temporals.format(bbs.updateDate, 'yyyy.MM.dd HH:mm')}">2025.07.02 09:58</span>
+                    <span class="createTime"
+                          th:text="${'작성일: ' + #temporals.format(bbs.createDate, 'yyyy.MM.dd HH:mm')}">2025.07.02
+                      09:58</span>
+                  <span class="updateTime"
+                        th:text="${'수정일: ' + #temporals.format(bbs.updateDate, 'yyyy.MM.dd HH:mm')}">2025.07.02
+                      09:58</span>
                 </div>
               </div>
-              <button id="btn-report"
-                      type="button"
-                      th:attr="data-reported=${reported}"
-                      th:disabled="${reported}" >
+              <button id="btn-report" type="button" th:attr="data-reported=${reported}" th:disabled="${reported}">
                 <!-- 신고된 경우 -->
-                <img th:if="${reported}"
-                     th:src="@{/img/bbs/bbs_detail/report_filled.png}"
-                     alt="신고됨 아이콘">
+                <img th:if="${reported}" th:src="@{/img/bbs/bbs_detail/report_filled.png}" alt="신고됨 아이콘">
 
                 <!-- 신고되지 않은 경우 -->
-                <img th:unless="${reported}"
-                     th:src="@{/img/bbs/bbs_detail/report_begin.png}"
-                     alt="신고 아이콘">
+                <img th:unless="${reported}" th:src="@{/img/bbs/bbs_detail/report_begin.png}" alt="신고 아이콘">
 
                 <span>신고</span>
               </button>
@@ -118,15 +122,11 @@
           <div class="contentReview">
             <button id="btn-like" type="button">
 
-              <img th:if="${liked}"
-                   th:src="@{/img/bbs/bbs_detail/Icon_Heart_fill.png}"
-                   alt="좋아요 활성화 아이콘"
-                   width="21" height="21"/>
+              <img th:if="${liked}" th:src="@{/img/bbs/bbs_detail/Icon_Heart_fill.png}" alt="좋아요 활성화 아이콘" width="21"
+                   height="21"/>
 
-              <img th:unless="${liked}"
-                   th:src="@{/img/bbs/bbs_detail/Icon_Heart.png}"
-                   alt="좋아요 비활성화 아이콘"
-                   width="21" height="21"/>
+              <img th:unless="${liked}" th:src="@{/img/bbs/bbs_detail/Icon_Heart.png}" alt="좋아요 비활성화 아이콘" width="21"
+                   height="21"/>
               <span class="cntLike" th:text="${'좋아요  ' + cnt_like}">좋아요 0</span>
             </button>
             <div class="commentCnt">
@@ -161,13 +161,7 @@
           <form id="edit-form">
             <!-- 제목 -->
             <label for="edit-title" class="form-label">제목</label>
-            <input
-                type="text"
-                id="edit-title"
-                name="title"
-                th:value="${bbs.title}"
-                required
-            />
+            <input type="text" id="edit-title" name="title" th:value="${bbs.title}" required/>
             <!-- 본문 에디터 -->
 
             <div class="content-editor-wrapper">
@@ -216,9 +210,9 @@
             </div>
           </form>
         </div>
-        <div class="post-nav" >
-          <button type="button" id="btn-list" >
-            <img th:src="@{/img/bbs/bbs_detail/comment.png}"alt="목록">
+        <div class="post-nav">
+          <button type="button" id="btn-list">
+            <img th:src="@{/img/bbs/bbs_detail/comment.png}" alt="목록">
             목록
           </button>
         </div>
@@ -243,4 +237,5 @@
 <script type="module" src="/js/community/bbs/csr/community_detail.js"></script>
 <script th:src="@{/js/layout.js}"></script>
 </body>
+
 </html>

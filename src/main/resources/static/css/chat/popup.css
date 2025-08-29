@@ -1,10 +1,10 @@
 :root {
   /* 공통 색상 변수 */
-  --me: #22C5CD;     /* 내가 보낸 말풍선 */
-  --them: #F8F8F8;   /* 상대방 말풍선 */
-  --bg: #fff;        /* 배경색 */
-  --line: #e9ecef;   /* 구분선 */
-  --text: #222;      /* 기본 글자색 */
+  --me: #22c5cd; /* 내가 보낸 말풍선 */
+  --them: #f8f8f8; /* 상대방 말풍선 */
+  --bg: #fff; /* 배경색 */
+  --line: #e9ecef; /* 구분선 */
+  --text: #222; /* 기본 글자색 */
 }
 
 /* ========================= */
@@ -18,7 +18,7 @@ html,
 body {
   height: 100%;
   margin: 0;
-  font-family: 'Pretendard', sans-serif;
+  font-family: "Pretendard", sans-serif;
   color: var(--text);
   background: var(--bg);
   overflow: hidden;
@@ -26,23 +26,20 @@ body {
 
 body {
   display: flex;
-  flex-direction: column;  /* 헤더-본문-입력창 세로 배치 */
+  flex-direction: column; /* 헤더-본문-입력창 세로 배치 */
   background: #fff;
 
   width: 100%;
   height: 100%;
 
   /* ✅ 최소 크기 보장 */
-  min-width: 470px;
-  min-height: 800px;
+  min-width: 405px;
+  min-height: 600px;
 
   /* ✅ 화면에 꽉 차도록 (팝업 창 크기에 따라 자동 늘어남) */
   max-width: 100%;
   max-height: 100%;
 }
-
-
-
 
 /* ========================= */
 /* 상단 헤더                  */
@@ -52,7 +49,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-bottom: 1px solid #D9D9D9;
+  border-bottom: 1px solid #d9d9d9;
   position: sticky;
   top: 0;
   background: #fff;
@@ -77,12 +74,68 @@ body {
   color: #666;
 }
 
+/* 종료 요청 */
+.endBtn {
+  margin-top: 25px;
+  border: none;
+  background-color: #fff;
+  color: #22c5cd;
+}
+
+.endBtn:hover {
+  /* font-weight: bold; */
+  cursor: pointer;
+  color: rgb(243, 32, 32);
+  margin-top: 25px;
+  border: none;
+  background-color: #fff;
+  transition-delay: 0.1;
+}
+
+/* 종료 확인 박스 및 버튼 */
+.end-confirm {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.end-dialog-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.endYes {
+  width: 50px;
+  border: none;
+  background-color: #80ccd6;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 300;
+}
+
+.endYes:hover {
+  background-color: #22c5cd;
+  transition-delay: 0.2;
+}
+
+.endNo {
+  width: 50px;
+  border: none;
+  background-color: #bfbfbf;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 300;
+}
+.endNo:hover {
+  background-color: #8b8b8b;
+  transition-delay: 0.2;
+}
+
 /* 신고 버튼 (아이콘+텍스트 가로 배치) */
 .header .icon-btn.report-btn {
   width: 44px;
   min-width: 0;
   height: 44px;
-  margin-left: 15px;
+  margin-left: 0px;
   display: inline-flex;
   flex-direction: row;
   align-items: flex-end;
@@ -101,7 +154,7 @@ body {
   font-weight: 500;
   line-height: 1;
   user-select: none;
-  color: #6B6B6B;
+  color: #6b6b6b;
 }
 
 /* ========================= */
@@ -114,14 +167,13 @@ body {
   min-height: 100px;
   gap: 10px;
   padding: 10px 12px;
-  border-bottom: 1px solid #D9D9D9;
+  border-bottom: 1px solid #d9d9d9;
 
-  position: sticky;   /* ✅ 스크롤 내려도 고정 */
-  top: 50px;          /* 헤더(50px) 바로 아래에 붙도록 */
-  background: #fff;   /* 겹침 방지 */
+  position: sticky; /* ✅ 스크롤 내려도 고정 */
+  top: 50px; /* 헤더(50px) 바로 아래에 붙도록 */
+  background: #fff; /* 겹침 방지 */
   z-index: 9;
 }
-
 
 .product-thumb {
   width: 75px;
@@ -145,7 +197,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;     /* ✅ 폭 자동 */
+  max-width: 100%; /* ✅ 폭 자동 */
   height: 30px;
   display: block;
 }
@@ -164,14 +216,14 @@ body {
   overflow-y: auto;
   padding: 12px;
   background: #ffffff;
+  min-height: 0; /*flex 레이아웃에서 스크롤 영역 정상 작동*/
 }
-
 
 .item {
   display: flex;
   margin: 6px 0;
   gap: 6px;
-  max-width: 75%;   /* ✅ 상대적 너비 */
+  max-width: 75%; /* ✅ 상대적 너비 */
 }
 
 .item.them {
@@ -241,9 +293,14 @@ body {
 
 .bubble img.msg-img {
   display: block;
-  max-width: 100%;   /* ✅ 부모 폭에 맞게 */
+  max-width: 100%; /* ✅ 부모 폭에 맞게 */
   height: auto;
   border-radius: 12px;
+}
+
+.sys-msg-box {
+  text-align: center;
+  color: #80ccd6;
 }
 
 /* ========================= */
@@ -255,6 +312,7 @@ body {
   gap: 8px;
   padding: 10px 12px;
   background: #fff;
+  flex-shrink: 0; /*줄어들지 않게*/
   position: sticky;
   bottom: 0;
 }
@@ -272,7 +330,7 @@ body {
 
 .input input[type="text"] {
   flex: 1;
-  min-width: 0;        /* ✅ 줄어듦 대응 */
+  min-width: 0; /* ✅ 줄어듦 대응 */
   height: 40px;
   padding: 0 12px;
   border: 1px solid var(--line);

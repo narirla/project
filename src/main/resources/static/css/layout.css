@@ -29,7 +29,7 @@ header {
   width: 100%;
   height: 167px;
   background-color: #fff;
-  z-index: 1000;
+  z-index: 3000;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -624,37 +624,36 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-
-/* ============================= */
-/* ✅ 장바구니 배지 스타일        */
-/* ============================= */
-.cart-link {
-  position: relative;
 }
 
-.cart-badge {
+/* 장바구니 카운트 배지 */
+.cart-link {
+  position: relative;
+  display: inline-block;
+}
+
+#cart-count {
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #ff4757;
+  background-color: #FF6B6B;
   color: white;
-  border-radius: 50%;
-  padding: 0;
+  border-radius: 8px;
+  padding: 3px 6px;
   font-size: 11px;
-  font-weight: bold;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
-  text-align: center;
+  font-weight: 600;
+  min-width: 16px;
+  min-height: 16px;
+  line-height: 1;
   box-sizing: border-box;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
-.cart-badge:empty {
+#cart-count:empty,
+#cart-count.hidden {
   display: none;
 }
 

@@ -5,32 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>장바구니 - MO:SI</title>
 
-  <!-- 기존 CSS 파일 -->
+  <!-- CSS 파일 -->
   <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/buyerpage/buyerMypageHome.css}">
   <!-- 업데이트된 장바구니 CSS -->
-  <link rel="stylesheet" th:href="@{/css/cart/cart.css}">
+  <link rel="stylesheet" th:href="@{/css/cart/cart.css?v=2}">
   <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css}">
   <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css}">
 
-  <!-- CSRF 토큰 -->
-  <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
-  <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
+
 </head>
 <body>
 <div class="layout-wrapper">
-  <!-- 기존 헤더 -->
-  <header th:replace="~{fragments/header :: header}"></header>
+  <!-- 헤더 -->
+  <th:block th:switch="${session.loginRole ?: 'BUYER'}">
+    <header th:case="'SELLER'" th:replace="~{fragments/sellerHeader :: sellerHeader(activeUri=${currentPath ?: ''})}">
+    </header>
+    <header th:case="*" th:replace="~{fragments/header :: header(activeUri=${currentPath ?: ''})}">
+    </header>
+  </th:block>
 
   <div class="page-container">
     <main class="mypage-container">
-      <!-- 기존 사이드바 -->
-      <aside th:replace="~{fragments/buyerSidebar :: buyerSidebar('cart', ${member})}"></aside>
+      <!-- 사이드바 -->
+      <aside th:if="${session.loginRole == 'BUYER'}"
+             th:replace="~{fragments/buyerSidebar :: buyerSidebar(activePath='cart', member=${loginMember})}"></aside>
+      <aside th:if="${session.loginRole == 'SELLER'}"
+             th:replace="~{fragments/sellerSidebar :: sellerSidebar(activePath='cart', member=${loginMember})}"></aside>
 
       <section class="content">
-        <!-- 🏝️ React Islands: 기존 Thymeleaf 레이아웃은 그대로 두고, 
-             이 div에만 React 컴포넌트가 마운트됩니다 -->
         <div class="cart-page-header">
           <div class="cart-title-breadcrumb">
             <h1 class="page-title">장바구니</h1>
@@ -38,8 +42,6 @@
           </div>
           <div class="title-divider"></div>
         </div>
-        
-        <!-- React Island: 순수 장바구니 리스트만 렌더링 -->
         <div id="cart-root"></div>
       </section>
     </main>
@@ -52,23 +54,12 @@
     </div>
   </div>
 
-  <!-- 기존 푸터 -->
+  <!-- 푸터 -->
   <footer th:replace="~{fragments/footer :: footer}"></footer>
 </div>
-
-<!-- React Fast Refresh(화면 자동 반영) -->
-<script th:if="${@environment.acceptsProfiles('dev')}" type="module">
-  import RefreshRuntime from 'http://localhost:3000/@react-refresh'
-  RefreshRuntime.injectIntoGlobalHook(window)
-  window.$RefreshReg$ = () => {}
-  window.$RefreshSig$ = () => (type) => type
-  window.__vite_plugin_react_preamble_installed__ = true
-</script>
-
 <!-- React 스크립트 -->
-<script th:if="${@environment.acceptsProfiles('dev')}" type="module" src="http://localhost:3000/@vite/client"></script>
-<script th:if="${@environment.acceptsProfiles('dev')}" type="module" src="http://localhost:3000/src/main.jsx"></script>
-<script th:unless="${@environment.acceptsProfiles('dev')}" type="module" src="/assets/main.js"></script>
+<script th:if="${@environment.acceptsProfiles('local')}" type="module" src="http://localhost:3000/@vite/client"></script>
+    <script th:unless="${@environment.acceptsProfiles('local')}" type="module" th:src="@{/assets/main-BwBf_jCb.js}"></script>
 
 <!-- 기존 스크립트 -->
 <script th:src="@{/js/buyerpage/buyerMypageHome.js}"></script>

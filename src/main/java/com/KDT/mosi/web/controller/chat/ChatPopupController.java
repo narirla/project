@@ -47,6 +47,12 @@ public class ChatPopupController {
       partnerNickname = popupInfo.getSellerNickname();
     }
 
+    // ✅ 내가 seller인지 buyer인지 판별
+    String role = "BUYER";
+    if (popupInfo.getSellerId().equals(senderId)) {
+      role = "SELLER";
+    }
+
     // 모델에 담기
     model.addAttribute("roomId", popupInfo.getRoomId());
     model.addAttribute("senderId", senderId);
@@ -54,6 +60,7 @@ public class ChatPopupController {
     model.addAttribute("productTitle", popupInfo.getProductTitle());
     model.addAttribute("productPrice", popupInfo.getProductPrice());
     model.addAttribute("productThumbBase64", productThumbBase64);
+    model.addAttribute("role", role);
 
     log.info("📩 popup opened: roomId={}, sender={}, partner={}",
         roomId, senderId, partnerNickname);

@@ -39,6 +39,10 @@ public class LoginController {
   public String logout(HttpServletRequest request) {
     HttpSession session = request.getSession(false);
     if (session != null) {
+      // 주문 진행 상태만 삭제 (장바구니는 유지)
+      session.removeAttribute("orderInProgress");
+      
+      // 전체 세션 무효화
       session.invalidate();
     }
     return "redirect:/";

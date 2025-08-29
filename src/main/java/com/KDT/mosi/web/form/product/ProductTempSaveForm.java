@@ -1,8 +1,5 @@
-// ProductTempSaveForm.java
+package com.KDT.mosi.web.form.product;
 
-package com.KDT.mosi.domain.product.dto;
-
-import com.KDT.mosi.domain.entity.Product;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -41,5 +38,4 @@ public class ProductTempSaveForm {
   private MultipartFile documentFile; // 대표 이미지 파일
   private List<MultipartFile> productImages; // 추가 이미지 파일 리스트
 
-  // ... (나머지 getter/setter는 Lombok의 @Data가 자동으로 생성합니다.)
 }

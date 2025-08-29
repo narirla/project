@@ -16,9 +16,11 @@ import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -125,21 +127,50 @@ public class ProductSearchService {
         .build();
   }
 
+  // ✨✨✨ 수정된 메서드: '판매중' 상품만 인덱싱 ✨✨✨
+  @Scheduled(cron = "0 */5 * * * ?")
   public void indexAllProductsFromDB() {
-    log.info("DB의 모든 상품을 인덱싱합니다.");
+    log.info("DB에서 '판매중' 상태의 상품만 인덱싱합니다.");
     long totalCount = productDAO.countAll();
     int pageSize = 100;
     int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
     for (int page = 1; page <= totalPages; page++) {
+      // DB에서 모든 상품을 가져옴
       List<Product> products = productDAO.findAllByPage(page, pageSize);
+
+      // '판매중' 상태의 상품만 필터링
       List<ProductDocument> productDocuments = products.stream()
+          .filter(p -> "판매중".equals(p.getStatus()))
           .map(this::convertToDocument)
           .collect(Collectors.toList());
-      productDocumentRepository.saveAll(productDocuments);
-      log.info("Page " + page + "/" + totalPages + " : " + products.size() + " products indexed.");
+
+      if (!productDocuments.isEmpty()) {
+        productDocumentRepository.saveAll(productDocuments);
+        log.info("Page " + page + "/" + totalPages + " : " + productDocuments.size() + " products indexed.");
+      } else {
+        log.info("Page " + page + "/" + totalPages + " : No '판매중' products to index.");
+      }
     }
-    log.info("Total " + totalCount + " products have been successfully indexed.");
+    log.info("DB의 모든 '판매중' 상품 인덱싱이 완료되었습니다.");
+  }
+
+  // ✨✨✨ 상품 인덱싱 (추가/수정 시) ✨✨✨
+  public void indexProduct(Product product) throws IOException {
+    if ("판매중".equals(product.getStatus())) {
+      ProductDocument document = convertToDocument(product);
+      productDocumentRepository.save(document);
+      log.info("상품 ID {}가 성공적으로 인덱싱되었습니다.", product.getProductId());
+    } else {
+      // '판매중'이 아니면 인덱스에서 삭제
+      deleteProduct(product.getProductId());
+    }
+  }
+
+  // ✨✨✨ 상품 삭제 (삭제 시) ✨✨✨
+  public void deleteProduct(Long productId) {
+    productDocumentRepository.deleteById(String.valueOf(productId));
+    log.info("상품 ID {}가 인덱스에서 삭제되었습니다.", productId);
   }
 
   public List<String> searchAutocomplete(String keyword) {

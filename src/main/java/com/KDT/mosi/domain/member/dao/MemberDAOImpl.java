@@ -95,15 +95,17 @@ public class MemberDAOImpl implements MemberDAO {
   @Override
   public int update(Member member) {
     String sql = """
-      UPDATE member SET 
-        name = :name, passwd = :passwd, tel = :tel, nickname = :nickname, gender = :gender, 
-        address = :address, birth_date = :birthDate, pic = :pic, update_date = systimestamp 
-      WHERE member_id = :memberId
-    """;
+    UPDATE member SET 
+      name = :name, passwd = :passwd, tel = :tel, nickname = :nickname, gender = :gender,
+      address = :address, birth_date = :birthDate, pic = :pic, update_date = systimestamp
+    WHERE member_id = :memberId
+  """;
 
+    log.info("✅ DAO 단계 Member.nickname = {}", member.getNickname()); // 추가
     SqlParameterSource param = new BeanPropertySqlParameterSource(member);
     return template.update(sql, param);
   }
+
 
   /** 전화번호로 이메일 찾기 */
   @Override
@@ -214,6 +216,16 @@ public class MemberDAOImpl implements MemberDAO {
     Map<String, Object> params = Map.of("memberId", memberId);
 
     return template.queryForList(sql, params, String.class);
+  }
+
+  @Override
+  public int updateNickname(Long memberId, String nickname) {
+    String sql = "UPDATE member SET nickname = :nickname WHERE member_id = :memberId";
+    Map<String, Object> param = Map.of(
+        "nickname", nickname,
+        "memberId", memberId
+    );
+    return template.update(sql, param);
   }
 
 }

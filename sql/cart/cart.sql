@@ -1,0 +1,136 @@
+-- 기존 테이블 삭제
+DROP TABLE CART_ITEMS CASCADE CONSTRAINTS;
+DROP TABLE ORDER_ITEMS CASCADE CONSTRAINTS;
+DROP TABLE CART CASCADE CONSTRAINTS;
+DROP TABLE ORDERS CASCADE CONSTRAINTS;
+
+-- 기존 시퀀스 삭제
+DROP SEQUENCE CART_ITEMS_SEQ;
+DROP SEQUENCE ORDER_ITEMS_SEQ;
+DROP SEQUENCE CART_SEQ;
+DROP SEQUENCE ORDERS_SEQ;
+
+-- 장바구니 테이블
+CREATE TABLE CART (
+    CART_ID         NUMBER(10)      PRIMARY KEY,                                 -- PK
+    BUYER_ID        NUMBER(10)      NOT NULL,                                    -- 구매자 ID
+    TOTAL_PRICE     NUMBER(10)      NOT NULL,                                    -- 총 금액
+    CREATED_AT      TIMESTAMP       DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT      TIMESTAMP       DEFAULT SYSTIMESTAMP NOT NULL
+);
+
+-- 장바구니 제약 조건
+ALTER TABLE CART ADD CONSTRAINT FK_CART_BUYER FOREIGN KEY (BUYER_ID)
+REFERENCES MEMBER(MEMBER_ID) ON DELETE CASCADE;
+
+-- 장바구니 시퀀스
+CREATE SEQUENCE CART_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+-- 장바구니 상품 테이블
+CREATE TABLE CART_ITEMS (
+    CART_ITEM_ID    NUMBER(10)      PRIMARY KEY,                                    -- PK
+    CART_ID         NUMBER(10)      NOT NULL,                                       -- 장바구니 ID
+    BUYER_ID        NUMBER(10)      NOT NULL,                                       -- 구매자 ID
+    SELLER_ID       NUMBER(10)      NOT NULL,                                       -- 판매자 ID
+    PRODUCT_ID      NUMBER(10)      NOT NULL,                                       -- 상품 ID
+    OPTION_TYPE     VARCHAR2(30)    NOT NULL,                                       -- 옵션 구분
+    QUANTITY        NUMBER(5)       DEFAULT 1 CHECK (QUANTITY>0),                   -- 수량
+    ORIGINAL_PRICE  NUMBER(10)      NOT NULL,                                       -- 정가
+    SALE_PRICE      NUMBER(10)      NOT NULL,                                       -- 할인가
+    CREATED_AT      TIMESTAMP       DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT      TIMESTAMP       DEFAULT SYSTIMESTAMP NOT NULL
+);
+
+-- 장바구니 상품 제약 조건
+ALTER TABLE CART_ITEMS ADD CONSTRAINT FK_CART_ITEMS_CART FOREIGN KEY (CART_ID)
+REFERENCES CART(CART_ID) ON DELETE CASCADE;
+
+ALTER TABLE CART_ITEMS ADD CONSTRAINT FK_CART_ITEMS_BUYER FOREIGN KEY (BUYER_ID)
+REFERENCES MEMBER(MEMBER_ID) ON DELETE CASCADE;
+
+ALTER TABLE CART_ITEMS ADD CONSTRAINT FK_CART_ITEMS_SELLER FOREIGN KEY (SELLER_ID)
+REFERENCES MEMBER(MEMBER_ID) ON DELETE CASCADE;
+
+ALTER TABLE CART_ITEMS ADD CONSTRAINT FK_CART_ITEMS_PRODUCT FOREIGN KEY (PRODUCT_ID)
+REFERENCES PRODUCT(PRODUCT_ID) ON DELETE CASCADE;
+
+ALTER TABLE CART_ITEMS ADD CONSTRAINT CHK_CART_ITEMS_OPTION_TYPE
+CHECK (OPTION_TYPE IN ('기본코스', '가이드포함'));
+
+-- 복합 유니크 키: 한 회원이 동일 상품을 중복 담지 못하도록 함
+ALTER TABLE CART_ITEMS ADD CONSTRAINT UK_CART_BUYER_PRODUCT UNIQUE (BUYER_ID, PRODUCT_ID);
+
+-- 장바구니 상품 시퀀스
+CREATE SEQUENCE CART_ITEMS_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+-- 주문서 테이블
+CREATE TABLE ORDERS (
+    ORDER_ID        NUMBER(10)      PRIMARY KEY,                                    -- PK
+    ORDER_CODE      VARCHAR2(150)   NOT NULL,                                       -- 주문번호
+    BUYER_ID        NUMBER(10)      NOT NULL,                                       -- 구매자 ID
+    TOTAL_PRICE     NUMBER(10)      NOT NULL,                                       -- 총액
+    SPECIAL_REQUEST VARCHAR2(150),                                                  -- 요청사항
+    ORDER_DATE      TIMESTAMP       DEFAULT SYSTIMESTAMP NOT NULL,                  -- 주문 일자
+    STATUS          VARCHAR2(20)    DEFAULT '결제대기' NOT NULL                      -- 주문 상태
+);
+
+-- 주문서 제약 조건
+ALTER TABLE ORDERS ADD CONSTRAINT FK_ORDERS_BUYER FOREIGN KEY (BUYER_ID)
+REFERENCES MEMBER(MEMBER_ID) ON DELETE CASCADE;
+
+ALTER TABLE ORDERS ADD CONSTRAINT CHK_ORDERS_STATUS
+CHECK (STATUS IN ('결제대기', '결제완료', '취소'));
+SELECT * FROM ORDERS;
+-- 주문서 시퀀스
+CREATE SEQUENCE ORDERS_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+-- 주문 상세 테이블
+CREATE TABLE ORDER_ITEMS (
+    ORDER_ITEM_ID   NUMBER(10)      PRIMARY KEY,                                   -- PK
+    ORDER_ID        NUMBER(10)      NOT NULL,                                      -- 주문 ID
+    PRODUCT_ID      NUMBER(10)      NOT NULL,                                      -- 상품 ID
+    SELLER_ID       NUMBER(10)      NOT NULL,                                      -- 판매자 ID
+    QUANTITY        NUMBER(5)       DEFAULT 1  CHECK (QUANTITY>0),                 -- 수량
+    ORIGINAL_PRICE  NUMBER(10)      NOT NULL,                                      -- 정가
+    SALE_PRICE      NUMBER(10)      NOT NULL,                                      -- 할인가
+    REQUEST         VARCHAR2(150),                                                 -- 요청사항
+    OPTION_TYPE     VARCHAR2(30)    NOT NULL,                                      -- 옵션 구분
+    REVIEWED        CHAR(1)         DEFAULT 'N' NOT NULL                           -- 리뷰 여부
+);
+
+-- 주문 상세 제약 조건
+ALTER TABLE ORDER_ITEMS ADD CONSTRAINT FK_ORDER_ITEMS_ORDER FOREIGN KEY (ORDER_ID)
+REFERENCES ORDERS(ORDER_ID) ON DELETE CASCADE;
+
+ALTER TABLE ORDER_ITEMS ADD CONSTRAINT FK_ORDER_ITEMS_PRODUCT FOREIGN KEY (PRODUCT_ID)
+REFERENCES PRODUCT(PRODUCT_ID) ON DELETE CASCADE;
+
+ALTER TABLE ORDER_ITEMS ADD CONSTRAINT FK_ORDER_ITEMS_SELLER FOREIGN KEY (SELLER_ID)
+REFERENCES MEMBER(MEMBER_ID) ON DELETE CASCADE;
+
+ALTER TABLE ORDER_ITEMS ADD CONSTRAINT CHK_ORDER_ITEMS_OPTION_TYPE
+CHECK (OPTION_TYPE IN ('기본코스', '가이드포함'));
+
+ALTER TABLE ORDER_ITEMS ADD CONSTRAINT CHK_ORDER_ITEMS_REVIEWED
+CHECK (REVIEWED IN ('Y', 'N'));
+
+-- 주문 상세 시퀀스
+CREATE SEQUENCE ORDER_ITEMS_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+COMMIT;

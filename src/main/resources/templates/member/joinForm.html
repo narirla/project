@@ -28,7 +28,7 @@
 
     <form th:action="@{/members/join}" th:object="${form}" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
       <div th:if="${#fields.hasGlobalErrors()}" class="error global-error">
-        <p th:each="err : ${#fields.globalErrors()}" th:text="${err.defaultMessage}"></p>
+        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
       </div>
 
       <!-- ✅ 이메일 (아이디/도메인 분리) -->

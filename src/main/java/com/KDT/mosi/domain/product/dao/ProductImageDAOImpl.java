@@ -54,7 +54,7 @@ public class ProductImageDAOImpl implements ProductImageDAO {
   public int insert(ProductImage productImage) {
     String sql = "INSERT INTO product_image (" +
         "image_id, product_id, image_data, image_order, file_name, file_size, mime_type, upload_time) " +
-        "VALUES (PRODUCT_IMAGE_IMAGE_ID_SEQ.NEXTVAL, :productId, :imageData, :imageOrder, :fileName, :fileSize, :mimeType, SYSDATE)";
+        "VALUES (IMAGE_IMAGE_ID_SEQ.NEXTVAL, :productId, :imageData, :imageOrder, :fileName, :fileSize, :mimeType, SYSDATE)";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
     MapSqlParameterSource params = new MapSqlParameterSource();

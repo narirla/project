@@ -18,7 +18,8 @@ public class ChatRoomListDto {
   private LocalDateTime createdAt;
 
   // 화면 표시용 추가 필드
-  private String buyerNickname;
+  private String buyerNickname;   // 판매자 화면에서 상대방(구매자) 닉네임
+  private String sellerNickname;  // 구매자 화면에서 상대방(판매자) 닉네임
   private String productTitle;
   private byte[] productImage;
   private String lastMessage;
@@ -26,4 +27,5 @@ public class ChatRoomListDto {
   // 🔔 새 메시지 여부
   private boolean hasNew;
 }
+
 

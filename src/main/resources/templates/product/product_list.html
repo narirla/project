@@ -23,7 +23,7 @@
     </th:block>
     <div class="page-container">
       <div class="breadcrumb">
-        <span>홈 &gt; 테마여행 &gt; <span id="category-select" th:attr="data-category=${selectedCategory}"
+         <span><a th:href="@{/}">홈</a> &gt; <a th:href="@{/product/list?category=all}">테마여행</a> &gt; <span id="category-select" th:attr="data-category=${selectedCategory}"
             th:text="${selectedCategory}"></span>
         </span>
       </div>
@@ -298,16 +298,16 @@
                   <a class="product-item-container" th:href="@{/product/view/{id}(id=${form.product.productId})}">
                     <div class="thumbnail">
                       <img th:if="${form.images != null and #lists.size(form.images) > 0}"
-                           th:src="${form.images[0].base64ImageData}" th:alt="${form.images[0].fileName}" />
+                        th:src="${form.images[0].base64ImageData}" th:alt="${form.images[0].fileName}" />
                       <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
-                           th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
+                        th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
                     </div>
                     <div class="product-info">
                       <h3 th:text="${form.product.title}">상품명</h3>
                       <p class="s-price"
-                         th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                        th:text="|${#numbers.formatDecimal(form.product.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
                       <p class="n-price"
-                         th:text="|${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                        th:text="|${#numbers.formatDecimal(form.product.normalPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
                     </div>
                   </a>
                 </div>

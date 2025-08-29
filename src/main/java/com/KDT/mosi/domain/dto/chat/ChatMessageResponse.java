@@ -3,6 +3,7 @@
 package com.KDT.mosi.domain.dto.chat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,8 @@ public record ChatMessageResponse(
     boolean read,
     String seller_nickname,     // member 테이블 조인
     String buyer_nickname,     // member 테이블 조인
+    @JsonProperty("seller_profileImage")
     byte[] seller_profileImage,  // member 테이블 조인
+    @JsonProperty("buyer_profileImage")
     byte[] buyer_profileImage  // member 테이블 조인
 ) {}

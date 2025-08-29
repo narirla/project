@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const imageMsg = document.getElementById('imageMsg');
   const telInput = document.querySelector('#tel');
   const telMsg = document.querySelector('#telMsg');
+  const charCount = document.querySelector('.char-count');
 
   // ─── 상태 값 ───
   let isNicknameChecked = false;
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const allowExt = ['jpg', 'jpeg', 'png', 'gif'];
   const maxSize = 2 * 1024 * 1024; // 2MB
   const defaultImageSrc = '/img/default-profile.png';
+
 
   // ─── 닉네임 중복 확인 ───
   nicknameBtn?.addEventListener('click', async () => {
@@ -191,6 +193,22 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => flashMsgFadeOut.remove(), 1000);
     }, 3000);
   }
+
+  // ─── 자기소개 글자수 실시간 카운트 ───
+  introTextarea?.addEventListener('input', () => {
+    const currentLength = introTextarea.value.length;
+    if (charCount) {
+      charCount.textContent = `${currentLength}자 / 150자`;
+
+      if (currentLength > 150) {
+        charCount.style.color = 'red';     // 150자 초과 시 빨간색
+        charCount.style.fontWeight = 'bold';
+      } else {
+        charCount.style.color = '';        // 정상 범위 시 기본색 복원
+        charCount.style.fontWeight = '';
+      }
+    }
+  });
 
   // ─── 전화번호 유효성 검사 및 실시간 메시지 제거 ───
   telInput?.addEventListener('blur', () => {

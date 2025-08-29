@@ -135,6 +135,7 @@ public class MemberSVCImpl implements MemberSVC {
       memberDAO.findById(id).ifPresent(existing -> member.setPasswd(existing.getPasswd()));
     }
 
+    log.info("✅ SVC 단계 Member.nickname = {}", member.getNickname());
     memberDAO.update(member);
   }
 

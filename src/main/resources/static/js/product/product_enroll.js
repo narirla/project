@@ -1,3 +1,5 @@
+// product_enroll.js (상품 등록 전용)
+
 document.addEventListener('DOMContentLoaded', function () {
     const uploadBox = document.querySelector('.upload-box');
     const input = document.querySelector('#productImage');
@@ -5,13 +7,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const icon = uploadBox.querySelector('i');
     const text = uploadBox.querySelector('p');
     const nameList = document.getElementById('imageNameList');
+    const documentFileInput = document.querySelector('input[name="documentFile"]');
+    const documentFileNameDisplay = document.querySelector('.file-name');
+    const tempSaveBtn = document.getElementById('tempSaveBtn');
+    const productForm = document.getElementById('productForm');
 
     const maxCount = 10;
-    let filesArr = []; // 업로드할 이미지 파일을 담을 배열
+    const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024;
+    const allowedDocumentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt', 'rtf', 'html'];
+    let filesArr = [];
+
+    // 유효성 검사 메시지 표시/숨김 함수 (product_validation.js에서 가져옴)
+    const showValidationMessage = window.showValidationMessage;
+    const hideValidationMessage = window.hideValidationMessage;
+    const validateForm = window.validateForm;
+
+    // 파일 확장자 검사 함수
+    function validateFileExtension(file, allowedExtensions) {
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        return allowedExtensions.includes(fileExtension);
+    }
 
     // 업로드 박스 클릭 시 파일 선택 창 열기
     uploadBox.addEventListener('click', function (e) {
-        // input 요소 자체가 클릭된 경우 이중 호출을 막음
         if(e.target === input || e.target.tagName === 'IMG') return;
         input.click();
     });
@@ -19,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // 파일 선택 시
     input.addEventListener('change', function (e) {
         const newFiles = Array.from(input.files);
-        // 새로운 파일 중 중복되지 않는 파일만 추가
         filesArr = filesArr.concat(newFiles.filter(newFile =>
             !filesArr.some(f => f.name === newFile.name && f.size === newFile.size)
         ));
@@ -28,7 +45,6 @@ document.addEventListener('DOMContentLoaded', function () {
             alert(`이미지는 최대 ${maxCount}개까지 업로드할 수 있습니다.`);
             filesArr = filesArr.slice(0, maxCount);
         }
-
         updateInputFiles();
         if (filesArr.length > 0) {
             showPreview(filesArr[0]);
@@ -66,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert(`이미지는 최대 ${maxCount}개까지 업로드할 수 있습니다.`);
                 filesArr = filesArr.slice(0, maxCount);
             }
-
             updateInputFiles();
             if (filesArr.length > 0) {
                 showPreview(filesArr[0]);
@@ -105,12 +120,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.stopPropagation();
                 filesArr.splice(idx, 1);
                 updateInputFiles();
-
                 let nextActiveFile = filesArr[0] || null;
                 if(activeFile && filesArr.length > 0 && !(activeFile.name === file.name && activeFile.size === file.size)){
                     nextActiveFile = activeFile;
                 }
-
                 if (filesArr.length > 0) {
                     showPreview(nextActiveFile);
                     renderNameList(nextActiveFile);
@@ -119,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     renderNameList(null);
                 }
             });
-
             item.appendChild(removeBtn);
             nameList.appendChild(item);
         });
@@ -152,43 +164,99 @@ document.addEventListener('DOMContentLoaded', function () {
         input.files = dt.files;
     }
 
+    // 문서 파일 첨부 유효성 검사 (클라이언트 측 검사)
+    if (documentFileInput) {
+      documentFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (!validateFileExtension(file, allowedDocumentExtensions)) {
+                showValidationMessage(this, `허용되지 않는 문서 파일 형식입니다.`);
+                this.value = '';
+            } else if (file.size > MAX_DOCUMENT_SIZE) {
+                showValidationMessage(this, `문서 파일은 ${MAX_DOCUMENT_SIZE / (1024 * 1024)}MB를 초과할 수 없습니다.`);
+                this.value = '';
+            } else {
+                hideValidationMessage(this);
+                if (documentFileNameDisplay) {
+                    documentFileNameDisplay.textContent = file.name;
+                }
+            }
+        } else {
+            hideValidationMessage(this);
+            if (documentFileNameDisplay) {
+                documentFileNameDisplay.textContent = '';
+            }
+        }
+      });
+    }
+
     // 임시저장 버튼 이벤트 리스너 추가
-    const tempSaveBtn = document.getElementById('tempSaveBtn');
     if (tempSaveBtn) {
-        tempSaveBtn.addEventListener('click', function(event) {
+        tempSaveBtn.addEventListener('click', async function(event) {
+            event.preventDefault();
+
+            const hasNewImages = filesArr.length > 0;
+            const hasNewDocument = documentFileInput?.files?.length > 0;
+
+            if (!hasNewImages) {
+                showValidationMessage(input.closest('.image-upload-container'), '상품 이미지를 1장 이상 등록해주세요.');
+                return;
+            } else {
+                hideValidationMessage(input.closest('.image-upload-container'));
+            }
+
+            if (!hasNewDocument) {
+                 showValidationMessage(documentFileInput.closest('.file, .input-container'), '판매 파일을 첨부해주세요.');
+                 return;
+            } else {
+                hideValidationMessage(documentFileInput.closest('.file, .input-container'));
+            }
+
+            // validateForm 함수를 호출하여 폼 필드 유효성 검사
+            const isFormValid = await validateForm(productForm);
+            if (!isFormValid) {
+                return;
+            }
+
+            // 모든 검사 통과 후 임시 저장 처리
             handleTempSave();
         });
     }
 
+    // 폼 제출 이벤트 리스너: 최종 검증 및 폼 제출
+    if (productForm) {
+      productForm.addEventListener('submit', async function(event) {
+          event.preventDefault();
+
+          const hasNewImages = filesArr.length > 0;
+          const hasNewDocument = documentFileInput?.files?.length > 0;
+
+          if (!hasNewImages) {
+              showValidationMessage(input.closest('.image-upload-container'), '상품 이미지를 1장 이상 등록해주세요.');
+              alert('상품 이미지를 1장 이상 등록해주세요.');
+              return;
+          } else {
+              hideValidationMessage(input.closest('.image-upload-container'));
+          }
+          if (!hasNewDocument) {
+               showValidationMessage(documentFileInput.closest('.file, .input-container'), '판매 파일을 첨부해주세요.');
+               alert('판매 파일을 첨부해주세요.');
+               return;
+          } else {
+              hideValidationMessage(documentFileInput.closest('.file, .input-container'));
+          }
+
+          const isFormValid = await validateForm(productForm);
+          if (isFormValid) {
+              productForm.submit();
+          }
+      });
+    }
+
     // 임시저장 버튼 클릭 핸들러
     async function handleTempSave() {
-        const form = document.getElementById('productForm');
-        const formData = new FormData(form);
-
-        // DTO에 '임시저장' 상태 값 추가
+        const formData = new FormData(productForm);
         formData.append('status', '임시저장');
-
-        // 이미지 및 파일 데이터 추가
-        const productImages = document.getElementById('productImage').files;
-        for (const file of productImages) {
-            formData.append('productImages', file);
-        }
-
-        const documentFile = document.querySelector('input[name="documentFile"]').files[0];
-        if (documentFile) {
-            formData.append('documentFile', documentFile);
-        }
-
-//        // 코스 포인트 데이터 추가 (만약 있다면)
-//        const coursePoints = getCoursePointsFromForm(); // ⭐ 이 함수는 기존에 구현되어 있어야 합니다.
-//        if (coursePoints.length > 0) {
-//            // FormData에 배열을 추가하는 방법
-//            coursePoints.forEach((point, index) => {
-//                formData.append(`coursePoints[${index}].latitude`, point.latitude);
-//                formData.append(`coursePoints[${index}].longitude`, point.longitude);
-//                formData.append(`coursePoints[${index}].description`, point.description);
-//            });
-//        }
 
         try {
             const response = await fetch('/product/temp-save', {
@@ -200,16 +268,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = response.url;
             } else {
                 const result = await response.json();
-                // 에러 처리 또는 성공 메시지 표시
                 if (result.error) {
                     alert(result.error);
                 } else {
                     alert('상품이 임시저장되었습니다.');
-                    // 성공적으로 임시저장되면 상품 관리 페이지로 리다이렉트
                     window.location.href = '/product/manage?status=임시저장';
                 }
             }
-
         } catch (error) {
             console.error('임시저장 중 오류 발생:', error);
             alert('임시저장 중 오류가 발생했습니다. 다시 시도해주세요.');

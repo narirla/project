@@ -42,4 +42,23 @@ public interface BuyerPageDAO {
    * @return Optional<BuyerPage>
    */
   Optional<BuyerPage> findById(Long pageId);
+
+  /**
+   * 회원 ID로 BuyerPage 존재 여부 확인
+   * @param memberId 회원 ID
+   * @return 존재 여부 (true/false)
+   */
+  boolean existsByMemberId(Long memberId);
+
+  /**
+   * 닉네임으로 BuyerPage 존재 여부 확인
+   * - 신규 등록/수정 시 닉네임 중복 체크용
+   * @param nickname 닉네임
+   * @return 존재 여부 (true/false)
+   */
+  boolean existsByNickname(String nickname);
+
+  int updateNickname(Long memberId, String nickname);
+
+
 }

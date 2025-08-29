@@ -1,25 +1,41 @@
 package com.KDT.mosi.domain.order.svc;
 
+import com.KDT.mosi.domain.order.dto.OrderResponse;
+import com.KDT.mosi.domain.order.request.OrderFormRequest;
+import com.KDT.mosi.web.api.ApiResponse;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
-import java.util.Map;
 
 public interface OrderSVC {
 
-  // 주문 생성
-  Map<String, Object> createOrder(Long buyerId, List<Long> cartItemIds, String specialRequest);
+  // 주문서 데이터 조회
+  OrderResponse getOrderForm(Long buyerId, List<Long> cartItemIds);
 
-  // 구매자 주문 목록 (마이페이지용)
-  Map<String, Object> getBuyerOrders(Long buyerId);
+  // 주문 생성
+  OrderResponse createOrder(Long buyerId, OrderFormRequest request);
 
   // 주문 상세 조회
-  Map<String, Object> getOrderDetail(Long orderId, Long buyerId);
+  OrderResponse getOrderDetail(Long orderId, Long buyerId);
+
+  // 주문번호로 주문 상세 조회
+  OrderResponse getOrderDetailByCode(String orderCode, Long buyerId);
 
   // 주문 취소
-  Map<String, Object> cancelOrder(Long orderId, Long buyerId);
+  OrderResponse cancelOrder(Long orderId, Long buyerId);
 
-  // 주문 코드로 조회
-  Map<String, Object> getOrderByCode(String orderCode, Long buyerId);
+  // 주문 목록 조회
+  ApiResponse<List<OrderResponse>> getOrderHistory(Long buyerId, int page, int size);
 
-  // 주문 개수 조회 (헤더용)
+  // 주문 개수 조회
   int getOrderCount(Long buyerId);
+
+  // 결제 완료 처리
+  OrderResponse completePayment(String orderCode, Long buyerId);
+
+  // 판매자 판매내역 조회
+  ApiResponse<List<OrderResponse>> getSellerOrderHistory(Long sellerId, int page, int size);
+
+  // 판매자 주문 개수 조회
+  int getSellerOrderCount(Long sellerId);
 }

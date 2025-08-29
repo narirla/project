@@ -22,7 +22,6 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
 
   private final NamedParameterJdbcTemplate template;
 
-  // ✅ 수동 매퍼: ResultSet → BuyerPage 변환
   private RowMapper<BuyerPage> buyerPageRowMapper() {
     return (rs, rowNum) -> {
       BuyerPage buyerPage = new BuyerPage();
@@ -37,44 +36,35 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
       buyerPage.setZonecode(rs.getString("zonecode"));
       buyerPage.setDetailAddress(rs.getString("detail_address"));
       buyerPage.setNotification(rs.getString("notification"));
-
-
       if (rs.getTimestamp("create_date") != null) {
         buyerPage.setCreateDate(rs.getTimestamp("create_date").toLocalDateTime());
       }
       if (rs.getTimestamp("update_date") != null) {
-        buyerPage.setUpdateDate(rs.getTimestamp("update_date").toLocalDateTime()); // ✅ 수정됨
+        buyerPage.setUpdateDate(rs.getTimestamp("update_date").toLocalDateTime());
       }
       buyerPage.setNickname(rs.getString("nickname"));
       return buyerPage;
     };
   }
 
-  // ✅ 마이페이지 등록
+  // 신규 저장
   @Override
   public Long save(BuyerPage buyerPage) {
-
-    // 1️⃣ SQL 조립
     StringBuffer sql = new StringBuffer();
-    // ✅ 수정 후: address, zonecode, detailAddress 추가
     sql.append("INSERT INTO BUYER_PAGE (PAGE_ID, MEMBER_ID, INTRO, ADDRESS, ZONECODE, DETAIL_ADDRESS, CREATE_DATE, UPDATE_DATE, NICKNAME) ");
     sql.append("  VALUES (BUYER_PAGE_SEQ.NEXTVAL, :memberId, :intro, :address, :zonecode, :detailAddress, systimestamp, systimestamp, :nickname) ");
 
-
-    // 2️⃣ 바인딩 파라미터 (필요한 항목만)
     MapSqlParameterSource param = new MapSqlParameterSource()
-        .addValue("memberId",  buyerPage.getMemberId())
-        .addValue("intro",     buyerPage.getIntro())
-        .addValue("nickname",  buyerPage.getNickname())
-        .addValue("address",   buyerPage.getAddress())
-        .addValue("zonecode",  buyerPage.getZonecode())
+        .addValue("memberId", buyerPage.getMemberId())
+        .addValue("intro", buyerPage.getIntro())
+        .addValue("nickname", buyerPage.getNickname())
+        .addValue("address", buyerPage.getAddress())
+        .addValue("zonecode", buyerPage.getZonecode())
         .addValue("detailAddress", buyerPage.getDetailAddress());
 
-    // 3️⃣ KeyHolder 로 PK 추출
     KeyHolder keyHolder = new GeneratedKeyHolder();
     template.update(sql.toString(), param, keyHolder, new String[]{"PAGE_ID"});
 
-    // 4️⃣ PAGE_ID 반환 (NPE 방지)
     Map<String, Object> keys = keyHolder.getKeys();
     if (keys != null && keys.get("PAGE_ID") != null) {
       return ((Number) keys.get("PAGE_ID")).longValue();
@@ -82,17 +72,40 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
     throw new IllegalStateException("❌ BuyerPage ID 생성 실패");
   }
 
+  // 회원 ID 존재 여부 확인
+  @Override
+  public boolean existsByMemberId(Long memberId) {
+    String sql = "SELECT COUNT(*) FROM BUYER_PAGE WHERE MEMBER_ID = :memberId";
+    SqlParameterSource param = new MapSqlParameterSource().addValue("memberId", memberId);
+    Integer count = template.queryForObject(sql, param, Integer.class);
+    return count != null && count > 0;
+  }
 
-  // ✅ 회원 ID로 조회
+  // 닉네임 존재 여부 확인
+  @Override
+  public boolean existsByNickname(String nickname) {
+    String sql = "SELECT COUNT(*) FROM BUYER_PAGE WHERE NICKNAME = :nickname";
+    SqlParameterSource param = new MapSqlParameterSource().addValue("nickname", nickname);
+    Integer count = template.queryForObject(sql, param, Integer.class);
+    return count != null && count > 0;
+  }
+
+  @Override
+  public int updateNickname(Long memberId, String nickname) {
+    String sql = "UPDATE member SET nickname = :nickname WHERE member_id = :memberId";
+    Map<String, Object> params = Map.of("nickname", nickname, "memberId", memberId);
+    return template.update(sql, params);
+  }
+
+
+  // 회원 ID로 조회
   @Override
   public Optional<BuyerPage> findByMemberId(Long memberId) {
     StringBuffer sql = new StringBuffer();
     sql.append("SELECT page_id, member_id, image, intro, recent_order, point, ");
-    sql.append("       tel, address, zonecode, detail_address, notification, "); // ⬅ 추가
+    sql.append("       tel, address, zonecode, detail_address, notification, ");
     sql.append("       create_date, update_date, nickname ");
-    sql.append("  FROM BUYER_PAGE ");
-    sql.append(" WHERE member_id = :memberId ");
-
+    sql.append("  FROM BUYER_PAGE WHERE member_id = :memberId");
 
     SqlParameterSource param = new MapSqlParameterSource().addValue("memberId", memberId);
 
@@ -104,20 +117,14 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
     }
   }
 
-  // ✅ 페이지 ID로 수정
+  // 페이지 ID로 수정
   @Override
   public int updateById(Long pageId, BuyerPage buyerPage) {
     StringBuffer sql = new StringBuffer();
-    sql.append("UPDATE BUYER_PAGE ");
-    sql.append("   SET image = :image, ");
-    sql.append("       intro = :intro, ");
-    sql.append("       nickname = :nickname, ");
-    sql.append("       tel = :tel, ");
-    sql.append("       address = :address, ");
-    sql.append("       zonecode = :zonecode, ");
-    sql.append("       detail_address = :detailAddress, ");
-    sql.append("       notification = :notification, ");
-    sql.append("       update_date = systimestamp ");
+    sql.append("UPDATE BUYER_PAGE SET ");
+    sql.append(" image = :image, intro = :intro, nickname = :nickname, tel = :tel, ");
+    sql.append(" address = :address, zonecode = :zonecode, detail_address = :detailAddress, ");
+    sql.append(" notification = :notification, update_date = systimestamp ");
     sql.append(" WHERE page_id = :pageId ");
 
     SqlParameterSource param = new MapSqlParameterSource()
@@ -134,43 +141,29 @@ public class BuyerPageDAOImpl implements BuyerPageDAO {
     return template.update(sql.toString(), param);
   }
 
-  // ✅ 회원 ID로 마이페이지 삭제
+  // 회원 ID로 삭제
   @Override
   public int deleteByMemberId(Long memberId) {
-    // SQL: 특정 회원의 마이페이지 정보 삭제
     String sql = "DELETE FROM BUYER_PAGE WHERE MEMBER_ID = :memberId";
-
-    // 파라미터 바인딩
-    MapSqlParameterSource param = new MapSqlParameterSource("memberId", memberId);
-
-    // SQL 실행 및 삭제된 행 수 반환
-    return template.update(sql, param);
+    return template.update(sql, new MapSqlParameterSource("memberId", memberId));
   }
 
-
-  // ✅ 페이지 ID로 조회 (삭제 권한 확인용)
+  // 페이지 ID로 조회
   @Override
   public Optional<BuyerPage> findById(Long pageId) {
     StringBuffer sql = new StringBuffer();
     sql.append("SELECT page_id, member_id, image, intro, recent_order, point, ");
     sql.append("       tel, address, zonecode, detail_address, notification, ");
     sql.append("       create_date, update_date, nickname ");
-    sql.append("  FROM BUYER_PAGE ");
-    sql.append(" WHERE page_id = :pageId");
+    sql.append("  FROM BUYER_PAGE WHERE page_id = :pageId");
 
-    SqlParameterSource param = new MapSqlParameterSource()
-        .addValue("pageId", pageId);
+    SqlParameterSource param = new MapSqlParameterSource().addValue("pageId", pageId);
 
     try {
-      BuyerPage buyerPage = template.queryForObject(
-          sql.toString(),
-          param,
-          buyerPageRowMapper() // ⬅ 수동 매퍼 재사용
-      );
+      BuyerPage buyerPage = template.queryForObject(sql.toString(), param, buyerPageRowMapper());
       return Optional.of(buyerPage);
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
   }
-
 }

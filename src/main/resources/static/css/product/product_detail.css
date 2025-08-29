@@ -2,8 +2,11 @@
 /* ----- 기본 설정 ----- */
 /* --------------------- */
 ul, ol {
-    list-style: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
+
 a{
     color: inherit;
     text-decoration: none;
@@ -28,7 +31,7 @@ body {
 
 .layout-wrapper {
   width: 1200px;
-  display: flex;
+  display: block;
   justify-content: center;
   flex-direction: column;
 }
@@ -61,6 +64,8 @@ body {
   transition: filter 0.3s;
   font-size: 14px;
   user-select: none;
+  margin-top: 25px;
+  min-height: 100px;
 }
 
 .detail-description.unlocked {
@@ -70,10 +75,12 @@ body {
   color: #333;
   background-color: transparent;
   padding: 0;
+  margin-top: 25px;
   border-radius: 0;
   box-shadow: none;
   font-family: inherit;
   transition: none;
+  min-height: 100px;
 }
 
 .product-detail-container{
@@ -115,8 +122,10 @@ h3{
     padding-right: 50px;
     padding-left: 20px;
 }
-.product-header-left div h1{
+.product-title{
     color: #414141;
+    font-size: 28px;
+    font-weight: bold;
 }
 
 .product-category{
@@ -135,14 +144,18 @@ h3{
     border-radius: 20px;
 }
 
+.product-seller .seller-info{
+  width: 580px;
+}
 .profile-img{
     width: 60px;
     height: 60px;
     border-radius: 50px;
-    margin-right: 10px;
+    margin-right: 25px;
 }
 .product-seller .inquiry-btn{
-    margin-left: auto;
+    margin-left: 15px;
+    margin-right: 5px;
     width: 80px;
     height: 30px;
     background: linear-gradient(to right, #56DDF8, #09D0C0);
@@ -161,6 +174,8 @@ h3{
 .product-header-right img{
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    object-position: center center;
     border-radius: 10px;
 }
 
@@ -172,14 +187,17 @@ h3{
     display: flex;
     width: 1200px;
     padding: 30px 20px 0px 20px;
-
+    overflow: visible;
 }
+
 /* ------ 왼쪽 (이미지, 리뷰, 상품탭 등) ----- */
 .product-body-left{
     display: flex;
     flex-direction: column;
     width: 70%;
     padding-right: 50px;
+    overflow: visible;
+    position: relative;
 }
 
 /* ------ 이미지 슬라이드 ----- */
@@ -198,25 +216,22 @@ h3{
   margin: auto;
 }
 
-/* 슬라이드 여러 장을 나란히 두지 않고, 단일 슬라이드 표시용 */
-/* display: flex 및 transform 관련 스타일 제거 */
+/* 이미지 전체 영역을 가로로 이어붙이기 */
 .image-slider {
-  /* 슬라이드 개별 처리를 하므로 flex 불필요 */
-  /* height 고정 */
-  width: 100%;
+  display: flex;
+  transition: transform 0.5s ease-in-out; /* 이동 애니메이션 */
+  width: 100%; 
   height: 100%;
-  /* transition 제거 (필요 시 JS에서 처리 가능) */
-  background-color: #fff !important;
 }
 
-/* 슬라이드 하나하나 스타일 */
+/* 개별 슬라이드: 한 화면에 딱 하나씩 차지 */
 .slide {
-  position: absolute;
-  top: 0; left:0; right:0; bottom:0;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
+  min-width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  position: relative; /* absolute 제거 */
 }
+
 
 /* 현재 보여지는 슬라이드 */
 .slide.active {
@@ -228,14 +243,17 @@ h3{
   height: 100%;    /* 고정된 슬라이드 높이만큼 나오게 */
 }
 
+
 /* 이미지 스타일 */
 .slide img {
   width: 100%;
   height: 100%;
-  object-fit: contain;    /* 비율 유지하며 슬라이드 영역에 맞춤 */
+  object-fit: cover;    /* 비율 유지하며 슬라이드 영역에 맞춤 */
+  object-position:  center center;
   border-radius: 10px;
   user-select: none;
   pointer-events: none;
+  justify-content: center;
 }
 
 /* 좌우 네비게이션 버튼 - 기존과 동일 */
@@ -248,7 +266,7 @@ h3{
   background-color: #FFF;
   border: none;
   border-radius: 50px;
-  box-shadow: 2px 2px 5px 1.5px #00000033;
+  /*box-shadow: 2px 2px 5px 1.5px #00000033;*/
   color: #BFBFBF;
   cursor: pointer;
   font-size: 40px;
@@ -278,7 +296,7 @@ h3{
 #recently-review{
   font-size: 22px;
   font-weight: 700;
-  margin-bottom: 30px;
+  margin: 30px 0px;
   margin-left: 30px;
   color: #414141;
 }
@@ -286,11 +304,19 @@ h3{
 .swiper-slide{
   width: 430px;
   height: 130px;
-  border-radius: 10px;
+  border-radius: 15px;
   margin: 0 10px;
-  padding: 10px 15px;
+  padding: 20px 15px 10px 25px;
   background-color: rgba(128, 204, 214, 0.1);
 
+}
+
+.stars {
+  margin-top: 7px;
+}
+
+.review-card p {
+  margin-top: 10px;
 }
 .product-recent-reviews .swiper.review-swiper {
   width: 100%;
@@ -346,22 +372,27 @@ h3{
 
 /* ------ 탭 메뉴 ----- */
 .tab-wrapper {
-  position: relative;  /* ✅ sticky 정상 작동을 위한 부모 */
+  width: 100%;
+  position: sticky;
+  top: 0;     /* 헤더 높이에 맞게 */
+  z-index: 2000;
+  background: #fff;
 }
+
 
 .tab-menu{
     display: flex;
     gap: 30px;
     padding-top: 10px;
     position: sticky;
-    top: 160px;
+    top: 0;
     border-bottom: 1px solid #BFBFBF;
     color: #BFBFBF;
     background: white;
     font-size: 22px;
     font-weight: 600;
     line-height: 22px;
-    z-index: 1000;
+    z-index: 2000;
 }
 .tab-menu a{
     display: inline-block;
@@ -431,7 +462,7 @@ h3{
   margin-top: 50px;
   width: 670px;
   height: auto;
-  min-height: 200px;
+  min-height: 100px;
   padding: 0 50px;
 }
 /*style="flex: 1 1 45%; margin: 5px 0;"*/
@@ -474,7 +505,7 @@ h3{
     margin: 10px;
     text-align: center;
     /* 높이는 부모 컨테이너 높이에 맞게 최소한 지정 */
-    min-height: 200px;
+    min-height: auto;
 }
 
 .course-info .price-box {
@@ -482,10 +513,11 @@ h3{
     padding: 10px;
     border-radius: 6px;
     font-weight: 400;
+    font-size: 18px;
 }
 
 .price-info-container .course-info button{
-    margin-top: 15px;
+    margin-top: auto;
     padding: 8px 20px;
     background: #a7e3eb;
     border: none;
@@ -506,6 +538,42 @@ h3{
     font-size: 14px;
     text-align: left;
 }
+
+.course-info .product-content.price-detail ul {
+  list-style: none;
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+/* 공통 li 스타일 */
+.course-info .product-content.price-detail li {
+  position: relative;
+  margin-bottom: 6px;
+  line-height: 1.6;
+  font-size: 16px;
+  color: #333;
+  white-space: pre-line; /* DB의 줄바꿈 반영 */
+}
+
+/* 불릿 있는 줄 */
+.course-info .product-content.price-detail li.with-bullet {
+  padding-left: 18px;
+}
+.course-info .product-content.price-detail li.with-bullet::before {
+  content: "●";
+  position: absolute;
+  left: 0;
+  top: 0.35em;
+  font-size: 14px;
+  color: #333;
+}
+
+/* 불릿 없는 들여쓰기 줄 */
+.course-info .product-content.price-detail li.no-bullet {
+  padding-left: 28px;  /* 불릿 대신 살짝 더 들여쓰기 */
+  color: #555;         /* 구분을 위해 색상 약간 흐리게 (옵션) */
+}
+
 
 /* ------ 가이드 정보 ----- */
 .product-seller.guide-inform{
@@ -530,6 +598,11 @@ h3{
     border: none;
     border-radius: 6px;
     cursor: pointer;
+}
+
+#guide-info > h3 {
+  margin-top: 120px;
+  margin-bottom: 10px;
 }
 
 .guide-inform .guide-inform-array {
@@ -562,6 +635,7 @@ h3{
 .array-detail div .array-detail-style {
     display: flex;
     width: 400px;
+    margin-top: 10px;
 }
 
 .array-detail div .array-detail-style a,
@@ -579,6 +653,10 @@ h3{
 }
 
 /* ------ 정책/규정 ----- */
+.policy-box {
+  margin-top: 120px;
+}
+
 .policy-box .policy-menu {
     display: flex;
     flex-direction: row;
@@ -590,6 +668,11 @@ h3{
     display: block;
     width: 40px;
     height: 40px;
+    margin-top: 120px;
+}
+
+.policy-menu h3{
+  margin-top: 120px;
 }
 
 /* ------ 숨기기/펼치기 ----- */
@@ -612,7 +695,13 @@ h3{
     align-items: center;
 }
 
-
+#review > h3 {
+  margin-top: 120px;
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #6B6B6B;
+}
 /* ------ 오른쪽 (구매박스) ----- */
 .product-body-right{
     width: 30%;
@@ -622,6 +711,10 @@ h3{
 .product-body-right .product-body-right-container{
     border: 1px solid #BFBFBF;
     border-radius: 10px;
+
+    position: sticky;
+    top: 180px;
+    z-index: 1000;
 }
 
 #content-basic, #content-guide{
@@ -666,7 +759,6 @@ h3{
     height: 50px;
     margin-top: 10px;
     margin-bottom: 10px;
-    border:1px solid #BFBFBF;
     border-radius: 10px;
     cursor:pointer;
 }
@@ -680,6 +772,7 @@ h3{
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 5px;
+    border: 1px solid #BFBFBF !important;
 }
 
 .product-btn.btn-buy{
@@ -687,6 +780,7 @@ h3{
     font-size: 20px;
     font-weight: 600;
     transition: all 0.2s ease;
+    border: 1px solid #80CCD6 !important;
 }
 
 .product-btn.btn-buy:hover{
@@ -701,6 +795,7 @@ h3{
     font-weight: 600;
     color: #333;
     transition: all 0.2s ease;
+    border: 1px solid #d9d9d9 !important;
 }
 
 .product-btn.btn-cart:hover{
@@ -714,6 +809,7 @@ h3{
     display: flex;
     gap: 8px;
     margin-top: 0px;
+    border: 1px solid #fff !important;
 }
 
 .btn-group .product-btn {
@@ -722,5 +818,77 @@ h3{
     margin-bottom: 0;
 }
 
+
+.notice-bar {
+  width: 1200px;
+  margin-top: 80px !important;
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background: white;
+  padding: 40px 50px;
+  border-radius: 12px;
+  text-align: center;
+  width: 450px;
+  height: 250px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modal-message {
+  margin: 0 0 30px 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #333;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn {
+  width: 100%;
+  height: 50px;
+  border: 1px solid #BFBFBF;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-btn.secondary {
+  background-color: #fff;
+  color: #333;
+}
+
+.modal-btn.primary {
+  background-color: #0099AD;
+  color: white;
+  font-weight: 600;
+}
+
+.modal-btn.primary:hover {
+  background-color: #007a8a;
+}
 
 

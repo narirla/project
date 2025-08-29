@@ -265,7 +265,7 @@ public class ProductDAOImpl implements ProductDAO {
     int offset = (pageNumber - 1) * pageSize;
 
     StringBuffer sql = new StringBuffer();
-    sql.append("SELECT * FROM product ORDER BY product_id DESC OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY");
+    sql.append("SELECT * FROM product WHERE status NOT IN '임시저장' ORDER BY product_id DESC OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY");
 
     Map<String, Object> params = new HashMap<>();
     params.put("offset", offset);
@@ -286,7 +286,7 @@ public class ProductDAOImpl implements ProductDAO {
   @Override
   public long countAll() {
     StringBuffer sql = new StringBuffer();
-    sql.append("SELECT COUNT(*) FROM product");
+    sql.append("SELECT COUNT(*) FROM product WHERE status NOT IN ('임시저장', '판매대기')");
 
     // ✨✨✨ 새로 추가할 로그
     log.info("countAll - SQL 실행: {}", sql.toString());
@@ -303,7 +303,7 @@ public class ProductDAOImpl implements ProductDAO {
   @Override
   public long countByCategory(String category) {
     StringBuffer sql = new StringBuffer();
-    sql.append("SELECT COUNT(*) FROM product WHERE category = :category AND status = '판매중'");
+    sql.append("SELECT COUNT(*) FROM product WHERE category = :category AND status IN '판매중'");
 
     Map<String, Object> params = new HashMap<>();
     params.put("category", category);

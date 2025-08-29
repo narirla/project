@@ -1,24 +1,22 @@
 package com.KDT.mosi.web.controller;
 
-import com.KDT.mosi.domain.cart.dto.CartRequest;
 import com.KDT.mosi.domain.cart.dto.CartResponse;
+import com.KDT.mosi.domain.cart.request.CartFormRequest;
 import com.KDT.mosi.domain.cart.svc.CartSVC;
+import com.KDT.mosi.domain.entity.BuyerPage;
 import com.KDT.mosi.domain.entity.Member;
+import com.KDT.mosi.domain.mypage.buyer.svc.BuyerPageSVC;
 import com.KDT.mosi.web.api.ApiResponse;
 import com.KDT.mosi.web.api.ApiResponseCode;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Controller
@@ -27,39 +25,42 @@ import java.util.Map;
 public class CartController {
 
   private final CartSVC cartSVC;
+  private final BuyerPageSVC buyerPageSVC;
 
   /**
    * 장바구니 HTML 페이지 반환 (브라우저 직접 접근)
-   * GET /cart (Accept: text/html)
+   * GET /cart
    */
   @GetMapping(produces = "text/html")
   public String cartPageHtml(HttpSession session, Model model) {
     Member loginMember = (Member) session.getAttribute("loginMember");
-    
+
     if (loginMember == null) {
       return "redirect:/login";
     }
 
     model.addAttribute("member", loginMember);
-    log.info("장바구니 HTML 페이지 접근: memberId={}, nickname={}", 
-        loginMember.getMemberId(), loginMember.getNickname());
-    
+
+    // ✅ buyerPage 조회해서 모델에 추가
+    BuyerPage buyerPage = buyerPageSVC.findByMemberId(loginMember.getMemberId())
+        .orElse(null);
+    model.addAttribute("buyerPage", buyerPage);
+
     return "cart/cart";
   }
 
   /**
    * 장바구니 JSON 데이터 반환 (React AJAX 호출)
-   * GET /cart (Accept: application/json)
+   * GET /cart
    */
   @GetMapping(produces = "application/json")
   @ResponseBody
-  public ResponseEntity<Map<String, Object>> getCartJson(HttpSession session) {
+  public ResponseEntity<ApiResponse<CartResponse>> getCartJson(HttpSession session) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
-      return ResponseEntity.status(401).body(Map.of(
-          "success", false,
-          "message", "로그인이 필요합니다"
-      ));
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+          ApiResponse.of(ApiResponseCode.LOGIN_REQUIRED, null)
+      );
     }
 
     try {
@@ -68,28 +69,14 @@ public class CartController {
           loginMember.getNickname()
       );
 
-      Map<String, Object> response = new HashMap<>();
-      response.put("success", cartResponse.isSuccess());
-      response.put("empty", cartResponse.isEmpty());
-      response.put("memberNickname", cartResponse.getMemberNickname());
-      response.put("memberId", cartResponse.getMemberId());
-      response.put("cartItems", cartResponse.getCartItems());
-      response.put("totalCount", cartResponse.getTotalCount());
-      response.put("totalQuantity", cartResponse.getTotalQuantity());
-      response.put("totalPrice", cartResponse.getTotalPrice());
-
-      if (cartResponse.isEmpty()) {
-        response.put("message", "장바구니가 비어있습니다");
-      }
-
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(
+          ApiResponse.of(ApiResponseCode.SUCCESS, cartResponse)
+      );
 
     } catch (Exception e) {
-      log.error("장바구니 조회 오류: memberId={}", loginMember.getMemberId(), e);
-      return ResponseEntity.status(500).body(Map.of(
-          "success", false,
-          "message", "장바구니 조회 중 오류가 발생했습니다"
-      ));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+          ApiResponse.of(ApiResponseCode.INTERNAL_SERVER_ERROR, null)
+      );
     }
   }
 
@@ -100,13 +87,13 @@ public class CartController {
   @PostMapping("/add")
   @ResponseBody
   public ResponseEntity<ApiResponse<Void>> addToCart(
-      @Valid @RequestBody CartRequest request,
+      @Valid @RequestBody CartFormRequest request,
       HttpSession session) {
 
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
-      return ResponseEntity.status(401).body(
-          ApiResponse.of(ApiResponseCode.USER_NOT_FOUND, null)
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+          ApiResponse.of(ApiResponseCode.LOGIN_REQUIRED, null)
       );
     }
 
@@ -118,23 +105,10 @@ public class CartController {
           request.getQuantity()
       );
 
-      boolean isSuccess = "S00".equals(result.getHeader().getRtcd());
-
-      if (isSuccess) {
-        return ResponseEntity.ok(result);
-      } else {
-        // 중복 상품인 경우 409 Conflict
-        if ("E04".equals(result.getHeader().getRtcd())) {
-          return ResponseEntity.status(409).body(result);
-        } else {
-          return ResponseEntity.badRequest().body(result);
-        }
-      }
+      return ResponseEntity.ok(result);
 
     } catch (Exception e) {
-      log.error("장바구니 추가 오류: memberId={}, productId={}",
-          loginMember.getMemberId(), request.getProductId(), e);
-      return ResponseEntity.status(500).body(
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
           ApiResponse.of(ApiResponseCode.INTERNAL_SERVER_ERROR, null)
       );
     }
@@ -146,16 +120,15 @@ public class CartController {
    */
   @PutMapping("/quantity")
   @ResponseBody
-  public ResponseEntity<Map<String, Object>> updateQuantity(
-      @Valid @RequestBody CartRequest request,
+  public ResponseEntity<ApiResponse<Void>> updateQuantity(
+      @Valid @RequestBody CartFormRequest request,
       HttpSession session) {
 
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
-      return ResponseEntity.status(401).body(Map.of(
-          "success", false,
-          "message", "로그인이 필요합니다"
-      ));
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+          ApiResponse.of(ApiResponseCode.LOGIN_REQUIRED, null)
+      );
     }
 
     try {
@@ -166,27 +139,12 @@ public class CartController {
           request.getQuantity()
       );
 
-      Map<String, Object> response = new HashMap<>();
-      boolean isSuccess = "S00".equals(result.getHeader().getRtcd());
-
-      response.put("success", isSuccess);
-      response.put("code", result.getHeader().getRtcd());
-
-      if (isSuccess) {
-        response.put("message", "수량이 변경되었습니다");
-      } else {
-        response.put("message", "수량 변경에 실패했습니다");
-      }
-
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(result);
 
     } catch (Exception e) {
-      log.error("수량 변경 오류: memberId={}, productId={}",
-          loginMember.getMemberId(), request.getProductId(), e);
-      return ResponseEntity.status(500).body(Map.of(
-          "success", false,
-          "message", "수량 변경 중 오류가 발생했습니다"
-      ));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+          ApiResponse.of(ApiResponseCode.INTERNAL_SERVER_ERROR, null)
+      );
     }
   }
 
@@ -196,16 +154,15 @@ public class CartController {
    */
   @DeleteMapping("/remove")
   @ResponseBody
-  public ResponseEntity<Map<String, Object>> removeFromCart(
-      @Valid @RequestBody CartRequest request,
+  public ResponseEntity<ApiResponse<Void>> removeFromCart(
+      @Valid @RequestBody CartFormRequest request,
       HttpSession session) {
 
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
-      return ResponseEntity.status(401).body(Map.of(
-          "success", false,
-          "message", "로그인이 필요합니다"
-      ));
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+          ApiResponse.of(ApiResponseCode.LOGIN_REQUIRED, null)
+      );
     }
 
     try {
@@ -215,27 +172,12 @@ public class CartController {
           request.getOptionType()
       );
 
-      Map<String, Object> response = new HashMap<>();
-      boolean isSuccess = "S00".equals(result.getHeader().getRtcd());
-
-      response.put("success", isSuccess);
-      response.put("code", result.getHeader().getRtcd());
-
-      if (isSuccess) {
-        response.put("message", "상품이 삭제되었습니다");
-      } else {
-        response.put("message", "상품 삭제에 실패했습니다");
-      }
-
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(result);
 
     } catch (Exception e) {
-      log.error("상품 삭제 오류: memberId={}, productId={}",
-          loginMember.getMemberId(), request.getProductId(), e);
-      return ResponseEntity.status(500).body(Map.of(
-          "success", false,
-          "message", "상품 삭제 중 오류가 발생했습니다"
-      ));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+          ApiResponse.of(ApiResponseCode.INTERNAL_SERVER_ERROR, null)
+      );
     }
   }
 
@@ -245,28 +187,58 @@ public class CartController {
    */
   @GetMapping("/count")
   @ResponseBody
-  public ResponseEntity<Map<String, Object>> getCartItemCount(HttpSession session) {
+  public ResponseEntity<ApiResponse<Integer>> getCartItemCount(HttpSession session) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
-      return ResponseEntity.ok(Map.of(
-          "success", true,
-          "count", 0
-      ));
+      return ResponseEntity.ok(
+          ApiResponse.of(ApiResponseCode.SUCCESS, 0)
+      );
     }
 
     try {
       int count = cartSVC.getCartItemCount(loginMember.getMemberId());
-      return ResponseEntity.ok(Map.of(
-          "success", true,
-          "count", count
-      ));
+      return ResponseEntity.ok(
+          ApiResponse.of(ApiResponseCode.SUCCESS, count)
+      );
     } catch (Exception e) {
-      log.error("장바구니 개수 조회 오류: memberId={}", loginMember.getMemberId(), e);
-      return ResponseEntity.ok(Map.of(
-          "success", false,
-          "count", 0,
-          "message", "장바구니 개수 조회 중 오류가 발생했습니다"
-      ));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+          ApiResponse.of(ApiResponseCode.INTERNAL_SERVER_ERROR, 0)
+      );
+    }
+  }
+
+  /**
+   * 장바구니 아이템 ID 목록으로 조회
+   * GET /cart/items?ids=1,2,3
+   */
+  @GetMapping("/items")
+  @ResponseBody
+  public ResponseEntity<ApiResponse<Object>> getCartItemsByIds(
+      @RequestParam("ids") String ids,
+      HttpSession session) {
+    
+    Member loginMember = (Member) session.getAttribute("loginMember");
+    if (loginMember == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+          ApiResponse.of(ApiResponseCode.LOGIN_REQUIRED, null)
+      );
+    }
+
+    try {
+      // 전체 장바구니 조회 후 클라이언트에서 필터링하도록 반환
+      CartResponse cartResponse = cartSVC.getCart(
+          loginMember.getMemberId(),
+          loginMember.getNickname()
+      );
+
+      return ResponseEntity.ok(
+          ApiResponse.of(ApiResponseCode.SUCCESS, cartResponse.getCartItems())
+      );
+
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+          ApiResponse.of(ApiResponseCode.INTERNAL_SERVER_ERROR, null)
+      );
     }
   }
 
@@ -276,59 +248,24 @@ public class CartController {
    */
   @DeleteMapping("/clear")
   @ResponseBody
-  public ResponseEntity<Map<String, Object>> clearCart(HttpSession session) {
+  public ResponseEntity<ApiResponse<Void>> clearCart(HttpSession session) {
     Member loginMember = (Member) session.getAttribute("loginMember");
     if (loginMember == null) {
-      return ResponseEntity.status(401).body(Map.of(
-          "success", false,
-          "message", "로그인이 필요합니다"
-      ));
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+          ApiResponse.of(ApiResponseCode.LOGIN_REQUIRED, null)
+      );
     }
 
     try {
       cartSVC.clearCart(loginMember.getMemberId());
-      return ResponseEntity.ok(Map.of(
-          "success", true,
-          "message", "장바구니가 비워졌습니다"
-      ));
+      return ResponseEntity.ok(
+          ApiResponse.of(ApiResponseCode.SUCCESS, null)
+      );
 
     } catch (Exception e) {
-      log.error("장바구니 비우기 오류: memberId={}", loginMember.getMemberId(), e);
-      return ResponseEntity.status(500).body(Map.of(
-          "success", false,
-          "message", "장바구니 비우기 중 오류가 발생했습니다"
-      ));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+          ApiResponse.of(ApiResponseCode.INTERNAL_SERVER_ERROR, null)
+      );
     }
-  }
-
-  /**
-   * 유효성 검증 예외 처리
-   */
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
-    Map<String, Object> response = new HashMap<>();
-    response.put("success", false);
-    response.put("message", "입력값이 올바르지 않습니다");
-
-    Map<String, String> errors = new HashMap<>();
-    for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-      errors.put(error.getField(), error.getDefaultMessage());
-    }
-    response.put("errors", errors);
-
-    log.warn("유효성 검증 실패: {}", errors);
-    return ResponseEntity.badRequest().body(response);
-  }
-
-  /**
-   * 일반 예외 처리
-   */
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<Map<String, Object>> handleGenericError(Exception ex) {
-    log.error("예상치 못한 오류 발생", ex);
-    return ResponseEntity.status(500).body(Map.of(
-        "success", false,
-        "message", "서버에서 오류가 발생했습니다"
-    ));
   }
 }

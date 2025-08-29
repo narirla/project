@@ -1,6 +1,7 @@
 package com.KDT.mosi.domain.mypage.buyer.svc;
 
 import com.KDT.mosi.domain.entity.BuyerPage;
+import com.KDT.mosi.domain.member.dao.MemberDAO;
 import com.KDT.mosi.domain.mypage.buyer.dao.BuyerPageDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,12 +17,13 @@ import static org.mockito.BDDMockito.then;
 class BuyerPageSVCImplTest {
 
   private BuyerPageDAO buyerPageDAO;
+  private MemberDAO memberDAO;
   private BuyerPageSVC buyerPageSVC;
 
   @BeforeEach
   void setup() {
     buyerPageDAO = Mockito.mock(BuyerPageDAO.class);
-    buyerPageSVC = new BuyerPageSVCImpl(buyerPageDAO);
+    buyerPageSVC = new BuyerPageSVCImpl(buyerPageDAO, memberDAO);
   }
 
   @Test

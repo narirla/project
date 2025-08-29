@@ -75,7 +75,7 @@
     window.__closeAllDropdowns = closeAll;
     
     // 장바구니 개수 설정
-    initCartCount();
+    updateCartCount();
   };
 
   (document.readyState === 'loading')
@@ -83,24 +83,7 @@
     : ready();
 })();
 
-// 장바구니 개수 초기화
-async function initCartCount() {
-  try {
-    const response = await fetch('/cart/count', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      updateCartBadge(data.count || 0);
-    }
-  } catch (error) {
-    // 오류 시 조용히 무시 (로그인하지 않은 경우 등)
-  }
-}
-
-// 장바구니 개수 업데이트
+// 장바구니 개수 업데이트 (통합된 함수)
 async function updateCartCount() {
   try {
     const response = await fetch('/cart/count', {
@@ -109,27 +92,25 @@ async function updateCartCount() {
     });
     
     if (response.ok) {
-      const data = await response.json();
-      updateCartBadge(data.count || 0);
+      const apiResponse = await response.json();
+      const badge = document.getElementById('cart-count');
+      
+      // ApiResponse 구조에서 데이터 추출
+      const count = apiResponse.body || apiResponse;
+      
+      if (badge) {
+        if (count > 0) {
+          badge.textContent = count > 99 ? '99+' : count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
     }
   } catch (error) {
-    console.error('장바구니 개수 업데이트 실패:', error);
-  }
-}
-
-// 장바구니 배지 업데이트
-function updateCartBadge(count) {
-  const badge = document.getElementById('cart-count');
-  if (badge) {
-    if (count > 0) {
-      badge.textContent = count;
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
-    }
+    // 오류 시 조용히 무시 (로그인하지 않은 경우 등)
   }
 }
 
 // 전역에서 접근 가능하도록
 window.updateCartCount = updateCartCount;
-window.initCartCount = initCartCount;

@@ -1,6 +1,7 @@
 package com.KDT.mosi.domain.product.svc;
 
 import com.KDT.mosi.domain.entity.Product;
+import com.KDT.mosi.web.form.product.ProductTempSaveForm; // DTO 임포트
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,4 +49,12 @@ public interface ProductSVC {
    * @param status 변경할 상태 값
    */
   void updateProductStatus(Long productId, String status);
+
+  /**
+   * 상품 임시저장
+   * @param form 임시저장할 상품 데이터 (DTO)
+   * @param memberId 회원 ID
+   * @return 임시저장된 상품 엔티티
+   */
+  Product saveTempProduct(ProductTempSaveForm form, Long memberId);
 }

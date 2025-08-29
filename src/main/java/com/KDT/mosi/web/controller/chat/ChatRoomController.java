@@ -43,4 +43,11 @@ public class ChatRoomController {
     return ResponseEntity.ok(messages);
   }
 
+  /** 채팅방 닫기 */
+  @PostMapping("/{roomId}/close")
+  public ResponseEntity<Void> closeRoom(@PathVariable("roomId") long roomId) {
+    service.closeRoom(roomId);
+    return ResponseEntity.ok().build();
+  }
+
 }

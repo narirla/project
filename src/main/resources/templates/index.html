@@ -9,6 +9,7 @@
   <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.8/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
 </head>
 
@@ -20,12 +21,53 @@
     </header>
 
     <div class="page-container">
-      <div class="main-banner" style="height: 500px;">
-        <img th:src="@{/img/gwanganbridge.png}" alt="광안대교 메인 배너"
-          style="width: 100%; height: 500px; object-fit: cover; display: block;">
-        <div class="main-banner-text">
-          <h2>떠나요,<br>바다가 부르는 곳으로.</h2>
-          <p>삶이 지칠 때 푸른 바다와 함께</p>
+      <!-- 메인 배너 -->
+      <div class="main-banner swiper mySwiper" style="height: 500px;">
+        <div class="swiper-wrapper">
+          <!-- 기존 광안대교 배너 -->
+          <div class="swiper-slide">
+            <img th:src="@{/img/gwanganbridge.png}" alt="광안대교 메인 배너">
+            <div class="main-banner-text">
+              <h2>떠나요,<br>바다가 부르는 곳으로.</h2>
+              <p>삶이 지칠 때 푸른 바다와 함께</p>
+            </div>
+          </div>
+
+          <!-- 감천문화마을 -->
+          <div class="swiper-slide gamcheon">
+            <img th:src="@{/img/banner/gamcheon.jpg}" alt="감천문화마을_공공누리">
+            <div class="main-banner-text">
+              <h2>감천 문화마을,<br>다채로운 색을 담다.</h2>
+              <p>골목마다 숨어 있는 이야기</p>
+            </div>
+          </div>
+
+          <!-- 송도해상케이블카 -->
+          <div class="swiper-slide">
+            <img th:src="@{/img/banner/songdo.jpg}" alt="송도해상케이블카_공공누리">
+            <div class="main-banner-text">
+              <h2>송도 해상 케이블카,<br>바다 위를 걷다.</h2>
+              <p>부산의 바다를 한눈에</p>
+            </div>
+          </div>
+
+          <!-- 영도대교 도개 -->
+          <div class="swiper-slide">
+            <img th:src="@{/img/banner/yeongdo.jpg}" alt="영도대교 도개_공공누리">
+            <div class="main-banner-text">
+              <h2>영도대교,<br>부산의 역사와 함께.</h2>
+              <p>도개 순간의 특별한 경험</p>
+            </div>
+          </div>
+
+          <!-- 해동용궁사 -->
+          <div class="swiper-slide yonggungsa">
+            <img th:src="@{/img/banner/yonggungsa.jpg}" alt="해동용궁사_공공누리">
+            <div class="main-banner-text">
+              <h2>해동용궁사,<br>바다와 맞닿은 사찰.</h2>
+              <p>동해 위에서의 힐링</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -339,5 +381,7 @@
 
   <!-- 기존 스크립트 -->
   <script th:src="@{/js/layout.js}"></script>
+  <script th:src="@{/js/index.js}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 </body>
 </html>

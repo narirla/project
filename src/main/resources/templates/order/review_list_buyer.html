@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MO:SI 구매자 마이페이지</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/buyerpage/BuyerMypageHome.css}">
+  <link rel="stylesheet" th:href="@{/css/order/review_list_buyer.css}">
+  <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css}">
+  <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css}"/>
+</head>
+
+<body>
+
+<div class="layout-wrapper">
+  <header th:replace="~{fragments/Header :: Header}"></header>
+  <div class="page-container">
+    <main class="mypage-container">
+      <div th:replace="fragments/buyerSidebar :: buyerSidebar"></div>
+      <section class="content">
+        <div class="product-managing">
+          <h2>내 주문 목록</h2>
+          <hr>
+          <div class="product-managing-main">
+            <div class="product-search-box">
+              <input class="search-box-input" type="text" placeholder="상품명을 입력해주세요.">
+            </div>
+
+            <div class="product-list">
+              <div class="product-item" th:each="order : ${orderHistory}">
+
+                <hr>
+
+                <div class="product-info" th:each="item : ${order.orderItems}">
+                  <div class="image-box">
+                    <img th:if="${item.productImage != null}"
+                         th:src="${item.productImage}"
+                         alt="상품 이미지"/>
+                    <img th:unless="${item.productImage != null}"
+                         th:src="@{/img/default-product.png}" alt="기본 상품 이미지"/>
+                  </div>
+
+                  <div class="product-info-left">
+                    <h2><a th:text="${item.productName}">상품명</a></h2>
+
+                    <div class="product-info-left-detail">
+                      <div class="product-info-left-detail-details">
+                        <div th:if="${item.guideYn == 'Y'}">가이드포함</div>
+                        <div th:if="${item.guideYn == 'N'}">가이드미포함</div>
+                        <div class="product-info-left-pdate-and-nickname">
+                        <div th:text="|상품등록일 : ${item.createdDate}|" class="created-date">상품등록일</div>
+                        <div th:text="|판매자 : ${item.sellerNickname}|" class="seller-nickname">판매자 닉네임</div>
+                        </div>
+                        <span class="text-trim" th:text="${item.description}"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="product-info-right">
+                    <div class="product-info-right-detail">
+                      <div class="btn-group">
+                        <button class="review-btn btn " th:data-order-item-id="${order.orderId}">리뷰</button>
+                        <button class="delete-btn btn">삭제</button>
+                      </div>
+                      <div class="price-and-order-date">
+                        <div class="price">
+                          <h1 th:if="${item.guideYn == 'Y'}" th:text="|${#numbers.formatDecimal(item.currentPrice, 0, 'COMMA', 0, 'POINT')}|"></h1>
+                          <h1 th:if="${item.guideYn == 'N'}" th:text="|${#numbers.formatDecimal(item.currentPrice, 0, 'COMMA', 0, 'POINT')}|"></h1>
+                          <div>원</div>
+                        </div>
+                        <p th:text="|구매일자: ${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}|"></p>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <hr>
+              </div>
+            </div>
+            <div class="pagination" th:if="${paging != null and paging.totalCount > 0}">
+<!--              <a th:if="${paging.pageNo > 1}"-->
+<!--                 th:href="@{/complete/history(page=${paging.pageNo - 1}, size=${paging.numOfRows})}"-->
+<!--                 class="page-link">&lt;</a>-->
+<!--              <span th:unless="${paging.pageNo > 1}" class="page-link-spacer">&lt;</span>-->
+
+              <th:block th:each="i : ${#numbers.sequence(1, (paging.totalCount - 1) / paging.numOfRows + 1)}">
+                <a th:if="${i == paging.pageNo}"
+                   th:href="@{/order/history(page=${i}, size=${paging.numOfRows})}"
+                   class="page-link active" th:text="${i}">1</a>
+                <a th:if="${i != paging.pageNo}"
+                   th:href="@{/order/history(page=${i}, size=${paging.numOfRows})}"
+                   class="page-link" th:text="${i}">1</a>
+              </th:block>
+
+<!--              <a th:if="${paging.pageNo < (paging.totalCount - 1) / paging.numOfRows + 1}"-->
+<!--                 th:href="@{/complete/history(page=${paging.pageNo + 1}, size=${paging.numOfRows})}"-->
+<!--                 class="page-link">&gt;</a>-->
+<!--              <span th:unless="${paging.pageNo < (paging.totalCount - 1) / paging.numOfRows + 1}" class="page-link-spacer">&gt;</span>-->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
+    </div>
+  </div>
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+<script th:src="@{/js/buyerpage/buyerMypageHome.js}"></script>
+<script th:src="@{/js/layout.js}"></script>
+<script>
+  // review-btn 클릭 시 /review/add/{orderItemId}로 이동
+  document.addEventListener("DOMContentLoaded", () => {
+    const reviewBtns = document.querySelectorAll(".review-btn");
+
+    reviewBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const orderItemId = btn.dataset.orderItemId;
+        if (orderItemId) {
+          window.location.href = `/review/add/${orderItemId}`;
+        }
+      });
+    });
+  });
+
+
+</script>
+</body>
+
+</html>

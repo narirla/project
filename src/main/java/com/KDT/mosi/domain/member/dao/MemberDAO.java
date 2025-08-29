@@ -123,4 +123,7 @@ public interface MemberDAO {
   String findPasswdById(Long memberId);
 
   List<String> findRolesByMemberId(Long memberId);
+
+  // 닉네임 수정
+  int updateNickname(Long memberId, String nickname);
 }

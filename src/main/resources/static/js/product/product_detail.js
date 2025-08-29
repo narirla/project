@@ -1,37 +1,46 @@
 document.addEventListener("DOMContentLoaded", function() {
   // 상품 이미지 슬라이더
+  const slider = document.querySelector(".image-slider");
   const slides = document.querySelectorAll(".slide");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
   let currentIndex = 0;
 
+  const maxLength = 70;
+  const descriptionElements = document.querySelectorAll('.text-trim');
+
+  descriptionElements.forEach(el => {
+    if (el.textContent.length > maxLength) {
+      el.textContent = el.textContent.substring(0, maxLength) + '...';
+    }
+  });
+
+
   // 슬라이드 표시
-  function showSlide(index) {
-    slides.forEach((slide, i) => {
-      slide.classList.toggle("active", i === index);
+    function showSlide(index) {
+    currentIndex = index;
+    slider.style.transform = `translateX(-${index * 100}%)`;
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
+      showSlide(currentIndex);
     });
   }
 
-  // 이전 버튼
-  if (prevBtn) {
-  prevBtn.addEventListener("click", () => {
-    currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
-    showSlide(currentIndex);
-  });
-  }
-
-  // 다음 버튼
   if (nextBtn) {
-  nextBtn.addEventListener("click", () => {
-    currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1;
-    showSlide(currentIndex);
-  });
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1;
+      showSlide(currentIndex);
+    });
   }
 
-  // 초기 슬라이드 표시
+  // 초기 위치
   if (slides.length > 0) {
-  showSlide(currentIndex);
+    showSlide(0);
   }
+
 
   // 가격 포맷팅
   const priceElems = document.querySelectorAll(".allPrice");
@@ -114,6 +123,9 @@ async function handleAddToCart(event) {
     if (result.header && result.header.rtcd === 'S00') {
       showSuccessModal('장바구니에 상품이 추가되었습니다');
       updateCartCount();
+    } else if (result.header && result.header.rtcd === 'C11') {
+      // 장바구니 중복 상품 에러 처리
+      showAlert('이미 장바구니에 동일한 상품이 존재합니다.');
     } else {
       const message = result.header?.rtmsg || '장바구니 추가에 실패했습니다';
       showAlert(message);
@@ -142,10 +154,45 @@ async function handleBuyNow(event) {
       return;
     }
     
-    // 주문 페이지로 이동
+    // 1. 먼저 장바구니에 추가
     const productId = getProductIdFromPage();
-    const orderUrl = `/order?productId=${productId}&optionType=${encodeURIComponent(optionType)}&quantity=1`;
-    window.location.href = orderUrl;
+    const result = await addToCartAPI(productId, optionType, 1);
+    
+    if (result.header && result.header.rtcd === 'S00') {
+      // 2. 장바구니 추가 성공 시 해당 상품을 세션 스토리지에 저장
+      try {
+        const cartResponse = await fetch('/cart', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        if (cartResponse.ok) {
+          const cartData = await cartResponse.json();
+          const cartItems = cartData.body?.cartItems || cartData.cartItems || [];
+          
+          // 방금 추가한 상품을 찾아서 세션 스토리지에 저장
+          const addedItem = cartItems.find(item => 
+            item.productId == productId && item.optionType === optionType
+          );
+          
+          if (addedItem) {
+            sessionStorage.setItem('selectedCartItems', JSON.stringify([addedItem]));
+          }
+        }
+      } catch (error) {
+        console.error('장바구니 데이터 조회 실패:', error);
+      }
+      
+      // 3. 주문서 작성 페이지로 바로 이동
+      window.location.href = '/order';
+    } else {
+      const message = result.header?.rtmsg || '상품 추가에 실패했습니다';
+      showAlert(message);
+    }
     
   } catch (error) {
     console.error('구매하기 오류:', error);
@@ -175,12 +222,9 @@ async function validatePurchase(optionType) {
     };
   }
   
-  // 옵션 체크
+  // 옵션 체크 - 자동으로 기본 옵션 선택
   if (!optionType) {
-    return {
-      isValid: false,
-      message: '옵션을 선택해주세요.'
-    };
+    optionType = '기본코스'; // 기본 옵션으로 설정
   }
   
   return { isValid: true };
@@ -250,57 +294,14 @@ function getProductStatusFromPage() {
 // 성공 모달 표시
 function showSuccessModal(message) {
   const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); display: flex; align-items: center;
-    justify-content: center; z-index: 10000;
-  `;
+  modal.className = 'modal-overlay';
   
   modal.innerHTML = `
-    <div style="
-      background: white; 
-      padding: 40px 50px; 
-      border-radius: 12px; 
-      text-align: center; 
-      width: 450px;
-      height: 250px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    ">
-      <p style="
-        margin: 0 0 30px 0; 
-        font-size: 20px; 
-        font-weight: 600;
-        line-height: 1.5;
-        color: #333;
-      ">${message}</p>
-      <div style="display: flex; gap: 12px; justify-content: center;">
-        <button id="continue-shopping" style="
-          width: 100%;
-          height: 50px;
-          border: 1px solid #BFBFBF;
-          border-radius: 10px;
-          background-color: #fff;
-          font-size: 16px;
-          font-weight: 500;
-          cursor: pointer;
-          color: #333;
-          transition: all 0.2s ease;
-        ">계속 쇼핑하기</button>
-        <button id="go-to-cart" style="
-          width: 100%;
-          height: 50px;
-          border: 1px solid #BFBFBF;
-          border-radius: 10px;
-          background-color: #0099AD;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          color: white;
-          transition: all 0.2s ease;
-        ">장바구니 확인하기</button>
+    <div class="modal-content">
+      <p class="modal-message">${message}</p>
+      <div class="modal-buttons">
+        <button id="continue-shopping" class="modal-btn secondary">계속 쇼핑하기</button>
+        <button id="go-to-cart" class="modal-btn primary">장바구니 확인하기</button>
       </div>
     </div>
   `;
@@ -310,17 +311,6 @@ function showSuccessModal(message) {
   // 버튼 요소 선택
   const continueBtn = modal.querySelector('#continue-shopping');
   const cartBtn = modal.querySelector('#go-to-cart');
-  
-  // 장바구니 확인하기 버튼만 호버 효과 적용
-  cartBtn.addEventListener('mouseenter', () => {
-    cartBtn.style.backgroundColor = '#007a8a';
-    cartBtn.style.transform = 'translateY(-1px)';
-  });
-  
-  cartBtn.addEventListener('mouseleave', () => {
-    cartBtn.style.backgroundColor = '#0099AD';
-    cartBtn.style.transform = 'translateY(0)';
-  });
   
   // 클릭 이벤트
   continueBtn.addEventListener('click', () => {
@@ -350,53 +340,10 @@ function showAlert(message) {
   }
 }
 
-// 장바구니 개수 업데이트
-async function updateCartCount() {
-  try {
-    const response = await fetch('/cart/count', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      const badge = document.getElementById('cart-count');
-      
-      if (badge) {
-        if (data.count > 0) {
-          badge.textContent = data.count > 99 ? '99+' : data.count;
-          badge.style.display = 'inline';
-        } else {
-          badge.style.display = 'none';
-        }
-      }
-    }
-  } catch (error) {
-
+// 장바구니 개수 업데이트 (전역 함수 사용)
+function updateCartCount() {
+  if (window.updateCartCount) {
+    window.updateCartCount();
   }
 }
 
-// 중복 상품 체크
-async function checkDuplicateProduct(productId, optionType) {
-  try {
-    const response = await fetch('/cart', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      // 동일한 상품ID와 옵션이 이미 장바구니에 있는지 확인
-      // 판매 상품은 최대 1개만 구매 가능 (중복 불가)
-      const existingItem = data.cartItems?.find(item => 
-        item.productId == productId && item.optionType === optionType
-      );
-      
-      return !!existingItem;
-    }
-    
-    return false;
-  } catch (error) {
-    return false;
-  }
-}

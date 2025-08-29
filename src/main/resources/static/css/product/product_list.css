@@ -501,11 +501,16 @@ input[type="radio"]:checked+.radio-img {
   flex-direction: column;
   align-items: center;
   width: 290px;
-  height: 380px;
+  height: 340px;
   margin: 0 auto;
   padding-top: 5px;
   padding-bottom: 5px;
   cursor: pointer;
+}
+
+.product-item-container {
+  width: inherit;
+  height: inherit;
 }
 
 .product-item:hover {
@@ -546,14 +551,14 @@ input[type="radio"]:checked+.radio-img {
 .s-price {
   font-size: 24px;
   font-weight: 700;
-  color: #414141;
+  color: #0099AD;
   margin: 0 0 4px 0;
 }
 
 .n-price {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
-  color: #0099AD;
+  color: #414141;
   margin: 0 0 4px 0;
 }
 

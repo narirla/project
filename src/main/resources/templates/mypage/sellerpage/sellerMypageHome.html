@@ -20,7 +20,7 @@
     <div class="page-container">
       <main class="mypage-container">
         <!-- 사이드 바 분리 -->
-        <div th:replace="~{fragments/sellerSidebar :: sellerSidebar(activePath=${activePath})}"></div>
+        <aside th:replace="~{fragments/sellerSidebar :: sellerSidebar}"></aside>
 
         <section class="content">
           <h2>내 정보</h2>
@@ -47,8 +47,8 @@
 
           <div class="section-card recent-orders">
             <div class="section-header">
-              <h3>주문 현황<span class="sub-text">(최근 1주일 이내)</span></h3>
-              <a href="#" class="view-all">전체보기 ></a>
+              <h3>판매 내역<span class="sub-text">(최근 1주일 이내)</span></h3>
+              <a th:href="@{/order/seller/history}" class="view-all">전체보기 ></a>
             </div>
             <table>
               <thead>
@@ -102,75 +102,45 @@
               <h3>내 상품 목록</h3>
               <a th:href="@{/product/manage}" class="view-all">전체보기 ></a>
             </div>
-            <div class="card-list">
-              <div class="tour-card" th:each="product : ${products}">
-                <div class="card-image" th:style="|background-image:url('${product.imageUrl}')|">
-                  <i class="fa-solid fa-heart heart-icon"></i>
+            <div class="home-product-list">
+              <th:block th:if="${totalCount > 0}">
+                <div class="home-product-item" th:each="form : ${productList}">
+                  <a class="home-product-item-container" th:href="@{/product/view/{id}(id=${form.productId})}">
+                    <div class="home-thumbnail">
+                      <img th:if="${form.images != null and #lists.size(form.images) > 0}"
+                           th:src="|data:${form.images[0].mimeType};base64,${form.images[0].encodedImageData}|"
+                           th:alt="${form.images[0].fileName}" />
+                      <img th:if="${form.images == null or #lists.isEmpty(form.images)}"
+                           th:src="@{/img/default-product.png}" alt="기본 상품 이미지" />
+                    </div>
+                    <div class="home-product-info">
+                      <h3 th:text="${form.title}">상품명</h3>
+                      <p class="s-price"
+                         th:text="|${#numbers.formatDecimal(form.salesPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                      <p class="n-price"
+                         th:text="|${#numbers.formatDecimal(form.normalPrice, 0, 'COMMA', 0, 'POINT')} 원|"></p>
+                    </div>
+                  </a>
                 </div>
-                <div class="card-content">
-                  <p class="card-title" th:text="${product.name}">[MO:SI Pick] 황령산 투어 (1박2일)</p>
-                  <p class="card-price">
-                    <span class="price-value" th:text="${product.price}">5,000</span>
-                    <span class="price-unit">원</span>
-                  </p>
-                  <p class="card-sub-text">가이드 구독시 10% 추가할인</p>
-                  <p class="card-discount">
-                    <span class="discount-value" th:text="${product.discountPrice}">4,500</span>
-                    <span class="price-unit">원</span>
-                    <span class="discount-badge">MO:SI 할인가</span>
-                  </p>
-                </div>
-              </div>
-              <div class="tour-card" th:each="product : ${products}">
-                <div class="card-image" th:style="|background-image:url('${product.imageUrl}')|">
-                  <i class="fa-solid fa-heart heart-icon"></i>
-                </div>
-                <div class="card-content">
-                  <p class="card-title" th:text="${product.name}">[MO:SI Pick] 황령산 투어 (1박2일)</p>
-                  <p class="card-price">
-                    <span class="price-value" th:text="${product.price}">5,000</span>
-                    <span class="price-unit">원</span>
-                  </p>
-                  <p class="card-sub-text">가이드 구독시 10% 추가할인</p>
-                  <p class="card-discount">
-                    <span class="discount-value" th:text="${product.discountPrice}">4,500</span>
-                    <span class="price-unit">원</span>
-                    <span class="discount-badge">MO:SI 할인가</span>
-                  </p>
-                </div>
-              </div>
-              <div class="tour-card" th:each="product : ${products}">
-                <div class="card-image" th:style="|background-image:url('${product.imageUrl}')|">
-                  <i class="fa-solid fa-heart heart-icon"></i>
-                </div>
-                <div class="card-content">
-                  <p class="card-title" th:text="${product.name}">[MO:SI Pick] 황령산 투어 (1박2일)</p>
-                  <p class="card-price">
-                    <span class="price-value" th:text="${product.price}">5,000</span>
-                    <span class="price-unit">원</span>
-                  </p>
-                  <p class="card-sub-text">가이드 구독시 10% 추가할인</p>
-                  <p class="card-discount">
-                    <span class="discount-value" th:text="${product.discountPrice}">4,500</span>
-                    <span class="price-unit">원</span>
-                    <span class="discount-badge">MO:SI 할인가</span>
-                  </p>
-                </div>
-              </div>
+              </th:block>
+              <th:block th:if="${totalCount == 0}">
+                <p class="no-products">등록된 상품이 없습니다.</p>
+              </th:block>
             </div>
           </div>
         </section>
       </main>
-      <!-- 공지 -->
-      <div class="notice-bar">
-        <div class="notice-label">공지</div>
-        <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
-        <a href="#" class="more-link">+ 더보기</a>
-      </div>
-
-      <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
+    <!-- 공지 -->
+    <div class="notice-bar">
+      <div class="notice-label">공지</div>
+      <div class="notice-text">&lt;MO:SI&gt; 신규 코스 등록 이벤트 당첨자 안내</div>
+      <a href="#" class="more-link">+ 더보기</a>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
   </div>
+
   <script th:src="@{/js/sellerpage/sellerMypageHome.js}"></script>
   <script th:src="@{/js/layout.js}"></script>
 </body>

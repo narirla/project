@@ -1,6 +1,5 @@
 package com.KDT.mosi.web.controller.chat;
 
-
 import com.KDT.mosi.domain.chat.svc.ChatRoomService;
 import com.KDT.mosi.domain.dto.chat.ChatRoomListDto;
 import jakarta.servlet.http.HttpSession;
@@ -22,26 +21,38 @@ public class ChatRoomListController {
 
   private final ChatRoomService chatRoomService;
 
-  /** 판매자 채팅방 목록 페이지 */
-  @GetMapping
+
+  //=============================== 판매자 ===============================
+
+  /**
+   * 판매자 채팅방 목록 페이지 (HTML 렌더링)
+   * - 세션에서 로그인된 판매자(memberId) 확인
+   * - 전체 채팅방 목록을 조회하여 model에 담아 뷰로 반환
+   */
+  @GetMapping("/seller")
   public String roomListPage(HttpSession session, Model model) {
     log.info("session.memberId값={}", session.getAttribute("loginMemberId"));
+
     // 세션에서 로그인 회원 ID 꺼내기
     Long memberId = (Long) session.getAttribute("loginMemberId");
     if (memberId == null) {
       return "redirect:/login"; // 로그인 안 됐으면 로그인 페이지로
     }
 
+    // 전체 채팅방 목록 (ACTIVE + CLOSED)
     List<ChatRoomListDto> rooms = chatRoomService.findBySellerId(memberId);
 
+    // 뷰로 전달할 데이터
     model.addAttribute("rooms", rooms);
     model.addAttribute("memberId", memberId); // → HTML에서 data-member-id 로 내려줌
 
-    return "chat/chatList_seller";
+    return "chat/chatList_seller"; // 📄 templates/chat/chatList_seller.html
   }
 
-  /** Ajax/REST 요청 */
-  @GetMapping("/api")
+  /**
+   * Ajax/REST 요청: 판매자 전체 채팅방 목록 (ACTIVE + CLOSED)
+   */
+  @GetMapping("/seller/api")
   @ResponseBody
   public List<ChatRoomListDto> roomListApi(HttpSession session) {
     Long memberId = (Long) session.getAttribute("loginMemberId");
@@ -65,6 +76,115 @@ public class ChatRoomListController {
     return rooms;
   }
 
+  /**
+   * Ajax/REST 요청: 진행중(Active) 채팅방 목록
+   */
+  @GetMapping("/seller/api/active")
+  @ResponseBody
+  public List<ChatRoomListDto> activeRooms(HttpSession session) {
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      throw new IllegalStateException("로그인 필요");
+    }
+
+    List<ChatRoomListDto> rooms = chatRoomService.getActiveRooms(memberId);
+    log.info("📡 [판매자:{}] 진행중 채팅방 {}건 조회", memberId, rooms.size());
+    return rooms;
+  }
+
+  /**
+   * Ajax/REST 요청: 종료된(Closed) 채팅방 목록
+   */
+  @GetMapping("/seller/api/closed")
+  @ResponseBody
+  public List<ChatRoomListDto> closedRooms(HttpSession session) {
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      throw new IllegalStateException("로그인 필요");
+    }
+
+    List<ChatRoomListDto> rooms = chatRoomService.getClosedRooms(memberId);
+    log.info("📡 [판매자:{}] 종료된 채팅방 {}건 조회", memberId, rooms.size());
+    return rooms;
+  }
+
+
+  //=============================== 구매자 ===============================
+  /**
+   * 구매자 채팅방 목록 페이지 (HTML 렌더링)
+   */
+  @GetMapping("/buyer")
+  public String buyerRoomListPage(HttpSession session, Model model) {
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      return "redirect:/login"; // 로그인 안 됐으면 로그인 페이지로
+    }
+
+    // 전체 채팅방 목록 (ACTIVE + CLOSED)
+    List<ChatRoomListDto> rooms = chatRoomService.findByBuyerId(memberId);
+
+    // 뷰로 전달할 데이터
+    model.addAttribute("rooms", rooms);
+    model.addAttribute("memberId", memberId);
+
+    return "chat/chatList_buyer"; // 📄 templates/chat/chatList_buyer.html
+  }
+
+  /**
+   * Ajax/REST 요청: 구매자 전체 채팅방 목록 (ACTIVE + CLOSED)
+   */
+  @GetMapping("/buyer/api")
+  @ResponseBody
+  public List<ChatRoomListDto> buyerRoomListApi(HttpSession session) {
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      throw new IllegalStateException("로그인 필요");
+    }
+
+    List<ChatRoomListDto> rooms = chatRoomService.findByBuyerId(memberId);
+
+    rooms.forEach(room ->
+        log.info("📋 [구매자:{}] 채팅방ID={}, 상품ID={}, 판매자={}, 마지막메시지={}",
+            memberId,
+            room.getRoomId(),
+            room.getProductId(),
+            room.getSellerId(),
+            room.getLastMessage())
+    );
+
+    return rooms;
+  }
+
+  /**
+   * Ajax/REST 요청: 진행중(Active) 채팅방 목록
+   */
+  @GetMapping("/buyer/api/active")
+  @ResponseBody
+  public List<ChatRoomListDto> activeBuyerRooms(HttpSession session) {
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      throw new IllegalStateException("로그인 필요");
+    }
+
+    List<ChatRoomListDto> rooms = chatRoomService.getActiveRoomsByBuyer(memberId);
+    log.info("📡 [구매자:{}] 진행중 채팅방 {}건 조회", memberId, rooms.size());
+    return rooms;
+  }
+
+  /**
+   * Ajax/REST 요청: 종료된(Closed) 채팅방 목록
+   */
+  @GetMapping("/buyer/api/closed")
+  @ResponseBody
+  public List<ChatRoomListDto> closedBuyerRooms(HttpSession session) {
+    Long memberId = (Long) session.getAttribute("loginMemberId");
+    if (memberId == null) {
+      throw new IllegalStateException("로그인 필요");
+    }
+
+    List<ChatRoomListDto> rooms = chatRoomService.getClosedRoomsByBuyer(memberId);
+    log.info("📡 [구매자:{}] 종료된 채팅방 {}건 조회", memberId, rooms.size());
+    return rooms;
+  }
+
 }
-
-

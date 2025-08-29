@@ -1,3 +1,4 @@
+// product_update.js (상품 수정 전용)
 
 document.addEventListener('DOMContentLoaded', function () {
   // 기본 설정
@@ -7,9 +8,28 @@ document.addEventListener('DOMContentLoaded', function () {
   const icon = uploadBox.querySelector('i');
   const text = uploadBox.querySelector('p');
   const nameList = document.getElementById('imageNameList');
+  const tempSaveBtn = document.getElementById('tempSaveBtn');
+  const registerBtn = document.getElementById('registerBtn'); // ⭐ 이 부분을 수정했습니다.
+  const productForm = document.getElementById('productForm');
+  const documentFileInput = document.querySelector('input[name="documentFile"]');
+
   const maxCount = 10;
+  const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024;
+  const allowedDocumentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt', 'rtf', 'html'];
   let filesArr = [];
 
+  // 유효성 검사 메시지 표시/숨김 함수 (product_validation.js에서 가져옴)
+  const showValidationMessage = window.showValidationMessage;
+  const hideValidationMessage = window.hideValidationMessage;
+  const validateForm = window.validateForm;
+
+  // 파일 확장자 검사 함수
+  function validateFileExtension(file, allowedExtensions) {
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      return allowedExtensions.includes(fileExtension);
+  }
+
+  // 기존 이미지 초기화
   initializeExistingImages();
 
   // 업로드 박스 클릭 이벤트
@@ -29,11 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
       alert(`이미지는 최대 ${maxCount}개까지 업로드할 수 있습니다.`);
       filesArr = filesArr.slice(0, maxCount);
     }
-
     updateInputFiles();
-
     if (filesArr.length > 0) {
-      // 새 파일 업로드 시 모든 active 제거
       document.querySelectorAll('.image-name-item.active').forEach(el => el.classList.remove('active'));
       showPreview(filesArr[0]);
       renderNameList(filesArr[0]);
@@ -66,16 +83,12 @@ document.addEventListener('DOMContentLoaded', function () {
       filesArr = filesArr.concat(Array.from(e.dataTransfer.files).filter(f =>
         !filesArr.some(file => file.name === f.name && file.size === f.size)
       ));
-
       if (filesArr.length > maxCount) {
         alert(`이미지는 최대 ${maxCount}개까지 업로드할 수 있습니다.`);
         filesArr = filesArr.slice(0, maxCount);
       }
-
       updateInputFiles();
-
       if (filesArr.length > 0) {
-        // 새 파일 드롭 시 모든 active 제거
         document.querySelectorAll('.image-name-item.active').forEach(el => el.classList.remove('active'));
         showPreview(filesArr[0]);
         renderNameList(filesArr[0]);
@@ -94,24 +107,20 @@ document.addEventListener('DOMContentLoaded', function () {
     filesArr.forEach((file, idx) => {
       const item = document.createElement('div');
       item.className = 'image-name-item new-file-item';
-
       const fileNameSpan = document.createElement('span');
       fileNameSpan.textContent = file.name;
       item.appendChild(fileNameSpan);
 
-      // 현재 미리보기 파일이면 active 추가
       if (activeFile && activeFile.name === file.name && activeFile.size === file.size) {
         item.classList.add('active');
       }
 
-      // 파일 클릭 시 미리보기 변경
       item.addEventListener('click', (e) => {
         e.stopPropagation();
         showPreview(file);
         renderNameList(file);
       });
 
-      // 파일 삭제 버튼
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
       removeBtn.className = 'remove-image';
@@ -134,7 +143,6 @@ document.addEventListener('DOMContentLoaded', function () {
           renderNameList(null);
         }
       });
-
       item.appendChild(removeBtn);
       nameList.appendChild(item);
     });
@@ -177,7 +185,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // 기존 이미지 초기화
   function initializeExistingImages() {
     const existingImages = document.querySelectorAll('.existing-image');
-
     if (existingImages.length > 0) {
       const firstImage = existingImages[0];
       const firstImageId = firstImage.getAttribute('data-image-id');
@@ -186,131 +193,232 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     existingImages.forEach((imageItem) => {
-      const fileName = imageItem.getAttribute('data-image-name');
       const imageId = imageItem.getAttribute('data-image-id');
-
-      // 이미지 클릭 이벤트
       imageItem.addEventListener('click', function(e) {
         if (e.target.tagName === 'BUTTON') return;
         e.stopPropagation();
-
         showPreview(`/product-images/${imageId}/data`);
-
-        // 모든 active 제거 후 현재만 활성화
         document.querySelectorAll('.image-name-item.active').forEach(el => el.classList.remove('active'));
         this.classList.add('active');
       });
 
-      // 이미지 삭제 이벤트
       const removeBtn = imageItem.querySelector('.remove-image');
       if (removeBtn) {
         removeBtn.addEventListener('click', function(e) {
           e.stopPropagation();
+          const imageId = imageItem.getAttribute('data-image-id');
+          if (imageId) {
+            addDeleteImageIdToForm(imageId);
+          }
           imageItem.remove();
+          updatePreviewAfterDelete();
         });
       }
     });
   }
 
-  // 문서 파일 업로드
-  const documentFileInput = document.querySelector('input[name="documentFile"]');
-  let currentBlobUrl = null;
+  // 삭제할 이미지 ID를 폼에 추가하는 함수
+  function addDeleteImageIdToForm(imageId) {
+    const form = document.getElementById('productForm');
+    let hiddenInput = form.querySelector('input[name="deleteImageIds"]');
+    if (!hiddenInput) {
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'deleteImageIds';
+        hiddenInput.value = '';
+        form.appendChild(hiddenInput);
+    }
+    const currentIds = hiddenInput.value.split(',').filter(id => id.trim() !== '');
+    currentIds.push(imageId);
+    hiddenInput.value = currentIds.join(',');
+  }
 
-  if (documentFileInput) {
+  // 이미지 삭제 후 미리보기 업데이트 함수
+  function updatePreviewAfterDelete() {
+    const remainingImages = document.querySelectorAll('.existing-image, .new-file-item');
+    if (remainingImages.length > 0) {
+      const firstImage = remainingImages[0];
+      if (firstImage.classList.contains('existing-image')) {
+          const firstImageId = firstImage.getAttribute('data-image-id');
+          showPreview(`/product-images/${firstImageId}/data`);
+      } else {
+          const fileIndex = filesArr.findIndex(f => f.name === firstImage.textContent.trim());
+          if (fileIndex !== -1) {
+              showPreview(filesArr[fileIndex]);
+          }
+      }
+      document.querySelectorAll('.image-name-item.active').forEach(el => el.classList.remove('active'));
+      firstImage.classList.add('active');
+    } else {
+      hidePreview();
+    }
+  }
+
+  // 문서 파일 첨부 유효성 검사 (클라이언트 측 검사)
+  const fileNameDisplay = document.querySelector('.file-name');
+  if (documentFileInput && fileNameDisplay) {
     documentFileInput.addEventListener('change', function(e) {
-      const currentFileInfo = document.querySelector('.current-file-info');
-      if (e.target.files.length > 0 && currentFileInfo) {
-        const file = e.target.files[0];
-        const fileName = file.name;
-        const fileSize = Math.round(file.size / 1024);
-
-        // 이전 Blob URL 메모리 해제
-        if (currentBlobUrl) {
-          URL.revokeObjectURL(currentBlobUrl);
-        }
-
-        currentBlobUrl = URL.createObjectURL(file);
-
-        const fileLink = currentFileInfo.querySelector('.current-file-link');
-        const fileSizeSpan = currentFileInfo.querySelector('.file-size');
-
-        if (fileLink) {
-          fileLink.textContent = fileName;
-          fileLink.href = currentBlobUrl;
-          fileLink.download = fileName;
-        }
-        if (fileSizeSpan) {
-          fileSizeSpan.innerHTML = `(${fileSize} KB)`;
-        }
+      const file = e.target.files[0];
+      if (file) {
+          if (!validateFileExtension(file, allowedDocumentExtensions)) {
+              showValidationMessage(this, `허용되지 않는 문서 파일 형식입니다.`);
+              this.value = '';
+          } else if (file.size > MAX_DOCUMENT_SIZE) {
+              showValidationMessage(this, `문서 파일은 ${MAX_DOCUMENT_SIZE / (1024 * 1024)}MB를 초과할 수 없습니다.`);
+              this.value = '';
+          } else {
+              hideValidationMessage(this);
+              fileNameDisplay.textContent = file.name;
+          }
+      } else {
+          hideValidationMessage(this);
+          const hasExistingDocument = document.querySelector('.existing-document');
+          if (!hasExistingDocument) {
+              fileNameDisplay.textContent = '';
+          }
       }
     });
   }
 
   // 임시저장 버튼 이벤트
-   const tempSaveBtn = document.getElementById('tempSaveBtn');
-    const updateBtn = document.getElementById('updateBtn');
+  if (tempSaveBtn) {
+    tempSaveBtn.addEventListener('click', async function(event) {
+        event.preventDefault();
 
-    if (tempSaveBtn) {
-      tempSaveBtn.addEventListener('click', function(event) {
-        handleTempSave();
-      });
-    }
-
-    // 임시저장 버튼 클릭 핸들러 함수
-    async function handleTempSave() {
-      const form = document.getElementById('productForm');
-      const formData = new FormData(form);
-
-      // '임시저장' 상태 값 추가
-      formData.append('status', '임시저장');
-
-      // ⭐ 기존 로직을 활용하여 삭제할 이미지 ID 리스트를 FormData에 추가
-      const deleteImageIds = document.getElementById('deleteImageIds').value;
-      if (deleteImageIds) {
-        formData.append('deleteImageIds', deleteImageIds);
-      }
-
-      // ⭐ 기존 로직을 활용하여 업로드할 새 이미지 파일을 FormData에 추가
-      // filesArr는 현재 JS 코드에서 업로드할 새 이미지를 담는 배열입니다.
-      filesArr.forEach(file => {
-        formData.append('uploadImages', file); // HTML의 name="uploadImages"와 일치시킴
-      });
-
-      // ⭐ 기존 문서 파일 로직에서 선택한 새 문서 파일을 FormData에 추가
-      const documentFile = document.querySelector('input[name="documentFile"]').files[0];
-      if (documentFile) {
-          formData.append('documentFile', documentFile);
-      }
-
-      try {
-        const response = await fetch('/product/temp-save', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (response.redirected) {
-          window.location.href = response.url;
-        } else {
-          const result = await response.json();
-          if (result.error) {
-            alert(result.error);
-          } else {
-            alert('상품이 임시저장되었습니다.');
-            window.location.href = '/product/manage?status=임시저장';
-          }
+        // 폼 필드 유효성 검사
+        const isFormValid = await validateForm(productForm);
+        if (!isFormValid) {
+            return;
         }
 
-      } catch (error) {
-        console.error('임시저장 중 오류 발생:', error);
-        alert('임시저장 중 오류가 발생했습니다. 다시 시도해주세요.');
-      }
-    }
+        const hasExistingImages = document.querySelectorAll('.existing-image').length > 0;
+        const hasNewImages = filesArr.length > 0;
+        if (!hasExistingImages && !hasNewImages) {
+            showValidationMessage(input.closest('.image-upload-container'), '상품 이미지를 1장 이상 등록해주세요.');
+            return;
+        } else {
+            hideValidationMessage(input.closest('.image-upload-container'));
+        }
 
-    // ⭐ 기존 수정 버튼 이벤트
-    if (updateBtn) {
-      updateBtn.addEventListener('click', function(event) {
-        // 폼의 기본 제출 동작을 따르므로, 별도 로직 없이 그대로 둡니다.
-        // 폼의 action="/product/edit/{id}"와 method="post"가 동작하게 됩니다.
+        const hasExistingDocument = document.querySelector('.file-name')?.textContent.trim() !== '';
+        const hasNewDocument = documentFileInput?.files?.length > 0;
+        if (!hasExistingDocument && !hasNewDocument) {
+             showValidationMessage(documentFileInput.closest('.file, .input-container'), '판매 파일을 첨부해주세요.');
+             return;
+        } else {
+            hideValidationMessage(documentFileInput.closest('.file, .input-container'));
+        }
+
+        // 모든 검사 통과 후 임시 저장 처리
+        handleTempSave();
+    });
+  }
+
+  // 임시저장 버튼 클릭 핸들러
+  async function handleTempSave() {
+    const formData = new FormData(productForm);
+    formData.append('status', '임시저장');
+
+    filesArr.forEach(file => {
+      formData.append('uploadImages', file);
+    });
+
+    try {
+      const response = await fetch('/product/temp-save', {
+        method: 'POST',
+        body: formData,
       });
+
+      if (response.redirected) {
+        window.location.href = response.url;
+      } else {
+        const result = await response.json();
+        if (result.error) {
+          alert(result.error);
+        } else {
+          alert('상품이 임시저장되었습니다.');
+          window.location.href = '/product/manage?status=임시저장';
+        }
+      }
+    } catch (error) {
+      console.error('임시저장 중 오류 발생:', error);
+      alert('임시저장 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
+  }
+
+  // 폼 제출 이벤트
+  if (registerBtn) {
+      registerBtn.addEventListener('click', async function(event) {
+          event.preventDefault();
+
+          const isFormValid = await validateForm(productForm);
+          if (!isFormValid) {
+              return;
+          }
+
+          const hasExistingImages = document.querySelectorAll('.existing-image').length > 0;
+          const hasNewImages = filesArr.length > 0;
+          if (!hasExistingImages && !hasNewImages) {
+              showValidationMessage(input.closest('.image-upload-container'), '상품 이미지를 1장 이상 등록해주세요.');
+              alert('상품 이미지를 1장 이상 등록해주세요.');
+              return;
+          } else {
+              hideValidationMessage(input.closest('.image-upload-container'));
+          }
+
+          const hasExistingDocument = document.querySelector('.file-name')?.textContent.trim() !== '';
+          const hasNewDocument = documentFileInput?.files?.length > 0;
+          if (!hasExistingDocument && !hasNewDocument) {
+               showValidationMessage(documentFileInput.closest('.file, .input-container'), '판매 파일을 첨부해주세요.');
+               alert('판매 파일을 첨부해주세요.');
+               return;
+          } else {
+              hideValidationMessage(documentFileInput.closest('.file, .input-container'));
+          }
+
+          // ⭐ 수정된 부분: FormData를 생성하고 status 값을 설정, 파일들을 추가
+          const formData = new FormData(productForm);
+          formData.set('status', '판매중');
+          filesArr.forEach(file => {
+              formData.append('uploadImages', file);
+          });
+          const documentFile = document.querySelector('input[name="documentFile"]').files[0];
+          if (documentFile) {
+              formData.append('documentFile', documentFile);
+          }
+          const deleteImageIds = document.getElementById('deleteImageIds').value;
+          if (deleteImageIds) {
+              formData.append('deleteImageIds', deleteImageIds);
+          }
+
+
+          const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+          try {
+              const response = await fetch(productForm.action, {
+                  method: 'POST',
+                  headers: {
+                      'X-CSRF-TOKEN': csrfToken
+                  },
+                  body: formData
+              });
+
+              if (response.ok) {
+                  // 성공적으로 수정되었을 경우
+                  alert('상품 정보가 성공적으로 수정되었습니다.');
+                  window.location.href = '/product/manage?status=판매중';
+              } else {
+                  // 서버에서 에러 응답을 보낼 경우
+                  const result = await response.json();
+                  if (result.error) {
+                      alert(result.error);
+                  } else {
+                      alert('상품 수정에 실패했습니다. 다시 시도해주세요.');
+                  }
+              }
+          } catch (error) {
+              console.error('상품 수정 중 오류 발생:', error);
+              alert('상품 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+          }
+      });
+  }
 });

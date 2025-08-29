@@ -1,21 +1,19 @@
 package com.KDT.mosi.web.controller.review;
 
-import com.KDT.mosi.domain.entity.Member;
+import com.KDT.mosi.domain.entity.review.ReviewEdit;
 import com.KDT.mosi.domain.entity.review.ReviewProduct;
-import com.KDT.mosi.domain.member.svc.MemberSVC;
+import com.KDT.mosi.domain.mypage.buyer.svc.BuyerPageSVC;
+import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.review.svc.ReviewSVC;
 import com.KDT.mosi.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Base64;
 import java.util.Optional;
@@ -27,18 +25,9 @@ import java.util.Optional;
 public class CsrApiReviewController {
 
   private final ReviewSVC reviewSVC;
-  private final MemberSVC memberSVC;
+  private final BuyerPageSVC buyerPageSVC;
+  private final SellerPageSVC sellerPageSVC;
 
-  private Long getLoginMemberId() {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    Object principal = auth.getPrincipal();
-
-    if (principal instanceof com.KDT.mosi.security.CustomUserDetails userDetails) {
-      return userDetails.getMember().getMemberId();
-    }
-
-    throw new IllegalStateException("로그인 사용자 정보를 확인할 수 없습니다.");
-  }
 
   @GetMapping("/add/{orderItemId}")
   public String bbs(@PathVariable("orderItemId") Long orderItemId,
@@ -46,15 +35,7 @@ public class CsrApiReviewController {
                     Model model) {
 
     Long memberId = user.getMember().getMemberId();
-    Long loginMemberId = getLoginMemberId();
-    Optional<Member> optionalMember = memberSVC.findById(loginMemberId);
-    if (optionalMember.isEmpty()) {
-      return "error/403"; // 로그인 정보 없음
-    }
 
-    Member member = optionalMember.get();
-    model.addAttribute("memberId", loginMemberId);
-    model.addAttribute("member", member);
     Optional<ReviewProduct> reviewProductOpt = reviewSVC.summaryFindById(orderItemId, memberId);
 
     ReviewProduct reviewProduct = reviewProductOpt.orElse(null);
@@ -77,25 +58,82 @@ public class CsrApiReviewController {
 //    return "review/write";
   }
 
-  @GetMapping("/list")
-  public String reviewListBuyer(
-      @RequestParam(name = "pageNo", required = false) Integer pageNo,
-      @RequestParam(name = "numOfRows", required = false) Integer numOfRows,
+  @GetMapping("/edit/{reviewId}")
+  public String editReview(@PathVariable("reviewId") Long reviewId,
+                           @AuthenticationPrincipal CustomUserDetails user,
+                           Model model) {
+
+    Long memberId = user.getMember().getMemberId();
+
+    // 1) 본인 검증 + 수정용 데이터
+    ReviewEdit review = reviewSVC.findReviewId(reviewId, memberId)
+        .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+
+    // 2) productId로 요약 정보 조회
+    ReviewProduct reviewProduct = reviewSVC.summaryFindByProductId(review.getOrderItemId())
+        .orElse(null);
+    log.info("reviewProductId={}",review.getProductId());
+    log.info("reviewProduct={}",reviewProduct.getOptionType());
+
+    model.addAttribute("review", review);
+    model.addAttribute("reviewProduct", reviewProduct);
+
+    // 3) 이미지 data URI
+    String imageSrc = null;
+    if (reviewProduct != null) {
+      byte[] data = reviewProduct.getImageData();
+      if (data != null && data.length > 0) {
+        String mime = (reviewProduct.getMimeType() != null && !reviewProduct.getMimeType().isBlank())
+            ? reviewProduct.getMimeType()
+            : "image/jpeg";
+        String base64 = Base64.getEncoder().encodeToString(data);
+        imageSrc = "data:" + mime + ";base64," + base64;
+      }
+    }
+    model.addAttribute("imageSrc", imageSrc);
+
+    return "review/review_writeForm";
+  }
+
+
+  @GetMapping("/seller/list")
+  public String reviewListSeller(
       @AuthenticationPrincipal CustomUserDetails user,
       Model model
   ) {
     if (user == null) return "redirect:/login";
-    int p = (pageNo == null) ? 1 : pageNo;
-    int r = (numOfRows == null) ? 5 : numOfRows;
 
-    // 쿼리 없으면 주소창에 기본값 고정
-    if (pageNo == null || numOfRows == null) {
-      return "redirect:/review/list?pageNo=" + p + "&numOfRows=" + r;
-    }
+    Long memberId = user.getMember().getMemberId();
 
-    model.addAttribute("mode", "buyer");     // 프런트에서 /api/review/paging/buyer 호출
-    model.addAttribute("pageNo", p);
-    model.addAttribute("numOfRows", r);
-    return "review/review_list";             // 목록 뷰 (앞서 만든 HTML 템플릿)
+    // 세션 Member
+    model.addAttribute("member", user.getMember());
+
+    // SellerPage 조회 후 내려줌
+    sellerPageSVC.findByMemberId(memberId)
+        .ifPresent(sp -> model.addAttribute("sellerPage", sp));
+
+    return "review/seller_review_list";
   }
+
+
+  @GetMapping("/buyer/list")
+  public String reviewListBuyer(
+      @AuthenticationPrincipal CustomUserDetails user,
+      Model model
+  ) {
+    if (user == null) return "redirect:/login";
+
+    Long memberId = user.getMember().getMemberId();
+
+    // 세션 Member 그대로 내려줌
+    model.addAttribute("member", user.getMember());
+
+    // BuyerPage DB 조회 후 내려줌 (닉네임/프로필 포함)
+    buyerPageSVC.findByMemberId(memberId)
+        .ifPresent(bp -> model.addAttribute("buyerPage", bp));
+
+    return "review/buyer_review_list";
+  }
+
+
 }

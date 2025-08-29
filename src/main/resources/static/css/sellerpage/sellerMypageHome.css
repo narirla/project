@@ -31,7 +31,7 @@ ul {
   width: 1200px;
   margin: 0 auto;
   background-color: #fff;
-  height: 1980px; /* ✅ 전체 높이 확보 */
+  min-height: 1450px; /* ✅ 전체 높이 확보 */
   display: flex;
   flex-direction: column;
 }
@@ -318,7 +318,7 @@ ul {
   padding: 15px 20px;
   border-radius: 4px;
   margin-top: 38px;
-  margin-bottom: 30px;
+  margin-bottom: 75px;
   gap: 40px;
 }
 
@@ -334,13 +334,13 @@ ul {
 }
 
 /* 상품 카드 */
-.card-list {
+.home-product-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
-.tour-card {
+.home-product-item {
   width: 290px;
   height: 415px;
   border-radius: 8px;
@@ -348,12 +348,14 @@ ul {
   border: 1px solid #e1e4e8;
 }
 
-.card-image {
+.home-thumbnail img {
   width: 290px;
   height: 290px; /* ✅ 시안과 동일 */
   background-size: cover;
   background-position: center;
   position: relative;
+  object-fit: cover;
+  object-position: center center;
 }
 
 .heart-icon {
@@ -365,69 +367,40 @@ ul {
   text-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
 
-.card-content {
+.home-product-info {
   width: 290px;
   height: 96px;
   padding: 12px;
 }
 
-.card-title {
+.home-product-info h3 {
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 5px;
 }
 
-.card-price {
+.n-price {
   margin-bottom: 5px;
-}
-
-/* ✅ card-price 안의 값과 단위 */
-.card-price .price-value {
-  font-size: 24px;       /* ✅ 세미볼드 24px */
+  font-size: 20px;
   font-weight: 600;
-  color: #000;
 }
 
-.card-price .price-unit {
-  font-size: 20px;       /* ✅ 레귤러 20px */
-  font-weight: 400;
-  color: #000;
-  margin-left: 2px;      /* 숫자와 ‘원’ 사이 살짝 간격 */
-}
-
-/* ✅ card-discount 안의 값과 단위 */
-.card-discount .discount-value {
-  font-size: 22px;       /* ✅ 세미볼드 22px */
+.s-price {
+  color: #0099AD;
+  font-size: 24px;
   font-weight: 600;
-  color: #0099AD;        /* ✅ 파란색 */
+  margin: 5px 0px;
 }
 
-.card-discount .price-unit {
-  font-size: 18px;       /* ✅ 레귤러 18px */
-  font-weight: 400;
-  color: #0099AD;        /* ✅ 파란색 */
-  margin-right: 5px;
+.no-products {
+  text-align: center;
+  color: #777;
+  font-size: 18px;
+  padding: 40px 20px;
+  width: 850px;
+  margin-left: 40px;
 }
 
-
-.card-sub-text {
-  font-size: 12px;
-  font-weight: 500;
-  color: #1E7889;
-  margin-bottom: 5px;
-}
-
-.discount-badge {
-  width: 87px;
-  height: 22px;
-  background: linear-gradient(to right, #56DDF8 0%, #09D0C0 100%);
-  color: #FFFFFF;
-  font-size: 12px;
-  padding: 3px 6px;
-  border-radius: 4px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
 
 /* 하단 섹션 */
 .section-header {

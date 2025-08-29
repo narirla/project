@@ -2,6 +2,10 @@
   margin-top: 80px;
 }
 
+.post-section hr {
+  border: solid 2px #1ec4cc;
+}
+
 /* tap 메뉴 */
 .tab-menu {
   display: flex;
@@ -90,7 +94,16 @@
   justify-content: center;
   align-items: center;
   margin: 10px;
+  
 }
+
+.inquiry-list-product_img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
 .inquiry-list-product_title {
   flex-grow: 3;
   margin-left: 15px;
@@ -99,6 +112,7 @@
 .inquiry-list-msgs {
   width: 430px;
   flex-grow: 4;
+  margin-left: 10px;
 }
 
 .inquiry-list-product_title {
@@ -108,12 +122,14 @@
   font-weight: bold;
 }
 
+.inquiry-list-seller_nickname,
 .inquiry-list-buyer_nickname {
   font-weight: bold;
   margin-bottom: 5px;
 }
 .inquiry-list-last_msg:hover,
-.inquiry-list-buyer_nickname:hover {
+.inquiry-list-buyer_nickname:hover,
+.inquiry-list-seller_nickname:hover {
   cursor: pointer;
   color: #1ec4cc;
   transition: 0.2s;

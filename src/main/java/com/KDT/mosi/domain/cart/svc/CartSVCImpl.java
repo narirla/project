@@ -1,7 +1,7 @@
 package com.KDT.mosi.domain.cart.svc;
 
-import com.KDT.mosi.domain.cart.dto.CartResponse;
 import com.KDT.mosi.domain.cart.dto.CartItemResponse;
+import com.KDT.mosi.domain.cart.dto.CartResponse;
 import com.KDT.mosi.domain.cart.repository.CartItemRepository;
 import com.KDT.mosi.domain.cart.repository.CartRepository;
 import com.KDT.mosi.domain.entity.Product;
@@ -10,6 +10,8 @@ import com.KDT.mosi.domain.entity.cart.Cart;
 import com.KDT.mosi.domain.entity.cart.CartItem;
 import com.KDT.mosi.domain.mypage.seller.svc.SellerPageSVC;
 import com.KDT.mosi.domain.product.svc.ProductSVC;
+import com.KDT.mosi.domain.product.svc.ProductImageSVC;
+import com.KDT.mosi.domain.entity.ProductImage;
 import com.KDT.mosi.web.api.ApiResponse;
 import com.KDT.mosi.web.api.ApiResponseCode;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * 장바구니 서비스 구현체
- */
 @Slf4j
 @Service
 @Transactional
@@ -33,9 +32,13 @@ public class CartSVCImpl implements CartSVC {
   private final CartRepository cartRepository;
   private final CartItemRepository cartItemRepository;
   private final ProductSVC productSVC;
+  private final ProductImageSVC productImageSVC;
   private final SellerPageSVC sellerPageSVC;
 
+
+  // 장바구니 상품 추가
   @Override
+  @Transactional
   public ApiResponse<Void> addToCart(Long buyerId, Long productId, String optionType, Long quantity) {
     try {
       if (quantity <= 0) {
@@ -53,7 +56,9 @@ public class CartSVCImpl implements CartSVC {
           .findByBuyerIdAndProductIdAndOptionType(buyerId, productId, optionType);
 
       if (existingItem.isPresent()) {
-        return ApiResponse.of(ApiResponseCode.DUPLICATE_DATA, null);
+        log.warn("중복 상품 추가 시도: buyerId={}, productId={}, optionType={}",
+            buyerId, productId, optionType);
+        return ApiResponse.of(ApiResponseCode.CART_ITEM_ALREADY_EXISTS, null);
       } else {
         Cart cart = getOrCreateCart(buyerId);
 
@@ -78,6 +83,9 @@ public class CartSVCImpl implements CartSVC {
     }
   }
 
+  /**
+   * 장바구니 조회
+   */
   @Override
   @Transactional(readOnly = true)
   public CartResponse getCart(Long buyerId, String memberNickname) {
@@ -88,13 +96,13 @@ public class CartSVCImpl implements CartSVC {
         return CartResponse.createEmptyCart(memberNickname, buyerId);
       }
 
-      // Entity → DTO 수동 변환
+      // Entity → DTO 변환
       List<CartItemResponse> cartItems = convertToCartItemResponses(items);
 
       long totalPrice = 0;
       int totalQuantity = 0;
 
-      // 총 금액과 수량 계산
+      // 서버에서 미리 계산
       for (CartItemResponse dto : cartItems) {
         if (dto.isAvailable()) {
           totalPrice += dto.getPrice() * dto.getQuantity();
@@ -102,14 +110,13 @@ public class CartSVCImpl implements CartSVC {
         }
       }
 
-      // 장바구니 응답 생성
       return CartResponse.createSuccess(
           memberNickname,
           buyerId,
-          cartItems,                    // List<CartItemResponse>
-          (long) cartItems.size(),      // Long
-          (long) totalQuantity,         // Long
-          totalPrice                    // Long
+          cartItems,
+          (long) cartItems.size(),
+          (long) totalQuantity,
+          totalPrice
       );
 
     } catch (Exception e) {
@@ -118,6 +125,9 @@ public class CartSVCImpl implements CartSVC {
     }
   }
 
+  /**
+   * 수량 변경
+   */
   @Override
   public ApiResponse<Void> updateQuantity(Long buyerId, Long productId, String optionType, Long quantity) {
     try {
@@ -147,6 +157,9 @@ public class CartSVCImpl implements CartSVC {
     }
   }
 
+  /**
+   * 상품 삭제
+   */
   @Override
   public ApiResponse<Void> removeFromCart(Long buyerId, Long productId, String optionType) {
     try {
@@ -160,6 +173,9 @@ public class CartSVCImpl implements CartSVC {
     }
   }
 
+  /**
+   * 장바구니 비우기
+   */
   @Override
   public void clearCart(Long buyerId) {
     try {
@@ -171,6 +187,9 @@ public class CartSVCImpl implements CartSVC {
     }
   }
 
+  /**
+   * 상품 개수 조회
+   */
   @Override
   @Transactional(readOnly = true)
   public int getCartItemCount(Long buyerId) {
@@ -183,7 +202,7 @@ public class CartSVCImpl implements CartSVC {
   }
 
   /**
-   * 장바구니 아이템 DTO 변환
+   * CartItem → CartItemResponse 변환
    */
   private List<CartItemResponse> convertToCartItemResponses(List<CartItem> items) {
     List<CartItemResponse> result = new ArrayList<>();
@@ -196,15 +215,18 @@ public class CartSVCImpl implements CartSVC {
         String sellerNickname = getSellerNickname(item.getSellerId());
         boolean isAvailable = "판매중".equals(product.getStatus());
 
-        // 상품 이미지 조회
+        // 첫 번째 상품 이미지 (ProductImageSVC 사용)
         String imageData = null;
-        if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
-          imageData = product.getProductImages().get(0).getEncodedImageData();
+        List<ProductImage> images = productImageSVC.findByProductId(product.getProductId());
+        log.info("🖼상품 이미지 조회: productId={}, 이미지 개수={}", product.getProductId(), images != null ? images.size() : 0);
+        if (images != null && !images.isEmpty()) {
+          imageData = images.get(0).getBase64ImageData();
+          log.info("이미지 데이터 설정 완료: {}", imageData != null ? "성공" : "실패");
         }
 
-        // DTO 매핑
         CartItemResponse dto = isAvailable ?
             CartItemResponse.createAvailable(
+                item.getCartItemId(), // cartItemId 추가
                 item.getProductId(),
                 product.getTitle(),
                 product.getDescription(),
@@ -216,6 +238,7 @@ public class CartSVCImpl implements CartSVC {
                 sellerNickname
             ) :
             CartItemResponse.createUnavailable(
+                item.getCartItemId(), // cartItemId 추가
                 item.getProductId(),
                 product.getTitle(),
                 product.getDescription(),
@@ -244,7 +267,7 @@ public class CartSVCImpl implements CartSVC {
   }
 
   /**
-   * 장바구니 가져오기 또는 생성
+   * 장바구니 가져오기
    */
   private Cart getOrCreateCart(Long buyerId) {
     return cartRepository.findByBuyerId(buyerId)

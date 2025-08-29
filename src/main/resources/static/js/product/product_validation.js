@@ -1,15 +1,29 @@
-// product_validation.js
+// product_validation.js (최종 수정된 전체 코드)
 
 document.addEventListener('DOMContentLoaded', function () {
     const productForm = document.getElementById('productForm');
     const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
 
-    // 필수 입력 필드들
+    function showValidationMessage(element, message) {
+        const validationMessageEl = element.closest('.input-container, .form-group').querySelector('.validation-message');
+        if (validationMessageEl) {
+            validationMessageEl.textContent = message;
+        }
+    }
+
+    function hideValidationMessage(element) {
+        const validationMessageEl = element.closest('.input-container, .form-group').querySelector('.validation-message');
+        if (validationMessageEl) {
+            validationMessageEl.textContent = '';
+        }
+    }
+
+    // ⭐ 기존의 모든 유효성 검사 필드 정의
     const titleInput = document.querySelector('input[name="title"]');
     const categorySelect = document.querySelector('select[name="category"]');
-    const guideYnRadios = document.querySelectorAll('input[name="guideYn"]');
     const normalPriceInput = document.querySelector('input[name="normalPrice"]');
     const salesPriceInput = document.querySelector('input[name="salesPrice"]');
+    const guideYnRadios = document.querySelectorAll('input[name="guideYn"]');
     const guidePriceInput = document.querySelector('input[name="guidePrice"]');
     const totalDayInput = document.querySelector('input[name="totalDay"]');
     const totalTimeInput = document.querySelector('input[name="totalTime"]');
@@ -18,282 +32,158 @@ document.addEventListener('DOMContentLoaded', function () {
     const detailTextarea = document.querySelector('textarea[name="detail"]');
     const priceDetailTextarea = document.querySelector('textarea[name="priceDetail"]');
     const gpriceDetailTextarea = document.querySelector('textarea[name="gpriceDetail"]');
-    const productImageInput = document.querySelector('#productImage');
-    const documentFileInput = document.querySelector('input[name="documentFile"]');
     const reqPeopleInput = document.querySelector('input[name="reqPeople"]');
-    const targetInput = document.querySelector('input[name="target"]');
-    const transportInfoInput = document.querySelector('input[name="transportInfo"]');
-    const stucksInput = document.querySelector('input[name="stucks"]');
-    const salesGuidePriceInput = document.querySelector('input[name="salesGuidePrice"]');
+    const guidePriceBox = document.querySelector('.price-info-guided');
 
-    // 검사 대상 필드 목록 (HTML 요소)
-    const fieldsToValidate = [
-        titleInput, categorySelect, normalPriceInput, salesPriceInput,
-        guidePriceInput, totalDayInput, totalTimeInput, salesGuidePriceInput,
-        reqMoneyInput, descriptionTextarea, detailTextarea, priceDetailTextarea,
-        gpriceDetailTextarea, reqPeopleInput, targetInput, transportInfoInput, stucksInput
-    ];
+    // 개별 필드 유효성 검사 함수
+    function validateField(field) {
+        const value = field.value.trim();
+        const fieldName = field.name;
 
-    const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024; // 20MB
-    const allowedDocumentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt', 'rtf', 'html'];
-
-    // 유효성 검사 메시지 표시/숨김 함수
-    function showValidationMessage(element, message) {
-        if (!element) return;
-        const parent = element.closest('.input-container, .image-upload-container, .input-with-tag, .guide-yn-radios');
-        if (!parent) return;
-
-        let messageElement = parent.querySelector('.validation-message');
-        if (!messageElement) {
-            messageElement = document.createElement('div');
-            messageElement.className = 'validation-message';
-            parent.appendChild(messageElement);
-        }
-        messageElement.textContent = message;
-        messageElement.style.display = 'block';
-    }
-
-    function hideValidationMessage(element) {
-        if (!element) return;
-        const parent = element.closest('.input-container, .image-upload-container, .input-with-tag, .guide-yn-radios');
-        if (!parent) return;
-
-        const messageElement = parent.querySelector('.validation-message');
-        if (messageElement) {
-            messageElement.style.display = 'none';
-        }
-    }
-
-    // 다른 스크립트에서 접근할 수 있도록 함수를 전역 객체에 노출
-    window.showValidationMessage = showValidationMessage;
-    window.hideValidationMessage = hideValidationMessage;
-
-    // 글자수 카운트 업데이트 함수
-    function updateLengthMessage(inputElement, maxLength) {
-        const messageElement = inputElement.closest('.input-container').querySelector('.word-count-message');
-        if (!inputElement || !messageElement) return;
-
-        const currentLength = inputElement.value.length;
-        messageElement.textContent = `${currentLength}/${maxLength}자`;
-        messageElement.style.color = currentLength > maxLength ? 'red' : '#777';
-    }
-
-    // 파일 확장자 검사 함수
-    function validateFileExtension(file, allowedExtensions) {
-        const fileExtension = file.name.split('.').pop().toLowerCase();
-        return allowedExtensions.includes(fileExtension);
-    }
-
-    // 서버에 유효성 검사 요청을 보내는 범용 함수
-    async function sendAjaxValidation(data) {
-        const response = await fetch('/api/product/validate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify(data)
-        });
-        return response;
-    }
-
-    // 단일 필드에 대한 Ajax 검사 로직 (실시간 검사 목적)
-    async function validateField(element) {
-        if (!element || element.type === 'file' || element.name === 'category') return true;
-
-        const fieldName = element.name;
-        const value = element.value.trim(); // 공백 제거
-
-        const data = { [fieldName]: value };
-
-        // ⭐⭐⭐ 수정된 부분: 클라이언트 측에서 미리 글자수와 공백 검사를 수행합니다. ⭐⭐⭐
-        const maxLength = {
-            title: 60, transportInfo: 15, stucks: 30, reqPeople: 15, target: 15,
-            description: 500, detail: 1000, priceDetail: 150, gpriceDetail: 150
-        }[fieldName];
-
-        // 입력 필드가 비어있을 때 에러 메시지를 표시
-        if (value.length === 0) {
-            showValidationMessage(element, `${element.placeholder}을(를) 입력하세요.`);
+        // 필수 필드 검사
+        if (field.required && !value) {
+            showValidationMessage(field, '필수 입력 항목입니다.');
             return false;
         }
 
-        // 글자수 초과 에러 메시지를 표시
-        if (maxLength && value.length > maxLength) {
-            showValidationMessage(element, `글자수를 ${maxLength}자 이하로 줄여주세요.`);
+        // 특정 필드에 대한 추가 유효성 검사
+        if (fieldName === 'title' && value.length > 50) {
+            showValidationMessage(field, '상품명은 50자 이내로 입력해주세요.');
             return false;
         }
 
-        // 클라이언트 측 검사를 통과하면 메시지 숨김
-        hideValidationMessage(element);
-
-        // 연관 필드가 있는 경우, 함께 전송
-        if (fieldName === 'salesPrice') {
-            data.normalPrice = normalPriceInput.value;
-        } else if (fieldName === 'salesGuidePrice') {
-            data.guidePrice = guidePriceInput.value;
-        } else if (fieldName === 'totalDay') {
-            data.totalTime = totalTimeInput.value;
-        } else if (fieldName === 'totalTime') {
-            data.totalDay = totalDayInput.value;
-        }
-
-        try {
-            const response = await sendAjaxValidation(data);
-            const errorData = await response.json();
-
-            if (response.status === 400 && errorData[fieldName]) {
-                showValidationMessage(element, errorData[fieldName]);
+        // 가격 검증
+        if ((fieldName === 'normalPrice' || fieldName === 'salesPrice' || fieldName === 'guidePrice') && value) {
+            if (isNaN(value) || parseInt(value, 10) <= 0) {
+                showValidationMessage(field, '유효한 가격을 입력해주세요.');
                 return false;
-            } else {
-                hideValidationMessage(element);
-                return true;
             }
-        } catch (error) {
-            console.error('Ajax 유효성 검사 실패:', error);
-            return false;
         }
+
+        // 가이드 여부 라디오 버튼 검사
+        if (fieldName === 'guideYn') {
+          const isGuideSelected = Array.from(guideYnRadios).some(radio => radio.checked);
+          if (!isGuideSelected) {
+              // 라디오 버튼 그룹 전체에 대한 메시지 표시
+              showValidationMessage(guideYnRadios[0], '필수 선택 항목입니다.');
+              return false;
+          }
+        }
+
+        // 모든 검사 통과 시 메시지 숨기기
+        hideValidationMessage(field);
+        return true;
     }
 
-    // 입력 필드에 blur 이벤트 리스너 추가 (실시간 검사)
-    fieldsToValidate.forEach(field => {
-        if (field && field.type !== 'file' && field.name !== 'category') {
-            field.addEventListener('blur', function() {
-                validateField(this);
+    // 각 필드에 focusout 이벤트 리스너 추가 (실시간 유효성 검사)
+    const fields = [
+        titleInput, categorySelect, normalPriceInput, salesPriceInput, totalDayInput, totalTimeInput,
+        reqMoneyInput, descriptionTextarea, detailTextarea, priceDetailTextarea, gpriceDetailTextarea,
+        reqPeopleInput, guidePriceInput
+    ].filter(el => el); // null인 요소 제거
+
+    fields.forEach(field => {
+        field.addEventListener('focusout', () => {
+            validateField(field);
+        });
+    });
+
+    // 라디오 버튼에도 이벤트 리스너 추가
+    if (guideYnRadios.length > 0) {
+        guideYnRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                validateField(radio);
+                // 가이드 동반에 따른 가격 입력 필드 가시성 제어
+                const guideYesRadio = document.querySelector('input[name="guideYn"][value="yes"]');
+                if (guideYesRadio.checked) {
+                    guidePriceBox.classList.remove('hidden');
+                } else {
+                    guidePriceBox.classList.add('hidden');
+                }
             });
-        }
-    });
+        });
+    }
 
-    // 글자수 카운트 이벤트 리스너
-    const wordCountFields = [
-        { el: titleInput, max: 60 },
-        { el: transportInfoInput, max: 15 },
-        { el: stucksInput, max: 30 },
-        { el: reqPeopleInput, max: 15 },
-        { el: targetInput, max: 15 },
-        { el: descriptionTextarea, max: 500 },
-        { el: detailTextarea, max: 1000 },
-        { el: priceDetailTextarea, max: 150 },
-        { el: gpriceDetailTextarea, max: 150 }
-    ];
-    wordCountFields.forEach(item => {
-        if (item.el) {
-            item.el.addEventListener('input', () => updateLengthMessage(item.el, item.max));
-        }
-    });
+    // ⭐ 최종 등록/수정 버튼 클릭 시 모든 유효성 검사 수행
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+        registerBtn.addEventListener('click', async function(event) {
+            event.preventDefault(); // 기본 폼 제출 동작 방지
 
-    // select, radio, file 등 change 이벤트 리스너
-    categorySelect.addEventListener('change', () => validateField(categorySelect));
-    guideYnRadios.forEach(radio => radio.addEventListener('change', () => {
-        const selectedRadio = document.querySelector('input[name="guideYn"]:checked');
-        if (selectedRadio) {
-            hideValidationMessage(guideYnRadios[0]);
-        }
-        // 라디오 버튼 선택 시 가이드 가격 필드 활성화/비활성화
-        toggleGuidePriceFields();
-    }));
+            let isFormValid = true;
 
-    // 문서 파일 첨부 유효성 검사 (클라이언트 측 검사)
-    documentFileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            if (!validateFileExtension(file, allowedDocumentExtensions)) {
-                showValidationMessage(this, `허용되지 않는 문서 파일 형식입니다.`);
-                this.value = '';
-            } else if (file.size > MAX_DOCUMENT_SIZE) {
-                showValidationMessage(this, `문서 파일은 ${MAX_DOCUMENT_SIZE / (1024 * 1024)}MB를 초과할 수 없습니다.`);
-                this.value = '';
+            // 1. 클라이언트 측 개별 필드 유효성 검사
+            fields.forEach(field => {
+                if (!validateField(field)) {
+                    isFormValid = false;
+                }
+            });
+
+            // 2. 파일 필드 유효성 검사 (상품 등록/수정 페이지에 따라 달라짐)
+            const productImageInput = document.querySelector('#productImage');
+            const hasExistingImages = document.querySelectorAll('.existing-image').length > 0;
+            const isUpdatePage = document.querySelector('.product-registration h2')?.textContent.trim() === '상품 수정';
+
+            if (!isUpdatePage && productImageInput.files.length === 0) {
+                // 등록 페이지이고 이미지가 없을 경우
+                showValidationMessage(productImageInput, '이미지는 최소 1개 이상 업로드해야 합니다.');
+                isFormValid = false;
+            } else if (isUpdatePage && productImageInput.files.length === 0 && !hasExistingImages) {
+                // 수정 페이지이고 기존 이미지도 없고 새 이미지도 없을 경우
+                showValidationMessage(productImageInput, '이미지는 최소 1개 이상 존재해야 합니다.');
+                isFormValid = false;
             } else {
-                hideValidationMessage(this);
+                hideValidationMessage(productImageInput);
             }
-        } else {
-            hideValidationMessage(this); // 파일 선택 안 했을 경우 메시지 숨김
-        }
-    });
 
-    // ⭐⭐⭐ 수정된 부분: 모든 관련 필드를 함수 내에서 재선언합니다. ⭐⭐⭐
-    function toggleGuidePriceFields() {
-        const isGuideIncluded = document.querySelector('input[name="guideYn"][value="Y"]').checked;
+            if (!isFormValid) {
+                alert('입력된 항목을 다시 확인해주세요. 화면에 표시된 오류 메시지를 수정해야 합니다.');
+                return;
+            }
 
-        const salesGuidePriceInput = document.querySelector('input[name="salesGuidePrice"]');
-        const guidePriceInput = document.querySelector('input[name="guidePrice"]');
-        const gpriceDetailTextarea = document.querySelector('textarea[name="gpriceDetail"]');
+            // 3. 서버 측 유효성 검사 (API 호출)
+            const validationFormData = new FormData(productForm);
 
-        const fields = [guidePriceInput, salesGuidePriceInput, gpriceDetailTextarea];
+            try {
+                const response = await fetch('/api/product/validate', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: validationFormData
+                });
 
-        fields.forEach(field => {
-            if (!field) return;
+                const result = await response.json();
 
-            field.disabled = !isGuideIncluded;
-            if (!isGuideIncluded) {
-                field.value = '';
-                hideValidationMessage(field);
-                const messageElement = field.closest('.input-container').querySelector('.word-count-message');
-                if(messageElement) messageElement.textContent = `0/${field.maxLength || 150}자`;
+                if (result.errors && Object.keys(result.errors).length > 0) {
+                    document.querySelectorAll('.validation-message').forEach(el => el.textContent = '');
+
+                    let errorMessage = "필수 입력 항목을 확인해주세요.\n\n";
+                    const errorMessages = [];
+
+                    for (const fieldName in result.errors) {
+                        const message = result.errors[fieldName];
+                        errorMessages.push(`- ${message}`);
+
+                        const fieldElement = document.querySelector(`[name="${fieldName}"]`);
+                        if (fieldElement) {
+                            showValidationMessage(fieldElement, message);
+                        }
+                    }
+                    alert(errorMessage + errorMessages.join('\n'));
+                } else {
+                    // 유효성 검사 통과 시 폼 제출
+                    productForm.submit();
+                }
+
+            } catch (error) {
+                console.error('유효성 검사 오류:', error);
+                alert('유효성 검사 중 오류가 발생했습니다. 다시 시도해주세요.');
             }
         });
     }
-    toggleGuidePriceFields();
 
-    // 폼 제출 시 모든 필드에 대한 최종 유효성 검사
-    productForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        // 1. 모든 클라이언트 측 유효성 검사를 비동기로 동시에 실행합니다.
-        const validationPromises = fieldsToValidate.map(field => {
-            if (field) {
-                return validateField(field);
-            }
-            return Promise.resolve(true); // 필드가 없는 경우 true 반환
-        });
-
-        // 이미지 파일 및 문서 파일 클라이언트 측 검사 추가
-        validationPromises.push(new Promise(resolve => {
-            const isValid = productImageInput.files.length > 0;
-            if (!isValid) {
-                showValidationMessage(productImageInput.closest('.image-upload-container'), '상품 이미지를 1장 이상 등록해주세요.');
-            } else {
-                hideValidationMessage(productImageInput.closest('.image-upload-container'));
-            }
-            resolve(isValid);
-        }));
-
-        validationPromises.push(new Promise(resolve => {
-            const isValid = documentFileInput.files.length > 0;
-            if (!isValid) {
-                showValidationMessage(documentFileInput, '판매 파일을 첨부해주세요.');
-            } else {
-                hideValidationMessage(documentFileInput);
-            }
-            resolve(isValid);
-        }));
-
-        // 라디오 버튼 검사 추가
-        validationPromises.push(new Promise(resolve => {
-            const isGuideYnSelected = document.querySelector('input[name="guideYn"]:checked');
-            const isValid = !!isGuideYnSelected;
-            if (!isValid) {
-                showValidationMessage(guideYnRadios[0], '가이드 동반 여부를 선택해주세요.');
-            } else {
-                hideValidationMessage(guideYnRadios[0]);
-            }
-            resolve(isValid);
-        }));
-
-        // 2. 모든 비동기 검사 결과를 기다림
-        const results = await Promise.all(validationPromises);
-        const allValid = results.every(result => result === true);
-
-        if (allValid) {
-            // 3. 모든 클라이언트 측 검사를 통과하면 폼을 서버로 제출합니다.
-            this.submit();
-        } else {
-            // 4. 클라이언트 측 검사 실패 시 알림창을 띄웁니다.
-            alert('필수 입력 항목을 확인해주세요.');
-        }
-    });
-
-    // 페이지 로드 시 서버에서 받은 에러 메시지를 alert으로 표시
+    // 페이지 로드 시 서버에서 받은 에러 메시지를 alert으로 표시 (Thymeleaf 연동)
     (function () {
         const serverErrorsDiv = document.getElementById('server-validation-errors');
         if (serverErrorsDiv) {
@@ -302,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 errorText = errorText.substring(1, errorText.length - 1);
                 const errors = errorText.split(',').map(err => err.trim());
                 let errorMessage = "필수 입력 항목을 확인해주세요.\n\n";
-
                 errors.forEach(error => {
                     errorMessage += `- ${error}\n`;
                 });

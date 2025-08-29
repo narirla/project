@@ -20,14 +20,33 @@ public class ChatMessageDao {
 
   /** 테이블 그대로 → ChatMessageDto 매핑 */
   private static final RowMapper<ChatMessageDto> ROW_MAPPER = (rs, rowNum) ->
-      new ChatMessageDto(
-          rs.getLong("MSG_ID"),
-          rs.getLong("ROOM_ID"),
-          rs.getLong("SENDER_ID"),
-          rs.getString("CONTENT"),
-          rs.getTimestamp("CREATED_AT").toLocalDateTime(),
-          "Y".equals(rs.getString("READ_YN"))
-      );
+      ChatMessageDto.builder()
+          .msgId(rs.getLong("msg_id"))
+          .roomId(rs.getLong("room_id"))
+          .senderId(rs.getLong("sender_id"))
+          .content(rs.getString("content"))
+          .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+          .read(rs.getBoolean("read"))
+          // DB에 type 컬럼이 없으면 null 들어가도 OK
+          .type(rs.getString("type"))
+          .build();
+
+
+
+
+
+  /**
+   private static final RowMapper<ChatMessageDto> ROW_MAPPER = (rs, rowNum) -> ChatMessageDto.builder()
+   .msgId(rs.getLong("msg_id"))
+   .roomId(rs.getLong("room_id"))
+   .senderId(rs.getLong("sender_id"))
+   .content(rs.getString("content"))
+   .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+   .read(rs.getBoolean("read"))
+   .type(rs.getString("type")) // DB에 type 컬럼 없으면 null
+   .build();
+   */
+
 
   /** member JOIN 결과 → ChatMessageResponse 매핑 */
   private static final RowMapper<ChatMessageResponse> RESPONSE_MAPPER = (rs, rowNum) ->
@@ -69,21 +88,22 @@ public class ChatMessageDao {
   /** 특정 방 전체 메시지 (닉네임+프로필 포함) */
   public List<ChatMessageResponse> findAllByRoomWithMember(Long roomId) {
     String sql = """
-                  SELECT m.MSG_ID,
-                 m.ROOM_ID,
-                 m.SENDER_ID,
-                 m.CONTENT,
-                 m.CREATED_AT,
-                 m.READ_YN,
-                 sp.NICKNAME AS SELLER_NICKNAME,
-                 bp.nickname AS BUYER_NICKNAME,
-                 sp.image AS SELLER_IMAGE,
-                 bp.IMAGE AS BUYER_IMAGE
-          FROM CHAT_MESSAGE m
-          JOIN SELLER_PAGE sp  ON m.SENDER_ID = sp.MEMBER_ID
-          JOIN BUYER_PAGE bp ON m.SENDER_ID = bp.MEMBER_ID
-          WHERE m.ROOM_ID = :roomId
-          ORDER BY m.CREATED_AT ASC
+            SELECT m.MSG_ID,
+                   m.ROOM_ID,
+                   m.SENDER_ID,
+                   m.CONTENT,
+                   m.CREATED_AT,
+                   m.READ_YN,
+                   sp.NICKNAME AS seller_nickname,
+                   sp.IMAGE    AS seller_image,
+                   bp.NICKNAME AS buyer_nickname,
+                   bp.image    AS buyer_image
+            FROM CHAT_MESSAGE m
+            JOIN CHAT_ROOM r   ON m.ROOM_ID = r.ROOM_ID
+            JOIN SELLER_PAGE sp ON r.SELLER_ID = sp.MEMBER_ID
+            JOIN BUYER_PAGE bp      ON r.BUYER_ID = bp.MEMBER_ID   -- BUYER_PAGE가 따로 없다면 MEMBER 사용
+            WHERE m.ROOM_ID = :roomId
+            ORDER BY m.CREATED_AT ASC
         """;
 
     var p = new MapSqlParameterSource()
@@ -95,21 +115,21 @@ public class ChatMessageDao {
   /** 메시지 들고오기 */
   public ChatMessageResponse findByIdWithMember(Long msgId) {
     String sql = """
-        SELECT m.MSG_ID,
-               m.ROOM_ID,
-               m.SENDER_ID,
-               m.CONTENT,
-               m.CREATED_AT,
-               m.READ_YN,
-               sp.NICKNAME AS seller_nickname,
-               bp.NICKNAME AS buyer_nickname,
-               sp.IMAGE AS SELLER_IMAGE,
-               bp.IMAGE AS BUYER_IMAGE
-        FROM CHAT_MESSAGE m
-        JOIN MEMBER mem ON m.SENDER_ID = mem.MEMBER_ID
-        JOIN SELLER_PAGE sp ON sp.MEMBER_ID = mem.MEMBER_ID
-        JOIN BUYER_PAGE bp ON bp.MEMBER_ID = mem.MEMBER_ID
-        WHERE m.MSG_ID = :msgId
+          SELECT m.MSG_ID,
+                 m.ROOM_ID,
+                 m.SENDER_ID,
+                 m.CONTENT,
+                 m.CREATED_AT,
+                 m.READ_YN,
+                 mem.NICKNAME  AS buyer_nickname,
+                 mem.pic       AS buyer_image,
+                 sp.NICKNAME   AS seller_nickname,
+                 sp.IMAGE      AS seller_image
+          FROM CHAT_MESSAGE m
+          JOIN MEMBER mem       ON m.SENDER_ID = mem.MEMBER_ID
+          JOIN CHAT_ROOM r      ON m.ROOM_ID = r.ROOM_ID
+          JOIN SELLER_PAGE sp   ON r.SELLER_ID = sp.MEMBER_ID
+          WHERE m.MSG_ID = :msgId
     """;
 
 
@@ -177,6 +197,8 @@ public class ChatMessageDao {
 
 
 }
+
+//
 
 
 

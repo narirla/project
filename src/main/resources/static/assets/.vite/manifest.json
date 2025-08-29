@@ -1,0 +1,39 @@
+{
+  "_client-D_PkVYew.js": {
+    "file": "client-D_PkVYew.js",
+    "name": "client"
+  },
+  "_modulepreload-polyfill-B5Qt9EMX.js": {
+    "file": "modulepreload-polyfill-B5Qt9EMX.js",
+    "name": "modulepreload-polyfill"
+  },
+  "src/main.jsx": {
+    "file": "main-BwBf_jCb.js",
+    "name": "main",
+    "src": "src/main.jsx",
+    "isEntry": true,
+    "imports": [
+      "_client-D_PkVYew.js",
+      "_modulepreload-polyfill-B5Qt9EMX.js"
+    ]
+  },
+  "src/order-complete-main.jsx": {
+    "file": "order-complete-main-BRbD99ma.js",
+    "name": "order-complete-main",
+    "src": "src/order-complete-main.jsx",
+    "isEntry": true,
+    "imports": [
+      "_client-D_PkVYew.js"
+    ]
+  },
+  "src/order-main.jsx": {
+    "file": "order-main-C6hdHbYA.js",
+    "name": "order-main",
+    "src": "src/order-main.jsx",
+    "isEntry": true,
+    "imports": [
+      "_client-D_PkVYew.js",
+      "_modulepreload-polyfill-B5Qt9EMX.js"
+    ]
+  }
+}
