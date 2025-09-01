@@ -2,6 +2,12 @@ package com.KDT.mosi.web.controller.chat;
 
 import com.KDT.mosi.domain.chat.svc.ChatRoomService;
 import com.KDT.mosi.domain.dto.chat.ChatRoomListDto;
+import com.KDT.mosi.domain.entity.BuyerPage;
+import com.KDT.mosi.domain.entity.Member;
+import com.KDT.mosi.domain.entity.SellerPage;
+import com.KDT.mosi.domain.member.dao.MemberDAO;
+import com.KDT.mosi.domain.mypage.buyer.dao.BuyerPageDAO;
+import com.KDT.mosi.domain.mypage.seller.dao.SellerPageDAO;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +26,9 @@ import java.util.List;
 public class ChatRoomListController {
 
   private final ChatRoomService chatRoomService;
+  private final MemberDAO memberDAO;
+  private final SellerPageDAO sellerPageDAO;
+  private final BuyerPageDAO buyerPageDAO;
 
 
   //=============================== 판매자 ===============================
@@ -45,6 +54,9 @@ public class ChatRoomListController {
     // 뷰로 전달할 데이터
     model.addAttribute("rooms", rooms);
     model.addAttribute("memberId", memberId); // → HTML에서 data-member-id 로 내려줌
+
+    SellerPage sp = sellerPageDAO.findByMemberId(memberId).orElse(null);
+    model.addAttribute("sellerPage", sp);
 
     return "chat/chatList_seller"; // 📄 templates/chat/chatList_seller.html
   }
@@ -126,6 +138,13 @@ public class ChatRoomListController {
     // 뷰로 전달할 데이터
     model.addAttribute("rooms", rooms);
     model.addAttribute("memberId", memberId);
+
+    // 👇 추가: 사이드바용 buyerPage
+    BuyerPage bp = buyerPageDAO.findByMemberId(memberId).orElse(null);
+    model.addAttribute("buyerPage", bp);
+
+    Member loginMember = memberDAO.findById(memberId).orElse(null);
+    model.addAttribute("member", loginMember);
 
     return "chat/chatList_buyer"; // 📄 templates/chat/chatList_buyer.html
   }
