@@ -69,24 +69,17 @@
 
 ## 📊 Tech Stack
 
-### 🖥 Backend
+### 🧩 Project Stack
+
 ![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot)
 ![Spring Security](https://img.shields.io/badge/SpringSecurity-6DB33F?style=for-the-badge&logo=springsecurity)
 ![WebSocket](https://img.shields.io/badge/WebSocket-000000?style=for-the-badge)
-
----
-
-### 🎨 Frontend
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript)
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge&logo=thymeleaf)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react)
-
----
-
-### 🗄 Database
 ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle)
 ![JPA](https://img.shields.io/badge/JPA-59666C?style=for-the-badge)
 ![JDBC](https://img.shields.io/badge/JDBC-007396?style=for-the-badge)
@@ -94,12 +87,16 @@
 
 ---
 
-### ⚙️ DevOps & Tool
-![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git)
-![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github)
-![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle)
-![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker)
+### 🙋‍♀️ My Contribution
+
+![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot)
+![Thymeleaf](https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge&logo=thymeleaf)
+![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle)
+![JDBC](https://img.shields.io/badge/JDBC-007396?style=for-the-badge)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript)
 
 ## 5. 시스템 아키텍처
 
